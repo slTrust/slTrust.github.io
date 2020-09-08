@@ -1,0 +1,600 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>DOM事件 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="事件模型应用 点击显示浮层 点击其它地方关闭浮层 问题1 点击按钮浮层不出现12345678910111213141516&amp;lt;div id=&amp;quot;wrapper&amp;quot; class=&amp;quot;wrapper&amp;quot;&amp;gt;    &amp;lt;button id=&amp;quot;clickMe&amp;quot;&amp;gt;点我&amp;lt;/button&amp;gt;    &amp;lt;div id=&amp;quot;">
+<meta name="keywords" content="前端知识点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DOM事件">
+<meta property="og:url" content="http://yoursite.com/2017/12/01/N032_DOM事件/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="事件模型应用 点击显示浮层 点击其它地方关闭浮层 问题1 点击按钮浮层不出现12345678910111213141516&amp;lt;div id=&amp;quot;wrapper&amp;quot; class=&amp;quot;wrapper&amp;quot;&amp;gt;    &amp;lt;button id=&amp;quot;clickMe&amp;quot;&amp;gt;点我&amp;lt;/button&amp;gt;    &amp;lt;div id=&amp;quot;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.261Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DOM事件">
+<meta name="twitter:description" content="事件模型应用 点击显示浮层 点击其它地方关闭浮层 问题1 点击按钮浮层不出现12345678910111213141516&amp;lt;div id=&amp;quot;wrapper&amp;quot; class=&amp;quot;wrapper&amp;quot;&amp;gt;    &amp;lt;button id=&amp;quot;clickMe&amp;quot;&amp;gt;点我&amp;lt;/button&amp;gt;    &amp;lt;div id=&amp;quot;">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/12/01/N032_DOM事件/" title="DOM事件" itemprop="url">DOM事件</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-12-01T07:39:47.000Z" itemprop="datePublished"> Published 2017-12-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#事件模型应用-点击显示浮层-点击其它地方关闭浮层"><span class="toc-number">1.</span> <span class="toc-text">事件模型应用 点击显示浮层 点击其它地方关闭浮层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何解决-gt-event-stopPropagation"><span class="toc-number">2.</span> <span class="toc-text">如何解决 ==&gt; event.stopPropagation();</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃"><span class="toc-number">2.0.1.</span> <span class="toc-text">早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失"><span class="toc-number">3.</span> <span class="toc-text">问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题"><span class="toc-number">4.</span> <span class="toc-text">问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播"><span class="toc-number">5.</span> <span class="toc-text">jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中"><span class="toc-number">6.</span> <span class="toc-text">又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决问题3-性能问题"><span class="toc-number">7.</span> <span class="toc-text">解决问题3 性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示"><span class="toc-number">8.</span> <span class="toc-text">问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="事件模型应用-点击显示浮层-点击其它地方关闭浮层"><a href="#事件模型应用-点击显示浮层-点击其它地方关闭浮层" class="headerlink" title="事件模型应用 点击显示浮层 点击其它地方关闭浮层"></a>事件模型应用 点击显示浮层 点击其它地方关闭浮层</h3><blockquote>
+<p>问题1 点击按钮浮层不出现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">      浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    //点击显示浮层 </span><br><span class="line">    clickMe.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">        popover.style.display = &apos;block&apos;;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">        popover.style.display = &apos;none&apos;</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>点击按钮的时候浮层确实出现了 </p>
+</blockquote>
+<blockquote>
+<p>但是addEventListener(‘事件’,fn,布尔值) 第三个参数不传代表false 代表冒泡</p>
+</blockquote>
+<blockquote>
+<p>冒泡到document  </p>
+</blockquote>
+<blockquote>
+<p>document 发现事件队列里有 fn于是执行   popover.style.display = ‘none’</p>
+</blockquote>
+<h3 id="如何解决-gt-event-stopPropagation"><a href="#如何解决-gt-event-stopPropagation" class="headerlink" title="如何解决 ==&gt; event.stopPropagation();"></a>如何解决 ==&gt; event.stopPropagation();</h3><blockquote>
+<p>Prevents further propagation of the current event in the capturing and bubbling phases.</p>
+</blockquote>
+<blockquote>
+<p>防止当前事件在捕获和冒泡阶段的进一步传播。</p>
+</blockquote>
+<blockquote>
+<h5 id="早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃"><a href="#早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃" class="headerlink" title="早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃"></a>早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃</h5></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//点击显示浮层 </span><br><span class="line">clickMe.addEventListener(&apos;click&apos;, function(event)&#123;</span><br><span class="line">    popover.style.display = &apos;block&apos;;</span><br><span class="line">    event.stopPropagation(); //这样冒泡阶段就被禁止了 </span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">    popover.style.display = &apos;none&apos;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失"><a href="#问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失" class="headerlink" title="问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失"></a>问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失</h3><blockquote>
+<p>这样就不能在按钮上阻止冒泡 因为点击浮层也会冒泡到wrapper</p>
+<ul>
+<li>因为btn会冒泡到 wrapper </li>
+<li>popover会冒泡到 wrapper</li>
+<li>所以在它们的父节点做阻止冒泡</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">        浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">clickMe.addEventListener(&apos;click&apos;, function(e)&#123;</span><br><span class="line">    popover.style.display = &apos;block&apos;;</span><br><span class="line">&#125;)</span><br><span class="line">wrapper.addEventListener(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    //解决点击浮层触发的冒泡</span><br><span class="line">    e.stopPropagation()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">    popover.style.display = &apos;none&apos;</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题"><a href="#问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题" class="headerlink" title="问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题"></a>问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题</h3><ul>
+<li>100个浮层就是100个事件队列  10000个呢？</li>
+</ul>
+<blockquote>
+<p>现在我们先换jq来实现刚刚的效果</p>
+</blockquote>
+<blockquote>
+<h3 id="jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播"><a href="#jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播" class="headerlink" title="jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播"></a>jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播</h3></blockquote>
+<h3 id="又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中"><a href="#又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中" class="headerlink" title="又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中"></a>又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">        &lt;input type=&quot;checkbox&quot;&gt;浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">&#125;);</span><br><span class="line">// 这样会再次出bug就是  如果浮层里有checkbox就无法选中 因为阻止了默认事件 </span><br><span class="line">$(wrapper).on(&apos;click&apos;,false)  </span><br><span class="line"></span><br><span class="line">$(document).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).hide();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所以我们还是单独阻止传播 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">$(wrapper).on(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    e.stopPropagation(); //阻止冒泡</span><br><span class="line">&#125;);  </span><br><span class="line"></span><br><span class="line">$(document).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).hide();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="解决问题3-性能问题"><a href="#解决问题3-性能问题" class="headerlink" title="解决问题3 性能问题"></a>解决问题3 性能问题</h3><ul>
+<li>点击按钮的时候显示浮层 同时添加一个document监听</li>
+<li>为什么监听不会触发 因为 wrapper哪里阻止了 冒泡<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">    //只有显示的时候监听一次 但是不会触发  因为 wrapper上阻止了冒泡</span><br><span class="line">    //这样我只监听一次 click 同时马上干掉这个监听事件   </span><br><span class="line">    $(document).one(&apos;click&apos;,function()&#123;</span><br><span class="line">      console.log(&apos;doc&apos;)</span><br><span class="line">      $(popover).hide();</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//所以只能这样写  单独阻止它的冒泡 不阻止默认事件</span><br><span class="line">$(wrapper).on(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    e.stopPropagation(); //阻止冒泡</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示"><a href="#问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示" class="headerlink" title="问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示"></a>问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">    //只有显示的时候监听一次 但是不会触发  因为 wrapper上阻止了冒泡</span><br><span class="line">    //这样我只监听一次 click 同时马上干掉这个监听事件   </span><br><span class="line">    $(document).one(&apos;click&apos;,function()&#123;</span><br><span class="line">      console.log(&apos;doc&apos;)</span><br><span class="line">      $(popover).hide();</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在你点击btn的时候它会做两件事</li>
+<li>1 浮层显示出来</li>
+<li>2 document的事件队列里 添加一个函数</li>
+<li>3 事件开始冒泡</li>
+<li>4 开始发现 document的事件队列里有一个函数</li>
+<li>5 执行 document事件队列里的函数</li>
+<li>6 浮层隐藏了</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2017/12/01/N032_DOM事件/" data-title="DOM事件 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/12/03/N033_JSONP是什么鬼/" title="JSONP是什么鬼">
+  <strong>上一篇：</strong><br/>
+  <span>
+  JSONP是什么鬼</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/12/01/N030_DOM事件初识/"  title="DOM事件初识">
+ <strong>下一篇：</strong><br/> 
+ <span>DOM事件初识
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#事件模型应用-点击显示浮层-点击其它地方关闭浮层"><span class="toc-number">1.</span> <span class="toc-text">事件模型应用 点击显示浮层 点击其它地方关闭浮层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何解决-gt-event-stopPropagation"><span class="toc-number">2.</span> <span class="toc-text">如何解决 ==&gt; event.stopPropagation();</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃"><span class="toc-number">2.0.1.</span> <span class="toc-text">早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失"><span class="toc-number">3.</span> <span class="toc-text">问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题"><span class="toc-number">4.</span> <span class="toc-text">问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播"><span class="toc-number">5.</span> <span class="toc-text">jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中"><span class="toc-number">6.</span> <span class="toc-text">又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决问题3-性能问题"><span class="toc-number">7.</span> <span class="toc-text">解决问题3 性能问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示"><span class="toc-number">8.</span> <span class="toc-text">问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

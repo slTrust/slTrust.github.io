@@ -1,0 +1,583 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py008-10-08url重写 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="url重写 rewrite模块(ngx_http_rewrite_module) Rewrite功能是Nginx服务器提供的⼀个重要功能。⼏乎是所有的web产品必备技能，⽤于实现URL重写。URL重写是⾮常有用的功能，比如它可以在 我们在改变网站结构后，不需要客户端修改原来的书签，也不需要其他⽹站修改对我们⽹站的友情链接，还可以在一定程度上提⾼网站的安全性，能够让我们的网站显得更专业。 Nginx">
+<meta name="keywords" content="M08">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py008-10-08url重写">
+<meta property="og:url" content="http://yoursite.com/2019/01/02/Py008-10-08url重写/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="url重写 rewrite模块(ngx_http_rewrite_module) Rewrite功能是Nginx服务器提供的⼀个重要功能。⼏乎是所有的web产品必备技能，⽤于实现URL重写。URL重写是⾮常有用的功能，比如它可以在 我们在改变网站结构后，不需要客户端修改原来的书签，也不需要其他⽹站修改对我们⽹站的友情链接，还可以在一定程度上提⾼网站的安全性，能够让我们的网站显得更专业。 Nginx">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.309Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py008-10-08url重写">
+<meta name="twitter:description" content="url重写 rewrite模块(ngx_http_rewrite_module) Rewrite功能是Nginx服务器提供的⼀个重要功能。⼏乎是所有的web产品必备技能，⽤于实现URL重写。URL重写是⾮常有用的功能，比如它可以在 我们在改变网站结构后，不需要客户端修改原来的书签，也不需要其他⽹站修改对我们⽹站的友情链接，还可以在一定程度上提⾼网站的安全性，能够让我们的网站显得更专业。 Nginx">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/02/Py008-10-08url重写/" title="Py008-10-08url重写" itemprop="url">Py008-10-08url重写</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-02T14:43:00.000Z" itemprop="datePublished"> Published 2019-01-02</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#url重写"><span class="toc-number">1.</span> <span class="toc-text">url重写</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#应用场景"><span class="toc-number">1.1.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重写原理"><span class="toc-number">1.2.</span> <span class="toc-text">重写原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#URL-rewrite实现"><span class="toc-number">1.3.</span> <span class="toc-text">URL rewrite实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#url模块指令"><span class="toc-number">1.4.</span> <span class="toc-text">url模块指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#set指令"><span class="toc-number">1.5.</span> <span class="toc-text">set指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#if指令"><span class="toc-number">1.6.</span> <span class="toc-text">if指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#return指令"><span class="toc-number">1.7.</span> <span class="toc-text">return指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#break指令"><span class="toc-number">1.8.</span> <span class="toc-text">break指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rewrite-语法"><span class="toc-number">1.9.</span> <span class="toc-text">rewrite 语法</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="url重写"><a href="#url重写" class="headerlink" title="url重写"></a>url重写</h3><ul>
+<li>rewrite模块(ngx_http_rewrite_module)</li>
+<li>Rewrite功能是Nginx服务器提供的⼀个重要功能。⼏乎是所有的web产品必备技能，⽤于实现URL重写。URL重写是⾮常有用的功能，比如它可以在 我们在改变网站结构后，不需要客户端修改原来的书签，也不需要其他⽹站修改对我们⽹站的友情链接，还可以在一定程度上提⾼网站的安全性，能够让我们的网站显得更专业。</li>
+<li>Nginx服务器Rewrite功能的实现是依赖于PCRE(Perl Compatible Regular Expression。Perl兼容的正则表达式)的支持，所以在编译安装Nginx之前， 需要安装PCRE库。</li>
+</ul>
+<p>如 <a href="http://www.360buy.com" target="_blank" rel="noopener">www.360buy.com</a> 就是京东的url重写</p>
+<blockquote>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4></blockquote>
+<ul>
+<li>域名变更(京东)</li>
+<li>用户跳转(从某个链接跳到另一个链接)</li>
+<li>伪静态场景(便于CDN缓存动态页面数据)</li>
+</ul>
+<h4 id="重写原理"><a href="#重写原理" class="headerlink" title="重写原理"></a>重写原理</h4><p>你找我，我不给你数据，我告诉你哪里有数据</p>
+<p>张三找李四借钱，李四说王五有钱去找王五</p>
+<h4 id="URL-rewrite实现"><a href="#URL-rewrite实现" class="headerlink" title="URL rewrite实现"></a>URL rewrite实现</h4><blockquote>
+<h4 id="url模块指令"><a href="#url模块指令" class="headerlink" title="url模块指令"></a>url模块指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1) set 设置变量</span><br><span class="line">2) if 负责判断</span><br><span class="line">3) return  返回返回值或 url</span><br><span class="line">4) break   终止后续的rewtite规则</span><br><span class="line">5) rewrite 重定向URL</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># set指令 ⾃自定义变量量 </span><br><span class="line"># Syntax:语法</span><br><span class="line">set $variable value; </span><br><span class="line">Default:</span><br><span class="line">—</span><br><span class="line"># Context:作用域 可以放在 server/location/if里</span><br><span class="line">server, location, if</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 将http://www.baidu.com 重写为 http://www.baidu.com/xxx </span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    set $name hjx;</span><br><span class="line">    rewrite ^(.*)$ http://www.baidu.com/$name; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h4></blockquote>
+<ul>
+<li>nginx有一些内置变量 自行百度</li>
+<li>匹配规则  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 模糊匹配</span><br><span class="line">～ 匹配</span><br><span class="line">!~ 不匹配</span><br><span class="line">~* 匹配而且不区分大小写</span><br><span class="line"></span><br><span class="line"># 精确匹配</span><br><span class="line">=</span><br><span class="line">!=</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">if指令 负责判断 Syntax:</span><br><span class="line">if (condition) &#123; ... &#125; Default:</span><br><span class="line"></span><br><span class="line">—</span><br><span class="line">Context: server, location</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    # 日志里 $http_user_agent是用来代表客户端访问的浏览器(它其实是nginx的内置变量)</span><br><span class="line">    # 这里针对 google访问 返回403</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        </span><br><span class="line">        return 403;</span><br><span class="line">        #return http://www.jd.com; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">return 指令 定义返回数据 Syntax: return code [text]; return code URL;</span><br><span class="line">return URL;</span><br><span class="line">Default: —</span><br><span class="line">Context: server, location, if</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------------------------- 如果chrome浏览器访问就返回 京东</span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        # return 403;</span><br><span class="line">        # return指令 既可以返回状态码 还可以返回url</span><br><span class="line">        return http://www.jd.com; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 本来是匹配chrome浏览器访问就返回 京东 但是有 break 就导致提前结束 后续的url重写就失效了</span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        break;</span><br><span class="line">        # return 403;</span><br><span class="line">        # return指令 既可以返回状态码 还可以返回url</span><br><span class="line">        return http://www.jd.com; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="rewrite-语法"><a href="#rewrite-语法" class="headerlink" title="rewrite 语法"></a>rewrite 语法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rewrite  &lt;regex&gt;  &lt;replacement&gt; [flag];</span><br><span class="line">关键字    正则          替代内容 flag标记</span><br><span class="line"></span><br><span class="line">flag:</span><br><span class="line">last  # 本条规则匹配完成后，继续向下匹配新的location URL规则</span><br><span class="line">break # 本条规则匹配完成即终止，不再匹配后面的任何规则</span><br><span class="line">redirect # 返回302临时重定向，浏览器地址会显示跳转后URL地址</span><br><span class="line">permanent #返回301永久重定向，浏览器器地址栏会显示跳转后的URL地址</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">域名跳转</span><br><span class="line">www.ayitula.com 重写为 www.jd.com</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    # 修改本地host 里添加www.ayitula.com的解析</span><br><span class="line">    server_name www.ayitula.com; </span><br><span class="line">    location / &#123;</span><br><span class="line">        # 临时重定向301</span><br><span class="line">        rewrite ^/$ http://www.jd.com permanent ;</span><br><span class="line">        # 永久重定向302</span><br><span class="line">        rewrite ^/$ http://www.jd.com redirect ; </span><br><span class="line">        # 碰到break不往后处理了 直接返回 www.jd.com  也是302</span><br><span class="line">        rewrite ^/$ http://www.jd.com break ;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">注意:</span><br><span class="line">重定向就是将⽹页自动转向重定向 </span><br><span class="line"># 对新域名推广</span><br><span class="line">301永久性重定向:新网址完全继承旧网址，旧网址的排名等完全清零</span><br><span class="line">   301重定向是⽹页更改地址后对搜索引擎友好的最好⽅法，只要不是暂时搬移的情况，都建议使用301来做转址。</span><br><span class="line">   </span><br><span class="line"># 对老域名推广</span><br><span class="line">302临时性重定向:对旧⽹址没有影响，但新网址不会有排名</span><br><span class="line">    搜索引擎会抓取新的内容而保留旧的⽹址</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>last指令</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果是chrome浏览器器 就将 http://192.168.10.42/$URI 重写为 http://192.168.10.42/chrome/$URI</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">如果是chrome浏览器器 就将 http://192.168.10.42/$URI 重写为 http://192.168.10.42/chrome/$URI</span><br><span class="line">location / &#123;</span><br><span class="line">    if ($http_user_agent ~* &apos;chrome&apos;)&#123; </span><br><span class="line">        rewrite ^(.*)$ /chrome/$1 last;</span><br><span class="line">    &#125;</span><br><span class="line">    # 对重写为 http://192.168.10.42/chrome/$URI 匹配</span><br><span class="line">    location /chrome &#123;</span><br><span class="line">        root html ;</span><br><span class="line">        index index.html; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">根据⽤用户浏览器器重写访问⽬目录</span><br><span class="line">#^ 以什什么开头 ^a</span><br><span class="line">#$ 以什什么结尾 c$</span><br><span class="line">#. 除了了回⻋车以外的任意⼀一个字符</span><br><span class="line">#* 前⾯面的字符可以出现多次或者不不出现 #更更多内容看正则表达式 re</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M08/">M08</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/01/02/Py008-10-08url重写/" data-title="Py008-10-08url重写 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/01/03/Py008-11-01部署实例/" title="Py008-11-01部署实例">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py008-11-01部署实例</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/01/02/Py008-10-07限速/"  title="Py008-10-07限速">
+ <strong>下一篇：</strong><br/> 
+ <span>Py008-10-07限速
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#url重写"><span class="toc-number">1.</span> <span class="toc-text">url重写</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#应用场景"><span class="toc-number">1.1.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重写原理"><span class="toc-number">1.2.</span> <span class="toc-text">重写原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#URL-rewrite实现"><span class="toc-number">1.3.</span> <span class="toc-text">URL rewrite实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#url模块指令"><span class="toc-number">1.4.</span> <span class="toc-text">url模块指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#set指令"><span class="toc-number">1.5.</span> <span class="toc-text">set指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#if指令"><span class="toc-number">1.6.</span> <span class="toc-text">if指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#return指令"><span class="toc-number">1.7.</span> <span class="toc-text">return指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#break指令"><span class="toc-number">1.8.</span> <span class="toc-text">break指令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rewrite-语法"><span class="toc-number">1.9.</span> <span class="toc-text">rewrite 语法</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

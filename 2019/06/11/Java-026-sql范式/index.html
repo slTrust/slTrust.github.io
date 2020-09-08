@@ -1,0 +1,755 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Java-026-sql范式 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="关系数据库范式数据库表设计需求 –&amp;gt; API, 数据库 (数据库的表) –&amp;gt; 实现功能代码和操作数据!  应该有什么表? 用户表, 商品表, 订单表, 购物车表 –&amp;gt; RESTful API的资源所对应, Session表 每个表应该有什么的字段! 范式! 定义对数据库的SQL操作, 查询, 更新, 插入, 删除 建立Index索引, 对什么样的数据建立索引, 建立什么样的索引!">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-026-sql范式">
+<meta property="og:url" content="http://yoursite.com/2019/06/11/Java-026-sql范式/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="关系数据库范式数据库表设计需求 –&amp;gt; API, 数据库 (数据库的表) –&amp;gt; 实现功能代码和操作数据!  应该有什么表? 用户表, 商品表, 订单表, 购物车表 –&amp;gt; RESTful API的资源所对应, Session表 每个表应该有什么的字段! 范式! 定义对数据库的SQL操作, 查询, 更新, 插入, 删除 建立Index索引, 对什么样的数据建立索引, 建立什么样的索引!">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.246Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java-026-sql范式">
+<meta name="twitter:description" content="关系数据库范式数据库表设计需求 –&amp;gt; API, 数据库 (数据库的表) –&amp;gt; 实现功能代码和操作数据!  应该有什么表? 用户表, 商品表, 订单表, 购物车表 –&amp;gt; RESTful API的资源所对应, Session表 每个表应该有什么的字段! 范式! 定义对数据库的SQL操作, 查询, 更新, 插入, 删除 建立Index索引, 对什么样的数据建立索引, 建立什么样的索引!">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/06/11/Java-026-sql范式/" title="Java-026-sql范式" itemprop="url">Java-026-sql范式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-06-11T06:34:58.000Z" itemprop="datePublished"> Published 2019-06-11</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#关系数据库范式"><span class="toc-number">1.</span> <span class="toc-text">关系数据库范式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数据库表设计"><span class="toc-number">1.1.</span> <span class="toc-text">数据库表设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参考示例"><span class="toc-number">1.2.</span> <span class="toc-text">参考示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第一范式-1NF"><span class="toc-number">1.3.</span> <span class="toc-text">第一范式 1NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求"><span class="toc-number">1.3.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例"><span class="toc-number">1.3.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#坑"><span class="toc-number">1.3.3.</span> <span class="toc-text">坑:</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息"><span class="toc-number">1.3.4.</span> <span class="toc-text">没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息.</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段"><span class="toc-number">1.3.5.</span> <span class="toc-text">正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第二范式-2NF"><span class="toc-number">1.4.</span> <span class="toc-text">第二范式 2NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求-1"><span class="toc-number">1.4.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例-1"><span class="toc-number">1.4.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#同一用户-同一时间-同一商品-不该存在-quantity-两种状态"><span class="toc-number">1.4.3.</span> <span class="toc-text">同一用户,同一时间,同一商品 不该存在 quantity 两种状态</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第三范式-3NF"><span class="toc-number">1.5.</span> <span class="toc-text">第三范式 3NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求-2"><span class="toc-number">1.5.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例-2"><span class="toc-number">1.5.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#反例"><span class="toc-number">1.5.3.</span> <span class="toc-text">反例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#目的"><span class="toc-number">1.5.4.</span> <span class="toc-text">目的</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#总结"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参考资料"><span class="toc-number">1.7.</span> <span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码链接"><span class="toc-number">1.8.</span> <span class="toc-text">代码链接</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="关系数据库范式"><a href="#关系数据库范式" class="headerlink" title="关系数据库范式"></a>关系数据库范式</h3><h4 id="数据库表设计"><a href="#数据库表设计" class="headerlink" title="数据库表设计"></a>数据库表设计</h4><p>需求 –&gt; API, 数据库 (数据库的表) –&gt; 实现功能代码和操作数据!</p>
+<ul>
+<li>应该有什么表? 用户表, 商品表, 订单表, 购物车表 –&gt; RESTful API的资源所对应, Session表</li>
+<li>每个表应该有什么的字段! 范式!</li>
+<li>定义对数据库的SQL操作, 查询, 更新, 插入, 删除</li>
+<li>建立Index索引, 对什么样的数据建立索引, 建立什么样的索引!</li>
+</ul>
+<p>过度优化的边界: 是否真正理解了业务需求, 了解了瓶颈!</p>
+<blockquote>
+<h4 id="参考示例"><a href="#参考示例" class="headerlink" title="参考示例"></a>参考示例</h4></blockquote>
+<p>用户表 user:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>type</th>
+<th>password</th>
+<th>content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Alex</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is the first</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Alice</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is thhe first user</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Alex</td>
+<td>vip</td>
+<td>password</td>
+<td>Here is the second Alex</td>
+</tr>
+</tbody>
+</table>
+<p>订单表 order:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>5</td>
+<td>203231232</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>15</td>
+<td>1</td>
+<td>324324234</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>213213219</td>
+</tr>
+</tbody>
+</table>
+<h4 id="第一范式-1NF"><a href="#第一范式-1NF" class="headerlink" title="第一范式 1NF"></a>第一范式 1NF</h4><p>每一个字段都是不可分的数据项, 即字段的原子性.</p>
+<h5 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>有主键, 且主键不能为空, 主键不能重复</li>
+<li>字段必须不能再分, 字段必须是原子的</li>
+</ul>
+<h5 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h5><p>用户表和订单表都包含主键 – id.</p>
+<p>然后每一个字段都只包含单一不可分的数据内容项, 比如说, name就是只有name的意思, 不能够拆分.</p>
+<blockquote>
+<p>一个常见的错误例子是, 比如用户表, 有一个项叫做信息项, 然后把相关的电话, 地址信息都放到这个信息项里, 这样就破坏了字段的原子性.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>type</th>
+<th>password</th>
+<th>content</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Alex</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is the first</td>
+<td>{“phone”:”13311122211”,”city”:”北京”,”email”:”<a href="mailto:xx@xx.com" target="_blank" rel="noopener">xx@xx.com</a>“}</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<h5 id="坑"><a href="#坑" class="headerlink" title="坑:"></a>坑:</h5></blockquote>
+<h5 id="没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息"><a href="#没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息" class="headerlink" title="没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息."></a>没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息.</h5><ul>
+<li>查 phone 要查询整个 info</li>
+<li>查 email 要查询整个 info</li>
+<li>查 city 要查询整个 info</li>
+<li>而且造成了性能瓶颈</li>
+<li>还有单独更新 phone/email/city 时候数据更新的问题,很容易造成数据被无意间更改</li>
+</ul>
+<h5 id="正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段"><a href="#正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段" class="headerlink" title="正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段"></a>正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段</h5><p>而如果 单独 phone/email/city 成为一列</p>
+<blockquote>
+<p>查询仅需要 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select phone from user;   </span><br><span class="line">select email from user;   </span><br><span class="line">select phone from city;</span><br></pre></td></tr></table></figure>
+<h4 id="第二范式-2NF"><a href="#第二范式-2NF" class="headerlink" title="第二范式 2NF"></a>第二范式 2NF</h4><p>在第一范式得基础上, 且每一个非主属性完全函数依赖于码.</p>
+<h5 id="要求-1"><a href="#要求-1" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>满足第一范例</li>
+<li>表中得每一个非主键属性, 必须完全依赖于本表码, 码可以是主键, 或者多个字段组成的主键</li>
+</ul>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h5><p>在订单表中, 一个订单由用户, 产品和订单时间确定. 那这三个属性就可以称之为码: (用户, 产品, 订单时间).</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>5</td>
+<td>20001000</td>
+</tr>
+</tbody>
+</table>
+<p>这样, 如果相同用户, 相同产品, 相同订单时间就应该能够确定查询到其订单中产品数量, 而不允许有相同的用户, 相同产品, 相同订单时间, 但是订单数量不一样的数据产生.</p>
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 0</td>
+<td>15</td>
+<td>5</td>
+<td>20001000</td>
+</tr>
+<tr>
+<td> 0</td>
+<td>15</td>
+<td>9</td>
+<td>20001000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="同一用户-同一时间-同一商品-不该存在-quantity-两种状态"><a href="#同一用户-同一时间-同一商品-不该存在-quantity-两种状态" class="headerlink" title="同一用户,同一时间,同一商品 不该存在 quantity 两种状态"></a>同一用户,同一时间,同一商品 不该存在 quantity 两种状态</h5><p>如果添加其他的内容, 比如订单状态, 这个订单状态也应该完全依赖于码: (用户, 产品, 订单时间)</p>
+<h4 id="第三范式-3NF"><a href="#第三范式-3NF" class="headerlink" title="第三范式 3NF"></a>第三范式 3NF</h4><p>满足第二范式的基础上, 除了主键外没有冗余数据</p>
+<h5 id="要求-2"><a href="#要求-2" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>数据没有冗余</li>
+</ul>
+<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h5><p>在用户表中, 主键是id, 然后包含用户名name字段, 这样在订单表中就不应该重复存储用户名, 只需要存储用户id (主键), 需要用到用户名等其他信息时候, 通过用户id (主键) 在用户表中查询.</p>
+<h5 id="反例"><a href="#反例" class="headerlink" title="反例"></a>反例</h5><p>用户表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id	name	type	password	content</span><br></pre></td></tr></table></figure>
+<p>订单表 里有用户名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id	user_id user_name	product_id	quantity	timestamp</span><br></pre></td></tr></table></figure></p>
+<p>其他表里也有用户名 user_name</p>
+<p><strong>这样就导致了冗余</strong></p>
+<blockquote>
+<p>当你进行更新 user_name 的时候呢？ </p>
+</blockquote>
+<p>你要同时维护多张表。而且更新 user_name 要对每个出现的表检查是否更新</p>
+<ul>
+<li>这样 问题出现的时候就会呈现指数型增长。</li>
+<li>因为你不确定～ 那张表里有这个 user_name</li>
+<li>要cover所有情况</li>
+</ul>
+<p><strong>正确做法就是 不要用 user_name</strong></p>
+<p>而应该使用 <strong>user_id</strong></p>
+<ul>
+<li>因为 主键是无法更改的</li>
+<li>你用的时候连表就行了</li>
+</ul>
+<h5 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h5><p><strong>消除冗余数据</strong>: 一个数据只出现在同一地方, 同样保证了, 我们在维护一个数据时候, 只需要维护好一个地方的数据就好了! 不用去思考到底还有没有其他地方需要同时维护.</p>
+<p><strong>坑</strong>: 例如在用户表中有用户名, 在订单表中也有一份用户名, 则我们更改用户表用户名的时候, 就得同时更新订单表里的用户名!</p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>范式主要是我们在设计数据库结构和字段时候需要遵循的一些规则, 用来避免出现的一些坑.</p>
+<p>在设计或者Review数据库表的过程中, 需要对照范式来看是否出现反范式的情况.</p>
+<p>但是既然不是硬语法规定, 那就是在实际应用中, 在需求, 性能或者特例的考量下, 可以根据实际情况进行妥协, 使用一些反范式的设计, 但是对这些特例需要有特别的关注.</p>
+<p>一个原则永远记在心中: <strong>重复是万恶之源, 在关系数据库里, 数据冗余是万恶之源</strong></p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><ul>
+<li><a href="https://www.zhihu.com/question/24696366/answer/29189700" target="_blank" rel="noopener">如何解释关系数据库的第一第二第三范式</a></li>
+<li><a href="https://book.douban.com/subject/4024318/" target="_blank" rel="noopener">Head First SQL (中文版)</a></li>
+</ul>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a><a href="https://github.com/slTrust/java_026_crud" target="_blank" rel="noopener">代码链接</a></h4>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/06/11/Java-026-sql范式/" data-title="Java-026-sql范式 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/06/11/Java-027-ORM/" title="Java-027-ORM">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Java-027-ORM</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/06/11/Java-025-sql进阶/"  title="Java-025-sql进阶">
+ <strong>下一篇：</strong><br/> 
+ <span>Java-025-sql进阶
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#关系数据库范式"><span class="toc-number">1.</span> <span class="toc-text">关系数据库范式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数据库表设计"><span class="toc-number">1.1.</span> <span class="toc-text">数据库表设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参考示例"><span class="toc-number">1.2.</span> <span class="toc-text">参考示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第一范式-1NF"><span class="toc-number">1.3.</span> <span class="toc-text">第一范式 1NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求"><span class="toc-number">1.3.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例"><span class="toc-number">1.3.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#坑"><span class="toc-number">1.3.3.</span> <span class="toc-text">坑:</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息"><span class="toc-number">1.3.4.</span> <span class="toc-text">没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息.</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段"><span class="toc-number">1.3.5.</span> <span class="toc-text">正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第二范式-2NF"><span class="toc-number">1.4.</span> <span class="toc-text">第二范式 2NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求-1"><span class="toc-number">1.4.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例-1"><span class="toc-number">1.4.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#同一用户-同一时间-同一商品-不该存在-quantity-两种状态"><span class="toc-number">1.4.3.</span> <span class="toc-text">同一用户,同一时间,同一商品 不该存在 quantity 两种状态</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第三范式-3NF"><span class="toc-number">1.5.</span> <span class="toc-text">第三范式 3NF</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#要求-2"><span class="toc-number">1.5.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#示例-2"><span class="toc-number">1.5.2.</span> <span class="toc-text">示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#反例"><span class="toc-number">1.5.3.</span> <span class="toc-text">反例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#目的"><span class="toc-number">1.5.4.</span> <span class="toc-text">目的</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#总结"><span class="toc-number">1.6.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参考资料"><span class="toc-number">1.7.</span> <span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码链接"><span class="toc-number">1.8.</span> <span class="toc-text">代码链接</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

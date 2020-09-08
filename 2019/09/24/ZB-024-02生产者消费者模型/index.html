@@ -1,0 +1,573 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-024-02生产者消费者模型 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="生产者消费者模型 生产者和消费者之间有一个盘子 盘子只能有一个包子 生产者创造了一个包子 放置到盘子上。此时不会继续生产，而是等消费者把盘子上的包子吃了，再去生产 即盘子是空的菜生产 消费者吃掉一个包子后，就不会在吃了，而是等待生产者 生产 即盘子上有包子才消费  1.Object.wait/notify解决 2.Lock/Condition解决 3.BlockingQueue解决 方式一：Obj">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-024-02生产者消费者模型">
+<meta property="og:url" content="http://yoursite.com/2019/09/24/ZB-024-02生产者消费者模型/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="生产者消费者模型 生产者和消费者之间有一个盘子 盘子只能有一个包子 生产者创造了一个包子 放置到盘子上。此时不会继续生产，而是等消费者把盘子上的包子吃了，再去生产 即盘子是空的菜生产 消费者吃掉一个包子后，就不会在吃了，而是等待生产者 生产 即盘子上有包子才消费  1.Object.wait/notify解决 2.Lock/Condition解决 3.BlockingQueue解决 方式一：Obj">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.337Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-024-02生产者消费者模型">
+<meta name="twitter:description" content="生产者消费者模型 生产者和消费者之间有一个盘子 盘子只能有一个包子 生产者创造了一个包子 放置到盘子上。此时不会继续生产，而是等消费者把盘子上的包子吃了，再去生产 即盘子是空的菜生产 消费者吃掉一个包子后，就不会在吃了，而是等待生产者 生产 即盘子上有包子才消费  1.Object.wait/notify解决 2.Lock/Condition解决 3.BlockingQueue解决 方式一：Obj">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/09/24/ZB-024-02生产者消费者模型/" title="ZB-024-02生产者消费者模型" itemprop="url">ZB-024-02生产者消费者模型</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-09-24T13:26:46.000Z" itemprop="datePublished"> Published 2019-09-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#生产者消费者模型"><span class="toc-number">1.</span> <span class="toc-text">生产者消费者模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方式一：Object-wait-notify"><span class="toc-number">1.1.</span> <span class="toc-text">方式一：Object.wait/notify</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方式二：Lock-Condition"><span class="toc-number">1.2.</span> <span class="toc-text">方式二：Lock/Condition</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方式三：BlockingQueue"><span class="toc-number">1.3.</span> <span class="toc-text">方式三：BlockingQueue</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="生产者消费者模型"><a href="#生产者消费者模型" class="headerlink" title="生产者消费者模型"></a><a href="https://github.com/hcsp/producer-consumer" target="_blank" rel="noopener">生产者消费者模型</a></h3><ul>
+<li>生产者和消费者之间有一个盘子</li>
+<li>盘子只能有一个包子</li>
+<li>生产者创造了一个包子 放置到盘子上。此时不会继续生产，而是等消费者把盘子上的包子吃了，再去生产 即盘子是空的菜生产</li>
+<li>消费者吃掉一个包子后，就不会在吃了，而是等待生产者 生产 即盘子上有包子才消费</li>
+</ul>
+<p><a href="https://github.com/hcsp/producer-consumer/pull/22" target="_blank" rel="noopener">1.Object.wait/notify解决</a></p>
+<p><a href="https://github.com/hcsp/producer-consumer/pull/23" target="_blank" rel="noopener">2.Lock/Condition解决</a></p>
+<p><a href="https://github.com/hcsp/producer-consumer/pull/24" target="_blank" rel="noopener">3.BlockingQueue解决</a></p>
+<h4 id="方式一：Object-wait-notify"><a href="#方式一：Object-wait-notify" class="headerlink" title="方式一：Object.wait/notify"></a>方式一：Object.wait/notify</h4><p>Boss.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        Container container = new Container();</span><br><span class="line">        Object lock = new Object();</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(container, lock);</span><br><span class="line">        Consumer consumer = new Consumer(container, lock);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Container.java  放置包子的盘子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line"></span><br><span class="line">public class Container &#123;</span><br><span class="line">    private Optional&lt;Integer&gt; value = Optional.empty();</span><br><span class="line"></span><br><span class="line">    public Optional&lt;Integer&gt; getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setValue(Optional&lt;Integer&gt; value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Consumer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    Object lock;</span><br><span class="line"></span><br><span class="line">    public Consumer(Container container, Object lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            synchronized (lock) &#123;</span><br><span class="line">                // 只要盘子是空的 它就等待</span><br><span class="line">                while (!container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子不是空的就消费</span><br><span class="line">                Integer value = container.getValue().get();</span><br><span class="line">                // 清空盘子的内容</span><br><span class="line">                container.setValue(Optional.empty());</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + value);</span><br><span class="line"></span><br><span class="line">                // 唤醒生产者</span><br><span class="line">                lock.notify();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Producer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.Random;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    Object lock;</span><br><span class="line"></span><br><span class="line">    public Producer(Container container, Object lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            synchronized (lock) &#123;</span><br><span class="line">                // 只要盘子里有东西 它就必须等待</span><br><span class="line">                while (container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子是空的就生产</span><br><span class="line">                int r = new Random().nextInt();</span><br><span class="line">                System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">                container.setValue(Optional.of(r));</span><br><span class="line">                // 唤醒消费者</span><br><span class="line">                lock.notify();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方式二：Lock-Condition"><a href="#方式二：Lock-Condition" class="headerlink" title="方式二：Lock/Condition"></a>方式二：Lock/Condition</h4><p>Boss.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        ReentrantLock lock = new ReentrantLock();</span><br><span class="line">        Container container = new Container(lock);</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(container, lock);</span><br><span class="line">        Consumer consumer = new Consumer(container, lock);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Container.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.concurrent.locks.Condition;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Container &#123;</span><br><span class="line"></span><br><span class="line">    private Condition notConsumedYet; // 还没被消费掉</span><br><span class="line">    private Condition notProducedYet; // 还没被生产出来</span><br><span class="line">    private Optional&lt;Integer&gt; value = Optional.empty();</span><br><span class="line"></span><br><span class="line">    public Container(ReentrantLock lock) &#123;</span><br><span class="line">        this.notConsumedYet = lock.newCondition();</span><br><span class="line">        this.notProducedYet = lock.newCondition();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Condition getNotConsumedYet() &#123;</span><br><span class="line">        return notConsumedYet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Condition getNotProducedYet() &#123;</span><br><span class="line">        return notProducedYet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Optional&lt;Integer&gt; getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setValue(Optional&lt;Integer&gt; value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Consumer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    ReentrantLock lock;</span><br><span class="line"></span><br><span class="line">    public Consumer(Container container, ReentrantLock lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                lock.lock();</span><br><span class="line">                // 只要盘子是空的 它就等待</span><br><span class="line">                while (!container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        container.getNotProducedYet().await();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子不是空的就消费</span><br><span class="line">                Integer value = container.getValue().get();</span><br><span class="line">                // 清空盘子的内容</span><br><span class="line">                container.setValue(Optional.empty());</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + value);</span><br><span class="line"></span><br><span class="line">                // 唤醒生产者</span><br><span class="line">                container.getNotConsumedYet().signal();</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Producer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    ReentrantLock lock;</span><br><span class="line"></span><br><span class="line">    public Producer(Container container, ReentrantLock lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                lock.lock();</span><br><span class="line">                // 只要盘子里有东西 它就必须等待</span><br><span class="line">                while (container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        container.getNotConsumedYet().await();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子是空的就生产</span><br><span class="line">                int r = new Random().nextInt();</span><br><span class="line">                System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">                container.setValue(Optional.of(r));</span><br><span class="line">                // 唤醒消费者</span><br><span class="line">                container.getNotProducedYet().signal();</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方式三：BlockingQueue"><a href="#方式三：BlockingQueue" class="headerlink" title="方式三：BlockingQueue"></a>方式三：BlockingQueue</h4><blockquote>
+<p>signalQueue 是控制线程调度的 实际就是个开关</p>
+</blockquote>
+<p>Boss.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line">import java.util.concurrent.LinkedBlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        BlockingDeque&lt;Integer&gt; queue = new LinkedBlockingDeque&lt;&gt;(1);</span><br><span class="line">        // 控制线程的调度</span><br><span class="line">        BlockingDeque&lt;Integer&gt; signalQueue = new LinkedBlockingDeque&lt;&gt;(1);</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(queue, signalQueue);</span><br><span class="line">        Consumer consumer = new Consumer(queue, signalQueue);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Consumer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; queue;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; signalQueue;</span><br><span class="line"></span><br><span class="line">    public Consumer(BlockingDeque&lt;Integer&gt; queue, BlockingDeque&lt;Integer&gt; signalQueue) &#123;</span><br><span class="line">        this.queue = queue;</span><br><span class="line">        this.signalQueue = signalQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + queue.take());</span><br><span class="line">                signalQueue.put(0);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Producer.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; queue;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; signalQueue;</span><br><span class="line"></span><br><span class="line">    public Producer(BlockingDeque&lt;Integer&gt; queue, BlockingDeque&lt;Integer&gt; signalQueue) &#123;</span><br><span class="line">        this.queue = queue;</span><br><span class="line">        this.signalQueue = signalQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            int r = new Random().nextInt();</span><br><span class="line">            System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">            try &#123;</span><br><span class="line">                queue.put(r);</span><br><span class="line">                signalQueue.take();</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/09/24/ZB-024-02生产者消费者模型/" data-title="ZB-024-02生产者消费者模型 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/09/24/ZB-024-03线程池和Callable和Future/" title="ZB-024-03线程池和Callable和Future">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-024-03线程池和Callable和Future</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/09/17/ZB-024-01多线程初步/"  title="ZB-024-01多线程初步">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-024-01多线程初步
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#生产者消费者模型"><span class="toc-number">1.</span> <span class="toc-text">生产者消费者模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方式一：Object-wait-notify"><span class="toc-number">1.1.</span> <span class="toc-text">方式一：Object.wait/notify</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方式二：Lock-Condition"><span class="toc-number">1.2.</span> <span class="toc-text">方式二：Lock/Condition</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方式三：BlockingQueue"><span class="toc-number">1.3.</span> <span class="toc-text">方式三：BlockingQueue</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

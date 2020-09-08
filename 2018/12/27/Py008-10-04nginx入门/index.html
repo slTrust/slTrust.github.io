@@ -1,0 +1,633 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py008-10-04nginx入门 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="nginx默认网站当Nginx配置文件里 有且仅有一个 Server 的时候，该server就被nginx认为是默认网站，所有发送给nginx服务器80端口的数据都会默认给 该Server 123456789101112131415161718192021222324252627282930server &amp;#123;    # 虚拟主机使用的端口    listen       80;    #">
+<meta name="keywords" content="M08">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py008-10-04nginx入门">
+<meta property="og:url" content="http://yoursite.com/2018/12/27/Py008-10-04nginx入门/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="nginx默认网站当Nginx配置文件里 有且仅有一个 Server 的时候，该server就被nginx认为是默认网站，所有发送给nginx服务器80端口的数据都会默认给 该Server 123456789101112131415161718192021222324252627282930server &amp;#123;    # 虚拟主机使用的端口    listen       80;    #">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.308Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py008-10-04nginx入门">
+<meta name="twitter:description" content="nginx默认网站当Nginx配置文件里 有且仅有一个 Server 的时候，该server就被nginx认为是默认网站，所有发送给nginx服务器80端口的数据都会默认给 该Server 123456789101112131415161718192021222324252627282930server &amp;#123;    # 虚拟主机使用的端口    listen       80;    #">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/27/Py008-10-04nginx入门/" title="Py008-10-04nginx入门" itemprop="url">Py008-10-04nginx入门</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-27T15:37:46.000Z" itemprop="datePublished"> Published 2018-12-27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx默认网站"><span class="toc-number">1.</span> <span class="toc-text">nginx默认网站</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-目录访问控制"><span class="toc-number">2.</span> <span class="toc-text">nginx 目录访问控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#访问验证，需要登录"><span class="toc-number">3.</span> <span class="toc-text">访问验证，需要登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#日志格式"><span class="toc-number">4.</span> <span class="toc-text">日志格式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Log-format格式变量量"><span class="toc-number">4.1.</span> <span class="toc-text">Log_format格式变量量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#运维关心下json格式的日志定义"><span class="toc-number">4.2.</span> <span class="toc-text">运维关心下json格式的日志定义</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#防盗链"><span class="toc-number">5.</span> <span class="toc-text">防盗链</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#c目录下"><span class="toc-number"></span> <span class="toc-text">c目录下</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#宽广匹配-～"><span class="toc-number"></span> <span class="toc-text">宽广匹配 ～</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#代表不区分大小写"><span class="toc-number"></span> <span class="toc-text">* 代表不区分大小写</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#location-png-gif-bmp"><span class="toc-number"></span> <span class="toc-text">location ~* .(png|gif|bmp)$ {</span></a>
+		
+		</div>
+		
+		<h3 id="nginx默认网站"><a href="#nginx默认网站" class="headerlink" title="nginx默认网站"></a>nginx默认网站</h3><p>当Nginx配置文件里 有且仅有一个 Server 的时候，该server就被nginx认为是默认网站，所有发送给nginx服务器80端口的数据都会默认给 该Server</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    # 虚拟主机使用的端口</span><br><span class="line">    listen       80;</span><br><span class="line">    # 虚拟主机域名</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    # 字符集</span><br><span class="line">    #charset koi8-r;</span><br><span class="line">    </span><br><span class="line">    # 虚拟主机的访问日志路径 如果你不设置 就会使用全局的日志</span><br><span class="line">    #access_log  logs/host.access.log  main;</span><br><span class="line"></span><br><span class="line">    # 定义web根路径</span><br><span class="line">    location / &#123;</span><br><span class="line">        # 根目录路径</span><br><span class="line">        root   html;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 错误路径 </span><br><span class="line">    #error_page  404              /404.html;</span><br><span class="line"></span><br><span class="line">    # redirect server error pages to the static page /50x.html</span><br><span class="line">    # 根据错误码 返回对应页面</span><br><span class="line">    error_page   500 502 503 504  /50x.html;</span><br><span class="line">    # 定义页面路径</span><br><span class="line">    location = /50x.html &#123;</span><br><span class="line">        root   html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="nginx-目录访问控制"><a href="#nginx-目录访问控制" class="headerlink" title="nginx 目录访问控制"></a>nginx 目录访问控制</h3><blockquote>
+<p>如果你的其他电脑访问不到请关闭防火墙</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">https://blog.csdn.net/cool_summer_moon/article/details/78744009</span><br><span class="line"></span><br><span class="line"># 查看默认防火墙状态（关闭后显示not running，开启后显示running）</span><br><span class="line">firewall-cmd --state </span><br><span class="line"></span><br><span class="line"># 开启防火墙</span><br><span class="line">systemctl start firewalld.service  </span><br><span class="line"></span><br><span class="line"># 关闭防火墙：</span><br><span class="line">systemctl stop firewalld.service </span><br><span class="line"></span><br><span class="line"># 重启防火墙</span><br><span class="line">systemctl restart firewalld.service</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 去nginx 的网站根目录</span><br><span class="line">cd /usr/local/nginx/html</span><br><span class="line"># 新建三个目录 a b c </span><br><span class="line">mkdir a </span><br><span class="line">mkdir b</span><br><span class="line">mkdir c</span><br><span class="line">echo a &gt; c/index.html</span><br><span class="line">echo b &gt; b/index.html</span><br><span class="line">echo c &gt; c/index.html</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改nginx配置</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line">    charset utf-8;</span><br><span class="line">    #access_log  logs/host.access.log  main;</span><br><span class="line"></span><br><span class="line">    # 定义web根路径</span><br><span class="line">    location / &#123;</span><br><span class="line">        # 根目录路径</span><br><span class="line">        root   html;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # 对a路径的范围设置</span><br><span class="line">    location /a &#123;</span><br><span class="line">        # 允许个别</span><br><span class="line">        allow localhost;</span><br><span class="line">        allow 你本机ip</span><br><span class="line">        # 拒绝所有</span><br><span class="line">        deny all;</span><br><span class="line">        # 迷惑别人</span><br><span class="line">        # return 404;</span><br><span class="line">        # 还可以返回京东</span><br><span class="line">        return http://www.jd.com;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    # 错误路径 </span><br><span class="line">    #error_page  404              /404.html;</span><br><span class="line"></span><br><span class="line">    # redirect server error pages to the static page /50x.html</span><br><span class="line">    # 根据错误码 返回对应页面</span><br><span class="line">    error_page   500 502 503 504  /50x.html;</span><br><span class="line">    # 定义页面路径</span><br><span class="line">    location = /50x.html &#123;</span><br><span class="line">        root   html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不要太粗暴的重启nginx</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 杀掉nginx进程</span><br><span class="line">killall nginx </span><br><span class="line"># 此时不要这样</span><br><span class="line"># /usr/local/ngin/sbin/nginx 直接启动</span><br><span class="line"></span><br><span class="line"># 应该先检查配置文件是否正确</span><br><span class="line">/usr/local/ngin/sbin/nginx /usr/local/ngin/conf/nginx.conf</span><br><span class="line"></span><br><span class="line"># 直接重新加载配置文件的方法</span><br><span class="line">killall -s HUP nginx</span><br></pre></td></tr></table></figure>
+<h3 id="访问验证，需要登录"><a href="#访问验证，需要登录" class="headerlink" title="访问验证，需要登录"></a>访问验证，需要登录</h3><blockquote>
+<p>auth_basic</p>
+</blockquote>
+<ul>
+<li>语法 auth_basic string | off;</li>
+<li>默认值 auth_basic off;</li>
+</ul>
+<blockquote>
+<p>auth_basic_user_file file;</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 目录用户验证：任何人都可以访问，但是需要用户密码才能访问</span><br><span class="line">location /b &#123;</span><br><span class="line">    auth_basic &quot;hjx的登录验证唯一性(加点料)dfsdafsdafk321kj3h12&quot;;</span><br><span class="line">    auth_basic_user_file /etc/nginx/htpasswd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 解释 这个是你放账号密码的文件</span><br><span class="line"># /etc/nginx/htpasswd</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此时账号密码还没有（而且对应/etc/nginx/htpasswd目录也没有你需要建立目录）</p>
+</blockquote>
+<p>生成账号密码</p>
+<ul>
+<li>htpasswd </li>
+<li>openssl 默认应该有 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 安装</span><br><span class="line">yum -y install httpd-tools</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>建立目录文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">mkdir /etc/nginx/htpasswd</span><br><span class="line"></span><br><span class="line">vi /etc/nginx/htpasswd </span><br><span class="line"># 输入如下内容</span><br><span class="line">sko:123456</span><br><span class="line"></span><br><span class="line"># 重启nginx </span><br><span class="line">killall -s HUP nginx</span><br><span class="line"></span><br><span class="line"># 然后访问 http://xx.xx.xx.xx/b 目录 </span><br><span class="line">输入账号 sko</span><br><span class="line">输入密码 123456</span><br><span class="line"># 还是失败 ！ 因为你没有加密</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>加密两种方式</p>
+</blockquote>
+<ul>
+<li>htpasswd </li>
+<li>openssl</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 如果你没有那个加密的文件 以及对应的目录 </span><br><span class="line">htpasswd -c /etc/nginx/htpasswd  用户名</span><br><span class="line"># 回车</span><br><span class="line">输入你的密码 回车</span><br><span class="line">再次输入你的密码 回车</span><br><span class="line"></span><br><span class="line"># 如果你有那个文件 你就</span><br><span class="line">htpasswd -m /etc/nginx/htpasswd  用户名</span><br><span class="line"># 回车</span><br><span class="line">输入你的密码 回车</span><br><span class="line">再次输入你的密码 回车</span><br><span class="line"></span><br><span class="line">编辑你的 /etc/nginx/htpasswd 因为刚才还存留上次的 sko:123456 删掉这行</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 此时你就可以输入密码后 访问 b目录了</span><br></pre></td></tr></table></figure>
+<h3 id="日志格式"><a href="#日志格式" class="headerlink" title="日志格式"></a>日志格式</h3><p>Nginx 访问日志主要有两个参数控制</p>
+<ol>
+<li>log_format #⽤用来定义记录⽇日志的格式(可以定义多种⽇日志格式，取不不同名字即可)<br>log_format log_name string</li>
+<li>access_log #⽤用来指定⽇日⾄至⽂文件的路路径及使⽤用的何种⽇日志格式记录⽇日志<br>access_log logs/access.log main</li>
+</ol>
+<blockquote>
+<h4 id="Log-format格式变量量"><a href="#Log-format格式变量量" class="headerlink" title="Log_format格式变量量"></a>Log_format格式变量量</h4></blockquote>
+<p>log_format格式变量量:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$remote_addr #记录访问⽹网站的客户端地址</span><br><span class="line">$remote_user #远程客户端⽤用户名</span><br><span class="line">$time_local #记录访问时间与时区</span><br><span class="line">$request #⽤用户的http请求起始⾏行行信息</span><br><span class="line">$status #http状态码，记录请求返回的状态码，例例如:200、301、404等</span><br><span class="line">$body_bytes_sent #服务器器发送给客户端的响应body字节数</span><br><span class="line">$http_referer #记录此次请求是从哪个连接访问过来的，可以根据该参数进⾏行行防盗链设置。</span><br><span class="line">$http_user_agent #记录客户端访问信息，例例如:浏览器器、⼿手机客户端等</span><br><span class="line">$http_x_forwarded_for #当前端有代理理服务器器时，设置web节点记录客户端地址的配置，此参数⽣生效的前提是代理理服务器器也要进⾏行行相关的x_forwarded_for设置</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>自定义日志</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    #log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</span><br><span class="line">    #                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</span><br><span class="line">    #                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</span><br><span class="line"></span><br><span class="line">    #access_log  logs/access.log  main;</span><br><span class="line">    # 自定义日志</span><br><span class="line">    # 自定义日志</span><br><span class="line">    # 自定义日志</span><br><span class="line">    log_format hjx_log &apos;[$time_local] $remote_addr $request $status&apos;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    server&#123;</span><br><span class="line">        # ...</span><br><span class="line">        # 此处指定 日志格式文件</span><br><span class="line">        access_log logs/host.access.log hjx_log</span><br><span class="line"></span><br><span class="line">        # ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>重启nginx</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">killall -s HUP nginx</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>去你的浏览器访问 你对应 ip的地址</p>
+</blockquote>
+<blockquote>
+<p>查看日志是否生效</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/local/nginx/logs/host.access.log </span><br><span class="line"></span><br><span class="line">#或者 滚动输出</span><br><span class="line">tailf /usr/local/nginx/logs/host.access.log</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="运维关心下json格式的日志定义"><a href="#运维关心下json格式的日志定义" class="headerlink" title="运维关心下json格式的日志定义"></a>运维关心下json格式的日志定义</h4></blockquote>
+<p>自定义日志格式为json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">log_format main_json &apos;&#123;&quot;@timestamp&quot;:&quot;$time_local&quot;,&apos; &apos;&quot;client_ip&quot;: &quot;$remote_addr&quot;,&apos;</span><br><span class="line">&apos;&quot;request&quot;: &quot;$request&quot;,&apos;</span><br><span class="line">&apos;&quot;status&quot;: &quot;$status&quot;,&apos;</span><br><span class="line">&apos;&quot;bytes&quot;: &quot;$body_bytes_sent&quot;,&apos;</span><br><span class="line">&apos;&quot;x_forwarded&quot;: &quot;$http_x_forwarded_for&quot;,&apos;</span><br><span class="line">&apos;&quot;referer&quot;: &quot;$http_referer&quot;&apos;</span><br><span class="line">&apos;&#125;’;</span><br><span class="line">access_log logs/access_json.log main_json;</span><br></pre></td></tr></table></figure>
+<p>nginx.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    #log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</span><br><span class="line">    #                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</span><br><span class="line">    #                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;</span><br><span class="line"></span><br><span class="line">    #access_log  logs/access.log  main;</span><br><span class="line">    # 自定义日志</span><br><span class="line">    # 自定义日志</span><br><span class="line">    # 自定义日志</span><br><span class="line">    log_format hjx_log &apos;[$time_local] $remote_addr $request $status&apos;;</span><br><span class="line">    # json格式自定义日志</span><br><span class="line">    log_format main_json &apos;&#123;&quot;@timestamp&quot;:&quot;$time_local&quot;,&apos; &apos;&quot;client_ip&quot;: &quot;$remote_addr&quot;,&apos;</span><br><span class="line">        &apos;&quot;request&quot;: &quot;$request&quot;,&apos;</span><br><span class="line">        &apos;&quot;status&quot;: &quot;$status&quot;,&apos;</span><br><span class="line">        &apos;&quot;bytes&quot;: &quot;$body_bytes_sent&quot;,&apos;</span><br><span class="line">        &apos;&quot;x_forwarded&quot;: &quot;$http_x_forwarded_for&quot;,&apos;</span><br><span class="line">        &apos;&quot;referer&quot;: &quot;$http_referer&quot;,&apos;</span><br><span class="line">    &apos;&#125;’;</span><br><span class="line"></span><br><span class="line">    server&#123;</span><br><span class="line">        # ...</span><br><span class="line">        # 此处指定 日志格式文件</span><br><span class="line">        access_log logs/host.access.log main_json</span><br><span class="line"></span><br><span class="line">        # ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>json格式有问题 以后解决吧！！！！</li>
+</ul>
+<h3 id="防盗链"><a href="#防盗链" class="headerlink" title="防盗链"></a>防盗链</h3><blockquote>
+<p>先上传到你的服务器一个图片</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">scp 本地文件路径 centos文件存放地路径</span><br><span class="line"></span><br><span class="line">scp /Users/huangjiaxi/Desktop/aa.png root@xx.xx.xx.xx:/usr/local/nginx/html/c</span><br><span class="line">```</span><br></pre></td></tr></table></figure>
+<h1 id="c目录下"><a href="#c目录下" class="headerlink" title="c目录下"></a>c目录下</h1><p>location /c {</p>
+<h1 id="宽广匹配-～"><a href="#宽广匹配-～" class="headerlink" title="宽广匹配 ～"></a>宽广匹配 ～</h1><h1 id="代表不区分大小写"><a href="#代表不区分大小写" class="headerlink" title="* 代表不区分大小写"></a>* 代表不区分大小写</h1><h1 id="location-png-gif-bmp"><a href="#location-png-gif-bmp" class="headerlink" title="location ~* .(png|gif|bmp)$ {"></a>location ~* .(png|gif|bmp)$ {</h1><pre><code># valid_referers none 代表用户直接访问的
+# blocked 有防火墙标志的
+# *.ayitula.com; 我自己的服务器域名下的
+valid_referers none blocked *.ayitula.com; 
+# 假如是非法 referer直接返回403
+if ($invalid_referer) {
+return 403;
+} 
+</code></pre><p>}<br><code>`</code></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M08/">M08</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/12/27/Py008-10-04nginx入门/" data-title="Py008-10-04nginx入门 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/12/28/Py008-10-05虚拟主机/" title="Py008-10-05虚拟主机">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py008-10-05虚拟主机</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/12/27/Py008-10-03nginx配置详解/"  title="Py008-10-03nginx配置详解">
+ <strong>下一篇：</strong><br/> 
+ <span>Py008-10-03nginx配置详解
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx默认网站"><span class="toc-number">1.</span> <span class="toc-text">nginx默认网站</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx-目录访问控制"><span class="toc-number">2.</span> <span class="toc-text">nginx 目录访问控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#访问验证，需要登录"><span class="toc-number">3.</span> <span class="toc-text">访问验证，需要登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#日志格式"><span class="toc-number">4.</span> <span class="toc-text">日志格式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Log-format格式变量量"><span class="toc-number">4.1.</span> <span class="toc-text">Log_format格式变量量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#运维关心下json格式的日志定义"><span class="toc-number">4.2.</span> <span class="toc-text">运维关心下json格式的日志定义</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#防盗链"><span class="toc-number">5.</span> <span class="toc-text">防盗链</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#c目录下"><span class="toc-number"></span> <span class="toc-text">c目录下</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#宽广匹配-～"><span class="toc-number"></span> <span class="toc-text">宽广匹配 ～</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#代表不区分大小写"><span class="toc-number"></span> <span class="toc-text">* 代表不区分大小写</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#location-png-gif-bmp"><span class="toc-number"></span> <span class="toc-text">location ~* .(png|gif|bmp)$ {</span></a>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

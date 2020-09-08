@@ -1,0 +1,652 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-032-01范型的由来和范型擦除 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="没有范型之前实现类型安全1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465public class Main &amp;#123;    // 只能存放字符串 的 list    public static clas">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-032-01范型的由来和范型擦除">
+<meta property="og:url" content="http://yoursite.com/2019/10/30/ZB-032-01范型的由来和范型擦除/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="没有范型之前实现类型安全1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465public class Main &amp;#123;    // 只能存放字符串 的 list    public static clas">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.342Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-032-01范型的由来和范型擦除">
+<meta name="twitter:description" content="没有范型之前实现类型安全1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465public class Main &amp;#123;    // 只能存放字符串 的 list    public static clas">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/30/ZB-032-01范型的由来和范型擦除/" title="ZB-032-01范型的由来和范型擦除" itemprop="url">ZB-032-01范型的由来和范型擦除</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-30T12:20:49.000Z" itemprop="datePublished"> Published 2019-10-30</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#没有范型之前实现类型安全"><span class="toc-number">1.</span> <span class="toc-text">没有范型之前实现类型安全</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#java1-5之后范型出现了"><span class="toc-number">2.</span> <span class="toc-text">java1.5之后范型出现了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#看一看范型类-ArrayList-的定义"><span class="toc-number">3.</span> <span class="toc-text">看一看范型类 ArrayList 的定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ArrayList-lt-E-gt-里的E是什么"><span class="toc-number">4.</span> <span class="toc-text">ArrayList&lt;E&gt; 里的E是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#问题来了"><span class="toc-number">5.</span> <span class="toc-text">问题来了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#范型好处"><span class="toc-number">6.</span> <span class="toc-text">范型好处</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#因此有了范型"><span class="toc-number"></span> <span class="toc-text">因此有了范型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#因为向后兼容性带来的问题"><span class="toc-number">1.</span> <span class="toc-text">因为向后兼容性带来的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#怎么实现擦除的"><span class="toc-number">2.</span> <span class="toc-text">怎么实现擦除的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#擦除带来的问题"><span class="toc-number">3.</span> <span class="toc-text">擦除带来的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#编译器的警告"><span class="toc-number">4.</span> <span class="toc-text">编译器的警告</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用限定符List-lt-gt-的"><span class="toc-number">5.</span> <span class="toc-text">使用限定符List&lt;?&gt; 的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用类型擦除绕过编译器检查"><span class="toc-number">6.</span> <span class="toc-text">利用类型擦除绕过编译器检查</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数组是真范型"><span class="toc-number">7.</span> <span class="toc-text">数组是真范型</span></a></li></ol>
+		
+		</div>
+		
+		<h4 id="没有范型之前实现类型安全"><a href="#没有范型之前实现类型安全" class="headerlink" title="没有范型之前实现类型安全"></a>没有范型之前实现类型安全</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    // 只能存放字符串 的 list</span><br><span class="line">    public static class StringList&#123;</span><br><span class="line">        public List list = new ArrayList();</span><br><span class="line"></span><br><span class="line">        public void add(String s)&#123;</span><br><span class="line">            list.add(s);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public String get(int i)&#123;</span><br><span class="line">            return (String) list.get(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public int size()&#123;</span><br><span class="line">            return list.size();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 只能存放整数 的 list</span><br><span class="line">    public static class IntList&#123;</span><br><span class="line">        public List list = new ArrayList();</span><br><span class="line"></span><br><span class="line">        public void add(Integer s)&#123;</span><br><span class="line">            list.add(s);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public Integer get(int i)&#123;</span><br><span class="line">            return (int) list.get(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public int size()&#123;</span><br><span class="line">            return list.size();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 从 String 到 Object 的映射</span><br><span class="line">    public static class StringObjectMap&#123;</span><br><span class="line">        Map map = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        public void put(String key,Object value)&#123;</span><br><span class="line">            map.put(key,value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public Object get(String key)&#123;</span><br><span class="line">            return map.get(key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        StringList stringList = new StringList();</span><br><span class="line">        stringList.add(&quot;a&quot;);</span><br><span class="line">        stringList.add(&quot;b&quot;);</span><br><span class="line"></span><br><span class="line">        IntList intList = new IntList();</span><br><span class="line">        intList.add(1);</span><br><span class="line">        intList.add(2);</span><br><span class="line"></span><br><span class="line">        StringObjectMap map = new StringObjectMap();</span><br><span class="line">        map.put(&quot;name&quot;,&quot;xxx&quot;);</span><br><span class="line">        map.put(&quot;age&quot;,18);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>很麻烦对不对~</li>
+<li>在上古时代 用刀耕火种的手段达到 类型安全的目的</li>
+<li>没有范型的年代 非常累  <a href="https://www.zhihu.com/question/62991191/answer/367617001" target="_blank" rel="noopener">go 语言到现在都没有范型(2019-10-30)</a></li>
+</ul>
+<h4 id="java1-5之后范型出现了"><a href="#java1-5之后范型出现了" class="headerlink" title="java1.5之后范型出现了"></a>java1.5之后范型出现了</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">       </span><br><span class="line"></span><br><span class="line">        ArrayList&lt;String&gt; stringList2 = new ArrayList&lt;&gt;();</span><br><span class="line">        stringList.add(&quot;a&quot;);</span><br><span class="line">        stringList.add(&quot;b&quot;);</span><br><span class="line"></span><br><span class="line">        ArrayList&lt;Integer&gt; intList2 = new ArrayList&lt;&gt;();</span><br><span class="line">        intList2.add(1);</span><br><span class="line">        intList2.add(2);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;String,Object&gt; map2 = new HashMap&lt;&gt;();</span><br><span class="line">        map.put(&quot;name&quot;,&quot;xxx&quot;);</span><br><span class="line">        map.put(&quot;age&quot;,18);</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时你再也不用写之前麻烦的代码</p>
+<h4 id="看一看范型类-ArrayList-的定义"><a href="#看一看范型类-ArrayList-的定义" class="headerlink" title="看一看范型类 ArrayList 的定义"></a>看一看范型类 ArrayList 的定义</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class ArrayList&lt;E&gt; extends AbstractList&lt;E&gt;</span><br><span class="line">        implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="ArrayList-lt-E-gt-里的E是什么"><a href="#ArrayList-lt-E-gt-里的E是什么" class="headerlink" title="ArrayList&lt;E&gt; 里的E是什么"></a><code>ArrayList&lt;E&gt;</code> 里的E是什么</h4></blockquote>
+<ul>
+<li>一个范型有一个类型声明(声明在类上) <code>ArrayList&lt;E&gt;</code> E </li>
+<li>可以通过传递一个参数进去，把这个类型变成全新的类型  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;String&gt;</span><br><span class="line">ArrayList&lt;Integer&gt;</span><br><span class="line">ArrayList&lt;Cat&gt;</span><br><span class="line">ArrayList&lt;Dog&gt;</span><br><span class="line">// 你传递什么类型 它就变成什么类型</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<h4 id="问题来了"><a href="#问题来了" class="headerlink" title="问题来了"></a>问题来了</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;String&gt; list1 = new ArrayList&lt;&gt;();</span><br><span class="line">ArrayList&lt;Integer&gt; list2 = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">list1.add(1); // 报错  只能添加 String 类型</span><br><span class="line">list2.add(&quot;1&quot;); // 报错 只能添加 Integer 类型</span><br><span class="line">// 报错 不能相互赋值</span><br><span class="line">ArrayList&lt;Integer&gt; list1 = new ArrayList&lt;String&gt;();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>它俩的区别，它们还是同一个类吗？</li>
+</ul>
+<p>答案是：<strong>它们是同一个类，也不是同一个类</strong></p>
+<blockquote>
+<p>它是同一个类，因为有 <strong>擦除</strong></p>
+</blockquote>
+<blockquote>
+<p>它不是同一个类，因为不能相互赋值</p>
+</blockquote>
+<h4 id="范型好处"><a href="#范型好处" class="headerlink" title="范型好处"></a>范型好处</h4><ul>
+<li>类型安全</li>
+<li>方便</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">HashMap hashMap = new HashMap();</span><br><span class="line">// 它的 key是 String, value 也是 String</span><br><span class="line">hashMap.put(&quot;name&quot;,&quot;abc&quot;);</span><br><span class="line">hashMap.put(&quot;age&quot;,&quot;18&quot;);</span><br><span class="line"></span><br><span class="line">for (Object key: hashMap.keySet()) &#123;</span><br><span class="line">    String stringKey = (String)key;</span><br><span class="line">    String stringValue = (String)hashMap.get(key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果你用的是范型就不需要这样转换类型</span><br><span class="line">HashMap&lt;String,String&gt; hashMap2 = new HashMap();</span><br><span class="line">// 它的 key是 String, value 也是 String</span><br><span class="line">hashMap2.put(&quot;name&quot;,&quot;abc&quot;);</span><br><span class="line">hashMap2.put(&quot;age&quot;,&quot;18&quot;);</span><br><span class="line"></span><br><span class="line">for (String key: hashMap2.keySet()) &#123;</span><br><span class="line">    String key2 = key;</span><br><span class="line">    String value2 = hashMap2.get(key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="因此有了范型"><a href="#因此有了范型" class="headerlink" title="因此有了范型"></a>因此有了范型</h3><ul>
+<li>从此，我们可以省力的方法编写类型安全的代码</li>
+<li>List<string></string></li>
+<li>Map&lt;String,Object&gt;</li>
+<li>Map&lt;Stirng,List<object>&gt;</object></li>
+</ul>
+<blockquote>
+<p>从无范型的世界1.4到有范型的世界1.5，那我们还要支持无范型的“原始类型”的容器吗？</p>
+</blockquote>
+<p>答案是：我们不想支持，但是不得不支持！</p>
+<p>因为<strong>向后兼容</strong>。这样的好处是 JDK1.0可以无缝在最新的JDK上运行 而且已经过了20多年了</p>
+<p>反观 Python2 / Python3 它为了更好的语法特性或改正一些缺陷放弃了向后兼容性，而java为了向后兼容性放弃了更好地语法特性</p>
+<h4 id="因为向后兼容性带来的问题"><a href="#因为向后兼容性带来的问题" class="headerlink" title="因为向后兼容性带来的问题"></a>因为向后兼容性带来的问题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">List list = new ArrayList();</span><br><span class="line">list.add(new Object());</span><br><span class="line">list.add(1);</span><br><span class="line">list.add(&quot;123&quot;);</span><br><span class="line">// 假设穿越到95年</span><br><span class="line">// list 可以添加任何类型没有限制</span><br></pre></td></tr></table></figure>
+<ul>
+<li><a href="https://www.zhihu.com/question/28665443" target="_blank" rel="noopener">java向后兼容性</a></li>
+<li>为了兼容性，只有两个选择<ul>
+<li>1擦除 java的选择</li>
+<li>2搞一套全新的API，C#的选择</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>为什么选择擦除</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JDK1.0的时候就存在的容器 </span><br><span class="line">它们是被废弃的容器</span><br><span class="line">Vector</span><br><span class="line">HashTable</span><br><span class="line">JDK1.2已经分裂了一次</span><br><span class="line"></span><br><span class="line">JDK1.5 范型的时候 如果在分裂 不是不行就是有点丑</span><br></pre></td></tr></table></figure>
+<h4 id="怎么实现擦除的"><a href="#怎么实现擦除的" class="headerlink" title="怎么实现擦除的"></a>怎么实现擦除的</h4><p>Main.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    </span><br><span class="line">        String[] arr = new String[2];</span><br><span class="line">        ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">    </span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译后 Main.class</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public Main() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String[] arr = new String[2];</span><br><span class="line">        new ArrayList();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时查看它的字节码文件 (IDEA顶部工具栏view -&gt; ShowByte code)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">// class version 52.0 (52)</span><br><span class="line">// access flags 0x21</span><br><span class="line">public class com/loder/demo/Main &#123;</span><br><span class="line"></span><br><span class="line">  // compiled from: Main.java</span><br><span class="line"></span><br><span class="line">  // access flags 0x1</span><br><span class="line">  public &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 5 L0</span><br><span class="line">    ALOAD 0</span><br><span class="line">    INVOKESPECIAL java/lang/Object.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE this Lcom/loder/demo/Main; L0 L1 0</span><br><span class="line">    MAXSTACK = 1</span><br><span class="line">    MAXLOCALS = 1</span><br><span class="line"></span><br><span class="line">  // access flags 0x9</span><br><span class="line">  public static main([Ljava/lang/String;)V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 9 L0</span><br><span class="line">    ICONST_2</span><br><span class="line">    ANEWARRAY java/lang/String</span><br><span class="line">    ASTORE 1</span><br><span class="line">   L1</span><br><span class="line">    LINENUMBER 10 L1</span><br><span class="line">    NEW java/util/ArrayList</span><br><span class="line">    DUP</span><br><span class="line">    INVOKESPECIAL java/util/ArrayList.&lt;init&gt; ()V</span><br><span class="line">    ASTORE 2</span><br><span class="line">   L2</span><br><span class="line">    LINENUMBER 12 L2</span><br><span class="line">    RETURN</span><br><span class="line">   L3</span><br><span class="line">    LOCALVARIABLE args [Ljava/lang/String; L0 L3 0</span><br><span class="line">    LOCALVARIABLE arr [Ljava/lang/String; L1 L3 1</span><br><span class="line">    LOCALVARIABLE list Ljava/util/ArrayList; L2 L3 2</span><br><span class="line">    // signature Ljava/util/ArrayList&lt;Ljava/lang/String;&gt;;</span><br><span class="line">    // declaration: list extends java.util.ArrayList&lt;java.lang.String&gt;</span><br><span class="line">    MAXSTACK = 2</span><br><span class="line">    MAXLOCALS = 3</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 你会惊讶的看到 ArrayList&lt;String&gt;上的 String 怎么没了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么说java的范型是一个假范型</p>
+</blockquote>
+<ul>
+<li>因为java的运行只看字节码，而字节码里ArrayList没有范型信息 String (它被擦除了)</li>
+</ul>
+<p>这就是为什么说java是假范型的原因</p>
+<p>因此称这个过程为 <strong>类型擦除</strong></p>
+<h4 id="擦除带来的问题"><a href="#擦除带来的问题" class="headerlink" title="擦除带来的问题"></a>擦除带来的问题</h4><ul>
+<li>Java的范型是编译器的范型<ul>
+<li>范型信息在运行期完全不保留<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;String&gt; list1 = new ArrayList&lt;&gt;();</span><br><span class="line">list1.add(1); // 编译器报错 提示你不能添加 不是 String的类型到 list1</span><br><span class="line"></span><br><span class="line">List list = new ArrayList();</span><br><span class="line">list.add(new Object()); // 此时编译器会给你警告 说你声明的list没有范型</span><br><span class="line">list.add(1);</span><br><span class="line">list.add(&quot;123&quot;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="编译器的警告"><a href="#编译器的警告" class="headerlink" title="编译器的警告"></a>编译器的警告</h4><blockquote>
+<h4 id="使用限定符List-lt-gt-的"><a href="#使用限定符List-lt-gt-的" class="headerlink" title="使用限定符List&lt;?&gt; 的"></a>使用限定符<code>List&lt;?&gt;</code> 的</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">List list = new ArrayList(); </span><br><span class="line">list.add(new Object());</span><br><span class="line">list.add(1);</span><br><span class="line">list.add(&quot;123&quot;);</span><br><span class="line"></span><br><span class="line">//你可以这样</span><br><span class="line">List&lt;?&gt; list = new ArrayList();</span><br><span class="line">// 此时编译器标红 </span><br><span class="line">list.add(new Object());</span><br><span class="line"></span><br><span class="line">//你可以 alt + enter 代码就变成了这样</span><br><span class="line">List&lt;Object&gt; list = new ArrayList();</span><br><span class="line">list.add(new Object());</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="利用类型擦除绕过编译器检查"><a href="#利用类型擦除绕过编译器检查" class="headerlink" title="利用类型擦除绕过编译器检查"></a>利用类型擦除绕过编译器检查</h4></blockquote>
+<blockquote>
+<p><code>List&lt;String&gt;并不是 List&lt;Object&gt;</code>的子类型</p>
+</blockquote>
+<ul>
+<li><code>类比String/Object,String[]/Object[]</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    static class Animal&#123;&#125;</span><br><span class="line"></span><br><span class="line">    static class Cat extends Animal&#123;&#125;</span><br><span class="line"></span><br><span class="line">    public static void foo(Animal a)&#123;&#125;</span><br><span class="line"></span><br><span class="line">    public static void foo(Animal[] a)&#123;&#125;</span><br><span class="line"></span><br><span class="line">    public static void foo(List&lt;Animal&gt; l)&#123;&#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // 可以传递子类型进入</span><br><span class="line">        foo(new Animal());</span><br><span class="line">        foo(new Cat());</span><br><span class="line"></span><br><span class="line">        // 即使是数组也可以传递 子类型数组</span><br><span class="line">        foo(new Animal[2]);</span><br><span class="line">        foo(new Cat[2]);</span><br><span class="line"></span><br><span class="line">        foo(new ArrayList&lt;Animal&gt;());</span><br><span class="line">        foo(new ArrayList&lt;Cat&gt;()); // 报错 此时竟然不能传递子类型的容器</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原因是：类型擦除你实际传递的是 <code>new ArrayList()</code></p>
+<blockquote>
+<p>另一个问题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void foo(List&lt;Animal&gt; l)&#123;&#125;</span><br><span class="line"></span><br><span class="line">public static void foo(List l)&#123;&#125;</span><br><span class="line"></span><br><span class="line">// 看上去不一样，但是会报错，因为范型是有抹去的(擦除)</span><br><span class="line">实际它们都是</span><br><span class="line">public static void foo(List l)&#123;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>绕过编译器检查</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;Animal&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">// 你可以这样</span><br><span class="line">ArrayList rawList = list;</span><br><span class="line">rawList.add(&quot;&quot;);</span><br><span class="line">rawList.add(1);</span><br><span class="line">rawList.add(new Object());</span><br><span class="line"></span><br><span class="line">// 还可以这样</span><br><span class="line">ArrayList&lt;Cat&gt; catArrayList = (ArrayList) list;</span><br></pre></td></tr></table></figure>
+<h4 id="数组是真范型"><a href="#数组是真范型" class="headerlink" title="数组是真范型"></a>数组是真范型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        </span><br><span class="line">        String[] s = new String[2];</span><br><span class="line">        // 通过了检查</span><br><span class="line">        testStringArray(s);</span><br><span class="line">    &#125;</span><br><span class="line">    // 数组是真范型，即使你通过了编译期的类型检查，但是运行还是会报错</span><br><span class="line"></span><br><span class="line">    public static void testStringArray(Object[] o)&#123;</span><br><span class="line">        // 这里修改为 int 类型</span><br><span class="line">        o[0] = 1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 运行报错</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.ArrayStoreException: java.lang.Integer</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但是如果是 List 就不会报错</p>
+</blockquote>
+<ul>
+<li>意思是只要通过编译器检查，就万事大吉了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">        testListSafety((ArrayList)list);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void testListSafety(List&lt;Object&gt; o)&#123;</span><br><span class="line">        // 这里添加 int 类型</span><br><span class="line">        o.add(1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 不报错</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结论</p>
+</blockquote>
+<p>所谓的java范型是编译期的，运行时就完全没了</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/10/30/ZB-032-01范型的由来和范型擦除/" data-title="ZB-032-01范型的由来和范型擦除 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/10/30/ZB-032-02范型的绑定/" title="ZB-032-02范型的绑定">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-032-02范型的绑定</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/10/29/ZB-031-01为什么需要范型/"  title="ZB-031-01为什么需要范型">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-031-01为什么需要范型
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#没有范型之前实现类型安全"><span class="toc-number">1.</span> <span class="toc-text">没有范型之前实现类型安全</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#java1-5之后范型出现了"><span class="toc-number">2.</span> <span class="toc-text">java1.5之后范型出现了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#看一看范型类-ArrayList-的定义"><span class="toc-number">3.</span> <span class="toc-text">看一看范型类 ArrayList 的定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ArrayList-lt-E-gt-里的E是什么"><span class="toc-number">4.</span> <span class="toc-text">ArrayList&lt;E&gt; 里的E是什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#问题来了"><span class="toc-number">5.</span> <span class="toc-text">问题来了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#范型好处"><span class="toc-number">6.</span> <span class="toc-text">范型好处</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#因此有了范型"><span class="toc-number"></span> <span class="toc-text">因此有了范型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#因为向后兼容性带来的问题"><span class="toc-number">1.</span> <span class="toc-text">因为向后兼容性带来的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#怎么实现擦除的"><span class="toc-number">2.</span> <span class="toc-text">怎么实现擦除的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#擦除带来的问题"><span class="toc-number">3.</span> <span class="toc-text">擦除带来的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#编译器的警告"><span class="toc-number">4.</span> <span class="toc-text">编译器的警告</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用限定符List-lt-gt-的"><span class="toc-number">5.</span> <span class="toc-text">使用限定符List&lt;?&gt; 的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#利用类型擦除绕过编译器检查"><span class="toc-number">6.</span> <span class="toc-text">利用类型擦除绕过编译器检查</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数组是真范型"><span class="toc-number">7.</span> <span class="toc-text">数组是真范型</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -1,0 +1,785 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-017-java包管理和maven | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="什么是包 JVM的⼯作被设计地相当简单： 执⾏⼀个类的字节码 假如这个过程中碰到了新的类，加载它，然后回到第一步，这样循环往复     那么，去哪⾥加载这些类呢？   答案是 classpath类路径  类路径（Classpath） 在哪⾥可以找到类 -classpath/-cp   类的全限定类名（⽬录层级）唯⼀确定了⼀个类 包就是把许多类放在⼀起打的压缩包 jar 包  每次 IDEA 运行j">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-017-java包管理和maven">
+<meta property="og:url" content="http://yoursite.com/2019/07/16/ZB-017-java包管理和maven/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="什么是包 JVM的⼯作被设计地相当简单： 执⾏⼀个类的字节码 假如这个过程中碰到了新的类，加载它，然后回到第一步，这样循环往复     那么，去哪⾥加载这些类呢？   答案是 classpath类路径  类路径（Classpath） 在哪⾥可以找到类 -classpath/-cp   类的全限定类名（⽬录层级）唯⼀确定了⼀个类 包就是把许多类放在⼀起打的压缩包 jar 包  每次 IDEA 运行j">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.334Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-017-java包管理和maven">
+<meta name="twitter:description" content="什么是包 JVM的⼯作被设计地相当简单： 执⾏⼀个类的字节码 假如这个过程中碰到了新的类，加载它，然后回到第一步，这样循环往复     那么，去哪⾥加载这些类呢？   答案是 classpath类路径  类路径（Classpath） 在哪⾥可以找到类 -classpath/-cp   类的全限定类名（⽬录层级）唯⼀确定了⼀个类 包就是把许多类放在⼀起打的压缩包 jar 包  每次 IDEA 运行j">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/07/16/ZB-017-java包管理和maven/" title="ZB-017-java包管理和maven" itemprop="url">ZB-017-java包管理和maven</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-07-16T12:47:35.000Z" itemprop="datePublished"> Published 2019-07-16</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是包"><span class="toc-number">1.</span> <span class="toc-text">什么是包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类路径（Classpath）"><span class="toc-number">2.</span> <span class="toc-text">类路径（Classpath）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是-jar-文件"><span class="toc-number">2.1.</span> <span class="toc-text">什么是 jar 文件</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#每当-JVM-需要一个类时，它就会在当前的-classpath里-按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出-classNotFound"><span class="toc-number">2.1.1.</span> <span class="toc-text">每当 JVM 需要一个类时，它就会在当前的 classpath里 按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出 classNotFound</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#别急，还没完"><span class="toc-number">3.</span> <span class="toc-text">别急，还没完</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#当你的-classpath里包含了相同包，但是版本不同会发生什么"><span class="toc-number">3.1.</span> <span class="toc-text">当你的 classpath里包含了相同包，但是版本不同会发生什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#问题升级，引入版本不同，但是同名的jar包"><span class="toc-number">3.2.</span> <span class="toc-text">问题升级，引入版本不同，但是同名的jar包</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是包管理"><span class="toc-number">4.</span> <span class="toc-text">什么是包管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#没有Maven的蛮荒年代"><span class="toc-number">5.</span> <span class="toc-text">没有Maven的蛮荒年代</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#黑暗时代"><span class="toc-number">5.1.</span> <span class="toc-text">黑暗时代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#启蒙时代"><span class="toc-number">5.2.</span> <span class="toc-text">启蒙时代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Maven——划时代的包管理"><span class="toc-number">5.3.</span> <span class="toc-text">Maven——划时代的包管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#maven-为什么知道包从哪里下载呢？"><span class="toc-number">5.4.</span> <span class="toc-text">maven 为什么知道包从哪里下载呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Maven的包"><span class="toc-number">5.5.</span> <span class="toc-text">Maven的包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#包冲突"><span class="toc-number">5.6.</span> <span class="toc-text">包冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实战：解决包冲突"><span class="toc-number">5.7.</span> <span class="toc-text">实战：解决包冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么会干掉-C0-2-而不是C0-1"><span class="toc-number">5.8.</span> <span class="toc-text">为什么会干掉 C0.2,而不是C0.1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">5.9.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如下依赖谁会被淘汰"><span class="toc-number">5.10.</span> <span class="toc-text">如下依赖谁会被淘汰</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#依赖的-scope"><span class="toc-number">5.11.</span> <span class="toc-text">依赖的 scope</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#maven-不仅仅是包管理工具还是一个自动化构建工具"><span class="toc-number">6.</span> <span class="toc-text">maven 不仅仅是包管理工具还是一个自动化构建工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#真实世界中的Maven"><span class="toc-number">7.</span> <span class="toc-text">真实世界中的Maven</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">8.</span> <span class="toc-text">练习</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="什么是包"><a href="#什么是包" class="headerlink" title="什么是包"></a>什么是包</h3><ul>
+<li>JVM的⼯作被设计地相当简单：<ol>
+<li>执⾏⼀个类的字节码</li>
+<li>假如这个过程中碰到了新的类，加载它，然后回到第一步，这样循环往复</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>那么，去哪⾥加载这些类呢？</p>
+</blockquote>
+<ul>
+<li>答案是 classpath<strong>类路径</strong></li>
+</ul>
+<h3 id="类路径（Classpath）"><a href="#类路径（Classpath）" class="headerlink" title="类路径（Classpath）"></a>类路径（Classpath）</h3><ul>
+<li>在哪⾥可以找到类<ul>
+<li>-classpath/-cp</li>
+</ul>
+</li>
+<li>类的全限定类名（⽬录层级）唯⼀确定了⼀个类</li>
+<li>包就是把许多类放在⼀起打的压缩包 <strong>jar 包</strong></li>
+</ul>
+<p>每次 IDEA 运行java项目显示的命令行</p>
+<p><strong>程序运行时：会挨个在 classpath路径里找。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java &quot;-javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=51272:</span><br><span class="line">/Applications/IntelliJ IDEA.app/Contents/bin&quot; </span><br><span class="line">-Dfile.encoding=UTF-8 </span><br><span class="line">-classpath </span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/charsets.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/deploy.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/cldrdata.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/dnsns.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/jaccess.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/jfxrt.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/localedata.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/nashorn.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunec.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunjce_provider.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunpkcs11.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/zipfs.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/javaws.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jce.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jfr.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jfxswt.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jsse.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/management-agent.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/plugin.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/resources.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/rt.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/ant-javafx.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/dt.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/javafx-mx.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/jconsole.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/packager.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/sa-jdi.jar:</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/tools.jar:</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 当前目录的 target/classes 就是本项目里的 类文件</span><br><span class="line"></span><br><span class="line">/Users/huangjiaxi/Desktop/java-fork-process/target/classes </span><br><span class="line"></span><br><span class="line">com.github.hcsp.shell.Fork</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="什么是-jar-文件"><a href="#什么是-jar-文件" class="headerlink" title="什么是 jar 文件"></a>什么是 jar 文件</h4></blockquote>
+<ul>
+<li>实际就是 跟<code>zip</code>一样压缩后的文件，只不过这里叫 <code>jar包</code></li>
+</ul>
+<h5 id="每当-JVM-需要一个类时，它就会在当前的-classpath里-按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出-classNotFound"><a href="#每当-JVM-需要一个类时，它就会在当前的-classpath里-按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出-classNotFound" class="headerlink" title="每当 JVM 需要一个类时，它就会在当前的 classpath里 按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出 classNotFound"></a>每当 JVM 需要一个类时，它就会在当前的 classpath里 按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出 classNotFound</h5><blockquote>
+<p>如果你依赖的类中还依赖了别的包呢？</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A 依赖 B , B 依赖 C , C 又依赖 D</span><br><span class="line">D 从那里找呢？</span><br></pre></td></tr></table></figure>
+<p>这就是 <strong>传递性依赖</strong> ,这就是为什么上面的命令行里 classpach 那么长的原因，要把所有依赖的path 添加进来</p>
+<p>一个简单的项目命令行尚且如此之长，而一个真实项目可能有成百上千的依赖，如果你手动拼接，肯定又各种各样的问题，这就是为什么使用自动化工具的原因。</p>
+<p>自动化的本质就是：帮我们把一些很啰嗦很累赘变成自动化</p>
+<h3 id="别急，还没完"><a href="#别急，还没完" class="headerlink" title="别急，还没完"></a>别急，还没完</h3><blockquote>
+<p>没有maven时，你要手动导入jar包还有相关依赖，多人协作的时候非常麻烦。</p>
+</blockquote>
+<ul>
+<li>传递性依赖<ul>
+<li>你依赖的类还依赖了别的类</li>
+</ul>
+</li>
+<li>Classpath hell<ul>
+<li>全限定类名是类的唯⼀标识</li>
+<li>当多个同名类同时出现在Classpath中，就是噩梦的开始</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<h4 id="当你的-classpath里包含了相同包，但是版本不同会发生什么"><a href="#当你的-classpath里包含了相同包，但是版本不同会发生什么" class="headerlink" title="当你的 classpath里包含了相同包，但是版本不同会发生什么"></a>当你的 classpath里包含了相同包，但是版本不同会发生什么</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-classpath </span><br><span class="line">xxx.5.0.0.jar:</span><br><span class="line">xxx.4.0.0.jar</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时两个jar包里 有同名类 a</li>
+<li>在你程序运行时 会引用那个 类？</li>
+</ul>
+<p>答案是 <strong>谁在前面用谁</strong></p>
+<blockquote>
+<h4 id="问题升级，引入版本不同，但是同名的jar包"><a href="#问题升级，引入版本不同，但是同名的jar包" class="headerlink" title="问题升级，引入版本不同，但是同名的jar包"></a>问题升级，引入版本不同，但是同名的jar包</h4></blockquote>
+<ul>
+<li>版本不同的时候，代码可能是不一样的，以致于你的程序看上去可以运行。突然三天或三年后的某一天突然运行到一个地方出错了。你就很懵  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-classpath </span><br><span class="line">xxx.4.0.0.jar: </span><br><span class="line">xxx.5.0.0.jar</span><br><span class="line"></span><br><span class="line"># 4.0.0 是你实际使用的jar包</span><br><span class="line"># 5.0.0 是更新后的一个大版本修复了4.0.0的某些bug, 可能一些方法 API 已经变的面目全非了。</span><br><span class="line">但是在你看在程序还是正常的跑，只是没运行到出bug的地方</span><br><span class="line">你的项目如期上线，然后某天爆出个bug</span><br><span class="line">这个情况就叫 Classpath hell 依赖地狱</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="什么是包管理"><a href="#什么是包管理" class="headerlink" title="什么是包管理"></a>什么是包管理</h3><ul>
+<li>你要使⽤⼀些第三⽅类，总要告诉JVM从哪⾥找吧？</li>
+<li>包管理的本质就是告诉JVM如何找到所需的第三⽅类库</li>
+<li>以及成功地解决其中的冲突问题</li>
+</ul>
+<h3 id="没有Maven的蛮荒年代"><a href="#没有Maven的蛮荒年代" class="headerlink" title="没有Maven的蛮荒年代"></a>没有Maven的蛮荒年代</h3><blockquote>
+<p>以前怎么做的这些依赖</p>
+</blockquote>
+<h4 id="黑暗时代"><a href="#黑暗时代" class="headerlink" title="黑暗时代"></a>黑暗时代</h4><ul>
+<li>⼿动写命令进⾏编译运⾏</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">javac -cp  xx.jar xx2.jar Main.java</span><br><span class="line">java -cp xx.jar xx2.jar Main</span><br><span class="line"></span><br><span class="line"># 假设此时 jar包成百上千呢？</span><br></pre></td></tr></table></figure>
+<h4 id="启蒙时代"><a href="#启蒙时代" class="headerlink" title="启蒙时代"></a>启蒙时代</h4><ul>
+<li>Apache Ant<ul>
+<li>⼿动下载jar包，放在⼀个⽬录中</li>
+<li>写XML配置，指定编译的源代码⽬录、依赖的jar包、输出<br>⽬录等</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>每个⼈都要⾃⼰造⼀套轮⼦<ol>
+<li>我的放在 libs</li>
+<li>你的放在 sources</li>
+<li>他的放在 libaray </li>
+</ol>
+</li>
+<li>依赖的第三⽅类库都需要⼿动下载，费时费⼒<ul>
+<li>假如你的应⽤依赖了⼀万个第三⽅的类库呢？都需要把依赖的库挨个下载下来</li>
+</ul>
+</li>
+<li>没有解决Classpath地狱的问题，碰上重复的库你就完蛋了</li>
+</ul>
+</li>
+</ul>
+<h4 id="Maven——划时代的包管理"><a href="#Maven——划时代的包管理" class="headerlink" title="Maven——划时代的包管理"></a>Maven——划时代的包管理</h4><ul>
+<li>Convention over configuration</li>
+<li>约定优于配置</li>
+<li>必须强调，Maven远远不⽌是包管理⼯具</li>
+<li>Maven的中央仓库<ul>
+<li>按照⼀定的约定存储包（坐标）</li>
+</ul>
+</li>
+<li>Maven的本地仓库<ul>
+<li>默认位于~/.m2</li>
+<li>下载的第三⽅包放在这⾥进⾏缓存</li>
+</ul>
+</li>
+<li>Maven的包<ul>
+<li>按照约定为所有的包编号，⽅便检索</li>
+<li>groupId/artifactId/version<ul>
+<li>扩展：语义化版本</li>
+</ul>
+</li>
+<li>SNAPSHOT快照版本</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>当你不知道一个包的坐标你就搜 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">xxx.xxx.xxx maven 通常第一个就是包的正确的名字</span><br><span class="line"></span><br><span class="line">每个包有自己的版本</span><br><span class="line">如 junit-jupiter-api 5.5.0</span><br><span class="line">它会不停的升级。版本一旦发布，maven的约定是不能更改只能继续升级。 </span><br><span class="line">目的是 maven 想要实现一个可重现的构建，就是你机子上跑的和我机子上跑的 是一样的。 </span><br><span class="line"></span><br><span class="line">因为一旦同版本允许修改，就可能你跑的时候是好的，我跑的时候是坏的</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="maven-为什么知道包从哪里下载呢？"><a href="#maven-为什么知道包从哪里下载呢？" class="headerlink" title="maven 为什么知道包从哪里下载呢？"></a>maven 为什么知道包从哪里下载呢？</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">当你引入依赖</span><br><span class="line"></span><br><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.4.2&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">maven 就会去它的主仓库 https://repo1.maven.org/maven2/</span><br><span class="line">按照你的 groupId 里的路径 </span><br><span class="line">https://repo1.maven.org/maven2/org</span><br><span class="line">https://repo1.maven.org/maven2/org/junit/</span><br><span class="line">https://repo1.maven.org/maven2/org/junit/jupiter</span><br><span class="line"></span><br><span class="line">然后按照 artifactId 找路径</span><br><span class="line">https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-engine/</span><br><span class="line"></span><br><span class="line">然后按照办不好 5.4.2</span><br><span class="line">https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-engine/5.4.2/</span><br></pre></td></tr></table></figure>
+<p>里面有一堆文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar            2019-04-07 17:29    683506      </span><br><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar.asc        2019-04-07 17:29       821      </span><br><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar.asc.md...  2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar.asc.sh...  2019-04-07 17:29        40      </span><br><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar.md5        2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2-javadoc.jar.sha1       2019-04-07 17:29        40    </span><br><span class="line"># 源代码  </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar            2019-04-07 17:29    110900      </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar.asc        2019-04-07 17:29       821      </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar.asc.md...  2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar.asc.sh...  2019-04-07 17:29        40      </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar.md5        2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2-sources.jar.sha1       2019-04-07 17:29        40      </span><br><span class="line"># 真正的 jar包</span><br><span class="line">junit-jupiter-engine-5.4.2.jar                    2019-04-07 17:29    177798      </span><br><span class="line">junit-jupiter-engine-5.4.2.jar.asc                2019-04-07 17:29       821      </span><br><span class="line">junit-jupiter-engine-5.4.2.jar.asc.md5            2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2.jar.asc.sha1           2019-04-07 17:29        40      </span><br><span class="line">junit-jupiter-engine-5.4.2.jar.md5                2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2.jar.sha1               2019-04-07 17:29        40    </span><br><span class="line"># 当前包所依赖的包  </span><br><span class="line">junit-jupiter-engine-5.4.2.pom                    2019-04-07 17:29      2395      </span><br><span class="line">junit-jupiter-engine-5.4.2.pom.asc                2019-04-07 17:29       821      </span><br><span class="line">junit-jupiter-engine-5.4.2.pom.asc.md5            2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2.pom.asc.sha1           2019-04-07 17:29        40      </span><br><span class="line">junit-jupiter-engine-5.4.2.pom.md5                2019-04-07 17:29        32      </span><br><span class="line">junit-jupiter-engine-5.4.2.pom.sha1               2019-04-07 17:29        40</span><br></pre></td></tr></table></figure>
+<p>这样就实现了。你pom引入了一个junit-jupiter-engine-5.4.2的依赖，然后它下载后根据junit-jupiter-engine-5.4.2.pom文件去下载 当前包的依赖(传递性依赖)</p>
+<p><strong>这样就形成了一颗依赖树</strong>，你可以在 IDEA maven工具栏的<code>Dependencies</code> 里看到</p>
+<p><code>pom.xml</code>里的aliyun镜像,就是为了下载更快。也可以配置到你本地安装的maven里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;repositories&gt;</span><br><span class="line">    &lt;repository&gt;</span><br><span class="line">        &lt;id&gt;alimaven&lt;/id&gt;</span><br><span class="line">        &lt;name&gt;aliyun maven&lt;/name&gt;</span><br><span class="line">        &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;</span><br><span class="line">    &lt;/repository&gt;</span><br><span class="line">&lt;/repositories&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="Maven的包"><a href="#Maven的包" class="headerlink" title="Maven的包"></a>Maven的包</h4></blockquote>
+<ul>
+<li>按照约定为所有的包编号，⽅便检索</li>
+<li>groupId/artifactId/version<ul>
+<li>扩展：<a href="https://semver.org/lang/zh-CN/" target="_blank" rel="noopener">语义化版本 x.y.z</a></li>
+</ul>
+</li>
+<li>SNAPSHOT快照版本  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-engine/</span><br><span class="line"></span><br><span class="line">里 你开发的包可能不会立马上线，需要一直测一直改一直发布。但是总不能每次都发布一个版本吧！ </span><br><span class="line">5.0.0/                                            2017-09-10 18:09         -      </span><br><span class="line">5.0.0-M1/                                         2016-07-07 09:05         -      </span><br><span class="line">5.0.0-M2/                                         2016-07-23 18:14         -      </span><br><span class="line">5.0.0-M3/                                         2016-11-30 09:06         -      </span><br><span class="line">5.0.0-M4/                                         2017-04-01 19:23         -      </span><br><span class="line">5.0.0-M5/                                         2017-07-04 16:39         -      </span><br><span class="line">5.0.0-M6/                                         2017-07-18 19:27         -      </span><br><span class="line"># RC叫做 发布准备版 但是它们都不是 SNAPSHOT快照版本，也基本不会在中央仓库里放置</span><br><span class="line"># 中央仓库都是放成熟的。</span><br><span class="line">5.0.0-RC1/                                        2017-07-30 19:13         -      </span><br><span class="line">5.0.0-RC2/                                        2017-07-30 20:37         -</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>maven 默认会帮你下载字节码的包，如需看源码 可以在 IDEA 点击下载 </p>
+<h4 id="包冲突"><a href="#包冲突" class="headerlink" title="包冲突"></a>包冲突</h4><blockquote>
+<p>当你看到如下的异常的时候，<strong>包冲突发生了</strong></p>
+<ul>
+<li>AbstractMethodError</li>
+<li>NoClassDefFoundError</li>
+<li>ClassNotFoundException</li>
+<li>LinkageError</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>举个例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">你的项目里</span><br><span class="line">依赖了 A</span><br><span class="line">依赖了 D</span><br><span class="line"></span><br><span class="line">A 又依赖了 B , B又依赖了 C</span><br><span class="line">D 又依赖了 C</span><br><span class="line"></span><br><span class="line">|A</span><br><span class="line">--|B</span><br><span class="line">--|--|C 1.0</span><br><span class="line"></span><br><span class="line">|D</span><br><span class="line">--|C 2.0</span><br><span class="line"></span><br><span class="line">此时 两个 C 就导致了 包冲突</span><br><span class="line"></span><br><span class="line">-classpath A:B:C1.0:D:C2.0</span><br><span class="line"></span><br><span class="line"># 因为之前说了 classpath hell 依赖地狱</span><br><span class="line">由于全限定类名是类的唯一标识，此时如果存在两个同名不同版本的库 同时出现在 classpath 中 那么噩梦开始了</span><br><span class="line"></span><br><span class="line">如果有同名的库出现在 classpath 中 JVM 会选择靠前的那个 也就是 C1.0</span><br><span class="line"></span><br><span class="line">但是 靠前的那个 C1.0 不一定是你想要的那个，有可能只是你忘了。</span><br></pre></td></tr></table></figure>
+<p><strong>对此</strong> maven 的原则是</p>
+<ul>
+<li>传递性依赖的⾃动管理<ul>
+<li>原则：绝对不允许最终的classpath出现同名不同版本的jar包</li>
+</ul>
+</li>
+<li><p>依赖冲突的解决：原则：<strong>最近的胜出</strong> </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">你的项目里</span><br><span class="line">依赖了 A</span><br><span class="line">依赖了 D</span><br><span class="line"></span><br><span class="line">A 又依赖了 B , B又依赖了 C</span><br><span class="line">D 又依赖了 C</span><br><span class="line"></span><br><span class="line">|A</span><br><span class="line">--|B</span><br><span class="line">--|--|C 1.0</span><br><span class="line"></span><br><span class="line">|D</span><br><span class="line">--|C 2.0</span><br><span class="line"></span><br><span class="line">C2.0 更加离 依赖树的根更近</span><br><span class="line">也就是 C2.0 获胜，淘汰 C1.0</span><br><span class="line">-classpath A:B:D:C2.0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这个过程绝大多数是可以正常工作的，但是</li>
+<li><code>mvn dependency:tree</code>  </li>
+</ul>
+</li>
+<li>依赖的scope</li>
+</ul>
+<blockquote>
+<h4 id="实战：解决包冲突"><a href="#实战：解决包冲突" class="headerlink" title="实战：解决包冲突"></a>实战：解决包冲突</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">你的项目依赖了 A / D</span><br><span class="line"></span><br><span class="line">|A 0.1</span><br><span class="line">--|B 0.1</span><br><span class="line">--|--|C 0.2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">|D 0.1</span><br><span class="line">--|C 0.1 </span><br><span class="line"></span><br><span class="line">此时 maven 帮你淘汰了 C0.2 版本 因为它离得太远</span><br><span class="line">-classpath A0.1:D0.1:B0.1:C0.1</span><br><span class="line"></span><br><span class="line">此时就有 bug ,因为你想要的是 C0.2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="为什么会干掉-C0-2-而不是C0-1"><a href="#为什么会干掉-C0-2-而不是C0-1" class="headerlink" title="为什么会干掉 C0.2,而不是C0.1"></a>为什么会干掉 C0.2,而不是C0.1</h4></blockquote>
+<ul>
+<li>答案是 <strong>maven就是这样设计的，它不分析语义版本，对于人类我们知道 0.2&gt;0.1,但是maven在设计上的原则是谁离得更近，Gradle的策略是选择版本高的，但这也不是万能的。</strong></li>
+<li>很多时候还是要人工介入</li>
+</ul>
+<blockquote>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4></blockquote>
+<ol>
+<li><p>强行引入 C0.2版本</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">|A 0.1</span><br><span class="line">--|B 0.1</span><br><span class="line">--|--|C 0.2</span><br><span class="line"></span><br><span class="line">|D 0.1</span><br><span class="line">--|C 0.1 </span><br><span class="line"></span><br><span class="line">|C0.2</span><br><span class="line"></span><br><span class="line">C0.2 离得比 C0.1近。所以淘汰 C0.1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>exclusion 排除指定依赖</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">|A 0.1</span><br><span class="line">--|B 0.1</span><br><span class="line">--|--|C 0.2</span><br><span class="line"></span><br><span class="line">|D 0.1</span><br><span class="line">--|C 0.1 </span><br><span class="line">通过 exclusion 来告诉 maven 忽略某个依赖 的子依赖</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;xxx.xxx&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;D&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;0.1&lt;/version&gt;</span><br><span class="line">    &lt;exclusions&gt;</span><br><span class="line">        &lt;groupId&gt;yyy.yyyy&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;C&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;0.1&lt;/version&gt;</span><br><span class="line">    &lt;/exclusions&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一个IDEA 插件 <code>maven helper</code></p>
+<ul>
+<li>能帮你分析当前的依赖树 和被淘汰的依赖标红显示</li>
+<li>你想排除指定版本只需要选中依赖 点击 <code>Exclude</code></li>
+<li>一目了然帮你看到依赖树</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<h4 id="如下依赖谁会被淘汰"><a href="#如下依赖谁会被淘汰" class="headerlink" title="如下依赖谁会被淘汰"></a>如下依赖谁会被淘汰</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">|A </span><br><span class="line">--|B </span><br><span class="line">--|--|C0.1</span><br><span class="line"></span><br><span class="line">|D</span><br><span class="line">--|E </span><br><span class="line">----|C0.2</span><br><span class="line"></span><br><span class="line">C0.1 获胜，因为C0.1 路径相同则选择靠前的那个</span><br></pre></td></tr></table></figure>
+<h4 id="依赖的-scope"><a href="#依赖的-scope" class="headerlink" title="依赖的 scope"></a>依赖的 scope</h4><blockquote>
+<p>实现代码的隔离</p>
+</blockquote>
+<ul>
+<li><code>&lt;scope&gt;test&lt;/scope&gt;</code> 代表只在 src/test目录可见</li>
+<li><code>&lt;scope&gt;compile&lt;/scope&gt;</code> 在 src/main 和 src/test 都有效</li>
+<li><code>&lt;scope&gt;provided&lt;/scope&gt;</code> 只在编译的时候有效<ol>
+<li>我们运行java的时候 右键 run 会先编译，此时会把依赖包在 -classpath 里体现</li>
+<li>而在运行的时候 -classpath 不包含依赖包的路径</li>
+<li>它的意思就是 编译的时候需要，运行的时候别人帮我提供，你不需要帮我加,防止包冲突。 最经典的就是 tomcat ，你的项目编译后会放在 tomcat容器里，tomcat 会帮你提供这些依赖包<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.4.2&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.4.2&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;compile&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="maven-不仅仅是包管理工具还是一个自动化构建工具"><a href="#maven-不仅仅是包管理工具还是一个自动化构建工具" class="headerlink" title="maven 不仅仅是包管理工具还是一个自动化构建工具"></a>maven 不仅仅是包管理工具还是一个自动化构建工具</h3><blockquote>
+<p>推荐一本书 Maven实战 google搜 <a href="https://github.com/skyformat99/books-1/blob/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E2%97%8F%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B%E2%97%8F%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/Maven%E5%AE%9E%E6%88%98.pdf" target="_blank" rel="noopener">Maven实战 site:github.com</a></p>
+</blockquote>
+<ul>
+<li>Maven实战哪些章节是值得看的？<ul>
+<li>1 简介可以看看</li>
+<li>3.1-3.4 代码是过时的</li>
+<li>4 可以看 背景案例也是过时的 看场景</li>
+<li>5  </li>
+<li>6</li>
+<li>7 </li>
+<li>8</li>
+<li>其他选看</li>
+</ul>
+</li>
+<li>Maven项⽬的基本结构（传世经典）</li>
+<li>基本概念：坐标和依赖/⽣命周期/仓库/聚合和继承</li>
+<li>使⽤Maven进⾏测试</li>
+<li>如果需要开发插件的话：</li>
+<li>Maven的插件</li>
+</ul>
+<h3 id="真实世界中的Maven"><a href="#真实世界中的Maven" class="headerlink" title="真实世界中的Maven"></a>真实世界中的Maven</h3><ul>
+<li>分析若⼲真实世界的Maven仓库</li>
+<li>pom的含义 <strong>project object model</strong> 项目说明书</li>
+</ul>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><ol>
+<li><a href="https://github.com/hcsp/fix-commons-lang-pom" target="_blank" rel="noopener">修复commons-lang项目的pom文件</a><br> <a href="https://github.com/hcsp/fix-commons-lang-pom/pull/6" target="_blank" rel="noopener">我的pr</a></li>
+<li><a href="https://github.com/hcsp/resolve-package-conflict" target="_blank" rel="noopener">解决包冲突</a><br> <a href="https://github.com/hcsp/resolve-package-conflict/pull/4" target="_blank" rel="noopener">我的pr</a></li>
+<li><a href="https://github.com/hcsp/implement-sem-version" target="_blank" rel="noopener">实现语义化版本</a><br> <a href="https://github.com/hcsp/implement-sem-version/pull/1" target="_blank" rel="noopener">我的pr</a></li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/07/16/ZB-017-java包管理和maven/" data-title="ZB-017-java包管理和maven | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/07/22/ZB-018-Collection体系原理/" title="ZB-018-Collection体系原理">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-018-Collection体系原理</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/07/15/ZB-016-命令行详解02/"  title="ZB-016-命令行详解02">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-016-命令行详解02
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是包"><span class="toc-number">1.</span> <span class="toc-text">什么是包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类路径（Classpath）"><span class="toc-number">2.</span> <span class="toc-text">类路径（Classpath）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#什么是-jar-文件"><span class="toc-number">2.1.</span> <span class="toc-text">什么是 jar 文件</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#每当-JVM-需要一个类时，它就会在当前的-classpath里-按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出-classNotFound"><span class="toc-number">2.1.1.</span> <span class="toc-text">每当 JVM 需要一个类时，它就会在当前的 classpath里 按照这个类的全限定类名挨个找，如果是jar包就解压缩然后在解压缩后的目录里找，如果是一个文件夹就直接按照目录找，找不到就抛出 classNotFound</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#别急，还没完"><span class="toc-number">3.</span> <span class="toc-text">别急，还没完</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#当你的-classpath里包含了相同包，但是版本不同会发生什么"><span class="toc-number">3.1.</span> <span class="toc-text">当你的 classpath里包含了相同包，但是版本不同会发生什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#问题升级，引入版本不同，但是同名的jar包"><span class="toc-number">3.2.</span> <span class="toc-text">问题升级，引入版本不同，但是同名的jar包</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是包管理"><span class="toc-number">4.</span> <span class="toc-text">什么是包管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#没有Maven的蛮荒年代"><span class="toc-number">5.</span> <span class="toc-text">没有Maven的蛮荒年代</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#黑暗时代"><span class="toc-number">5.1.</span> <span class="toc-text">黑暗时代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#启蒙时代"><span class="toc-number">5.2.</span> <span class="toc-text">启蒙时代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Maven——划时代的包管理"><span class="toc-number">5.3.</span> <span class="toc-text">Maven——划时代的包管理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#maven-为什么知道包从哪里下载呢？"><span class="toc-number">5.4.</span> <span class="toc-text">maven 为什么知道包从哪里下载呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Maven的包"><span class="toc-number">5.5.</span> <span class="toc-text">Maven的包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#包冲突"><span class="toc-number">5.6.</span> <span class="toc-text">包冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实战：解决包冲突"><span class="toc-number">5.7.</span> <span class="toc-text">实战：解决包冲突</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么会干掉-C0-2-而不是C0-1"><span class="toc-number">5.8.</span> <span class="toc-text">为什么会干掉 C0.2,而不是C0.1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决方案"><span class="toc-number">5.9.</span> <span class="toc-text">解决方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如下依赖谁会被淘汰"><span class="toc-number">5.10.</span> <span class="toc-text">如下依赖谁会被淘汰</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#依赖的-scope"><span class="toc-number">5.11.</span> <span class="toc-text">依赖的 scope</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#maven-不仅仅是包管理工具还是一个自动化构建工具"><span class="toc-number">6.</span> <span class="toc-text">maven 不仅仅是包管理工具还是一个自动化构建工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#真实世界中的Maven"><span class="toc-number">7.</span> <span class="toc-text">真实世界中的Maven</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">8.</span> <span class="toc-text">练习</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

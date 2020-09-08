@@ -1,0 +1,668 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-JS专精01函数与闭包 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="函数是什么？ 最开始程序员写的大部分是汇编，后来有了 C / C++ 那时候没有函数，只有子程序 比如有四行代码完成特定的功能 给这四行代码起了一个名字 叫做函数 但是那个时候不叫 函数而叫 子程序     子程序   一个或多个语句组成 完成特定功能 功能相对独立   子程序又分三种   函数(有返回值) function 过程(无返回值) procedure 方法 (类或对象中) method">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-JS专精01函数与闭包">
+<meta property="og:url" content="http://yoursite.com/2019/12/19/Node-JS专精01函数与闭包/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="函数是什么？ 最开始程序员写的大部分是汇编，后来有了 C / C++ 那时候没有函数，只有子程序 比如有四行代码完成特定的功能 给这四行代码起了一个名字 叫做函数 但是那个时候不叫 函数而叫 子程序     子程序   一个或多个语句组成 完成特定功能 功能相对独立   子程序又分三种   函数(有返回值) function 过程(无返回值) procedure 方法 (类或对象中) method">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.265Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-JS专精01函数与闭包">
+<meta name="twitter:description" content="函数是什么？ 最开始程序员写的大部分是汇编，后来有了 C / C++ 那时候没有函数，只有子程序 比如有四行代码完成特定的功能 给这四行代码起了一个名字 叫做函数 但是那个时候不叫 函数而叫 子程序     子程序   一个或多个语句组成 完成特定功能 功能相对独立   子程序又分三种   函数(有返回值) function 过程(无返回值) procedure 方法 (类或对象中) method">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/12/19/Node-JS专精01函数与闭包/" title="Node-JS专精01函数与闭包" itemprop="url">Node-JS专精01函数与闭包</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-12-19T15:05:45.000Z" itemprop="datePublished"> Published 2019-12-19</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数是什么？"><span class="toc-number">1.</span> <span class="toc-text">函数是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JS-里只有函数和方法"><span class="toc-number">1.1.</span> <span class="toc-text">JS 里只有函数和方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数学领域里的函数"><span class="toc-number">1.2.</span> <span class="toc-text">数学领域里的函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#但是-JS的函数不是数学函数"><span class="toc-number">1.3.</span> <span class="toc-text">但是 JS的函数不是数学函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数的返回值由什么确定？"><span class="toc-number">2.</span> <span class="toc-text">函数的返回值由什么确定？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#影响因素"><span class="toc-number">2.1.</span> <span class="toc-text">影响因素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这个例子说明-a-是定义时的-a-，而不是执行时的-a"><span class="toc-number">2.2.</span> <span class="toc-text">这个例子说明 a 是定义时的 a ，而不是执行时的 a</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#另一个例子"><span class="toc-number">2.2.1.</span> <span class="toc-text">另一个例子</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包"><span class="toc-number">2.3.</span> <span class="toc-text">闭包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包-时间"><span class="toc-number">2.4.</span> <span class="toc-text">闭包 + 时间</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#常见的考题"><span class="toc-number">2.4.1.</span> <span class="toc-text">常见的考题</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#请问打印什么？"><span class="toc-number">2.5.</span> <span class="toc-text">请问打印什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何打印成-0-1-2-3-4-5呢？"><span class="toc-number">2.6.</span> <span class="toc-text">如何打印成 0 1 2 3 4 5呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#结论"><span class="toc-number">2.6.1.</span> <span class="toc-text">结论</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="函数是什么？"><a href="#函数是什么？" class="headerlink" title="函数是什么？"></a>函数是什么？</h3><ul>
+<li>最开始程序员写的大部分是汇编，后来有了 C / C++ 那时候没有函数，只有<strong>子程序</strong><ul>
+<li>比如有四行代码完成特定的功能</li>
+<li>给这四行代码起了一个名字 叫做函数</li>
+<li>但是那个时候不叫 <strong>函数</strong>而叫 <strong>子程序</strong></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>子程序</p>
+</blockquote>
+<ul>
+<li>一个或多个语句组成</li>
+<li>完成特定功能</li>
+<li>功能相对独立</li>
+</ul>
+<blockquote>
+<p>子程序又分三种</p>
+</blockquote>
+<ul>
+<li>函数(有返回值) function</li>
+<li>过程(无返回值) procedure</li>
+<li>方法 (类或对象中) method </li>
+</ul>
+<blockquote>
+<h4 id="JS-里只有函数和方法"><a href="#JS-里只有函数和方法" class="headerlink" title="JS 里只有函数和方法"></a>JS 里只有函数和方法</h4></blockquote>
+<p>因为JS的所有函数都有返回值，你不写return 但是返回值是 undefined</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 函数</span><br><span class="line">function fn()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">const a = fn() // undefined</span><br><span class="line"></span><br><span class="line">// 方法</span><br><span class="line">var obe = &#123;</span><br><span class="line">    fn:fn //方法</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="数学领域里的函数"><a href="#数学领域里的函数" class="headerlink" title="数学领域里的函数"></a>数学领域里的函数</h4><ul>
+<li>数学中的函数<ul>
+<li>两个集合之间的对应关系 如<code>y = f(x)</code> 比如方程式 <code>y = a*x + b</code><ul>
+<li>X 叫做 定义域 Y 叫做 值域</li>
+</ul>
+</li>
+<li>定义域里的每个元素都对应一项 值域中的元素</li>
+</ul>
+</li>
+<li><code>f()</code>在数学领域是不合法的，因为没有输入</li>
+<li>函数式编程<ul>
+<li>如果你的函数符合数学函数的定义，就是 <strong>函数式</strong>的</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如 f(x) = 3 * x +2</span><br><span class="line">y = f(x)</span><br><span class="line"></span><br><span class="line">x = 1 时 y = 5</span><br><span class="line">x = 2 时 y = 8</span><br></pre></td></tr></table></figure>
+<h4 id="但是-JS的函数不是数学函数"><a href="#但是-JS的函数不是数学函数" class="headerlink" title="但是 JS的函数不是数学函数"></a>但是 JS的函数不是数学函数</h4><p>最大的区别就是，你给我一个值我可能给你返回不同的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a = 0</span><br><span class="line">function add()&#123;</span><br><span class="line">	a += 1</span><br><span class="line">	return a</span><br><span class="line">&#125;</span><br><span class="line">add() // 1</span><br><span class="line">add() // 2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们平时用的是哪个函数?</p>
+</blockquote>
+<p>是编程里的子程序，还是数学里的函数？</p>
+<ul>
+<li>答案是 子程序</li>
+</ul>
+<h3 id="函数的返回值由什么确定？"><a href="#函数的返回值由什么确定？" class="headerlink" title="函数的返回值由什么确定？"></a>函数的返回值由什么确定？</h3><h4 id="影响因素"><a href="#影响因素" class="headerlink" title="影响因素"></a>影响因素</h4><ul>
+<li>调用时输入的参数 params</li>
+<li>定义时的环境 env</li>
+</ul>
+<blockquote>
+<h4 id="这个例子说明-a-是定义时的-a-，而不是执行时的-a"><a href="#这个例子说明-a-是定义时的-a-，而不是执行时的-a" class="headerlink" title="这个例子说明 a 是定义时的 a ，而不是执行时的 a"></a>这个例子说明 a 是定义时的 a ，而不是执行时的 a</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let x = &apos;x&apos;</span><br><span class="line">let a = &apos;1&apos;</span><br><span class="line">function f1(x)&#123;</span><br><span class="line">    return x + a</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    let a = &apos;2&apos;</span><br><span class="line">    f1(&apos;x&apos;) // 值是多少？</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 答案是 &apos;x1&apos;</span><br></pre></td></tr></table></figure>
+<p><strong>为什么不是 ‘x2’?</strong></p>
+<ul>
+<li>x 很好理解是 参数 所以 <code>f1(&#39;x&#39;)</code> 时<code>x = &#39;x&#39;</code> </li>
+<li>a 在这里不是参数 ，它是环境，它由 f1 所处的环境确定的<ul>
+<li>如果你是参数 则在调用时 确定</li>
+<li>如果你是环境 则在 定义时确定</li>
+</ul>
+</li>
+</ul>
+<p>再看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let x = &apos;x&apos;</span><br><span class="line">let a = &apos;1&apos;</span><br><span class="line">function f1(x)&#123;</span><br><span class="line">    return x + a</span><br><span class="line">&#125;</span><br><span class="line">a = &apos;3&apos;</span><br><span class="line">&#123;</span><br><span class="line">    let a = &apos;2&apos;</span><br><span class="line">    f1(&apos;x&apos;) // 值是多少？</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 答案是  &apos;x3&apos;</span><br></pre></td></tr></table></figure>
+<p>再看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">let x = &apos;x&apos;</span><br><span class="line">let a = &apos;1&apos;</span><br><span class="line">function f1(x)&#123;</span><br><span class="line">    return x + a</span><br><span class="line">&#125;</span><br><span class="line">a = &apos;3&apos;</span><br><span class="line">&#123;</span><br><span class="line">    let a = &apos;2&apos;</span><br><span class="line">    f1(&apos;x&apos;) // 值是多少？</span><br><span class="line">&#125;</span><br><span class="line">a = &apos;4&apos;</span><br><span class="line"></span><br><span class="line">// 答案是  &apos;x3&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h5 id="另一个例子"><a href="#另一个例子" class="headerlink" title="另一个例子"></a>另一个例子</h5></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">let x = &apos;x&apos;</span><br><span class="line">let a = &apos;1&apos;</span><br><span class="line">function f1(c)&#123;</span><br><span class="line">    c()</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">    let a = &apos;2&apos;</span><br><span class="line">    function f2()&#123;</span><br><span class="line">        console.log(x + a)</span><br><span class="line">    &#125;</span><br><span class="line">    f1(f2) // 打印什么？</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 打印  &apos;x2&apos; </span><br><span class="line">// 因为 x 和 a 都不是参数，所以只能看定义的地方，从内向外依次找</span><br><span class="line">// 这个例子说明 a 是定义时的a ,而不是执行的 a</span><br></pre></td></tr></table></figure>
+<p><strong>这个就是闭包，函数里面可以访问外面的变量</strong></p>
+<p><strong>但并不是一定的，Ruby就不允许</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># ruby 代码</span><br><span class="line">def f1</span><br><span class="line">    a = 1 # 局部变量</span><br><span class="line">    def f2</span><br><span class="line">        print a # 打印 a</span><br><span class="line">    end</span><br><span class="line">    f2()</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f1()</span><br><span class="line"></span><br><span class="line"># 报错： NameError(undefined local variable or method &apos;a&apos; for main: Object)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果你就要在 ruby里访问局部变量，需要使用 lambda</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def f1</span><br><span class="line">    a = 1 # 局部变量</span><br><span class="line">    f2 = lambda &#123;print a&#125;  # 使用 lambda</span><br><span class="line">    f2.call()</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">f1()</span><br><span class="line"># 成功 打印 1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h4></blockquote>
+<p>函数里面可以访问外面的变量，那么<code>这个函数 + 这些变量 = 闭包</code></p>
+<h4 id="闭包-时间"><a href="#闭包-时间" class="headerlink" title="闭包 + 时间"></a>闭包 + 时间</h4><h5 id="常见的考题"><a href="#常见的考题" class="headerlink" title="常见的考题"></a>常见的考题</h5><blockquote>
+<h4 id="请问打印什么？"><a href="#请问打印什么？" class="headerlink" title="请问打印什么？"></a>请问打印什么？</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">for(var i=0;i&lt;6;i++)&#123;</span><br><span class="line">    setTimeout(</span><br><span class="line">        ()=&gt;console.log(i) //</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line">// 打印 6个 6</span><br><span class="line">// 因为六个函数共用了一个 i</span><br><span class="line">// 这其实就是闭包</span><br><span class="line"></span><br><span class="line">// setTimeout 是在 for循环之后执行的，所以循环已经结束了 那时 i = 6</span><br><span class="line"></span><br><span class="line">// 如果你不理解它，那就回想一个成语 “刻舟求剑”</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如何打印成-0-1-2-3-4-5呢？"><a href="#如何打印成-0-1-2-3-4-5呢？" class="headerlink" title="如何打印成 0 1 2 3 4 5呢？"></a>如何打印成 <code>0 1 2 3 4 5</code>呢？</h4></blockquote>
+<ul>
+<li>改用 <code>let</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">for(let i=0;i&lt;6;i++)&#123;</span><br><span class="line">    setTimeout(</span><br><span class="line">        ()=&gt;console.log(i) </span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 打印 0 1 2 3 4 5</span><br><span class="line"></span><br><span class="line">// let 的魔法：每次循环会把这个值复制一份， 然后把 这个值 分给这个闭包用</span><br></pre></td></tr></table></figure>
+<ul>
+<li>立即执行函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">// 立即执行函数</span><br><span class="line">(function(i)&#123;</span><br><span class="line">    console.log(i)</span><br><span class="line">&#125;)(x)</span><br><span class="line"></span><br><span class="line">// 立即执行函数</span><br><span class="line">!function(j)&#123;</span><br><span class="line">    console.log(j)</span><br><span class="line">&#125;(i)</span><br><span class="line">*/</span><br><span class="line">for(var i=0;i&lt;6;i++)&#123;</span><br><span class="line">    (function(x)&#123;</span><br><span class="line">        setTimeout(</span><br><span class="line">            ()=&gt;console.log(x) </span><br><span class="line">        )   </span><br><span class="line">    &#125;)(i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么？</p>
+</blockquote>
+<ul>
+<li>用 var 声明的时候 用的都是 一个 i，每个闭包用的同一个 i</li>
+<li>用了 let 后，每个闭包分配一个新的 i </li>
+</ul>
+<h5 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h5><blockquote>
+<p>闭包的特点</p>
+</blockquote>
+<ul>
+<li>能让一个函数维持住一个变量</li>
+<li>但不能维持这个变量的值</li>
+<li>尤其是变量的值会变化的时候</li>
+</ul>
+<blockquote>
+<p>对象是穷人的闭包</p>
+</blockquote>
+<ul>
+<li>对象也可以来维持一个变量</li>
+<li>如果一门语言不支持闭包，你可以用对象代理</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">    i:0,</span><br><span class="line">    fn()&#123;</span><br><span class="line">        console.log(this.i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const handle = function()&#123;</span><br><span class="line">    var i = 0;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        console.log(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>闭包是穷人的对象</p>
+</blockquote>
+<ul>
+<li>如果一门语言不支持对象，你可以用闭包代理</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// person 有 name age 属性</span><br><span class="line"></span><br><span class="line">function createPerson(age,name)&#123;</span><br><span class="line">    return function(key)&#123;</span><br><span class="line">        if(key === &apos;name&apos;) return name;</span><br><span class="line">        if(key === &apos;age&apos;) return age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var person = createPerson(18,&apos;hjx&apos;);</span><br><span class="line">person(&apos;name&apos;) // &apos;hjx&apos;</span><br><span class="line">person(&apos;age&apos;) // 18</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/12/19/Node-JS专精01函数与闭包/" data-title="Node-JS专精01函数与闭包 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/12/23/Node-JS专精03递归记忆化/" title="Node-JS专精03递归记忆化">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node-JS专精03递归记忆化</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/12/19/Node-JS专精02this变态面试题/"  title="Node-JS专精02this变态面试题">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精02this变态面试题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#函数是什么？"><span class="toc-number">1.</span> <span class="toc-text">函数是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JS-里只有函数和方法"><span class="toc-number">1.1.</span> <span class="toc-text">JS 里只有函数和方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数学领域里的函数"><span class="toc-number">1.2.</span> <span class="toc-text">数学领域里的函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#但是-JS的函数不是数学函数"><span class="toc-number">1.3.</span> <span class="toc-text">但是 JS的函数不是数学函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#函数的返回值由什么确定？"><span class="toc-number">2.</span> <span class="toc-text">函数的返回值由什么确定？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#影响因素"><span class="toc-number">2.1.</span> <span class="toc-text">影响因素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这个例子说明-a-是定义时的-a-，而不是执行时的-a"><span class="toc-number">2.2.</span> <span class="toc-text">这个例子说明 a 是定义时的 a ，而不是执行时的 a</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#另一个例子"><span class="toc-number">2.2.1.</span> <span class="toc-text">另一个例子</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包"><span class="toc-number">2.3.</span> <span class="toc-text">闭包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包-时间"><span class="toc-number">2.4.</span> <span class="toc-text">闭包 + 时间</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#常见的考题"><span class="toc-number">2.4.1.</span> <span class="toc-text">常见的考题</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#请问打印什么？"><span class="toc-number">2.5.</span> <span class="toc-text">请问打印什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何打印成-0-1-2-3-4-5呢？"><span class="toc-number">2.6.</span> <span class="toc-text">如何打印成 0 1 2 3 4 5呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#结论"><span class="toc-number">2.6.1.</span> <span class="toc-text">结论</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

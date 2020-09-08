@@ -1,0 +1,608 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-JS专精11_01Promise精讲 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Promise 先看代码  123456789101112function 摇骰子()&amp;#123;    return new Promise((resolve, reject)=&amp;gt;&amp;#123;        setTimeout(() =&amp;gt; &amp;#123;            const result = Math.floor(Math.random()*6+1)">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-JS专精11_01Promise精讲">
+<meta property="og:url" content="http://yoursite.com/2020/03/04/Node-JS专精11-01Promise精讲/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Promise 先看代码  123456789101112function 摇骰子()&amp;#123;    return new Promise((resolve, reject)=&amp;gt;&amp;#123;        setTimeout(() =&amp;gt; &amp;#123;            const result = Math.floor(Math.random()*6+1)">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-JS专精11_01Promise精讲">
+<meta name="twitter:description" content="Promise 先看代码  123456789101112function 摇骰子()&amp;#123;    return new Promise((resolve, reject)=&amp;gt;&amp;#123;        setTimeout(() =&amp;gt; &amp;#123;            const result = Math.floor(Math.random()*6+1)">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/04/Node-JS专精11-01Promise精讲/" title="Node-JS专精11_01Promise精讲" itemprop="url">Node-JS专精11_01Promise精讲</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T01:33:52.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Promise"><span class="toc-number">1.</span> <span class="toc-text">Promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#这是一个异步任务，那么问题来了-异步任务什么时候执行？"><span class="toc-number">1.0.1.</span> <span class="toc-text">这是一个异步任务，那么问题来了 异步任务什么时候执行？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面试中的-微任务-宏任务"><span class="toc-number">1.0.2.</span> <span class="toc-text">面试中的 微任务/宏任务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#微任务-宏任务这些前端名词的前因后果"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">微任务/宏任务这些前端名词的前因后果</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ES6以前"><span class="toc-number">1.0.2.2.</span> <span class="toc-text">ES6以前</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ES6之后"><span class="toc-number">1.0.2.3.</span> <span class="toc-text">ES6之后</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise-其他API"><span class="toc-number">1.0.3.</span> <span class="toc-text">Promise 其他API</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h1><blockquote>
+<p>先看代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        setTimeout(() =&gt; &#123;</span><br><span class="line">            const result = Math.floor(Math.random()*6+1)</span><br><span class="line">            resolve(result)</span><br><span class="line">        &#125;, 3000);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇骰子() // 此时返回的是一个 promise</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;) // 3秒后返回摇骰子的结果</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="这是一个异步任务，那么问题来了-异步任务什么时候执行？"><a href="#这是一个异步任务，那么问题来了-异步任务什么时候执行？" class="headerlink" title="这是一个异步任务，那么问题来了 异步任务什么时候执行？"></a>这是一个异步任务，那么问题来了 异步任务什么时候执行？</h3></blockquote>
+<ul>
+<li>改写了一下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        const result = Math.floor(Math.random()*6+1)</span><br><span class="line">        resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)  // 会立刻返回 摇骰子的结果，但是它是什么时候开始呢？</span><br></pre></td></tr></table></figure>
+<h3 id="面试中的-微任务-宏任务"><a href="#面试中的-微任务-宏任务" class="headerlink" title="面试中的 微任务/宏任务"></a>面试中的 微任务/宏任务</h3><p>看这样一段代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;btn1&quot;&gt;btn1&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;btn2&quot;&gt;btn2&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">// Promise</span><br><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn1.onclick=()=&gt;&#123;</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  console.log(&quot;end&quot;);</span><br><span class="line">  // 执行结果：很明显 我们知道  摇骰子 是异步任务 所以会晚于 同步代码 console.log</span><br><span class="line">  /*</span><br><span class="line">  &quot;end&quot;</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn2.onclick=()=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;),0&#125;)</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;),0&#125;)</span><br><span class="line">  // 执行结果</span><br><span class="line">  // 如果我们还有其他的异步任务 比如 setTimeout 那么谁会优先呢？</span><br><span class="line">  // 答案是 先打出骰子的点数</span><br><span class="line">  /*</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  &quot;timeout1&quot;</span><br><span class="line">  &quot;timeout2&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="微任务-宏任务这些前端名词的前因后果"><a href="#微任务-宏任务这些前端名词的前因后果" class="headerlink" title="微任务/宏任务这些前端名词的前因后果"></a>微任务/宏任务这些前端名词的前因后果</h4><ul>
+<li>本来是没有 Promise的 在 ES6之前，ES6之后才有了 Promise这种异步</li>
+<li>以前的JS非常单纯只有两个东西<ul>
+<li>当前任务 执行的代码(同步代码) </li>
+<li>延时任务 setTimeout / setInterval</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<h4 id="ES6以前"><a href="#ES6以前" class="headerlink" title="ES6以前"></a>ES6以前</h4></blockquote>
+<ul>
+<li>当前代码 如<code>console.log(1)</code></li>
+<li>异步队列 setTimeout </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">console.log(1)</span><br><span class="line">console.log(2)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 1&quot;)&#125;,0)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 2&quot;)&#125;,0)</span><br><span class="line">console.log(3)</span><br><span class="line">console.log(4)</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">timeout 1</span><br><span class="line">timeout 2</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">两次 setTimeout 不会立刻执行，而是放入异步队列里</span><br><span class="line">当前代码执行完了 就去看异步队列了</span><br></pre></td></tr></table></figure>
+<p><strong>所以以前的js非常好理解，就是我有个当前要执行的任务，和有个等待执行的任务</strong></p>
+<blockquote>
+<h4 id="ES6之后"><a href="#ES6之后" class="headerlink" title="ES6之后"></a>ES6之后</h4></blockquote>
+<p>前端觉得回调太蛋疼了，于是加了个 Promise</p>
+<ul>
+<li>宏任务 – 异步队列1（原来的异步队列 setTimeout）</li>
+<li>微任务 – 异步队列2 (Promise 使用)</li>
+<li>同步代码 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">// 伪代码</span><br><span class="line">ajax.then(s1)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout&quot;)&#125;,0)</span><br><span class="line">console.log(1);</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">依然  console.log 放入同步任务</span><br><span class="line">setTimeout 放入异步任务</span><br><span class="line"></span><br><span class="line">此时 ，如果不引入其他东西 ajax.then(s1) 就显得特别智障</span><br><span class="line">    假设只有一个异步任务 那么实际就是 把 s1 加入异步队列1 ， 然后把第二行的 setTimeout 加入异步队列1 s1之后</span><br><span class="line"></span><br><span class="line">    于是你惊讶的发现，那我要 then 干什么，有病吧？ 直接 setTimeout(s1,0) 不就完了</span><br><span class="line"></span><br><span class="line">所以他们就想了一个 让我们的 then 更有用的办法 ，在加一个 异步队列2</span><br><span class="line"></span><br><span class="line">于是乎上面的代码</span><br><span class="line">s1 放入 异步队列2</span><br><span class="line">setTimeout 放入 异步队列1</span><br><span class="line"></span><br><span class="line">当 同步代码执行完</span><br><span class="line">先去读取 异步队列2 里的任务 去执行</span><br><span class="line">等 异步队列2 里的任务执行完了， 再去读取 异步队列1 里的任务 去执行</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<p><strong>于是分别给 异步队列1 / 异步队列2 取了个名字叫做 宏任务 / 微任务</strong></p>
+<p><strong>如果队列里有任务，先把 微任务 做完，再去做 宏任务</strong></p>
+<h3 id="Promise-其他API"><a href="#Promise-其他API" class="headerlink" title="Promise 其他API"></a>Promise 其他API</h3><blockquote>
+<p>继续以摇骰子为例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line">// 随机的</span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>Promise.resolve(result) 制造一个成功(或失败)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 制造成功</span><br><span class="line">// 你想造假一直 摇6</span><br><span class="line"></span><br><span class="line">function 摇6的骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      resolve(6)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇6的骰子2()&#123;</span><br><span class="line">  return  Promise.resolve(6)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇6的骰子</span><br><span class="line">// 摇6的骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 摇6的骰子2().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 制造失败</span><br><span class="line">function 摇骰子返回失败()&#123;</span><br><span class="line">  return  Promise.resolve(</span><br><span class="line">              new Promise((resolve,reject)=&gt;reject())</span><br><span class="line">          )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子返回失败().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.reject(reason) 制造一个失败</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇坏的骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        reject(&apos;坏了&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇坏的骰子2()&#123;</span><br><span class="line">    return Promise.reject(&apos;坏了&apos;)</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">摇坏的骰子().then(null,(reason)=&gt;console.log(reason))</span><br><span class="line">摇坏的骰子2().then(null,(reason)=&gt;console.log(reason))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.all(数组) 等待全部成功，或有一个失败</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 所有人都成功了，才叫成功 返回所有成功的结果</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 打印 [1,2,3]</span><br><span class="line"></span><br><span class="line">// 某个失败 返回失败</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了3&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.resolve(1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了2&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了1&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>所以 Promise.all 非常没用,因为有一个失败就返回了不等所有的结果</li>
+<li>请使用 <code>Promise.allSettled</code></li>
+</ul>
+</li>
+<li><p>Promise.race(数组) 等待第一个状态改变</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同时发很多请求，只要又一个成功了，就成功，或者一个失败了就失败</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.allSettled(数组) 等待全部状态改变,目前处于 Stage-4(板上钉钉的实现)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">Promise.allSettled([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// resolve 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 2&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.resolve(1),Promise.reject(&apos;错了2&apos;),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line"></span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了1&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了3&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>由于<code>Promise.allSettled</code>很多浏览器不支持，我们依旧无法使用</p>
+</blockquote>
+<p>所以用 Promise.all 实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">// 假设还是三个 promise 任务  第一个和第二个会失败</span><br><span class="line">task1 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第一扇门关了&quot;)</span><br><span class="line">  &#125;,3000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task2 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第二扇门关了&quot;)</span><br><span class="line">  &#125;,4000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task3 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    resolve(&quot;第三扇门开了&quot;)</span><br><span class="line">  &#125;,5000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 如果这样</span><br><span class="line">// 发现第一个失败就 结束了</span><br><span class="line">Promise.all([task1(),task2(),task3()])</span><br><span class="line">  .then(null,(reason)=&gt;console.log(reason))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 正确姿势 把每个任务都 then一下 因为 Promise.then 会返回新的 promise</span><br><span class="line">Promise.all([</span><br><span class="line">          task1().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task2().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task3().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;ok&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 优化代码 因为写的太重复了  </span><br><span class="line">setSuccessResult = (promise) =&gt; promise.then(</span><br><span class="line">                                        (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                                        (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;),</span><br><span class="line">                                        )</span><br><span class="line">Promise.all([</span><br><span class="line">          setSuccessResult(task1()),</span><br><span class="line">          setSuccessResult(task2()),</span><br><span class="line">          setSuccessResult(task3()),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))                                     </span><br><span class="line">// 打印结果</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第一扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第二扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;ok&quot;, value: &quot;第三扇门开了&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 还能再次简化</span><br><span class="line">setSuccessResultList = (promiseList) =&gt; promiseList.map(</span><br><span class="line">  promise =&gt; promise.then(</span><br><span class="line">                         (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                         (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;)</span><br><span class="line">                        )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Promise.all(setSuccessResultList([task1(),task2(),task3()]))</span><br><span class="line">  .then((result)=&gt;console.log(result))  </span><br><span class="line"></span><br><span class="line">// 再次简化 你不是不支持  Promise.allSettled 吗？</span><br><span class="line">Promise.allSettled2 = function(promiseList)&#123;</span><br><span class="line">  return Promise.all(setSuccessResultList(promiseList))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这其实就是 allSettled2 的实现</span><br><span class="line">Promise.allSettled2([task1(),task2(),task3()])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/04/Node-JS专精11-01Promise精讲/" data-title="Node-JS专精11_01Promise精讲 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/03/04/Node-JS专精11-02Promise使用场景/" title="Node-JS专精11_02Promise使用场景">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node-JS专精11_02Promise使用场景</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/"  title="Node-JS专精10_02在浏览器支持nextTick">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精10_02在浏览器支持nextTick
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Promise"><span class="toc-number">1.</span> <span class="toc-text">Promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#这是一个异步任务，那么问题来了-异步任务什么时候执行？"><span class="toc-number">1.0.1.</span> <span class="toc-text">这是一个异步任务，那么问题来了 异步任务什么时候执行？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面试中的-微任务-宏任务"><span class="toc-number">1.0.2.</span> <span class="toc-text">面试中的 微任务/宏任务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#微任务-宏任务这些前端名词的前因后果"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">微任务/宏任务这些前端名词的前因后果</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ES6以前"><span class="toc-number">1.0.2.2.</span> <span class="toc-text">ES6以前</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ES6之后"><span class="toc-number">1.0.2.3.</span> <span class="toc-text">ES6之后</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise-其他API"><span class="toc-number">1.0.3.</span> <span class="toc-text">Promise 其他API</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

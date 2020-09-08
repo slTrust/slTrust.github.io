@@ -1,0 +1,1275 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Almost">
+<meta property="og:url" content="http://yoursite.com/page/28/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Almost">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/27/Py006-01-12模型层orm理解/" title="Py006-01-12模型层orm理解" itemprop="url">Py006-01-12模型层orm理解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-27T02:17:13.000Z" itemprop="datePublished"> Published 2018-10-27</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="分层思想"><a href="#分层思想" class="headerlink" title="分层思想"></a>分层思想</h3><ol>
+<li>mysql安装在操作系统上</li>
+<li>pymysql实现python与 mysql的连接</li>
+<li>orm就是在pymysql之上连接数据库的操作</li>
+</ol>
+<blockquote>
+<p>orm只能操作表级别，不能操作数据库</p>
+</blockquote>
+<h3 id="ORM简介"><a href="#ORM简介" class="headerlink" title="ORM简介"></a>ORM简介</h3><ul>
+<li>MVC或者MVC框架中包括一个重要的部分，就是ORM，它实现了数据模型与数据库的解耦，即数据模型的设计不需要依赖于特定的数据库，通过简单的配置就可以轻松更换数据库，这极大的减轻了开发人员的工作量，不需要面对因数据库变更而导致的无效劳动</li>
+<li>ORM是“对象-关系-映射”的简称。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1201.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">#sql中的表                                                      </span><br><span class="line"></span><br><span class="line"> #创建表:</span><br><span class="line">     CREATE TABLE employee(                                     </span><br><span class="line">                id INT PRIMARY KEY auto_increment ,                    </span><br><span class="line">                name VARCHAR (20),                                      </span><br><span class="line">                gender BIT default 1,                                  </span><br><span class="line">                birthday DATA ,                                         </span><br><span class="line">                department VARCHAR (20),                                </span><br><span class="line">                salary DECIMAL (8,2) unsigned,                          </span><br><span class="line">              );</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  #sql中的表纪录                                                  </span><br><span class="line"></span><br><span class="line">  #添加一条表纪录:                                                          </span><br><span class="line">      INSERT employee (name,gender,birthday,salary,department)            </span><br><span class="line">             VALUES   (&quot;alex&quot;,1,&quot;1985-12-12&quot;,8000,&quot;保洁部&quot;);               </span><br><span class="line"></span><br><span class="line">  #查询一条表纪录:                                                           </span><br><span class="line">      SELECT * FROM employee WHERE age=24;                               </span><br><span class="line"></span><br><span class="line">  #更新一条表纪录:                                                           </span><br><span class="line">      UPDATE employee SET birthday=&quot;1989-10-24&quot; WHERE id=1;              </span><br><span class="line"></span><br><span class="line">  #删除一条表纪录:                                                          </span><br><span class="line">      DELETE FROM employee WHERE name=&quot;alex&quot;                             </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#python的类</span><br><span class="line">class Employee(models.Model):</span><br><span class="line">     id=models.AutoField(primary_key=True)</span><br><span class="line">     name=models.CharField(max_length=32)</span><br><span class="line">     gender=models.BooleanField()</span><br><span class="line">     birthday=models.DateField()</span><br><span class="line">     department=models.CharField(max_length=32)</span><br><span class="line">     salary=models.DecimalField(max_digits=8,decimal_places=2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> #python的类对象</span><br><span class="line">      #添加一条表纪录:</span><br><span class="line">          emp=Employee(name=&quot;alex&quot;,gender=True,birthday=&quot;1985-12-12&quot;,epartment=&quot;保洁部&quot;)</span><br><span class="line">          emp.save()</span><br><span class="line">      #查询一条表纪录:</span><br><span class="line">          Employee.objects.filter(age=24)</span><br><span class="line">      #更新一条表纪录:</span><br><span class="line">          Employee.objects.filter(id=1).update(birthday=&quot;1989-10-24&quot;)</span><br><span class="line">      #删除一条表纪录:</span><br><span class="line">          Employee.objects.filter(name=&quot;alex&quot;).delete()</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/25/Py006-01-11django之模版语法继承/" title="Py006-01-11django之模版语法继承" itemprop="url">Py006-01-11django之模版语法继承</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-25T14:09:02.000Z" itemprop="datePublished"> Published 2018-10-25</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="模版继承"><a href="#模版继承" class="headerlink" title="模版继承"></a>模版继承</h3><p>Django模版引擎中最强大也是最复杂的部分就是模版继承了。模版继承可以让您创建一个基本的“骨架”模版，它包含您站点中的全部元素，并且可以定义能够被子模版覆盖的 blocks 。</p>
+<blockquote>
+<p>自行建立一个django项目 </p>
+</blockquote>
+<ul>
+<li>含有应用 app001</li>
+<li>视图函数 index</li>
+<li>视图模版 index.html</li>
+</ul>
+<p>app001/urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(r&apos;index/&apos;,views.index)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>app001/views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    return render(request,&apos;index.html&apos;)</span><br></pre></td></tr></table></figure>
+<p>index.html有如下布局</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        header&#123;height: 50px;background: #369;&#125;</span><br><span class="line">        .left&#123;background: #ddd;&#125;</span><br><span class="line">        .right&#123;background: aqua&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;header&gt;&lt;/header&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;row&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">            &lt;ol&gt;</span><br><span class="line">                &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">            &lt;/ol&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-9 right&quot;&gt;</span><br><span class="line">            &lt;ul&gt;</span><br><span class="line">                &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;5&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;6&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;7&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;8&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;9&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;10&lt;/li&gt;</span><br><span class="line">            &lt;/ul&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="需求想复用左侧的菜单列表"><a href="#需求想复用左侧的菜单列表" class="headerlink" title="需求想复用左侧的菜单列表"></a>需求想复用左侧的菜单列表</h3></blockquote>
+<p>拷贝菜单这段代码，在templates下建立menu.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;ol&gt;</span><br><span class="line">    &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">&lt;/ol&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改index.html</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">    &lt;ol&gt;</span><br><span class="line">        &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">    &lt;/ol&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">替换为</span><br><span class="line">&lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">    &#123;% include &apos;menu.html&apos; %&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="需求现在有订单页order-html-想有index-html的-顶部的header和左边菜单"><a href="#需求现在有订单页order-html-想有index-html的-顶部的header和左边菜单" class="headerlink" title="需求现在有订单页order.html 想有index.html的 顶部的header和左边菜单"></a>需求现在有订单页order.html 想有index.html的 顶部的header和左边菜单</h3></blockquote>
+<p>创建模版文件base.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        header&#123;height: 50px;background: #369;&#125;</span><br><span class="line">        .left&#123;background: #ddd;&#125;</span><br><span class="line">        .right&#123;background: aqua&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;header&gt;&lt;/header&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;row&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">            &#123;% include &apos;menu.html&apos; %&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-9 right&quot;&gt;</span><br><span class="line">           &#123;% block con %&#125;</span><br><span class="line">               &lt;h1&gt;默认显示内容&lt;/h1&gt;</span><br><span class="line">           &#123;% endblock  %&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line">-----------------------------</span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">    </span><br><span class="line">&#123;% endblock  %&#125;</span><br><span class="line">是一个空盒子 等继承的人来填充内容</span><br><span class="line"></span><br><span class="line">也可以设置默认内容</span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">    &lt;h1&gt;默认显示内容&lt;/h1&gt;</span><br><span class="line">&#123;% endblock  %&#125;</span><br><span class="line">当继承模版的页面没有使用盒子就用这个默认的内容</span><br><span class="line">使用了就覆盖掉这个默认的盒子</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>index.html</p>
+</blockquote>
+<ul>
+<li>extends 标签是这里的关键。它告诉模版引擎，这个模版“继承”了另一个模版。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &apos;base.html&apos; %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">    &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;5&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;6&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;7&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;8&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;9&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;10&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- 如果你在模版中使用 &#123;% extends %&#125; 标签，它必须是模版中的第一个标签。其他的任何情况下，模版继承都将无法工作。</span><br><span class="line"></span><br><span class="line">- 在base模版中设置越多的 &#123;% block %&#125; 标签越好。请记住，子模版不必定义全部父模版中的blocks，所以，你可以在大多数blocks中填充合理的默认内容，然后，只定义你需要的那一个。多一点钩子总比少一点好。</span><br><span class="line"></span><br><span class="line">- 如果你发现你自己在大量的模版中复制内容，那可能意味着你应该把内容移动到父模版中的一个 &#123;% block %&#125; 中。</span><br><span class="line"></span><br><span class="line">- If you need to get the content of the block from the parent template, the &#123;&#123; block.super &#125;&#125; variable will do the trick. This is useful if you want to add to the contents of a parent block instead of completely overriding it. Data inserted using &#123;&#123; block.super &#125;&#125; will not be automatically escaped (see the next section), since it was already escaped, if necessary, in the parent template.</span><br><span class="line"></span><br><span class="line">- 为了更好的可读性，你也可以给你的 &#123;% endblock %&#125; 标签一个 名字 。例如：</span><br><span class="line"></span><br><span class="line">&#123;% block content %&#125;</span><br><span class="line">...</span><br><span class="line">&#123;% endblock content %&#125;　　</span><br><span class="line"></span><br><span class="line">在大型模版中，这个方法帮你清楚的看到哪一个　 &#123;% block %&#125; 标签被关闭了。</span><br><span class="line"></span><br><span class="line">- 不能在一个模版中定义多个相同名字的 block 标签。</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/25/Py006-01-10django之自定义过滤器和标签/" title="Py006-01-10django之自定义过滤器和标签" itemprop="url">Py006-01-10django之自定义过滤器和标签</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-25T13:54:43.000Z" itemprop="datePublished"> Published 2018-10-25</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="自定义标签和过滤器"><a href="#自定义标签和过滤器" class="headerlink" title="自定义标签和过滤器"></a>自定义标签和过滤器</h3><p>1、在settings中的INSTALLED_APPS配置当前app，不然django无法找到自定义的simple_tag.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">如你的应用是app001就在</span><br><span class="line">INSTALLED_APPS = [</span><br><span class="line">    &apos;django.contrib.admin&apos;,</span><br><span class="line">    &apos;django.contrib.auth&apos;,</span><br><span class="line">    &apos;django.contrib.contenttypes&apos;,</span><br><span class="line">    &apos;django.contrib.sessions&apos;,</span><br><span class="line">    &apos;django.contrib.messages&apos;,</span><br><span class="line">    &apos;django.contrib.staticfiles&apos;,</span><br><span class="line">    &quot;app001&quot; #注册</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>2、在app中创建templatetags模块(模块名只能是templatetags)</p>
+<p>3、创建任意 .py 文件，如：my_tags.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># 必须要引入这个模块</span><br><span class="line">from django import template</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line">register = template.Library()   #register的名字是固定的,不可改变</span><br><span class="line"> </span><br><span class="line"># 过滤器就加这个装饰器</span><br><span class="line">@register.filter</span><br><span class="line">def filter_multi(x,y):</span><br><span class="line">    return  x * y</span><br><span class="line"></span><br><span class="line"># 自定义标签就加这个装饰器</span><br><span class="line">@register.simple_tag</span><br><span class="line">def simple_tag_multi(x,y):</span><br><span class="line">    return  x * y</span><br><span class="line"></span><br><span class="line">@register.simple_tag</span><br><span class="line">def my_input(id,arg):</span><br><span class="line">    result = &quot;&lt;input type=&apos;text&apos; id=&apos;%s&apos; class=&apos;%s&apos; /&gt;&quot; %(id,arg,)</span><br><span class="line">    return mark_safe(result)</span><br></pre></td></tr></table></figure>
+<p>4.使用自定义过滤器和标签必须load</p>
+<p>index.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&#123;% load my_tag_filter %&#125;</span><br><span class="line">&lt;p&gt;&#123;&#123; i|filter_multi:20&#125;&#125;&lt;/p&gt;  ===&gt; i=10  200 </span><br><span class="line"># 过滤器最多接受一个参数</span><br><span class="line"># 标签可以接受多个以空格分割</span><br><span class="line">&lt;p&gt;&#123;&#123;simple_tag_multi:7 9&#125;&#125;&lt;/p&gt;  ===&gt;63</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 过滤器可以和if标签联合使用而 自定义标签和标签不能联合用</span><br><span class="line">&#123;% if i|filter_multi:10 &gt; 100 %&#125;</span><br><span class="line">&lt;p&gt;100&lt;/p&gt;</span><br><span class="line">&#123;% else %&#125;</span><br><span class="line">&lt;p&gt;&#123;&#123; i &#125;&#125;&lt;/p&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line"></span><br><span class="line">正常</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;% if simple_tag_multi 9 10 &gt; 100 %&#125;</span><br><span class="line">&lt;p&gt;100&lt;/p&gt;</span><br><span class="line">&#123;% else %&#125;</span><br><span class="line">&lt;p&gt;&#123;&#123; i &#125;&#125;&lt;/p&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line"></span><br><span class="line">报错</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/25/Py006-01-09django之模版标签/" title="Py006-01-09django之模版标签" itemprop="url">Py006-01-09django之模版标签</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-25T13:22:05.000Z" itemprop="datePublished"> Published 2018-10-25</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标签看起来像是这样的： &#123;% tag %&#125;。标签比变量更加复杂：一些在输出中创建文本，一些通过循环或逻辑来控制流程，一些加载其后的变量将使用到的额外信息到模版中。一些标签需要开始和结束标签 （例如&#123;% tag %&#125; ...标签 内容 ... &#123;% endtag %&#125;）。</span><br></pre></td></tr></table></figure>
+<h4 id="for标签"><a href="#for标签" class="headerlink" title="for标签"></a>for标签</h4><ul>
+<li>遍历每一个元素：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">num_list = [1,2,3]</span><br><span class="line">&#123;% for i in num_list %&#125;</span><br><span class="line">    &lt;p&gt;&#123;&#123; i &#125;&#125;&lt;/p&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">person_list = [&#123;&quot;name&quot;:1&#125;,&#123;&quot;name&quot;:2&#125;]</span><br><span class="line">&#123;% for person in person_list %&#125;</span><br><span class="line">    &lt;p&gt;&#123;&#123; person.name &#125;&#125;&lt;/p&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">可以利用&#123;% for obj in list reversed %&#125;反向完成循环。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>遍历一个字典：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for key,val in dic.items %&#125;</span><br><span class="line">    &lt;p&gt;&#123;&#123; key &#125;&#125;:&#123;&#123; val &#125;&#125;&lt;/p&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line">注：循环序号可以通过｛｛forloop｝｝显示</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">forloop.counter            The current iteration of the loop (1-indexed)</span><br><span class="line">forloop.counter0           The current iteration of the loop (0-indexed)</span><br><span class="line">forloop.revcounter         The number of iterations from the end of the loop (1-indexed)</span><br><span class="line">forloop.revcounter0        The number of iterations from the end of the loop (0-indexed)</span><br><span class="line">forloop.first              True if this is the first time through the loop</span><br><span class="line">forloop.last               True if this is the last time through the loop</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>for … empty</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for 标签带有一个可选的&#123;% empty %&#125; 从句，以便在给出的组是空的或者没有被找到时，可以有所操作。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">arr = []</span><br><span class="line">&#123;% for i in arr %&#125;</span><br><span class="line">    &lt;p&gt;&#123;&#123; i &#125;&#125;&lt;/p&gt;</span><br><span class="line"></span><br><span class="line">&#123;% empty %&#125;</span><br><span class="line">    &lt;p&gt;暂无数据&lt;/p&gt;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="if-标签"><a href="#if-标签" class="headerlink" title="if 标签"></a>if 标签</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if %&#125;会对一个变量求值，如果它的值是“True”（存在、不为空、且不是boolean类型的false值），对应的内容块会输出。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if num &gt; 100 or num &lt; 0 %&#125;</span><br><span class="line">    &lt;p&gt;无效&lt;/p&gt;</span><br><span class="line">&#123;% elif num &gt; 80 and num &lt; 100 %&#125;</span><br><span class="line">    &lt;p&gt;优秀&lt;/p&gt;</span><br><span class="line">&#123;% else %&#125;</span><br><span class="line">    &lt;p&gt;凑活吧&lt;/p&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="with"><a href="#with" class="headerlink" title="with"></a>with</h4><p>使用一个简单地名字缓存一个复杂的变量，当你需要使用一个“昂贵的”方法（比如访问数据库）很多次的时候是非常有用的</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">person_list = [&#123;&quot;name&quot;:&quot;aaa&quot;&#125;]</span><br><span class="line">&#123;% with person_list.1.name as n %&#125;</span><br><span class="line">    &#123;&#123; n &#125;&#125;  ===&gt; &quot;aaa&quot;</span><br><span class="line">&#123;% endwith %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="csrf-token"><a href="#csrf-token" class="headerlink" title="csrf_token"></a>csrf_token</h4><p>这个标签用于跨站请求伪造保护</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">之前post请求出现403问题 </span><br><span class="line">之前是修改settings里的 csrf注释掉</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这个标签是另一种方案</p>
+</blockquote>
+<p>index.html添加这个标签就不会报错了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;&#123; csrf_token &#125;&#125;</span><br><span class="line">    账号&lt;input type=&quot;text&quot; name=&quot;user&quot;&gt;</span><br><span class="line">    密码&lt;input type=&quot;text&quot; pwd=&quot;pwd&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/24/Py006-01-08django之模版/" title="Py006-01-08django之模版" itemprop="url">Py006-01-08django之模版</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-24T13:56:52.000Z" itemprop="datePublished"> Published 2018-10-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<p>请自行建立一个django项目</p>
+</blockquote>
+<ul>
+<li>一个视图函数 index 渲染 render(request,’index.html’)</li>
+</ul>
+<h3 id="模版语法"><a href="#模版语法" class="headerlink" title="模版语法"></a>模版语法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- 变量：&#123;&#123;&#125;&#125; 双花括号</span><br><span class="line">    1深度查询   句点符 .</span><br><span class="line">- 标签 &#123;% %&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    name = &apos;hjx&apos;</span><br><span class="line">    age = 18</span><br><span class="line">    isMan = True</span><br><span class="line">    num_list = [11, 22, 33]</span><br><span class="line">    info = &#123;&quot;name&quot;: &quot;hjx&quot;, &quot;age&quot;: 18&#125;</span><br><span class="line"></span><br><span class="line">    class Person(object):</span><br><span class="line">        def __init__(self, name, age):</span><br><span class="line">            self.name = name</span><br><span class="line">            self.age = age</span><br><span class="line"></span><br><span class="line">    aa = Person(&quot;hjx&quot;, 18)</span><br><span class="line">    bb = Person(&quot;alex&quot;, 98)</span><br><span class="line">    person_list = [aa, bb]</span><br><span class="line">    # 这样写每个值都要写一遍很麻烦</span><br><span class="line">    # return render(request,&quot;index.html&quot;,&#123;&quot;name&quot;:name,&quot;age&quot;:age,&quot;isMan&quot;:isMan,&quot;num_list&quot;:num_list,&quot;info&quot;:info,&quot;aa&quot;:aa,&quot;bb&quot;:bb,&quot;person_list&quot;:person_list&#125;)</span><br><span class="line">    # 使用locals</span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<p>index.html里取值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;p&gt;&#123;&#123; name &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; age &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; isMan &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; num_list &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; info &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; aa &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; bb &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; person_list &#125;&#125;&lt;/p&gt;</span><br><span class="line"></span><br><span class="line">&lt;hr&gt;</span><br><span class="line">深度查询</span><br><span class="line">&lt;p&gt;&#123;&#123; num_list.1 &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; info.name &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; aa.name &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; bb.age &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;p&gt;&#123;&#123; person_list.1.name &#125;&#125;&lt;/p&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><p>语法规则</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;变量|过滤器名字:param&#125;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    import datetime</span><br><span class="line">    now = datetime.now()</span><br><span class="line">    arr = []</span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>index.html</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;now|date:&quot;Y-m-d&quot;&#125;&#125;   ===&gt; &quot;2018-10-11&quot;</span><br><span class="line">&#123;&#123;arr|default:&quot;数据为空&quot;&#125;&#125; ===&gt; &quot;数据为空&quot;</span><br><span class="line">&#123;&#123;arr|length&#125;&#125;  ===&gt; 0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>default</p>
+</blockquote>
+<p>如果一个变量是false或者为空，使用给定的默认值。否则，使用变量的值。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|default:&quot;nothing&quot; &#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>length</p>
+</blockquote>
+<p>返回值的长度。它对字符串和列表都起作用。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|length &#125;&#125;</span><br><span class="line">如果 value 是 [&apos;a&apos;, &apos;b&apos;, &apos;c&apos;, &apos;d&apos;]，那么输出是 4。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>filesizeformat</p>
+</blockquote>
+<p>将值格式化为一个 “人类可读的” 文件尺寸 （例如 ‘13 KB’, ‘4.1 MB’, ‘102 bytes’, 等等）。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|filesizeformat &#125;&#125;</span><br><span class="line">如果 value 是 123456789，输出将会是 117.7 MB。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>date</p>
+</blockquote>
+<p>如果 value=datetime.datetime.now()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|date:&quot;Y-m-d&quot; &#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>slice</p>
+</blockquote>
+<p>如果 value=”hello world”</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|slice:&quot;2:-1&quot; &#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>truncatechars</p>
+</blockquote>
+<p>如果字符串字符多于指定的字符数量，那么会被截断。截断的字符串将以可翻译的省略号序列（“…”）结尾。</p>
+<p>参数：要截断的字符数</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; value|truncatechars:9 &#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>truncatewords 按照单词截</p>
+</blockquote>
+<blockquote>
+<p>safe</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">value=&quot;&lt;a href=&quot;&quot;&gt;点击&lt;/a&gt;&quot;</span><br><span class="line">&#123;&#123;value&#125;&#125;  ===&gt; 此时渲染出来不是a标签</span><br></pre></td></tr></table></figure>
+<p>Django的模板中会对HTML标签和JS等语法标签进行自动转义，原因显而易见，这样是为了安全。但是有的时候我们可能不希望这些HTML元素被转义，比如我们做一个内容管理系统，后台添加的文章中是经过修饰的，这些修饰可能是通过一个类似于FCKeditor编辑加注了HTML修饰符的文本，如果自动转义的话显示的就是保护HTML标签的源文件。为了在Django中关闭HTML的自动转义有两种方式，如果是一个单独的变量我们可以通过过滤器“|safe”的方式告诉Django这段代码是安全的不必转义。比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">value=&quot;&lt;a href=&quot;&quot;&gt;点击&lt;/a&gt;&quot;</span><br><span class="line">&#123;&#123; value|safe&#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>add</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">value = 1</span><br><span class="line">&#123;&#123;value|add:100&#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>upper</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">value = &quot;a&quot;</span><br><span class="line">&#123;&#123;value|upper&#125;&#125; ===&gt; A</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/24/Py006-01-07django之request和response/" title="Py006-01-07django之request和response" itemprop="url">Py006-01-07django之request和response</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-24T13:03:34.000Z" itemprop="datePublished"> Published 2018-10-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="请求对象"><a href="#请求对象" class="headerlink" title="请求对象"></a>请求对象</h3><blockquote>
+<p>前置工作准备项目</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"># step001</span><br><span class="line">新建django项目  mydj004 设置应用名  app001</span><br><span class="line"># step002 修改 mydj004/urls.py</span><br><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    re_path(r&apos;index/&apos;,views.index)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># step003 app001/views.py</span><br><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line">    # 此处逻辑处理操作请求对象 request</span><br><span class="line">    </span><br><span class="line">    return render(request,&quot;index.html&quot;)</span><br><span class="line"></span><br><span class="line"># step004 template/index.html</span><br><span class="line"></span><br><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    账号&lt;input type=&quot;text&quot; name=&quot;user&quot;&gt;</span><br><span class="line">    密码&lt;input type=&quot;text&quot; pwd=&quot;pwd&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line"></span><br><span class="line">action什么都不写代表会拿当前url作为路径访问</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># step005 去掉settings.py里的 csrf设置</span><br><span class="line"></span><br><span class="line"> &apos;django.middleware.csrf.CsrfViewMiddleware&apos;, 注释就好</span><br><span class="line"></span><br><span class="line"># step006 打开 http://localhost:8000/index/ 准备工作完毕</span><br></pre></td></tr></table></figure>
+<h4 id="request的一些内容"><a href="#request的一些内容" class="headerlink" title="request的一些内容"></a>request的一些内容</h4><p>在视图函数里修改就可以了。。。</p>
+<ul>
+<li>method</li>
+<li>GET 将get请求参数封装在字典里</li>
+<li>POST 将post请求参数封装在字典里</li>
+<li>path 返回请求url的路径</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    print(&apos;method&apos;, request.method)  # 打印请求的方式</span><br><span class="line">    print(request.GET)  # 访问 http://localhost:8000/index/?name=1&amp;pwd=2&amp;name=22  &#123;&apos;name&apos;: [&apos;1&apos;, &apos;22&apos;], &apos;pwd&apos;: [&apos;2&apos;]&#125;&gt;</span><br><span class="line">    print(request.POST) # http://localhost:8000/index/  提交表单内容 name=1 pwd=2  打印 &#123;&apos;name&apos;: [&apos;1&apos;], &apos;pwd&apos;: [&apos;2&apos;]&#125;&gt;</span><br><span class="line">    # 取字典的值</span><br><span class="line">    name = request.GET.get(&quot;name&quot;)</span><br><span class="line">    # 请求路径</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    http://localhost:8000/index/?name=1&amp;pwd=2</span><br><span class="line">    url:协议://ip:port/路径?get请求数据</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    print(request.path)</span><br><span class="line">    </span><br><span class="line">    return render(request,&quot;index.html&quot;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果此时匹配 <a href="http://localhost:8000时访问" target="_blank" rel="noopener">http://localhost:8000时访问</a>  index.html</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mydj004/urls.py里添加一个匹配规则</span><br><span class="line">re_path(r&apos;^$&apos;,views.index) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 此时 request.path打印  /</span><br></pre></td></tr></table></figure>
+<h4 id="request常用方法"><a href="#request常用方法" class="headerlink" title="request常用方法"></a>request常用方法</h4><ul>
+<li>get_full_path() 跟path不同的是  同时携带get请求数据</li>
+<li>is_ajax() 以后详细说 就是判断是不是ajax请求</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># http://localhost:8000/index/?name=1&amp;pwd=2</span><br><span class="line">request.path ===&gt; /index/</span><br><span class="line">request.get_full_path() ===&gt; /index/?name=1&amp;pwd=2</span><br></pre></td></tr></table></figure>
+<h3 id="request响应对象"><a href="#request响应对象" class="headerlink" title="request响应对象"></a>request响应对象</h3><p>对应视图函数里的 return</p>
+<ul>
+<li>HttpResponse</li>
+<li>render</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    return 响应内容</span><br><span class="line"></span><br><span class="line"># 返回字符串  &quot;OK&quot;</span><br><span class="line">return HttpResponse(&quot;OK&quot;)</span><br><span class="line"></span><br><span class="line"># 返回h1标签</span><br><span class="line">return HttpResponse(&quot;&lt;h1&gt;OK&lt;/h1&gt;&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># render返回 templates里的页面</span><br><span class="line">return render(request,&quot;index.html&quot;)</span><br><span class="line"></span><br><span class="line"># 可选参数 渲染变量 将视图函数里的数据渲染到页面里这时就要传递这个参数</span><br><span class="line">import time</span><br><span class="line">ctime = time.time()</span><br><span class="line">return render(request,&quot;index.html&quot;,&#123;&quot;timer&quot;:ctime&#125;)</span><br><span class="line"></span><br><span class="line">修改index.html 添加个p标签</span><br><span class="line">&lt;p&gt;&#123;&#123; timer &#125;&#125;&lt;/p&gt;</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.cnblogs.com/yuanchenqi/articles/8876856.html" target="_blank" rel="noopener">参考</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/22/Py006-01-06django之url控制path/" title="Py006-01-06django之url控制path" itemprop="url">Py006-01-06django之url控制path</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-22T14:42:28.000Z" itemprop="datePublished"> Published 2018-10-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<h3 id="先看问题"><a href="#先看问题" class="headerlink" title="先看问题"></a>先看问题</h3></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [  </span><br><span class="line">    re_path(&apos;articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/&apos;, year_archive),  </span><br><span class="line">    re_path(&apos;article/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/detail/&apos;, detail_view),  </span><br><span class="line">    re_path(&apos;articles/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/edit/&apos;, edit_view),  </span><br><span class="line">    re_path(&apos;articles/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/delete/&apos;, delete_view),  </span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>考虑下这样的两个问题：</p>
+<p>第一个问题，函数 year_archive 中year参数是字符串类型的，因此需要先转化为整数类型的变量值，当然year=int(year) 不会有诸如如TypeError或者ValueError的异常。那么有没有一种方法，在url中，使得这一转化步骤可以由Django自动完成？</p>
+<p>第二个问题，三个路由中article_id都是同样的正则表达式，但是你需要写三遍，当之后article_id规则改变后，需要同时修改三处代码，那么有没有一种方法，只需修改一处即可？</p>
+<p>在Django2.0中，可以使用 path 解决以上的两个问题。</p>
+<blockquote>
+<p>基本使用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">from django.urls import path  </span><br><span class="line">from . import views  </span><br><span class="line">urlpatterns = [  </span><br><span class="line">    path(&apos;articles/2003/&apos;, views.special_case_2003),  </span><br><span class="line">    path(&apos;articles/&lt;int:year&gt;/&apos;, views.year_archive),  </span><br><span class="line">    path(&apos;articles/&lt;int:year&gt;/&lt;int:month&gt;/&apos;, views.month_archive),  </span><br><span class="line">    path(&apos;articles/&lt;int:year&gt;/&lt;int:month&gt;/&lt;slug&gt;/&apos;, views.article_detail),  </span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h4 id="基本规则："><a href="#基本规则：" class="headerlink" title="基本规则："></a>基本规则：</h4><ul>
+<li>使用尖括号(&lt;&gt;)从url中捕获值。</li>
+<li>捕获值中可以包含一个转化器类型（converter type），比如使用 <a href="int:name" target="_blank" rel="noopener">int:name</a> 捕获一个整数变量。若果没有转化器，将匹配任何字符串，当然也包括了 / 字符。</li>
+<li>无需添加前导斜杠。</li>
+</ul>
+<p><img src="https://images2018.cnblogs.com/blog/877318/201804/877318-20180424163727952-1649289117.png" alt></p>
+<h4 id="path转换器"><a href="#path转换器" class="headerlink" title="path转换器"></a>path转换器</h4><p>Django默认支持以下5个转化器：</p>
+<ul>
+<li>str,匹配除了路径分隔符（/）之外的非空字符串，这是默认的形式</li>
+<li>int,匹配正整数，包含0。</li>
+<li>slug,匹配字母、数字以及横杠、下划线组成的字符串。</li>
+<li>uuid,匹配格式化的uuid，如 075194d3-6885-417e-a8a8-6c931e272f00。</li>
+<li>path,匹配任何非空字符串，包含了路径分隔符</li>
+</ul>
+<h4 id="自定义转换器"><a href="#自定义转换器" class="headerlink" title="自定义转换器"></a>自定义转换器</h4><p>对于一些复杂或者复用的需要，可以定义自己的转化器。转化器是一个类或接口，它的要求有三点：</p>
+<ul>
+<li>regex 类属性，字符串类型</li>
+<li>to_python(self, value) 方法，value是由类属性 regex 所匹配到的字符串，返回具体的Python变量值，以供Django传递到对应的视图函数中。</li>
+<li>to_url(self, value) 方法，和 to_python 相反，value是一个具体的Python变量值，返回其字符串，通常用于url反向引用。</li>
+</ul>
+<p>例子</p>
+<blockquote>
+<p>step001随便建一个类</p>
+</blockquote>
+<p>urlConvert.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class MyConvert:  </span><br><span class="line">    regex = &apos;[0-9]&#123;4&#125;&apos;  </span><br><span class="line">    def to_python(self, value):  </span><br><span class="line">        return int(value)  </span><br><span class="line">    def to_url(self, value):  # 反向解析</span><br><span class="line">        return &apos;%04d&apos; % value</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step002使用register_converter 将其注册到URL配置中</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># register_converter是必须引入的 帮你注册转换器</span><br><span class="line">from django.urls import register_converter, path  </span><br><span class="line">from . import urlConvert, views  </span><br><span class="line"># 注册转换器</span><br><span class="line">register_converter(urlConvert.MyConvert, &apos;yyyy&apos;)  </span><br><span class="line">urlpatterns = [  </span><br><span class="line">    path(&apos;articles/2003/&apos;, views.special_case_2003),  </span><br><span class="line">    path(&apos;articles/&lt;yyyy:year&gt;/&apos;, views.year_archive),  </span><br><span class="line">    ...  </span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/21/Py006-01-05django路由反向解析/" title="Py006-01-05django路由反向解析" itemprop="url">Py006-01-05django路由反向解析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-21T07:57:50.000Z" itemprop="datePublished"> Published 2018-10-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<h4 id="登陆需求前置工作"><a href="#登陆需求前置工作" class="headerlink" title="登陆需求前置工作"></a>登陆需求前置工作</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># step001 新建django项目  mydj003</span><br><span class="line"># step002 设置应用为  app001</span><br><span class="line">    # mydj003/urls.py</span><br><span class="line"></span><br><span class="line">    from django.contrib import admin</span><br><span class="line">    from django.urls import path</span><br><span class="line">    from app001 import views</span><br><span class="line">    urlpatterns = [</span><br><span class="line">        path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">        path(&apos;login/&apos;,views.login)</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    # app001/view.py</span><br><span class="line">    def login(request):</span><br><span class="line">        return render(request,&apos;login.html&apos;)</span><br><span class="line"># step003 开发登陆需求  localhost:8000/login</span><br><span class="line"># step004 login.html能提交表单 action先写死为  localhost:8000/login</span><br><span class="line"></span><br><span class="line">    templates/login.html</span><br><span class="line">    </span><br><span class="line">    &lt;form action=&quot;http://127.0.0.1:8000/login/&quot; method=&quot;post&quot;&gt;</span><br><span class="line">        用户名 &lt;input type=&quot;text&quot; name=&quot;user&quot;&gt;</span><br><span class="line">        密码 &lt;input type=&quot;password&quot; name=&quot;pwd&quot;&gt;</span><br><span class="line">        &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">    &lt;/form&gt;</span><br><span class="line"></span><br><span class="line"># step005 python3 manage.py runserver  提交表单发现报 403 </span><br><span class="line">    此时你要修改一下settings.py里的  csrf配置</span><br><span class="line">    注释掉 csrf哪一行(这个问题以后解决)</span><br><span class="line">    MIDDLEWARE = [</span><br><span class="line">        &apos;django.middleware.security.SecurityMiddleware&apos;,</span><br><span class="line">        &apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,</span><br><span class="line">        &apos;django.middleware.common.CommonMiddleware&apos;,</span><br><span class="line">        # &apos;django.middleware.csrf.CsrfViewMiddleware&apos;,</span><br><span class="line">        &apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;,</span><br><span class="line">        &apos;django.contrib.messages.middleware.MessageMiddleware&apos;,</span><br><span class="line">        &apos;django.middleware.clickjacking.XFrameOptionsMiddleware&apos;,</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"># step006 此时你就可以正常提交表单了 </span><br><span class="line">    访问 localhost:8000/login 会返回登陆页面 get请求</span><br><span class="line">    提交按钮 也会访问 localhost:8000/login  post请求</span><br></pre></td></tr></table></figure>
+<h4 id="分支处理get和post请求"><a href="#分支处理get和post请求" class="headerlink" title="分支处理get和post请求"></a>分支处理get和post请求</h4><p>app001/views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line"></span><br><span class="line">def login(request):</span><br><span class="line">    print(request.method)</span><br><span class="line"></span><br><span class="line">    if request.method ==&apos;GET&apos;:</span><br><span class="line">        return render(request,&apos;login.html&apos;)</span><br><span class="line">    else:</span><br><span class="line">        print(request.GET)</span><br><span class="line">        print(request.POST)</span><br><span class="line">        user=request.POST.get(&apos;user&apos;);</span><br><span class="line">        pwd=request.POST.get(&apos;pwd&apos;);</span><br><span class="line"></span><br><span class="line">        if user==&apos;aaa&apos; and pwd ==&apos;123&apos;:</span><br><span class="line">            return HttpResponse(&quot;login success&quot;)</span><br><span class="line">        else:</span><br><span class="line">            return HttpResponse(&quot;login error&quot;)</span><br><span class="line"></span><br><span class="line"># 在进行访问  localhost:8000/login 然后提交表单——一切正常</span><br></pre></td></tr></table></figure>
+<h4 id="反向解析"><a href="#反向解析" class="headerlink" title="反向解析"></a>反向解析</h4><blockquote>
+<p>刚刚的action里是写死的，但是在开发过程中业务是会变的，这样就导致一旦变了改的就很多了</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">此时你修改路由</span><br><span class="line"># path(&apos;login/&apos;,views.login) 修改 为 login.html</span><br><span class="line">path(&apos;login.html/&apos;,views.login)</span><br><span class="line"></span><br><span class="line"># 再去提交 表单 发现提交不好使了</span><br><span class="line">此时你必须把login.html里的 form的action修改才能正常访问！！！！</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解决问题</p>
+</blockquote>
+<ul>
+<li>路由别名 name</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 修改urls.py里的路由</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;login/&apos;,views.login,name=&quot;Login&quot;)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 修改login.html里action</span><br><span class="line">&lt;form action=&quot;&#123;% url &quot;Login&quot; %&#125;&quot; method=&quot;post&quot;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 注意模版里的 &#123;% url &quot;Login&quot; %&#125; 是在视图函数  return render的时候 解析Login的url</span><br></pre></td></tr></table></figure>
+<h4 id="反向解析函数"><a href="#反向解析函数" class="headerlink" title="反向解析函数"></a>反向解析函数</h4><blockquote>
+<p>step001添加路由</p>
+</blockquote>
+<p>app001/urls.py添加如下路由</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from django.urls import path,re_path</span><br><span class="line">from . import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;,views.x001,name=&quot;year2003&quot;),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;,views.x002,name=&quot;y_m&quot;)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step002路由分发</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path,include</span><br><span class="line">from app001 import views</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;login/&apos;,views.login,name=&quot;Login&quot;),</span><br><span class="line"></span><br><span class="line">    # 分发</span><br><span class="line">    re_path(r&quot;^app001/&quot;,include(&apos;app001.urls&apos;))</span><br><span class="line"></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step003添加视图函数</p>
+</blockquote>
+<ul>
+<li>reverse反向解析函数  传递定义的路由别名来获取url</li>
+<li>注意点在视图函数里可以反向解析 urls.py里的任意定义别名的url路由</li>
+<li>如果urls.py里的路由含有动态参数，反向解析的时候必须传递对应的参数才可以</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">from django.urls import reverse</span><br><span class="line"></span><br><span class="line">def x001(request):</span><br><span class="line">    url = reverse(&apos;year2003&apos;)</span><br><span class="line">    print(url)</span><br><span class="line">    # url2 = reverse(&apos;y_m&apos;)</span><br><span class="line">    #  这条url里有分组，r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;</span><br><span class="line">    #  所以反向解析的时候，要匹配一个参数才可以</span><br><span class="line">    #  正确的使用方式 传递args参数 这里是一个元祖</span><br><span class="line">    url2 = reverse(&apos;y_m&apos;,args=(4009,))</span><br><span class="line">    return HttpResponse(&apos;2003&apos;)</span><br><span class="line"></span><br><span class="line">def x002(request,year):</span><br><span class="line">    return HttpResponse(&apos;year%s&apos;%year)</span><br></pre></td></tr></table></figure>
+<h4 id="路由命名空间"><a href="#路由命名空间" class="headerlink" title="路由命名空间"></a>路由命名空间</h4><blockquote>
+<p>step000再开一个应用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py startapp app002</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step001添加路由</p>
+</blockquote>
+<ul>
+<li>app001/urls.py添加如下路由并使用别名index</li>
+<li>app002/urls.py添加如下路由并使用别名index</li>
+<li>此时app002和app001的路由别名是重复的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    re_path(&apos;index/&apos;,view.index,name=&quot;index&quot;),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step002路由分发</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path,include</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;login/&apos;,views.login,name=&quot;Login&quot;),</span><br><span class="line"></span><br><span class="line">    # 分发</span><br><span class="line">    re_path(r&quot;^app001/&quot;,include(&apos;app001.urls&apos;))</span><br><span class="line">    re_path(r&quot;^app002/&quot;,include(&apos;app002.urls&apos;))</span><br><span class="line"></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step003反向解析路由</p>
+</blockquote>
+<p>分别在app001和app002的urls.py的视图函数里反向解析url</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from django.urls import reverse</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line">    url = reverse(&apos;index&apos;);</span><br><span class="line">    return HttpResponse(url)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>step004访问如下url</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">localhost:8000/app001/index/</span><br><span class="line">响应 /app002/index</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">localhost:8000/app002/index/</span><br><span class="line">响应 /app002/index</span><br></pre></td></tr></table></figure>
+<p>为什么找到的都是一个路由</p>
+<ul>
+<li>因为app001和app002的路由index定义的别名相同，分发的时候就会发生覆盖</li>
+</ul>
+<blockquote>
+<h4 id="名称空间来解决不同应用别名相同覆盖的问题"><a href="#名称空间来解决不同应用别名相同覆盖的问题" class="headerlink" title="名称空间来解决不同应用别名相同覆盖的问题"></a>名称空间来解决不同应用别名相同覆盖的问题</h4></blockquote>
+<p>1.主urls.py里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 使用命名空间</span><br><span class="line">urlpatterns = [</span><br><span class="line">    # 分发 子应用 路由别名相同时，反向解析路由的时候就会发生覆盖</span><br><span class="line">    # re_path(r&quot;^app001/&quot;,include(&apos;app001.urls&apos;))</span><br><span class="line">    # re_path(r&quot;^app002/&quot;,include(&apos;app002.urls&apos;))</span><br><span class="line"></span><br><span class="line">    # 分发  使用命名空间来规避  反向解析路由覆盖问题</span><br><span class="line">    re_path(r&quot;^app001/&quot;,include((&apos;app001.urls&apos;,&quot;app001&quot;)))</span><br><span class="line">    re_path(r&quot;^app002/&quot;,include((&apos;app002.urls&apos;,&quot;app002&quot;)))</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>2.app001/views.py和app002/views.py里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># app001</span><br><span class="line">def index(request):</span><br><span class="line">    url = reverse(&quot;app001:index&quot;)</span><br><span class="line">    return HttpResponse(url)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># app002</span><br><span class="line">def index(request):</span><br><span class="line">    url = reverse(&quot;app002:index&quot;)</span><br><span class="line">    return HttpResponse(url)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此时反向解析就能解析对应的url里了</p>
+</blockquote>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/21/Py006-01-04django路由简单配置/" title="Py006-01-04django路由简单配置" itemprop="url">Py006-01-04django路由简单配置</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-20T16:34:04.000Z" itemprop="datePublished"> Published 2018-10-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<p>此逻辑建立在上一篇博客的代码基础上，请自行拷贝</p>
+</blockquote>
+<h3 id="URLconf"><a href="#URLconf" class="headerlink" title="URLconf"></a>URLconf</h3><p>URL配置(URLconf)就像Django 所支撑网站的目录。它的本质是URL与要为该URL调用的视图函数之间的映射表；你就是以这种方式告诉Django，对于客户端发来的某个URL调用哪一段逻辑代码对应执行。</p>
+<blockquote>
+<p>re_path是django1里的一个函数</p>
+</blockquote>
+<ul>
+<li>urls.py里  默认引入的是 from django.urls import path</li>
+<li>django2向前兼容也可以引入re_path</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># step001 修改  urls.py</span><br><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line"></span><br><span class="line">    # 路由配置    路径------》视图函数</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/([0-9]+)/$&apos;, views.article_detail),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># step002 在 app001/views.py里定义 special_case_2003函数</span><br><span class="line"></span><br><span class="line"># 引入HttpResponse函数</span><br><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line">def special_case_2003(request):</span><br><span class="line">    return HttpResponse(&quot;special_case_2003&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># step003 打开链接  http://localhost:8000/articles/2003/</span><br><span class="line">你会看到 special_case_2003</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>很明显 r’^articles/2003/$ 是一个正则匹配</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;$&quot;  </span><br><span class="line">-就可以匹配 articles/2003/01/11</span><br><span class="line"></span><br><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;^&quot;  </span><br><span class="line">-就可以匹配 aaa/articles/2003/</span><br><span class="line"></span><br><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;^&quot;和&quot;$&quot;  </span><br><span class="line">-就可以匹配 aaa/articles/2003/01/22</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：</p>
+</blockquote>
+<ul>
+<li>若要从URL 中捕获一个值，只需要在它周围放置一对圆括号。</li>
+<li>不需要添加一个前导的反斜杠，因为每个URL 都有。例如，应该是^articles 而不是 ^/articles。</li>
+<li>每个正则表达式前面的’r’ 是可选的但是建议加上。它告诉Python 这个字符串是“原始的” —— 字符串中任何字符都不应该转义</li>
+</ul>
+<blockquote>
+<p>新需求：刚刚的articles/2003 不一定永远是这样的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">你会有</span><br><span class="line">articles/2003</span><br><span class="line">articles/2004</span><br><span class="line">articles/2005</span><br><span class="line">articles/2006</span><br><span class="line">articles/2007</span><br><span class="line">...</span><br><span class="line">articles/2018</span><br><span class="line">这样每个都配置就很恶心了</span><br></pre></td></tr></table></figure>
+<h4 id="正则动态匹配路由"><a href="#正则动态匹配路由" class="headerlink" title="正则动态匹配路由"></a>正则动态匹配路由</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 路由修改如下</span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    # 路由配置    路径------》视图函数</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003), # 实际是调用 special_case_2003(request)</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive), # 实际是调用 year_archive(request,1999)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive) 中  </span><br><span class="line"></span><br><span class="line">([0-9]&#123;4&#125;) 代表——分组(匹配四位数字) 此时就会多传递一个参数</span><br><span class="line">只要有()就代表分组 就会多传递一个参数 形如 year_archive(request,1999)</span><br><span class="line"></span><br><span class="line">[0-9]&#123;4&#125; 如果没有&quot;()&quot;代表不分组，这样调用视图函数的时候这个动态的值就不会当作位置参数传递</span><br><span class="line">形如 year_archive(request)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line"># views.py里 更新对应的视图函数</span><br><span class="line">def year_archive(request,year):</span><br><span class="line">    return HttpResponse(&quot;year is %s&quot;%year)</span><br><span class="line"></span><br><span class="line"># 访问 http://localhost:8000/articles/2021/</span><br><span class="line">得到内容  year is 2021</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意访问 <a href="http://localhost:8000/articles/2003/" target="_blank" rel="noopener">http://localhost:8000/articles/2003/</a> </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">返回的是 special_case_2003</span><br><span class="line">因为路由里会按规则顺序进行匹配 刚好第一条规则在我们动态匹配年份的前面</span><br><span class="line"></span><br><span class="line">re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003), </span><br><span class="line">re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br></pre></td></tr></table></figure>
+<h4 id="匹配两个动态路由-不仅接受年还支持月份"><a href="#匹配两个动态路由-不仅接受年还支持月份" class="headerlink" title="匹配两个动态路由   不仅接受年还支持月份"></a>匹配两个动态路由   不仅接受年还支持月份</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 在修改 urls.py</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive), # # 实际是调用 month_archive(request,1999,12)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 在views.py 进行视图函数的定义</span><br><span class="line"></span><br><span class="line">def month_archive(request,year,month):</span><br><span class="line">    return HttpResponse(&quot;year is %s ,month is %s&quot;%(year,month))</span><br><span class="line"></span><br><span class="line"># 此时访问 http://localhost:8000/articles/2003/02/ </span><br><span class="line">返回 year is 2003 ,month is 02</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 注意</span><br><span class="line"># 注意</span><br><span class="line"># 注意</span><br><span class="line"># 此时如果你去掉 re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive), 的 &quot;$&quot; 就会导致月份没法匹配了</span><br></pre></td></tr></table></figure>
+<h4 id="有名分组"><a href="#有名分组" class="headerlink" title="有名分组"></a>有名分组</h4><p>参考刚才最后一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 在修改 urls.py</span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive), # # 实际是调用 month_archive(request,1999,12)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 在views.py 进行视图函数的定义</span><br><span class="line"></span><br><span class="line">def month_archive(request,year,month):</span><br><span class="line">    return HttpResponse(&quot;year is %s ,month is %s&quot;%(year,month))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果此时你修改month_archive(request,year,month)中的参数 year和month的位置那么 返回的结果就颠倒了</p>
+</blockquote>
+<ul>
+<li>关键字传参</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">修改路由如下</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    re_path(r&apos;^articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/$&apos;, views.month_archive)</span><br><span class="line">    #  实际是调用 month_archive(request,year=1999,month=12)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>再也不担心参数位置变更导致的问题了</p>
+<h4 id="路由分发"><a href="#路由分发" class="headerlink" title="路由分发"></a>路由分发</h4><p>现在就一个应用，假如以后多了呢？ 这样路由都写在 mydb002/urls.py里就很恶心 了</p>
+<ul>
+<li>1.在app001目录里建立  urls.py</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 每个应用的url独立</span><br><span class="line"># </span><br><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive),</span><br><span class="line">    re_path(r&apos;^articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/$&apos;, views.month_archive)</span><br><span class="line">    #  实际是调用 month_archive(request,year=1999,month=12)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><ol start="2">
+<li>修改 主(mydj002目录的) urls.py</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from django.contrib import admin</span><br><span class="line"># 引入 include函数</span><br><span class="line">from django.urls import path,re_path,include</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line">    # 内容分发</span><br><span class="line">    re_path(r&quot;app001/&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 此时你访问就都可以了</span><br><span class="line">http://localhost:8000/app001/articles/2003/</span><br><span class="line">http://localhost:8000/app001/articles/2004/12/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但是带着app001不太好看</p>
+</blockquote>
+<p>修改主 urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    # 内容分发</span><br><span class="line">    # re_path(r&quot;app001/&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">    re_path(r&quot;^&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 访问就正常了</span><br><span class="line"># http://localhost:8000/articles/2003/</span><br><span class="line"># http://localhost:8000/articles/2003/12/</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/21/Py006-01-03django静态文件配置/" title="Py006-01-03django静态文件配置" itemprop="url">Py006-01-03django静态文件配置</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-20T16:01:48.000Z" itemprop="datePublished"> Published 2018-10-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="django静态文件处理之引入jquery"><a href="#django静态文件处理之引入jquery" class="headerlink" title="django静态文件处理之引入jquery"></a>django静态文件处理之引入jquery</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">1.新建django项目   mydj002</span><br><span class="line">2.设置more settings 里  在application name里输入  app001</span><br><span class="line">3.继续实现timer的效果</span><br><span class="line">    app001/views.py里</span><br><span class="line">    from django.shortcuts import render</span><br><span class="line">    # Create your views here.</span><br><span class="line"></span><br><span class="line">    def timer(request):</span><br><span class="line">        import time</span><br><span class="line">        ctime = time.time()</span><br><span class="line"></span><br><span class="line">        return render(request,&quot;timer.html&quot;,&#123;&quot;ctime&quot;:ctime&#125;)</span><br><span class="line"></span><br><span class="line">4. mydj002/urls.py里</span><br><span class="line"></span><br><span class="line">    from django.contrib import admin</span><br><span class="line">    from django.urls import path</span><br><span class="line"></span><br><span class="line">    from app001 import views</span><br><span class="line"></span><br><span class="line">    urlpatterns = [</span><br><span class="line">        path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">        path(&apos;timer/&apos;, views.timer)</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">5. templates里 放置一个jquery-3.1.1.js</span><br><span class="line">    timer.html内容如下</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        h4&#123;color:red;&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script src=&quot;jquery-3.1.1.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">    &lt;h4&gt;当前时间:&#123;&#123; ctime &#125;&#125;&lt;/h4&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">        $(&apos;h4&apos;).on(&apos;click&apos;,function()&#123;</span><br><span class="line">            $(this).css(&apos;color&apos;,&apos;green&apos;)</span><br><span class="line">        &#125;)</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line">6.此时你单独运行 timer.py发现  </span><br><span class="line">    ctimer没有正常渲染因为脱离了django单独运行 </span><br><span class="line">    h4点击后确实变绿了 </span><br><span class="line"></span><br><span class="line">7.但是你 python3 manage.py runserver   访问 localhost:8000/timer发现jquery并没有加载</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么jquery没有加载</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">因为&lt;script src=&quot;jquery-3.1.1.js&quot;&gt;&lt;/script&gt;里的路径不对</span><br><span class="line">你需要对静态文件进行路径配置才可以访问</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="配置静态文件路径"><a href="#配置静态文件路径" class="headerlink" title="配置静态文件路径"></a>配置静态文件路径</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">1. 在项目里mydj002下新建 statics目录 把jquery-3.1.1.js移到这里</span><br><span class="line">    此时你去浏览器里访问 localhost:8000/statics/jquery-3.1.1.js 还是报错</span><br><span class="line">    因为你缺少一个配置</span><br><span class="line">    因为你缺少一个配置</span><br><span class="line">    因为你缺少一个配置</span><br><span class="line"></span><br><span class="line">2. 在 mydj002/settings.py里 </span><br><span class="line">    STATIC_URL = &apos;/static/&apos;</span><br><span class="line">    # 添加如下内容</span><br><span class="line">    # 注意必须叫 STATICFILES_DIRS这是规定好的</span><br><span class="line">    # statics</span><br><span class="line">    STATICFILES_DIRS = [</span><br><span class="line">        os.path.join(BASE_DIR,&quot;statics&quot;)</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    # STATIC_URL 是静态资源目录的一个别名   你访问时候就是 localhost:8000/static/静态文件</span><br><span class="line">    # os.path.join(BASE_DIR,&quot;statics&quot;) 中的 statics是你刚刚新建的statics目录名</span><br><span class="line"></span><br><span class="line">3. localhost:8000/static/jquery-3.1.1.js 发现找到了</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">4. 在 timer.html里修改 jquery的路径 注意别名</span><br><span class="line">    settings.py 里的 别名STATIC_URL = &apos;/static/&apos;</span><br><span class="line">    记住你刚刚配置了别名 static</span><br><span class="line">    记住你刚刚配置了别名 static</span><br><span class="line">    记住你刚刚配置了别名 static</span><br><span class="line">    &lt;script src=&quot;/static/jquery-3.1.1.js&quot;&gt;&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">5. 访问 http://localhost:8000/timer/ 点击h4发现成功了！！！</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/27/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="page-number" href="/page/27/">27</a><span class="page-number current">28</span><a class="page-number" href="/page/29/">29</a><a class="page-number" href="/page/30/">30</a><span class="space">&hellip;</span><a class="page-number" href="/page/49/">49</a><a class="extend next" rel="next" href="/page/29/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

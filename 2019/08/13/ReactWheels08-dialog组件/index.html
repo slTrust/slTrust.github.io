@@ -1,0 +1,666 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ReactWheels08-dialog组件 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Dialog组件 设计API  我们用的是React ,最好的办法就是抄同行，交互方式是用户学习软件的过程 你的dialog 不能和同行有明显的不同，否则用户学起来费劲 API 最好一致，否则别人迁移到你的UI也很费劲   确定UI API   123456789// 第一种方式 标签&amp;lt;Dialog visable=&amp;#123;x&amp;#125;&amp;gt;    你的内容&amp;lt;/Dialog&amp;g">
+<meta name="keywords" content="ReactWheels">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactWheels08-dialog组件">
+<meta property="og:url" content="http://yoursite.com/2019/08/13/ReactWheels08-dialog组件/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Dialog组件 设计API  我们用的是React ,最好的办法就是抄同行，交互方式是用户学习软件的过程 你的dialog 不能和同行有明显的不同，否则用户学起来费劲 API 最好一致，否则别人迁移到你的UI也很费劲   确定UI API   123456789// 第一种方式 标签&amp;lt;Dialog visable=&amp;#123;x&amp;#125;&amp;gt;    你的内容&amp;lt;/Dialog&amp;g">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.319Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactWheels08-dialog组件">
+<meta name="twitter:description" content="Dialog组件 设计API  我们用的是React ,最好的办法就是抄同行，交互方式是用户学习软件的过程 你的dialog 不能和同行有明显的不同，否则用户学起来费劲 API 最好一致，否则别人迁移到你的UI也很费劲   确定UI API   123456789// 第一种方式 标签&amp;lt;Dialog visable=&amp;#123;x&amp;#125;&amp;gt;    你的内容&amp;lt;/Dialog&amp;g">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/08/13/ReactWheels08-dialog组件/" title="ReactWheels08-dialog组件" itemprop="url">ReactWheels08-dialog组件</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-08-13T12:11:43.000Z" itemprop="datePublished"> Published 2019-08-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Dialog组件"><span class="toc-number">1.</span> <span class="toc-text">Dialog组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#设计API"><span class="toc-number">1.1.</span> <span class="toc-text">设计API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#初版-dialog"><span class="toc-number">1.2.</span> <span class="toc-text">初版 dialog</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#能凑乎使用的-dialog"><span class="toc-number">1.3.</span> <span class="toc-text">能凑乎使用的 dialog</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一个-z-indexBug"><span class="toc-number">1.4.</span> <span class="toc-text">一个 z-indexBug</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#z-index-结构划分"><span class="toc-number">1.5.</span> <span class="toc-text">z-index 结构划分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何不通过标签创造dialog呢？"><span class="toc-number">1.6.</span> <span class="toc-text">如何不通过标签创造dialog呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ReactElement-和-ReactNode-区别"><span class="toc-number">1.7.</span> <span class="toc-text">ReactElement 和 ReactNode 区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重构API"><span class="toc-number">1.8.</span> <span class="toc-text">重构API</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="Dialog组件"><a href="#Dialog组件" class="headerlink" title="Dialog组件"></a>Dialog组件</h3><blockquote>
+<h4 id="设计API"><a href="#设计API" class="headerlink" title="设计API"></a>设计API</h4></blockquote>
+<ul>
+<li>我们用的是React ,最好的办法就是抄同行，交互方式是用户学习软件的过程</li>
+<li>你的dialog 不能和同行有明显的不同，否则用户学起来费劲</li>
+<li>API 最好一致，否则别人迁移到你的UI也很费劲</li>
+</ul>
+<ol>
+<li>确定UI</li>
+<li>API </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 第一种方式 标签</span><br><span class="line">&lt;Dialog visable=&#123;x&#125;&gt;</span><br><span class="line">    你的内容</span><br><span class="line">&lt;/Dialog&gt;</span><br><span class="line"></span><br><span class="line">// 第二种方式  js</span><br><span class="line">alert(&apos;你好&apos;).then(fn)</span><br><span class="line">confirm(&apos;确定&apos;).then(sure,cancel)</span><br><span class="line">model(&lt;table&gt;...&lt;/table&gt;)</span><br></pre></td></tr></table></figure>
+<h4 id="初版-dialog"><a href="#初版-dialog" class="headerlink" title="初版 dialog"></a>初版 dialog</h4><p>lib/dialog/dialog.example.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; useState &#125; from &apos;react&apos;;</span><br><span class="line">import Dialog from &apos;./dialog&apos;;</span><br><span class="line"></span><br><span class="line">export default function()&#123;</span><br><span class="line">    const[x,setX] = useState(false);</span><br><span class="line">    return (</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;button onClick=&#123; ()=&gt;setX(!x) &#125;&gt;click&lt;/button&gt;</span><br><span class="line">            &lt;Dialog visible=&#123;x&#125;&gt;</span><br><span class="line">                &lt;div&gt;hi&lt;/div&gt;</span><br><span class="line">            &lt;/Dialog&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>lib/dialog/dialog.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">    visible:boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Dialog:React.FunctionComponent&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">    return  props.visible ?</span><br><span class="line">        // 对于 react来说 你必须返回一个节点或者 null </span><br><span class="line">        // 直接 &#123;props.children&#125; 报错</span><br><span class="line">        &lt;div&gt;&#123;props.children&#125;&lt;/div&gt; : </span><br><span class="line">        null</span><br><span class="line">&#125;</span><br><span class="line">export default Dialog;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Fragment 使用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Fragment &#125; from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">    visible:boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Dialog:React.FunctionComponent&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">    return  props.visible ?</span><br><span class="line">        // 遮罩层的div 和 dialog分开，因为点击遮罩层要消失 </span><br><span class="line">        // &lt;Fragment&gt;  是为了渲染时不多渲染一个 div 和通过编译 </span><br><span class="line">        // 不能直接返回多个节点必须一个根节点，</span><br><span class="line">        //  而是只它里面的内容</span><br><span class="line">        &lt;Fragment&gt;</span><br><span class="line">            &lt;div className=&quot;fui-dialog-mask&quot;&gt;&lt;/div&gt;</span><br><span class="line">            &lt;div className=&quot;fui-dialog&quot;&gt;</span><br><span class="line">                &#123;props.children&#125;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        &lt;/Fragment&gt;</span><br><span class="line">        : </span><br><span class="line">        null</span><br><span class="line">&#125;</span><br><span class="line">export default Dialog;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>dialog垂直水平居中</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">position:fixed;</span><br><span class="line">top:50%;</span><br><span class="line">left:50%;</span><br><span class="line">transform: translate(-50%,-50%);</span><br></pre></td></tr></table></figure>
+<p>dialog.scss</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">.fui-dialog&#123;</span><br><span class="line">    position: fixed;</span><br><span class="line">    background: white;</span><br><span class="line">    width:10em;</span><br><span class="line">    height: 10em;</span><br><span class="line">    border-radius: 4px;</span><br><span class="line">    top:50%;</span><br><span class="line">    left:50%;</span><br><span class="line">    transform: translate(-50%,-50%);</span><br><span class="line">    &amp;-mask&#123;</span><br><span class="line">        position: fixed;</span><br><span class="line">        top:0;</span><br><span class="line">        left:0;</span><br><span class="line">        width:100%;</span><br><span class="line">        height: 100%;</span><br><span class="line">        background: fade-out(black,  0.5);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>dialog.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Fragment &#125; from &apos;react&apos;;</span><br><span class="line">import &apos;./dialog.scss&apos;;</span><br><span class="line">import &#123;Icon&#125; from &apos;../index&apos;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">    visible:boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Dialog:React.FunctionComponent&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">    return  props.visible ?</span><br><span class="line">        // 遮罩层的div 和 dialog分开，因为点击遮罩层要消失 </span><br><span class="line">        // &lt;Fragment&gt;  是为了渲染时不多渲染一个 div 和通过编译 </span><br><span class="line">        // 不能直接返回多个节点必须一个根节点，</span><br><span class="line">        //  而是只它里面的内容</span><br><span class="line"></span><br><span class="line">        // 关闭按钮不要在 header里 因为这样就必须有 header</span><br><span class="line">        &lt;Fragment&gt;</span><br><span class="line">            &lt;div className=&quot;fui-dialog-mask&quot;&gt;&lt;/div&gt;</span><br><span class="line">            &lt;div className=&quot;fui-dialog&quot;&gt;</span><br><span class="line">                &lt;div className=&quot;fui-dialog-close&quot;&gt;</span><br><span class="line">                    &lt;Icon name=&quot;close&quot;/&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;header className=&quot;fui-dialog-header&quot;&gt;提示&lt;/header&gt;</span><br><span class="line">                &lt;main className=&quot;fui-dialog-main&quot;&gt;</span><br><span class="line">                    &#123;props.children&#125;</span><br><span class="line">                &lt;/main&gt;</span><br><span class="line">                &lt;footer className=&quot;fui-dialog-footer&quot;&gt;</span><br><span class="line">                    &lt;button&gt;ok&lt;/button&gt;</span><br><span class="line">                    &lt;button&gt;cancel&lt;/button&gt;</span><br><span class="line">                &lt;/footer&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        &lt;/Fragment&gt;</span><br><span class="line">        : </span><br><span class="line">        null</span><br><span class="line">&#125;</span><br><span class="line">export default Dialog;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>此时的问题是 <strong>如何简化 className</strong>很重复，而且麻烦</p>
+</blockquote>
+<ul>
+<li>偏函数使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function scopedClassMaker(prefix: string)&#123;</span><br><span class="line">    return function x(name?: string)&#123;</span><br><span class="line">        return [prefix,name].filter(Boolean).join(&apos;-&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const scopedClass = scopedClassMaker(&apos;fui-dialog&apos;);</span><br><span class="line">const sc = scopedClass;</span><br><span class="line"></span><br><span class="line">sc() // fui-dialog</span><br><span class="line">sc(&apos;hello&apos;) // fui-dialog-hello</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>给我们的组件加一个样式</p>
+</blockquote>
+<ul>
+<li>我们的组件样式应该有一个全局的控制如字体和盒模型</li>
+<li>新建 lib/index.scss</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">我们的组件都是 fui 开头的</span><br><span class="line"></span><br><span class="line">[class^=fui-]&#123;</span><br><span class="line">    box-sizing: border-box;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这个选择器的缺陷是无法选取到 伪元素</span><br><span class="line">// 这个选择器的缺陷是无法选取到 伪元素</span><br><span class="line">// 这个选择器的缺陷是无法选取到 伪元素</span><br><span class="line">// 优化后</span><br><span class="line"></span><br><span class="line">[class^=fui-]&#123;</span><br><span class="line">    box-sizing: border-box;</span><br><span class="line">    &amp;::after,</span><br><span class="line">    &amp;::before&#123;</span><br><span class="line">         box-sizing: border-box;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>svg 为父亲元素的颜色</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fill:currentColor;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>React.cloneElement</code> 的用法</p>
+</blockquote>
+<ul>
+<li>dialog 传递的按钮是个数组 buttons</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 直接这样会报错 ，意思是你缺少key</span><br><span class="line">&lt;footer&gt;</span><br><span class="line">    &#123;props.buttons&#125;</span><br><span class="line">&lt;/footer&gt;</span><br><span class="line"></span><br><span class="line">// 答案就是使用 map 和  React.cloneElement</span><br><span class="line">&lt;footer&gt;</span><br><span class="line">    &#123;props.buttons.map((button,index) =&gt; </span><br><span class="line">        React.cloneElement(button,&#123;key:index&#125;) </span><br><span class="line">    )&#125;</span><br><span class="line">&lt;/footer&gt;</span><br><span class="line"></span><br><span class="line">// 不过这里有个性能的损失，就是每次都会 map 产生新的 button</span><br></pre></td></tr></table></figure>
+<h4 id="能凑乎使用的-dialog"><a href="#能凑乎使用的-dialog" class="headerlink" title="能凑乎使用的 dialog"></a>能凑乎使用的 dialog</h4><p>dialog.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Fragment, ReactElement &#125; from &apos;react&apos;;</span><br><span class="line">import &apos;./dialog.scss&apos;;</span><br><span class="line">import &#123;Icon&#125; from &apos;../index&apos;;</span><br><span class="line">import &#123;scopedClassMaker&#125; from &apos;../classes&apos;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">    visible:boolean;</span><br><span class="line">    buttons:Array&lt;ReactElement&gt;;</span><br><span class="line">    onClose:React.MouseEventHandler;</span><br><span class="line">    closeOnClickMask?:boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const scopedClass = scopedClassMaker(&apos;fui-dialog&apos;);</span><br><span class="line">const sc = scopedClass;</span><br><span class="line"></span><br><span class="line">const Dialog:React.FunctionComponent&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">    const onClickClose:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">        props.onClose(e);</span><br><span class="line">    &#125;</span><br><span class="line">    const onClickMask:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">        if(props.closeOnClickMask)&#123;</span><br><span class="line">            props.onClose(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return  props.visible ?</span><br><span class="line">        &lt;Fragment&gt;</span><br><span class="line">            &lt;div className=&#123;sc(&apos;mask&apos;)&#125; onClick=&#123;onClickMask&#125;&gt;&lt;/div&gt;</span><br><span class="line">            &lt;div className=&#123;sc()&#125;&gt;</span><br><span class="line">                &lt;div className=&#123;sc(&apos;close&apos;)&#125; onClick=&#123;onClickClose&#125;&gt;</span><br><span class="line">                    &lt;Icon name=&quot;close&quot;/&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;header className=&#123;sc(&apos;header&apos;)&#125;&gt;提示&lt;/header&gt;</span><br><span class="line">                &lt;main className=&#123;sc(&apos;main&apos;)&#125;&gt;</span><br><span class="line">                    &#123;props.children&#125;</span><br><span class="line">                &lt;/main&gt;</span><br><span class="line">                &lt;footer className=&#123;sc(&apos;footer&apos;)&#125;&gt;</span><br><span class="line">                    &#123;props.buttons.map((button,index) =&gt; </span><br><span class="line">                        React.cloneElement(button,&#123;key:index&#125;) </span><br><span class="line">                    )&#125;</span><br><span class="line">                &lt;/footer&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        &lt;/Fragment&gt;</span><br><span class="line">        : </span><br><span class="line">        null</span><br><span class="line">&#125;</span><br><span class="line">Dialog.defaultProps = &#123;</span><br><span class="line">    closeOnClickMask : false</span><br><span class="line">&#125;</span><br><span class="line">export default Dialog;</span><br></pre></td></tr></table></figure>
+<p>dialog.scss</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">@import &quot;../helper&quot;;</span><br><span class="line">.fui-dialog&#123;</span><br><span class="line">    position: fixed;</span><br><span class="line">    background: white;</span><br><span class="line">    min-width:20em;</span><br><span class="line">    border-radius: 4px;</span><br><span class="line">    top:50%;</span><br><span class="line">    left:50%;</span><br><span class="line">    transform: translate(-50%,-50%);</span><br><span class="line">    &amp;-mask&#123;</span><br><span class="line">        position: fixed;</span><br><span class="line">        top:0;</span><br><span class="line">        left:0;</span><br><span class="line">        width:100%;</span><br><span class="line">        height: 100%;</span><br><span class="line">        background: fade-out(black,  0.5);</span><br><span class="line">    &#125;</span><br><span class="line">    &amp;-header&#123;</span><br><span class="line">        font-size: 22px;</span><br><span class="line">        padding:8px 16px;</span><br><span class="line">        border-bottom: 1px solid grey;</span><br><span class="line">    &#125;</span><br><span class="line">    &amp;-main&#123;</span><br><span class="line">        padding:8px 16px;</span><br><span class="line">        min-height: 6em;</span><br><span class="line">    &#125;</span><br><span class="line">    &amp;-footer&#123;</span><br><span class="line">        padding:8px 16px;</span><br><span class="line">        border-top: 1px solid grey;</span><br><span class="line">        display: flex;</span><br><span class="line">        justify-content: flex-end;</span><br><span class="line">    &#125;</span><br><span class="line">    &amp;-close&#123;</span><br><span class="line">        position: absolute;</span><br><span class="line">        bottom:100%;</span><br><span class="line">        left:100%;</span><br><span class="line">        background: $main-color;</span><br><span class="line">        width: 2em;</span><br><span class="line">        height: 2em;</span><br><span class="line">        border-radius: 50%;</span><br><span class="line">        transform: translate(-50%,50%);</span><br><span class="line">        display: flex;</span><br><span class="line">        justify-content: center;</span><br><span class="line">        align-items: center;</span><br><span class="line">        color: white;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>dialog.example.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; useState &#125; from &apos;react&apos;;</span><br><span class="line">import Dialog from &apos;./dialog&apos;;</span><br><span class="line"></span><br><span class="line">export default function()&#123;</span><br><span class="line">    const[x,setX] = useState(false);</span><br><span class="line">    const[y,setY] = useState(false);</span><br><span class="line">    return (</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;h1&gt;example1&lt;/h1&gt;</span><br><span class="line">                &lt;button onClick=&#123; ()=&gt;setX(!x) &#125;&gt;click&lt;/button&gt;</span><br><span class="line">                &lt;Dialog visible=&#123;x&#125;</span><br><span class="line">                    buttons=&#123;</span><br><span class="line">                        [</span><br><span class="line">                            &lt;button onClick=&#123;()=&gt;&#123;setX(false)&#125;&#125;&gt;1&lt;/button&gt;,</span><br><span class="line">                            &lt;button onClick=&#123;()=&gt;&#123;setX(false)&#125;&#125;&gt;2&lt;/button&gt;</span><br><span class="line">                        ]</span><br><span class="line">                    &#125;</span><br><span class="line">                    onClose=&#123;()=&gt;&#123;setX(false)&#125;&#125;</span><br><span class="line">                &gt;</span><br><span class="line">                    &lt;div&gt;hi&lt;/div&gt;</span><br><span class="line">                &lt;/Dialog&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">            &lt;div&gt;</span><br><span class="line">                &lt;h1&gt;example2&lt;/h1&gt;</span><br><span class="line">                &lt;button onClick=&#123; ()=&gt;setY(!y) &#125;&gt;click&lt;/button&gt;</span><br><span class="line">                &lt;Dialog visible=&#123;y&#125;</span><br><span class="line">                    closeOnClickMask=&#123;true&#125;</span><br><span class="line">                    buttons=&#123;</span><br><span class="line">                        [</span><br><span class="line">                            &lt;button onClick=&#123;()=&gt;&#123;setY(false)&#125;&#125;&gt;1&lt;/button&gt;,</span><br><span class="line">                            &lt;button onClick=&#123;()=&gt;&#123;setY(false)&#125;&#125;&gt;2&lt;/button&gt;</span><br><span class="line">                        ]</span><br><span class="line">                    &#125;</span><br><span class="line">                    onClose=&#123;()=&gt;&#123;setY(false)&#125;&#125;</span><br><span class="line">                &gt;</span><br><span class="line">                    &lt;div&gt;hi&lt;/div&gt;</span><br><span class="line">                &lt;/Dialog&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="一个-z-indexBug"><a href="#一个-z-indexBug" class="headerlink" title="一个 z-indexBug"></a>一个 <code>z-index</code>Bug</h4><ul>
+<li>场景如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style=&quot;z-index=10&quot;&gt;</span><br><span class="line">aaa</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;Dialog/&gt;</span><br><span class="line">// 此时我们的 dialog 没有盖住 div</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你可能会想给我们的 dialog 设置 <code>z-index:9999</code><ul>
+<li>如果是平级那没问题</li>
+<li>但如果你的 <code>Dialog</code> 在一个容器里那个容器的 <code>z-index:9</code> 你就算是 <code>z-index:99999</code> 也没用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;div style=&quot;z-index=10&quot;&gt;</span><br><span class="line">aaa</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;div style=&quot;z-index:9&quot;&gt;</span><br><span class="line">    &lt;!-- 就算dialog 是 z-index:99999 也没用，因为父 div这个层级已经被压住了 --&gt;</span><br><span class="line">    &lt;Dialog&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>解决办法就是：不要出现在任何元素的里面</strong></p>
+<p>解决方案是 react portal</p>
+<ul>
+<li><a href="https://reactjs.org/docs/portals.html" target="_blank" rel="noopener">react portal</a></li>
+<li><a href="https://zh-hans.reactjs.org/docs/portals.html" target="_blank" rel="noopener">react portal中文</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/29880992" target="_blank" rel="noopener">react protal知乎</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">render() &#123;</span><br><span class="line">  // React mounts a new div and renders the children into it</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &#123;this.props.children&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// react portal</span><br><span class="line"></span><br><span class="line">render() &#123;</span><br><span class="line">  // React does *not* create a new div. It renders the children into `domNode`.</span><br><span class="line">  // `domNode` is any valid DOM node, regardless of its location in the DOM.</span><br><span class="line">  return ReactDOM.createPortal(</span><br><span class="line">    this.props.children,</span><br><span class="line">    domNode</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>推荐dialog的 <code>z-index</code> 设置为1 ，因为用户可以改啊！</strong></p>
+<h4 id="z-index-结构划分"><a href="#z-index-结构划分" class="headerlink" title="z-index 结构划分"></a>z-index 结构划分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">背景区 0～5</span><br><span class="line"></span><br><span class="line">内容区 10～19</span><br><span class="line">菜单区 50～59</span><br><span class="line"></span><br><span class="line">对话框 100～120</span><br><span class="line"></span><br><span class="line">广告区 150～170</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么推荐我们的 dialog <code>z-index:1</code>呢？</p>
+</blockquote>
+<ul>
+<li>因为层级低容易出现，这样别人用的时候再去覆盖 <code>fui-dialog{z-index:100}</code> </li>
+</ul>
+<h4 id="如何不通过标签创造dialog呢？"><a href="#如何不通过标签创造dialog呢？" class="headerlink" title="如何不通过标签创造dialog呢？"></a>如何不通过标签创造dialog呢？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">const alert = (content:string) =&gt;&#123;</span><br><span class="line">    const component = &lt;Dialog visible=&#123;true&#125; onClose=&#123;()=&gt;&#123;</span><br><span class="line">        ReactDOM.render(React.cloneElement(component,&#123;visable:false&#125;),div);</span><br><span class="line">        // 从div上卸载 dialog</span><br><span class="line">        ReactDOM.unmountComponentAtNode(div);</span><br><span class="line">        // 删除div</span><br><span class="line">        div.remove();</span><br><span class="line"></span><br><span class="line">    &#125;&#125;&gt;&#123;content&#125;&lt;/Dialog&gt;;</span><br><span class="line">    const div = document.createElement(&apos;div&apos;);</span><br><span class="line">    document.body.append(div);</span><br><span class="line">    ReactDOM.render(component,div);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ReactElement-和-ReactNode-区别"><a href="#ReactElement-和-ReactNode-区别" class="headerlink" title="ReactElement 和 ReactNode 区别"></a>ReactElement 和 ReactNode 区别</h4><ul>
+<li>ReactElement 必须是个标签</li>
+<li>ReactNode 不仅可以是标签还可以是 “字符串”</li>
+</ul>
+<h4 id="重构API"><a href="#重构API" class="headerlink" title="重构API"></a>重构API</h4><blockquote>
+<p>原则就是 立刻完成功能后立刻重构</p>
+</blockquote>
+<ul>
+<li>别过一个小时</li>
+<li>别过一个星期后重构</li>
+<li>立刻！</li>
+</ul>
+<blockquote>
+<p>重构的目的就是</p>
+</blockquote>
+<ul>
+<li>移除重复，三则重构</li>
+</ul>
+<p>dialog.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Fragment, ReactElement, ReactNode, ReactFragment &#125; from &apos;react&apos;;</span><br><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import &apos;./dialog.scss&apos;;</span><br><span class="line">import &#123;Icon&#125; from &apos;../index&apos;;</span><br><span class="line">import &#123;scopedClassMaker&#125; from &apos;../classes&apos;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">    visible:boolean;</span><br><span class="line">    buttons?:Array&lt;ReactElement&gt;;</span><br><span class="line">    onClose:React.MouseEventHandler;</span><br><span class="line">    closeOnClickMask?:boolean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const scopedClass = scopedClassMaker(&apos;fui-dialog&apos;);</span><br><span class="line">const sc = scopedClass;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const Dialog:React.FunctionComponent&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">    const onClickClose:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">        props.onClose(e);</span><br><span class="line">    &#125;</span><br><span class="line">    const onClickMask:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">        if(props.closeOnClickMask)&#123;</span><br><span class="line">            props.onClose(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    const x = props.visible ?</span><br><span class="line">    &lt;Fragment&gt;</span><br><span class="line">        &lt;div className=&#123;sc(&apos;mask&apos;)&#125; onClick=&#123;onClickMask&#125;&gt;&lt;/div&gt;</span><br><span class="line">        &lt;div className=&#123;sc()&#125;&gt;</span><br><span class="line">            &lt;div className=&#123;sc(&apos;close&apos;)&#125; onClick=&#123;onClickClose&#125;&gt;</span><br><span class="line">                &lt;Icon name=&quot;close&quot;/&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">            &lt;header className=&#123;sc(&apos;header&apos;)&#125;&gt;提示&lt;/header&gt;</span><br><span class="line">            &lt;main className=&#123;sc(&apos;main&apos;)&#125;&gt;</span><br><span class="line">                &#123;props.children&#125;</span><br><span class="line">            &lt;/main&gt;</span><br><span class="line">            &#123;</span><br><span class="line">                props.buttons &amp;&amp; props.buttons.length &gt; 0 &amp;&amp;</span><br><span class="line">                &lt;footer className=&#123;sc(&apos;footer&apos;)&#125;&gt;</span><br><span class="line">                    &#123;props.buttons &amp;&amp; props.buttons.map((button,index) =&gt; </span><br><span class="line">                        React.cloneElement(button,&#123;key:index&#125;) </span><br><span class="line">                    )&#125;</span><br><span class="line">                &lt;/footer&gt;</span><br><span class="line">            &#125;</span><br><span class="line">           </span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/Fragment&gt;</span><br><span class="line">    : </span><br><span class="line">    null</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">    直接 &#123;props.buttons&#125; 会报错 因为 buttons 是数组</span><br><span class="line">    需要一个key</span><br><span class="line">    */</span><br><span class="line">    return (</span><br><span class="line">        ReactDOM.createPortal(x,document.body)</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line">// 设置默认 props</span><br><span class="line">Dialog.defaultProps = &#123;</span><br><span class="line">    closeOnClickMask : false</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const alert = (content:string) =&gt;&#123;</span><br><span class="line">    const onClose = () =&gt; &#123;</span><br><span class="line">        ReactDOM.render(React.cloneElement(component,&#123;visable:false&#125;),div);</span><br><span class="line">        ReactDOM.unmountComponentAtNode(div);</span><br><span class="line">        div.remove();</span><br><span class="line">    &#125;</span><br><span class="line">    const component = </span><br><span class="line">        &lt;Dialog </span><br><span class="line">            visible=&#123;true&#125; </span><br><span class="line">            onClose=&#123;onClose&#125;</span><br><span class="line">            buttons=&#123;[ &lt;button onClick=&#123;onClose&#125;&gt;OK&lt;/button&gt;]&#125;</span><br><span class="line">            &gt;</span><br><span class="line">            &#123;content&#125;</span><br><span class="line">        &lt;/Dialog&gt;;</span><br><span class="line">    const div = document.createElement(&apos;div&apos;);</span><br><span class="line">    document.body.append(div);</span><br><span class="line">    ReactDOM.render(component,div);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const confirm = (content:string,yes:()=&gt;void,no:()=&gt;void) =&gt;&#123;</span><br><span class="line">    const onClose = () =&gt; &#123;</span><br><span class="line">        ReactDOM.render(React.cloneElement(component,&#123;visable:false&#125;),div);</span><br><span class="line">        ReactDOM.unmountComponentAtNode(div);</span><br><span class="line">        div.remove();</span><br><span class="line">    &#125;</span><br><span class="line">    const onYes = () =&gt; &#123;</span><br><span class="line">        onClose()</span><br><span class="line">        yes &amp;&amp; yes();</span><br><span class="line">    &#125;;</span><br><span class="line">    const onNo = () =&gt; &#123;</span><br><span class="line">        onClose()</span><br><span class="line">        no &amp;&amp; no();</span><br><span class="line">    &#125;;</span><br><span class="line">    const component = (</span><br><span class="line">        &lt;Dialog </span><br><span class="line">            visible=&#123;true&#125; </span><br><span class="line">            onClose=&#123;onNo&#125;</span><br><span class="line">            buttons=&#123;[</span><br><span class="line">                &lt;button onClick=&#123;onYes&#125;&gt;yes&lt;/button&gt;,</span><br><span class="line">                &lt;button onClick=&#123;onNo&#125;&gt;no&lt;/button&gt;</span><br><span class="line">                ]&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &#123;content&#125;</span><br><span class="line">        &lt;/Dialog&gt;);</span><br><span class="line">    const div = document.createElement(&apos;div&apos;);</span><br><span class="line">    document.body.append(div);</span><br><span class="line">    ReactDOM.render(component,div);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const model = (content: ReactNode | ReactFragment) =&gt;&#123;</span><br><span class="line">    const onClose = () =&gt; &#123;</span><br><span class="line">        ReactDOM.render(React.cloneElement(component,&#123;visable:false&#125;),div);</span><br><span class="line">        // 从div上卸载 dialog</span><br><span class="line">        ReactDOM.unmountComponentAtNode(div);</span><br><span class="line">        // 删除div</span><br><span class="line">        div.remove();</span><br><span class="line">    &#125;</span><br><span class="line">    const component = (</span><br><span class="line">        &lt;Dialog visible=&#123;true&#125; </span><br><span class="line">            onClose=&#123;onClose&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &#123;content&#125;</span><br><span class="line">        &lt;/Dialog&gt;</span><br><span class="line">    );</span><br><span class="line">    const div = document.createElement(&apos;div&apos;);</span><br><span class="line">    document.body.append(div);</span><br><span class="line">    ReactDOM.render(component,div);</span><br><span class="line"></span><br><span class="line">    return onClose;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Dialog;</span><br><span class="line">export &#123;alert, confirm , model &#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>提取公共</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">const model = (content: ReactNode , buttons?: Array&lt;ReactElement&gt;,afterClose?:() =&gt; void) =&gt; &#123;</span><br><span class="line">    const close = () =&gt; &#123;</span><br><span class="line">        ReactDOM.render(React.cloneElement(component,&#123;visable:false&#125;),div);</span><br><span class="line">        ReactDOM.unmountComponentAtNode(div);</span><br><span class="line">        div.remove();</span><br><span class="line">        console.log(&apos;close&apos;)</span><br><span class="line">    &#125;</span><br><span class="line">    const component = </span><br><span class="line">        &lt;Dialog </span><br><span class="line">            visible=&#123;true&#125; </span><br><span class="line">            onClose=&#123;()=&gt;&#123;</span><br><span class="line">                close();</span><br><span class="line">                afterClose &amp;&amp; afterClose();</span><br><span class="line">            &#125;&#125;</span><br><span class="line">            buttons=&#123;buttons&#125;</span><br><span class="line">            &gt;</span><br><span class="line">            &#123;content&#125;</span><br><span class="line">        &lt;/Dialog&gt;;</span><br><span class="line">    const div = document.createElement(&apos;div&apos;);</span><br><span class="line">    document.body.append(div);</span><br><span class="line">    ReactDOM.render(component,div);</span><br><span class="line">    return close;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const alert = (content:string) =&gt;&#123;</span><br><span class="line">    const button = &lt;button onClick=&#123;() =&gt; close()&#125;&gt;OK&lt;/button&gt;;</span><br><span class="line">    const close = model(content,[button])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const confirm = (content:string,yes?:() =&gt; void,no?:() =&gt; void) =&gt;&#123;</span><br><span class="line">    const onYes = () =&gt; &#123;</span><br><span class="line">        close()</span><br><span class="line">        yes &amp;&amp; yes();</span><br><span class="line">    &#125;;</span><br><span class="line">    const onNo = () =&gt; &#123;</span><br><span class="line">        close()</span><br><span class="line">        no &amp;&amp; no();</span><br><span class="line">    &#125;;</span><br><span class="line">    const buttons = [</span><br><span class="line">        &lt;button onClick=&#123;onYes&#125;&gt;yes&lt;/button&gt;,</span><br><span class="line">        &lt;button onClick=&#123;onNo&#125;&gt;no&lt;/button&gt;</span><br><span class="line">    ]</span><br><span class="line">    const close = model(content,buttons, no);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>scopedClass 高阶函数</li>
+<li>Fragment 可以不生成多余的节点</li>
+<li><p>react portal 传送门</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ReactDOM.createPortal(渲染元素 , document.body)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>动态生成组件 参考 alert 实现</p>
+</li>
+<li>闭包传 API 如 <code>close</code></li>
+</ul>
+<blockquote>
+<p>代码连接</p>
+</blockquote>
+<p><a href="https://github.com/slTrust/react-gulu-test-4" target="_blank" rel="noopener">react-gulu-test-4</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ReactWheels/">ReactWheels</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/08/13/ReactWheels08-dialog组件/" data-title="ReactWheels08-dialog组件 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/08/14/ReactWheels09-layout组件/" title="ReactWheels09-layout组件">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ReactWheels09-layout组件</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/08/12/TS入门014ts高级类型下/"  title="TS入门014ts高级类型下">
+ <strong>下一篇：</strong><br/> 
+ <span>TS入门014ts高级类型下
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Dialog组件"><span class="toc-number">1.</span> <span class="toc-text">Dialog组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#设计API"><span class="toc-number">1.1.</span> <span class="toc-text">设计API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#初版-dialog"><span class="toc-number">1.2.</span> <span class="toc-text">初版 dialog</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#能凑乎使用的-dialog"><span class="toc-number">1.3.</span> <span class="toc-text">能凑乎使用的 dialog</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一个-z-indexBug"><span class="toc-number">1.4.</span> <span class="toc-text">一个 z-indexBug</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#z-index-结构划分"><span class="toc-number">1.5.</span> <span class="toc-text">z-index 结构划分</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何不通过标签创造dialog呢？"><span class="toc-number">1.6.</span> <span class="toc-text">如何不通过标签创造dialog呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ReactElement-和-ReactNode-区别"><span class="toc-number">1.7.</span> <span class="toc-text">ReactElement 和 ReactNode 区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重构API"><span class="toc-number">1.8.</span> <span class="toc-text">重构API</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

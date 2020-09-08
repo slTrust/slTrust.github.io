@@ -1,0 +1,620 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-016-命令行详解02 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="输⼊与输出 进程启动之后有三个要素，它们不和任何编程语言绑定，而且任何编程语言里都有这样的概念   标准输⼊ stdin 标准输出 stdout 标准错误 stderr  12345678public class Main&amp;#123;    public static void main(String[] args)&amp;#123;        // 标准输出        System.out.p">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-016-命令行详解02">
+<meta property="og:url" content="http://yoursite.com/2019/07/15/ZB-016-命令行详解02/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="输⼊与输出 进程启动之后有三个要素，它们不和任何编程语言绑定，而且任何编程语言里都有这样的概念   标准输⼊ stdin 标准输出 stdout 标准错误 stderr  12345678public class Main&amp;#123;    public static void main(String[] args)&amp;#123;        // 标准输出        System.out.p">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.334Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-016-命令行详解02">
+<meta name="twitter:description" content="输⼊与输出 进程启动之后有三个要素，它们不和任何编程语言绑定，而且任何编程语言里都有这样的概念   标准输⼊ stdin 标准输出 stdout 标准错误 stderr  12345678public class Main&amp;#123;    public static void main(String[] args)&amp;#123;        // 标准输出        System.out.p">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/07/15/ZB-016-命令行详解02/" title="ZB-016-命令行详解02" itemprop="url">ZB-016-命令行详解02</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-07-15T13:41:27.000Z" itemprop="datePublished"> Published 2019-07-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#输⼊与输出"><span class="toc-number">1.</span> <span class="toc-text">输⼊与输出</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux常⽤命令"><span class="toc-number">1.1.</span> <span class="toc-text">Linux常⽤命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux常⽤命令-1"><span class="toc-number">1.2.</span> <span class="toc-text">Linux常⽤命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#怎么才能掌握命令行？"><span class="toc-number">1.3.</span> <span class="toc-text">怎么才能掌握命令行？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用命令编译java程序"><span class="toc-number">1.4.</span> <span class="toc-text">使用命令编译java程序</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#D-的顺序有要求"><span class="toc-number">1.4.1.</span> <span class="toc-text">-D 的顺序有要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#classpath应用"><span class="toc-number">1.4.2.</span> <span class="toc-text">classpath应用</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在看IDEA里运行main的时候启动时的命令行"><span class="toc-number">1.5.</span> <span class="toc-text">在看IDEA里运行main的时候启动时的命令行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#java-中-fork进程"><span class="toc-number">2.</span> <span class="toc-text">java 中 fork进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">3.</span> <span class="toc-text">练习</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="输⼊与输出"><a href="#输⼊与输出" class="headerlink" title="输⼊与输出"></a>输⼊与输出</h3><blockquote>
+<p>进程启动之后有三个要素，它们不和任何编程语言绑定，而且任何编程语言里都有这样的概念</p>
+</blockquote>
+<ul>
+<li>标准输⼊ stdin</li>
+<li>标准输出 stdout</li>
+<li>标准错误 stderr</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class Main&#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        // 标准输出</span><br><span class="line">        System.out.println(&quot;output&quot;)</span><br><span class="line">        // 标准错误</span><br><span class="line">        System.err.println(&quot;error&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>执行我们的 java</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">javac Main.java &amp;&amp; java Main</span><br><span class="line">输出</span><br><span class="line">output</span><br><span class="line">error</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在操作系统中</p>
+</blockquote>
+<ul>
+<li>stdout 叫做 “文件描述符1”</li>
+<li>stderr 叫做 “文件描述符2”</li>
+</ul>
+<blockquote>
+<p>将输出放到文件里</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">java Main &gt; output.txt</span><br><span class="line"># 发现少了一行，因为输出默认会把标准输出重定向到文件里</span><br><span class="line">&gt; error </span><br><span class="line"></span><br><span class="line"># 一个 “&gt;” 代表重写覆盖， 两个&quot;&gt;&gt;&quot;代表追加</span><br><span class="line"></span><br><span class="line">重定向的 &quot;&gt;&quot; 默认等价于 &quot;文件描述符1&quot;</span><br><span class="line"></span><br><span class="line"># 执行 文件描述符2</span><br><span class="line">java Main 2&gt; output.txt</span><br><span class="line"># error 写在了 文件里</span><br><span class="line">&gt; output</span><br><span class="line"></span><br><span class="line"># 如何把 标准输出和 标准错误 同时输出到一个文件里</span><br><span class="line">java Main &gt; output 2&gt;&amp;1</span><br><span class="line"></span><br><span class="line"># 顺序写反是无效的</span><br><span class="line">java Main &gt; output 1&gt;&amp;2</span><br><span class="line">error</span><br><span class="line"></span><br><span class="line"># 现在会同时打印 标准输出和标准错误， 此时我只想要 标准输出,不要标准错误</span><br><span class="line">java Main 2&gt; /dev/null</span><br><span class="line"># 意思是把 错误输出丢到垃圾桶里</span><br></pre></td></tr></table></figure>
+<ul>
+<li>输出的重定向<ul>
+<li>覆盖⽂件</li>
+<li>追加⽂件</li>
+<li>改变流向</li>
+<li>/dev/null</li>
+</ul>
+</li>
+</ul>
+<h4 id="Linux常⽤命令"><a href="#Linux常⽤命令" class="headerlink" title="Linux常⽤命令"></a>Linux常⽤命令</h4><ul>
+<li>进⼊⽬录 cd (change directory)</li>
+<li>展示⽂件 ls/ll/ls -alth (list)</li>
+<li>移动/重命名⽂件 mv (move)</li>
+<li>删除⽂件 rm/rm -r/rm -rf (remove)</li>
+<li>拷⻉⽂件 cp/cp -r (copy)</li>
+<li>显示变量 echo</li>
+<li>导出变量 export</li>
+<li>Git系列操作 git pull/push/add/commit/…</li>
+</ul>
+<h4 id="Linux常⽤命令-1"><a href="#Linux常⽤命令-1" class="headerlink" title="Linux常⽤命令"></a>Linux常⽤命令</h4><ul>
+<li>新建⽬录 mkdir/mkdir -p (make directory)</li>
+<li>当前⽬录 pwd (print working directory)</li>
+<li>显示⽂件 cat (concatenate and print files)</li>
+<li>编辑⽂件 vi</li>
+</ul>
+<h4 id="怎么才能掌握命令行？"><a href="#怎么才能掌握命令行？" class="headerlink" title="怎么才能掌握命令行？"></a>怎么才能掌握命令行？</h4><blockquote>
+<p>以下方式逐级晋升</p>
+</blockquote>
+<ul>
+<li>⾃⼰对着书敲命令</li>
+<li>尽可能地在开发中使⽤命令⾏</li>
+<li>vi/git/mkdir, etc.</li>
+<li>使⽤命令⾏的各种⼩⼯具</li>
+<li>开发命令⾏的程序</li>
+<li>⾃⾏在云服务器上开发部署博客</li>
+<li>⾃⾏在云服务器上进⾏持续集成实战</li>
+<li>⽇常使⽤Linux进⾏开发</li>
+</ul>
+<h4 id="使用命令编译java程序"><a href="#使用命令编译java程序" class="headerlink" title="使用命令编译java程序"></a>使用命令编译java程序</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 环境变量 </span><br><span class="line">System.getenv(&quot;aaa&quot;)</span><br><span class="line"></span><br><span class="line">// 系统属性 只在 jvm 中有效</span><br><span class="line">System.getProperty(&quot;xxx&quot;)</span><br><span class="line">System.getProperty(&quot;java.version&quot;)</span><br><span class="line">System.getProperty(&quot;user.dir&quot;)</span><br></pre></td></tr></table></figure>
+<p>Main.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Main&#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        System.out.println(&quot;args:&quot;+ java.util.Arrays.toString(args));</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;env:&quot;+System.getenv(&quot;AAA&quot;));</span><br><span class="line">        </span><br><span class="line">        System.out.println(&quot;java version:&quot;+System.getProperty(&quot;java.version&quot;));</span><br><span class="line">        // System.getProperty(&quot;user.dir&quot;)</span><br><span class="line"></span><br><span class="line">         System.out.println(&quot;system property:&quot;+System.getProperty(&quot;BBB&quot;));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">javac Main.java &amp;&amp; java Main 1 2 3</span><br><span class="line"></span><br><span class="line">args:[1,2,3]</span><br><span class="line">env: null</span><br><span class="line">java version:1.8.0...</span><br><span class="line">system property:null</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 传递 系统属性</span><br><span class="line">export AAA=123</span><br><span class="line">java -DBBB=789 Main </span><br><span class="line"></span><br><span class="line">args:[]</span><br><span class="line">env: 123</span><br><span class="line">java version:1.8.0...</span><br><span class="line">system property:789</span><br></pre></td></tr></table></figure>
+<h5 id="D-的顺序有要求"><a href="#D-的顺序有要求" class="headerlink" title="-D 的顺序有要求"></a><code>-D</code> 的顺序有要求</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">javac -DBBB=789 Main</span><br><span class="line">args:[]</span><br><span class="line">env: 123</span><br><span class="line">java version:1.8.0...</span><br><span class="line">system property:789</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">javac  Main -DBBB=789</span><br><span class="line">args:[-DBBB=789]</span><br><span class="line">env: 123</span><br><span class="line">java version:1.8.0...</span><br><span class="line">system property:null</span><br></pre></td></tr></table></figure>
+<h5 id="classpath应用"><a href="#classpath应用" class="headerlink" title="classpath应用"></a>classpath应用</h5><p>假如我们的<code>Main.java</code> 里 用了第三方包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">java Main 报错 class not found</span><br><span class="line"></span><br><span class="line">javac -classpath common-lang3-3.9.jar Main.java</span><br><span class="line">java Main </span><br><span class="line">// 报错，意思只在 common-lang3-3.9.jar 的目录里找不在当前目录找</span><br><span class="line"></span><br><span class="line">还可以简写</span><br><span class="line">java -cp common-lang3-3.9.jar Main</span><br><span class="line"></span><br><span class="line"># 正确写法 除了在 common-lang3-3.9.jar 找还在 当前目录找</span><br><span class="line">java -cp common-lang3-3.9.jar:. Main</span><br></pre></td></tr></table></figure>
+<h4 id="在看IDEA里运行main的时候启动时的命令行"><a href="#在看IDEA里运行main的时候启动时的命令行" class="headerlink" title="在看IDEA里运行main的时候启动时的命令行"></a>在看IDEA里运行main的时候启动时的命令行</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java &quot;-javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=51272:/Applications/IntelliJ IDEA.app/Contents/bin&quot; -Dfile.encoding=UTF-8 -classpath /Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/deploy.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/cldrdata.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/dnsns.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/jaccess.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/jfxrt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/localedata.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/nashorn.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunec.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunjce_provider.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/sunpkcs11.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/ext/zipfs.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/javaws.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jfxswt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/management-agent.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/plugin.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/ant-javafx.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/dt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/javafx-mx.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/jconsole.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/packager.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/sa-jdi.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/lib/tools.jar:/Users/huangjiaxi/Desktop/java-fork-process/target/classes com.github.hcsp.shell.Fork</span><br></pre></td></tr></table></figure>
+<h3 id="java-中-fork进程"><a href="#java-中-fork进程" class="headerlink" title="java 中 fork进程"></a>java 中 fork进程</h3><ul>
+<li><a href="https://github.com/hcsp/java-fork-process" target="_blank" rel="noopener">代码仓库</a></li>
+<li><a href="https://github.com/hcsp/java-fork-process/pull/7" target="_blank" rel="noopener">pr</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.shell;</span><br><span class="line"></span><br><span class="line">import java.io.File;</span><br><span class="line">import java.nio.file.Path;</span><br><span class="line">import java.nio.file.Paths;</span><br><span class="line">import java.util.Map;</span><br><span class="line"></span><br><span class="line">public class Fork &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        // 请在这里使用Java代码fork一个子进程，将fork的子进程的标准输出重定向到指定文件：工作目录下名为output.txt的文件</span><br><span class="line">        // 工作目录是项目目录下的working-directory目录（可以用getWorkingDir()方法得到这个目录对应的File对象）</span><br><span class="line">        // 传递的命令是sh run.sh</span><br><span class="line">        // 环境变量是AAA=123</span><br><span class="line"></span><br><span class="line">        // 1. 可执行程序 2。 参数</span><br><span class="line">        ProcessBuilder pb = new ProcessBuilder(&quot;sh&quot;,&quot;run.sh&quot;);</span><br><span class="line">        // 3。 工作路径</span><br><span class="line">        pb.directory(getWorkingDir());</span><br><span class="line">        // 4。 设置环境变量</span><br><span class="line">        Map&lt;String,String&gt; envs = pb.environment();</span><br><span class="line">        envs.put(&quot;AAA&quot;,&quot;123&quot;);</span><br><span class="line"></span><br><span class="line">        // 把系统输入输出 继承到当前的进程中来</span><br><span class="line">        // pb.inheritIO();</span><br><span class="line"></span><br><span class="line">        // 将输出内容重定向到文件</span><br><span class="line">        pb.redirectOutput(getOutputFile());</span><br><span class="line"></span><br><span class="line">        pb.start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static File getWorkingDir() &#123;</span><br><span class="line">        Path projectDir = Paths.get(System.getProperty(&quot;user.dir&quot;));</span><br><span class="line">        return projectDir.resolve(&quot;working-directory&quot;).toFile();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static File getOutputFile() &#123;</span><br><span class="line">        return new File(getWorkingDir(), &quot;output.txt&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><ol>
+<li><a href="https://github.com/hcsp/practise-shell-commands" target="_blank" rel="noopener">Linux命令</a><br> <a href="https://github.com/hcsp/practise-shell-commands/pull/7" target="_blank" rel="noopener">我的pr</a></li>
+<li><a href="https://github.com/hcsp/practise-java-commands" target="_blank" rel="noopener">java命令</a><br> <a href="https://github.com/hcsp/practise-java-commands/pull/4" target="_blank" rel="noopener">我的pr</a></li>
+<li><a href="https://github.com/hcsp/java-fork-process" target="_blank" rel="noopener">使用Java代码fork子进程</a><br> <a href="https://github.com/hcsp/java-fork-process/pull/7" target="_blank" rel="noopener">我的pr</a></li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/07/15/ZB-016-命令行详解02/" data-title="ZB-016-命令行详解02 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/07/16/ZB-017-java包管理和maven/" title="ZB-017-java包管理和maven">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-017-java包管理和maven</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/07/15/ZB-016-命令行详解01/"  title="ZB-016-命令行详解01">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-016-命令行详解01
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#输⼊与输出"><span class="toc-number">1.</span> <span class="toc-text">输⼊与输出</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux常⽤命令"><span class="toc-number">1.1.</span> <span class="toc-text">Linux常⽤命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Linux常⽤命令-1"><span class="toc-number">1.2.</span> <span class="toc-text">Linux常⽤命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#怎么才能掌握命令行？"><span class="toc-number">1.3.</span> <span class="toc-text">怎么才能掌握命令行？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用命令编译java程序"><span class="toc-number">1.4.</span> <span class="toc-text">使用命令编译java程序</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#D-的顺序有要求"><span class="toc-number">1.4.1.</span> <span class="toc-text">-D 的顺序有要求</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#classpath应用"><span class="toc-number">1.4.2.</span> <span class="toc-text">classpath应用</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在看IDEA里运行main的时候启动时的命令行"><span class="toc-number">1.5.</span> <span class="toc-text">在看IDEA里运行main的时候启动时的命令行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#java-中-fork进程"><span class="toc-number">2.</span> <span class="toc-text">java 中 fork进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">3.</span> <span class="toc-text">练习</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

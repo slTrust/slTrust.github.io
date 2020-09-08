@@ -1,0 +1,575 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Java-022-控制反转和依赖注入 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="控制反转和依赖注入控制反转控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如: A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁 而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-022-控制反转和依赖注入">
+<meta property="og:url" content="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="控制反转和依赖注入控制反转控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如: A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁 而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.246Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java-022-控制反转和依赖注入">
+<meta name="twitter:description" content="控制反转和依赖注入控制反转控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如: A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁 而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/06/09/Java-022-控制反转和依赖注入/" title="Java-022-控制反转和依赖注入" itemprop="url">Java-022-控制反转和依赖注入</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-06-09T03:31:54.000Z" itemprop="datePublished"> Published 2019-06-09</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#控制反转和依赖注入"><span class="toc-number">1.</span> <span class="toc-text">控制反转和依赖注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#控制反转"><span class="toc-number">1.1.</span> <span class="toc-text">控制反转</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#依赖注入"><span class="toc-number">1.2.</span> <span class="toc-text">依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#我们如何把在外部创建的B的对象交给A呢"><span class="toc-number">1.3.</span> <span class="toc-text">我们如何把在外部创建的B的对象交给A呢?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#组件和依赖注入"><span class="toc-number">1.4.</span> <span class="toc-text">组件和依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Spring的组件管理和依赖注入"><span class="toc-number">1.5.</span> <span class="toc-text">Spring的组件管理和依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#常用的两种注入方式"><span class="toc-number">1.6.</span> <span class="toc-text">常用的两种注入方式:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#区别"><span class="toc-number">1.7.</span> <span class="toc-text">区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码链接"><span class="toc-number">1.8.</span> <span class="toc-text">代码链接</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="控制反转和依赖注入"><a href="#控制反转和依赖注入" class="headerlink" title="控制反转和依赖注入"></a>控制反转和依赖注入</h3><h4 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h4><p>控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如:</p>
+<p>A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁</p>
+<p>而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解耦.</p>
+<p>因为A类里的代码需要去new一个B的对象, 就需要调用B的构造方法: 更新了B的构造方法 –&gt; A中调用的B的构造方法!<br>X –&gt; A, B, C –&gt; D</p>
+<p>在X里创建D的对象, 然后再传给A, B, C</p>
+<p>和封装实现细节的对比</p>
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>通过控制反转, 我们把B的控制权转移到A的外部, 但是A仍然依赖于B, 需要使用B的对象去完成一些事情. 那问题来了:</p>
+<blockquote>
+<h4 id="我们如何把在外部创建的B的对象交给A呢"><a href="#我们如何把在外部创建的B的对象交给A呢" class="headerlink" title="我们如何把在外部创建的B的对象交给A呢?"></a>我们如何把在外部创建的B的对象交给A呢?</h4></blockquote>
+<ul>
+<li>在A的构造方法里把B作为一个参数传给A</li>
+<li>使用setter方法把B传给A</li>
+</ul>
+<p>这个其实就是所谓的依赖注入! 依赖注入其实就是控制反转的一个实现, 差不多也是同一回事.</p>
+<h4 id="组件和依赖注入"><a href="#组件和依赖注入" class="headerlink" title="组件和依赖注入"></a>组件和依赖注入</h4><p>回忆之前讲Java程序的基本结构: 抽象出一些类和对象, 然后处理对象之间的交互.</p>
+<p>然后在具体的场景中, 我们会有一些常用的对象来处理一些常见的逻辑结构, 比如说特定本地数据的访问, 数据库的访问, 配置文件访问, 认证, 这种我们会称之为组件或者模块, 在Spring里称之为Bean.</p>
+<p>同一个组件通常可能会在程序中很多地方需要使用, 比如说 UserController 可能会使用到 UserDao 这个组件, ManageControler 也会使用到 UserDao 这个组件. 那最简单的方式是, 我们每次使用的时候都创建一个组件 UserDao 的实例, 即使这个组件是可以重用的! (这里违反了什么原则?)</p>
+<p>但是有没有其他更好的方式呢? 就是统一管理组件的创建, 然后在需要使用的地方把这个组件的实例注入.</p>
+<h4 id="Spring的组件管理和依赖注入"><a href="#Spring的组件管理和依赖注入" class="headerlink" title="Spring的组件管理和依赖注入"></a>Spring的组件管理和依赖注入</h4><blockquote>
+<h4 id="常用的两种注入方式"><a href="#常用的两种注入方式" class="headerlink" title="常用的两种注入方式:"></a>常用的两种注入方式:</h4></blockquote>
+<ul>
+<li>组件直接标记注入</li>
+<li>工厂模式注入</li>
+</ul>
+<blockquote>
+<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></blockquote>
+<blockquote>
+<p>直接注入</p>
+</blockquote>
+<p>如果需要被注入的组件, 是我们能够控制的, 那我们就可以使用直接标记注入, 简洁优雅.</p>
+<blockquote>
+<p>工厂模式注入</p>
+</blockquote>
+<p>如果需要注入的组件, 我们需要更复杂的控制创建过程, 比如说动态根据输入内容创建组件, 那就使用工厂模式注入.</p>
+<p>或者需要注入的组件是一个外部库的类, 那我们没法给它加上@Component这样的标记, 那我们就必须使用工厂模式注入.</p>
+<p>再或者, 我们希望控制组件的数量, 如果是只需要一个组件的实例, 则使用直接注入或者工厂模式都可以. 但是如果需要使用多个实例(比如每次使用都创建一个新的实例), 那就使用工厂模式!</p>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a><a href="https://github.com/slTrust/java_022_spring" target="_blank" rel="noopener">代码链接</a></h4>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/" data-title="Java-022-控制反转和依赖注入 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/06/11/Java-024-数据库和jdbc/" title="Java-024-数据库和jdbc">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Java-024-数据库和jdbc</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/06/08/Java-021-单元测试/"  title="Java-021-单元测试">
+ <strong>下一篇：</strong><br/> 
+ <span>Java-021-单元测试
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#控制反转和依赖注入"><span class="toc-number">1.</span> <span class="toc-text">控制反转和依赖注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#控制反转"><span class="toc-number">1.1.</span> <span class="toc-text">控制反转</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#依赖注入"><span class="toc-number">1.2.</span> <span class="toc-text">依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#我们如何把在外部创建的B的对象交给A呢"><span class="toc-number">1.3.</span> <span class="toc-text">我们如何把在外部创建的B的对象交给A呢?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#组件和依赖注入"><span class="toc-number">1.4.</span> <span class="toc-text">组件和依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Spring的组件管理和依赖注入"><span class="toc-number">1.5.</span> <span class="toc-text">Spring的组件管理和依赖注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#常用的两种注入方式"><span class="toc-number">1.6.</span> <span class="toc-text">常用的两种注入方式:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#区别"><span class="toc-number">1.7.</span> <span class="toc-text">区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码链接"><span class="toc-number">1.8.</span> <span class="toc-text">代码链接</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

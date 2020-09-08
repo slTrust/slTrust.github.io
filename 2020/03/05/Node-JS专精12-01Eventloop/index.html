@@ -1,0 +1,695 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-JS专精12_01Eventloop | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="参考链接 Event Loop、计时器、nextTick  Eventloop 之前的前置内容 操作系统相关  12345678网页上有个输入框，当你按下键盘的 “J” 之后发生了什么实际 “J” 下面有一个非常复杂的电路当你按下 之后，会触发一个电流这个电流会触发一个你按键的信息 如 101然后把这个 信息 101 传递给 操作系统操作系统知道这个 按键信息之后，它就会通知给你的浏览器浏览器得到">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-JS专精12_01Eventloop">
+<meta property="og:url" content="http://yoursite.com/2020/03/05/Node-JS专精12-01Eventloop/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="参考链接 Event Loop、计时器、nextTick  Eventloop 之前的前置内容 操作系统相关  12345678网页上有个输入框，当你按下键盘的 “J” 之后发生了什么实际 “J” 下面有一个非常复杂的电路当你按下 之后，会触发一个电流这个电流会触发一个你按键的信息 如 101然后把这个 信息 101 传递给 操作系统操作系统知道这个 按键信息之后，它就会通知给你的浏览器浏览器得到">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-JS专精12_01Eventloop">
+<meta name="twitter:description" content="参考链接 Event Loop、计时器、nextTick  Eventloop 之前的前置内容 操作系统相关  12345678网页上有个输入框，当你按下键盘的 “J” 之后发生了什么实际 “J” 下面有一个非常复杂的电路当你按下 之后，会触发一个电流这个电流会触发一个你按键的信息 如 101然后把这个 信息 101 传递给 操作系统操作系统知道这个 按键信息之后，它就会通知给你的浏览器浏览器得到">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/05/Node-JS专精12-01Eventloop/" title="Node-JS专精12_01Eventloop" itemprop="url">Node-JS专精12_01Eventloop</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-05T02:46:11.000Z" itemprop="datePublished"> Published 2020-03-05</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考链接"><span class="toc-number">1.</span> <span class="toc-text">参考链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Eventloop-之前的前置内容"><span class="toc-number">2.</span> <span class="toc-text">Eventloop 之前的前置内容</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#事件"><span class="toc-number">2.1.</span> <span class="toc-text">事件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接下来我们看一下-浏览器的内容"><span class="toc-number">3.</span> <span class="toc-text">接下来我们看一下 浏览器的内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#这个轮询的规则是什么？"><span class="toc-number">4.</span> <span class="toc-text">这个轮询的规则是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#回到-Node-js"><span class="toc-number">4.1.</span> <span class="toc-text">回到 Node.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eventloop-之前的铺垫"><span class="toc-number">4.2.</span> <span class="toc-text">Eventloop 之前的铺垫</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eventloop-事件循环的阶段"><span class="toc-number">4.3.</span> <span class="toc-text">Eventloop 事件循环的阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#check-阶段是什么？"><span class="toc-number">4.4.</span> <span class="toc-text">check 阶段是什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一个坑-开启-Eventloop-这是需要消耗时间的"><span class="toc-number">4.5.</span> <span class="toc-text">一个坑 开启 Eventloop() 这是需要消耗时间的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#process-nextTick-是放到什么阶段"><span class="toc-number">4.6.</span> <span class="toc-text">process.nextTick 是放到什么阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#面试题"><span class="toc-number">4.7.</span> <span class="toc-text">面试题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#个性化题目的面试如何处理"><span class="toc-number">5.1.</span> <span class="toc-text">个性化题目的面试如何处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何准备"><span class="toc-number">5.2.</span> <span class="toc-text">如何准备</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><ul>
+<li><a href="https://juejin.im/post/5ab7677f6fb9a028d56711d0" target="_blank" rel="noopener">Event Loop、计时器、nextTick</a></li>
+</ul>
+<h3 id="Eventloop-之前的前置内容"><a href="#Eventloop-之前的前置内容" class="headerlink" title="Eventloop 之前的前置内容"></a>Eventloop 之前的前置内容</h3><blockquote>
+<p>操作系统相关</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">网页上有个输入框，当你按下键盘的 “J” 之后发生了什么</span><br><span class="line"></span><br><span class="line">实际 “J” 下面有一个非常复杂的电路</span><br><span class="line">当你按下 之后，会触发一个电流</span><br><span class="line">这个电流会触发一个你按键的信息 如 101</span><br><span class="line">然后把这个 信息 101 传递给 操作系统</span><br><span class="line">操作系统知道这个 按键信息之后，它就会通知给你的浏览器</span><br><span class="line">浏览器得到 “J” 按键信息之后，就会把这个 “J” 显示在你的输入框上</span><br></pre></td></tr></table></figure>
+<p>为什么讲这个：<strong>浏览器它会接受到系统给它的一个事件</strong>用户不停的触发事件，浏览器就不停的把用户输入渲染到输入框里</p>
+<p>这个东西呢就叫做 <strong>“事件”</strong></p>
+<blockquote>
+<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4></blockquote>
+<p>接受各种外部设备发出的信号</p>
+<ul>
+<li>蓝牙事件</li>
+<li>鼠标事件</li>
+<li>键盘事件</li>
+<li>USB事件</li>
+</ul>
+<blockquote>
+<p>疑问？为什么你一插 USB操作系统马上就知道呢？有没有延迟呢？它是非常的快呢？还是一段时间一段时间的查呢？</p>
+</blockquote>
+<ul>
+<li>非常遗憾的是，操作系统并没有你想想的那么聪明</li>
+<li>它是如何知道 用户按下了 “J” 呢？</li>
+</ul>
+<p>它实际上是 <strong>不停的等键盘，可能每隔5毫秒查看一下有没有按下这个键</strong> 这个过程 叫做 <strong>“轮询”</strong></p>
+<h3 id="接下来我们看一下-浏览器的内容"><a href="#接下来我们看一下-浏览器的内容" class="headerlink" title="接下来我们看一下 浏览器的内容"></a>接下来我们看一下 浏览器的内容</h3><ul>
+<li>浏览器除了运行 JS 之外，还有些网络请求<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 假设你做了这样的事情</span><br><span class="line">console.log(1)</span><br><span class="line">console.log(2)</span><br><span class="line">console.log(3)</span><br><span class="line">...</span><br><span class="line">console.log(10)</span><br><span class="line">ajax(); </span><br><span class="line">console.log(11)</span><br><span class="line">console.log(12)</span><br><span class="line">...</span><br><span class="line">console.log(20)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们发送了请求之后，请求大概需要0.2秒得到结果，</span><br><span class="line">首先JS是单线程，那么在这请求 0.2 秒的时间内， ajax() 后面的代码有么有执行？</span><br><span class="line"></span><br><span class="line">有！！！ 执行了</span><br><span class="line"></span><br><span class="line">那么此时 ajax 请求的 0.2秒 是谁在等？</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>或者说 等待请求结果是谁在处理 / 谁在轮询</p>
+</blockquote>
+<ul>
+<li>答案是：<strong>“C++”</strong>， 浏览器有一个轮询机制，每隔一段时间假设5毫秒就问 结果来了没？</li>
+<li>反正始终有一个东西在轮询 ，我们不管到底是 浏览器还是 操作系统这些细节。 反正不是JS在等就好了</li>
+</ul>
+<p><strong>所有的事件 应该如何通知给 JS</strong></p>
+<h3 id="这个轮询的规则是什么？"><a href="#这个轮询的规则是什么？" class="headerlink" title="这个轮询的规则是什么？"></a>这个轮询的规则是什么？</h3><p>搞清楚这些规则，你就明白什么是 <strong>Eventloop</strong></p>
+<ul>
+<li>刚刚的内容讲的是浏览器，我们必须要回到 Node.js 和浏览器是差不多的东西</li>
+<li>Node.js 可以执行js代码，浏览器也可以执行 js代码，Eventloop 是 Node.js的概念而不是 浏览器。 所以我们来看 Node.js</li>
+</ul>
+<h4 id="回到-Node-js"><a href="#回到-Node-js" class="headerlink" title="回到 Node.js"></a>回到 Node.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">同样执行10行代码</span><br><span class="line">然后发起一个异步任务 耗时2秒 setTimeout(fn,2000)</span><br><span class="line">下面又执行20行代码</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">那么这个  setTimeout 到底是谁在做呢？</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>引入 Eventloop</p>
+</blockquote>
+<ul>
+<li>首先这个 Eventloop 会去监听这个 setTimeout，它会保证 一段时间后执行这个 fn</li>
+</ul>
+<blockquote>
+<h4 id="Eventloop-之前的铺垫"><a href="#Eventloop-之前的铺垫" class="headerlink" title="Eventloop 之前的铺垫"></a>Eventloop 之前的铺垫</h4></blockquote>
+<ul>
+<li>Eventloop 到底是真实存在的对象，还是一个虚拟的概念？</li>
+</ul>
+<p>来个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">假设人是有轮回的？ 我们叫它 人生循环</span><br><span class="line">那么人生循环有那些阶段呢？</span><br><span class="line"></span><br><span class="line">生老病死 ==》 投胎 ==》 生老病死 ==》 投胎 。。。</span><br><span class="line">什么时候是尽头，除非宇宙毁灭，什么时候开始，也不要太关心。</span><br><span class="line"></span><br><span class="line">请问人生循环 是什么？</span><br><span class="line"></span><br><span class="line">人在一生中处于不同阶段的过程</span><br></pre></td></tr></table></figure>
+<p><strong>事件循环不是循环，它是状态变化的过程</strong></p>
+<h4 id="Eventloop-事件循环的阶段"><a href="#Eventloop-事件循环的阶段" class="headerlink" title="Eventloop 事件循环的阶段"></a>Eventloop 事件循环的阶段</h4><ul>
+<li>times (前端需要知道)</li>
+<li>I/O callbacks </li>
+<li>idle , prepare</li>
+<li>poll (前端需要知道)</li>
+<li>check (前端需要知道)</li>
+<li>close callbacks</li>
+</ul>
+<blockquote>
+<p>我们只需要清楚 times / poll / check 就够了</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1 times</span><br><span class="line">2 poll</span><br><span class="line">3 check </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">times =&gt; poll 会停留一段事件</span><br><span class="line">poll =&gt; check</span><br><span class="line">check =&gt; times</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们执行 setTimeout(fn,2000) 时， 会把 fn 放入 timse 的一个 数组里 (队列)同时记录 要在 2秒后执行 fn ,于是 js 就去做自己的事去了</span><br><span class="line"></span><br><span class="line">setTimeout(fn,2000) 之后就会进入 poll 阶段 等待的过程中 他会去看时间， </span><br><span class="line">刚才 js 说要在 2秒后执行 fn , 比如此时等了 500毫秒，发现不需要执行， 继续等 1000毫秒再去看， 继续等， 等到 2秒的时候 发现时间到了， </span><br><span class="line">赶紧进入 timse 阶段执行 fn， 虽然 poll之后要经过 check 阶段 ，但稍后再说</span><br><span class="line">执行完 fn 之后 又回到 poll 阶段 继续等。 一般来说有最长等待时间 假设3秒 后就会进入 check 然后进入 times 然后继续进入 poll</span><br><span class="line">所以 大部分时间都是在 poll 阶段 用来等</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="check-阶段是什么？"><a href="#check-阶段是什么？" class="headerlink" title="check 阶段是什么？"></a>check 阶段是什么？</h4></blockquote>
+<ul>
+<li>Node.js 除了 setTimeout 还有 setImmediate(fn2) </li>
+<li>当你调用 <code>setImmediate(fn2)</code> 的时候 你的 fn2 不会进入 times 阶段，会进入 check阶段</li>
+<li>check 阶段也是有 一个队列的 主要是用来存 <code>setImmediate</code> 执行的函数的</li>
+</ul>
+<blockquote>
+<p>来个考题, 先执行 fn 还是先执行 fn2</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(fn,0)</span><br><span class="line">setImmediate(fn2)</span><br><span class="line">// 答案是 fn2</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">setTimeout(fn,0) 执行后 会进入 times 阶段 把 fn 放入 times 的队列里 </span><br><span class="line">然后看到下一句代码</span><br><span class="line">setImmediate(fn2)  会把 fn2 放入 check 阶段的队列里 ， 并立即执行队列里的fn2。 </span><br><span class="line">于是JS开始做事了， 它看到 check 队列里有个需要立即执行的 于是就不停了 ，直接 fn2执行掉</span><br><span class="line">然后到 times 阶段 刚好发现 times 队列里 有个 0秒后执行，于是 执行 fn</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="一个坑-开启-Eventloop-这是需要消耗时间的"><a href="#一个坑-开启-Eventloop-这是需要消耗时间的" class="headerlink" title="一个坑 开启 Eventloop() 这是需要消耗时间的"></a>一个坑 开启 Eventloop() 这是需要消耗时间的</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 在 node环境下 运行这两句</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line"></span><br><span class="line">// 你会惊讶的发现 有的时候 fn fn2 有的时候 fn2 fn</span><br><span class="line"></span><br><span class="line">// 为什么？</span><br><span class="line">如果说 开启 Eventloop 很快 那么就是你分析的顺序 fn2 fn</span><br><span class="line">如果 Eventloop 开启很慢 我们在执行js的时候 可能还没进入 times 实际上是先把 fn 加到 times 队列里 然后在开始第一阶段</span><br><span class="line"></span><br><span class="line">这就刚好解释了 为什么顺序是不确定的？</span><br><span class="line">就是看 进入 times 阶段的时候 fn 就存在 还是 进入 times 阶段的时候 fn 不存在</span><br></pre></td></tr></table></figure>
+<p>如何解决这种情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">    setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line">&#125;,1000)</span><br><span class="line"></span><br><span class="line">// 这样每次都是  fn2 fn</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="process-nextTick-是放到什么阶段"><a href="#process-nextTick-是放到什么阶段" class="headerlink" title="process.nextTick 是放到什么阶段"></a>process.nextTick 是放到什么阶段</h4></blockquote>
+<ul>
+<li>首先它不属于 Eventloop 的任何一个阶段，官网说的，其他都是瞎扯的</li>
+<li>process.nextTick 意思就是 当前阶段结束后马上执行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">    setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line">    process.nextTick(()=&gt;&#123;console.log(&apos;fn3&apos;)&#125;)</span><br><span class="line">&#125;,1000)</span><br><span class="line"></span><br><span class="line">// 注意！！！ nextTick 不属于 Eventloop 任何阶段 ， 它的意思是当前阶段马上执行</span><br><span class="line">//  setImmediate 会在 setTimeout之前</span><br><span class="line">// setImmediate 是从 poll 阶段 进入 check 才执行</span><br><span class="line">// nextTick 是当前阶段 poll 所以先 nextTick 在 check 阶段里的 然后 times 里的</span><br><span class="line">/*</span><br><span class="line">fn3</span><br><span class="line">fn2</span><br><span class="line">fn</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<h4 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setImmediate(()=&#123;</span><br><span class="line">    console.log(&quot;setImmediate1&quot;)</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">        console.log(&quot;setTimeout1&quot;)</span><br><span class="line">        </span><br><span class="line">    &#125;,0)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setTimeout(()=&#123;</span><br><span class="line">    console.log(&quot;setTimeout2&quot;)</span><br><span class="line">    setImmediate(()=&gt;&#123;</span><br><span class="line">        console.log(&quot;setImmediate2&quot;)</span><br><span class="line">        </span><br><span class="line">    &#125;,0)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案是：</span><br><span class="line">setImmediate1</span><br><span class="line">setTimeout2</span><br><span class="line">setTimeout1</span><br><span class="line">setImmediate2</span><br><span class="line"></span><br><span class="line">// 务必画图分析</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>Eventloop 状态转移</p>
+</blockquote>
+<ul>
+<li>Node.js 有六个阶段 简化为三个 <ul>
+<li>times</li>
+<li>poll</li>
+<li>check</li>
+</ul>
+</li>
+<li>Chrome （一会，马上）(宏任务，微任务)</li>
+</ul>
+<blockquote>
+<p>Node.js</p>
+</blockquote>
+<ul>
+<li>setTimeout =&gt; times</li>
+<li>setImmediate =&gt; check</li>
+<li>nextTick =&gt; 当前阶段结束后执行</li>
+</ul>
+<blockquote>
+<p>Chrome</p>
+</blockquote>
+<ul>
+<li>setTimeout =&gt; 宏任务</li>
+<li>promise.then =&gt; 微任务<ul>
+<li>注意！ 面试喜欢问 await <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">await 转换成 promise</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>面试题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">async function async1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">    await async2()</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function async2()&#123;</span><br><span class="line">    console.log(3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line">new Promise(function(resolve)&#123;</span><br><span class="line">    console.log(4)</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(function()&#123;</span><br><span class="line">    console.log(5)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">1</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">2</span><br><span class="line">5</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<p><strong>首先改写所有的 await</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">async function async1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">    async2().then(f1)</span><br><span class="line">    function f1()&#123;</span><br><span class="line">        console.log(2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function async2()&#123;</span><br><span class="line">    console.log(3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line">new Promise(function(resolve)&#123;</span><br><span class="line">    console.log(4)</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(f2)</span><br><span class="line"></span><br><span class="line">function f2()&#123;</span><br><span class="line">    console.log(5)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line">在看 首先 async1()执行 打印1</span><br><span class="line">async2() 执行 打印3</span><br><span class="line">async2().then() 把 f1 存入 微任务 </span><br><span class="line">new Promsie 开始 打印4</span><br><span class="line">把 new Promise().then(f2) 的 f2 存入 微任务</span><br><span class="line">开始执行微任务队列里的内容</span><br><span class="line">f1 执行 打印 2</span><br><span class="line">f2 执行 打印 5</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>面试</p>
+</blockquote>
+<ul>
+<li>一定要画图</li>
+<li>一定要画图</li>
+<li>一定要画图</li>
+</ul>
+<h4 id="个性化题目的面试如何处理"><a href="#个性化题目的面试如何处理" class="headerlink" title="个性化题目的面试如何处理"></a>个性化题目的面试如何处理</h4><p>只有某些公司会问，80%的公司不会问的题</p>
+<ul>
+<li>PWA</li>
+<li>echarts / d3.js</li>
+<li>three.js</li>
+<li>flutter</li>
+<li>SSR</li>
+</ul>
+<blockquote>
+<h4 id="如何准备"><a href="#如何准备" class="headerlink" title="如何准备"></a>如何准备</h4></blockquote>
+<p><strong>平时用不到，公司太小众了， 但是面试问？</strong></p>
+<ul>
+<li>先看公司招聘启事，如果明确说了，用到某某技术，你就去看文档，搞出一个 hello world</li>
+<li>因为大部分跟你一起面试的人根本就不会对这些东西做任何准备，你只要比他们多准备一点点，就可以了</li>
+<li>你不在乎你比别人多厉害，而在乎只要比别人厉害一点</li>
+<li>如果你没做，被问到，你连接话的地方都没有那岂不是很尴尬。所以你做个Hello World 都能改善局面</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/05/Node-JS专精12-01Eventloop/" data-title="Node-JS专精12_01Eventloop | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/03/06/Node-JS专精13-01类/" title="Node-JS专精13_01类">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node-JS专精13_01类</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/04/Node-JS专精11-04async-await问题/"  title="Node-JS专精11_04async_await问题">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精11_04async_await问题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#参考链接"><span class="toc-number">1.</span> <span class="toc-text">参考链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Eventloop-之前的前置内容"><span class="toc-number">2.</span> <span class="toc-text">Eventloop 之前的前置内容</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#事件"><span class="toc-number">2.1.</span> <span class="toc-text">事件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#接下来我们看一下-浏览器的内容"><span class="toc-number">3.</span> <span class="toc-text">接下来我们看一下 浏览器的内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#这个轮询的规则是什么？"><span class="toc-number">4.</span> <span class="toc-text">这个轮询的规则是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#回到-Node-js"><span class="toc-number">4.1.</span> <span class="toc-text">回到 Node.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eventloop-之前的铺垫"><span class="toc-number">4.2.</span> <span class="toc-text">Eventloop 之前的铺垫</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Eventloop-事件循环的阶段"><span class="toc-number">4.3.</span> <span class="toc-text">Eventloop 事件循环的阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#check-阶段是什么？"><span class="toc-number">4.4.</span> <span class="toc-text">check 阶段是什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一个坑-开启-Eventloop-这是需要消耗时间的"><span class="toc-number">4.5.</span> <span class="toc-text">一个坑 开启 Eventloop() 这是需要消耗时间的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#process-nextTick-是放到什么阶段"><span class="toc-number">4.6.</span> <span class="toc-text">process.nextTick 是放到什么阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#面试题"><span class="toc-number">4.7.</span> <span class="toc-text">面试题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#个性化题目的面试如何处理"><span class="toc-number">5.1.</span> <span class="toc-text">个性化题目的面试如何处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如何准备"><span class="toc-number">5.2.</span> <span class="toc-text">如何准备</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

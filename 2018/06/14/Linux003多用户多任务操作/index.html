@@ -1,0 +1,585 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Linux003多用户多任务操作 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="多用户一个电脑多个用户可以同时登录 多任务一个电脑可以跑很多程序 QQ 微信 浏览器 QQ音乐 ifconfig查看网卡信息(一般能看到俩个代表你的虚拟机能上网了) 1ifconfig | grep &amp;apos;192&amp;apos; 查找一大堆文档中的关键字 vmware虚拟机的网络设置123NAT模式  比如你的window能上网，你想让虚拟机借助它上网(对于交换机来说它只看到一台电脑window">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux003多用户多任务操作">
+<meta property="og:url" content="http://yoursite.com/2018/06/14/Linux003多用户多任务操作/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="多用户一个电脑多个用户可以同时登录 多任务一个电脑可以跑很多程序 QQ 微信 浏览器 QQ音乐 ifconfig查看网卡信息(一般能看到俩个代表你的虚拟机能上网了) 1ifconfig | grep &amp;apos;192&amp;apos; 查找一大堆文档中的关键字 vmware虚拟机的网络设置123NAT模式  比如你的window能上网，你想让虚拟机借助它上网(对于交换机来说它只看到一台电脑window">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux003多用户多任务操作">
+<meta name="twitter:description" content="多用户一个电脑多个用户可以同时登录 多任务一个电脑可以跑很多程序 QQ 微信 浏览器 QQ音乐 ifconfig查看网卡信息(一般能看到俩个代表你的虚拟机能上网了) 1ifconfig | grep &amp;apos;192&amp;apos; 查找一大堆文档中的关键字 vmware虚拟机的网络设置123NAT模式  比如你的window能上网，你想让虚拟机借助它上网(对于交换机来说它只看到一台电脑window">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/14/Linux003多用户多任务操作/" title="Linux003多用户多任务操作" itemprop="url">Linux003多用户多任务操作</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-14T13:33:48.000Z" itemprop="datePublished"> Published 2018-06-14</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#多用户"><span class="toc-number">1.</span> <span class="toc-text">多用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多任务"><span class="toc-number">2.</span> <span class="toc-text">多任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ifconfig"><span class="toc-number">3.</span> <span class="toc-text">ifconfig</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#vmware虚拟机的网络设置"><span class="toc-number">3.1.</span> <span class="toc-text">vmware虚拟机的网络设置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping"><span class="toc-number">4.</span> <span class="toc-text">ping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh远程登录"><span class="toc-number">5.</span> <span class="toc-text">ssh远程登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#who命令"><span class="toc-number">6.</span> <span class="toc-text">who命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加用户账号useradd"><span class="toc-number">7.</span> <span class="toc-text">添加用户账号useradd</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#su切换用户"><span class="toc-number">8.</span> <span class="toc-text">su切换用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#userdel删除用户"><span class="toc-number">9.</span> <span class="toc-text">userdel删除用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sudo添加权限"><span class="toc-number">10.</span> <span class="toc-text">sudo添加权限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用户组的查看"><span class="toc-number">11.</span> <span class="toc-text">用户组的查看</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#添加用户组"><span class="toc-number">11.1.</span> <span class="toc-text">添加用户组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#修改用户所在用户组"><span class="toc-number">11.2.</span> <span class="toc-text">修改用户所在用户组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chmod修改文件权限"><span class="toc-number">12.</span> <span class="toc-text">chmod修改文件权限</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数字代表权限"><span class="toc-number">12.1.</span> <span class="toc-text">数字代表权限</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cal和date查看时间（自行百度）"><span class="toc-number">13.</span> <span class="toc-text">cal和date查看时间（自行百度）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ps查看进程"><span class="toc-number">14.</span> <span class="toc-text">ps查看进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kill终止进程"><span class="toc-number">15.</span> <span class="toc-text">kill终止进程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#关机重启"><span class="toc-number">15.1.</span> <span class="toc-text">关机重启</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看磁盘占用-du"><span class="toc-number">16.</span> <span class="toc-text">查看磁盘占用 du</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用文本编辑器gedit"><span class="toc-number">17.</span> <span class="toc-text">用文本编辑器gedit</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="多用户"><a href="#多用户" class="headerlink" title="多用户"></a>多用户</h3><p>一个电脑多个用户可以同时登录</p>
+<h3 id="多任务"><a href="#多任务" class="headerlink" title="多任务"></a>多任务</h3><p>一个电脑可以跑很多程序 QQ 微信 浏览器 QQ音乐</p>
+<h3 id="ifconfig"><a href="#ifconfig" class="headerlink" title="ifconfig"></a>ifconfig</h3><p>查看网卡信息(一般能看到俩个代表你的虚拟机能上网了)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig | grep &apos;192&apos; 查找一大堆文档中的关键字</span><br></pre></td></tr></table></figure>
+<h4 id="vmware虚拟机的网络设置"><a href="#vmware虚拟机的网络设置" class="headerlink" title="vmware虚拟机的网络设置"></a>vmware虚拟机的网络设置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NAT模式  比如你的window能上网，你想让虚拟机借助它上网(对于交换机来说它只看到一台电脑window)</span><br><span class="line">桥接模式  你想让window上网，而且虚拟机也能上网而不是间接的通过window就用这个(对于交换机它看到了两台电脑)</span><br><span class="line">仅主机模式 在没有网的情况下和windows进行通讯</span><br></pre></td></tr></table></figure>
+<h3 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h3><p>测试是否能通信</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping 192.168.2.123</span><br></pre></td></tr></table></figure>
+<h3 id="ssh远程登录"><a href="#ssh远程登录" class="headerlink" title="ssh远程登录"></a>ssh远程登录</h3><p>比如阿里云服务器跟这效果一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh hjx@192.168.17.76 代表远程登录服务器</span><br><span class="line"></span><br><span class="line">如果你第一次登录会让你确认是否连接  ==&gt; yes</span><br><span class="line">然后让你输入密码如果成功了就能远程登录 并且对系统进行远程操作</span><br></pre></td></tr></table></figure>
+<h3 id="who命令"><a href="#who命令" class="headerlink" title="who命令"></a>who命令</h3><p>查看当前登录的用户信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如果你的电脑被攻击了</span><br><span class="line">who可以查看当前谁登录了</span><br></pre></td></tr></table></figure>
+<p>whoami当前终端的用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whoami</span><br></pre></td></tr></table></figure>
+<p>exit退出登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exit</span><br></pre></td></tr></table></figure>
+<h3 id="添加用户账号useradd"><a href="#添加用户账号useradd" class="headerlink" title="添加用户账号useradd"></a>添加用户账号useradd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-m 自动创建家目录</span><br><span class="line">-d 路径  指定家目录 </span><br><span class="line">useradd aaa -m -d /home/aaa</span><br><span class="line">创建用户 aaa 同时指定家目录为 aaa</span><br><span class="line">通常提示你权限不够</span><br><span class="line"></span><br><span class="line">sudo useradd aaa -m -d /home/aaa</span><br><span class="line">会提示你输入这个用户的密码</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改密码passwd</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">passwd aaa</span><br><span class="line">可能会提示权限不够</span><br><span class="line"></span><br><span class="line">sudo passwd aaa</span><br><span class="line">请输入新密码</span><br></pre></td></tr></table></figure>
+<h3 id="su切换用户"><a href="#su切换用户" class="headerlink" title="su切换用户"></a>su切换用户</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su aaa </span><br><span class="line">输入密码</span><br><span class="line">su hjx</span><br><span class="line">输入密码</span><br></pre></td></tr></table></figure>
+<p>问题 如果你切换了多个用户然后exit会怎样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">su aaa</span><br><span class="line">su bbb</span><br><span class="line">su ccc</span><br><span class="line">su ddd</span><br><span class="line"></span><br><span class="line">你当前在 ddd用户 然后输入exit 退出会在 ccc用户</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">su aaa 切换后你当前目录在哪还在哪</span><br><span class="line">su - aaa 切换后跳到家目录</span><br></pre></td></tr></table></figure>
+<h3 id="userdel删除用户"><a href="#userdel删除用户" class="headerlink" title="userdel删除用户"></a>userdel删除用户</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">userdel abc 删除abc用户但不删除用户的主目录 (一般删除这个)</span><br><span class="line">userdel -r abc 删除abc用户同时删除用户的主目录</span><br></pre></td></tr></table></figure>
+<h3 id="sudo添加权限"><a href="#sudo添加权限" class="headerlink" title="sudo添加权限"></a>sudo添加权限</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo -s 一段时间内不询问你密码(最高权限)</span><br><span class="line"></span><br><span class="line">以$结尾代表普通用户</span><br><span class="line">以#结尾代表root用户</span><br></pre></td></tr></table></figure>
+<h3 id="用户组的查看"><a href="#用户组的查看" class="headerlink" title="用户组的查看"></a>用户组的查看</h3><ol>
+<li>cat etc/group</li>
+<li>groupmod + 三次tab键</li>
+</ol>
+<p>什么是用户组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">比如你输入 ls -al后显示如下信息</span><br><span class="line">-rw-r--r-- root root </span><br><span class="line">第一个root代表用户</span><br><span class="line">第二个root代表用户组</span><br><span class="line">如果其他用户也在 root用户组那他就有 root用户的权限</span><br></pre></td></tr></table></figure>
+<h4 id="添加用户组"><a href="#添加用户组" class="headerlink" title="添加用户组"></a>添加用户组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">groupadd YYY</span><br><span class="line">groupdel YYY</span><br><span class="line"></span><br><span class="line">权限不够请加sudo</span><br></pre></td></tr></table></figure>
+<h4 id="修改用户所在用户组"><a href="#修改用户所在用户组" class="headerlink" title="修改用户所在用户组"></a>修改用户所在用户组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-g 代表你将来默认的组(主组)</span><br><span class="line">-G 代表向其他组添加用户</span><br><span class="line"></span><br><span class="line">usermod -g 用户组 用户名 </span><br><span class="line"></span><br><span class="line">usermod -g aaa bbb 把bbb用户修改到aaa用户组里</span><br></pre></td></tr></table></figure>
+<p>一个用户可以有多个用户组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo usermod -a -G XXX bbb 将 bbb添加到 XXX组里</span><br></pre></td></tr></table></figure>
+<h3 id="chmod修改文件权限"><a href="#chmod修改文件权限" class="headerlink" title="chmod修改文件权限"></a>chmod修改文件权限</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">drwxrwxrwx </span><br><span class="line">第一个rwx代表文件拥有者(用户)的权限</span><br><span class="line">第二个rwx代表同组者里的(用户)的权限</span><br><span class="line">第三个rwx代表其他人的权限</span><br><span class="line"></span><br><span class="line">r代表读</span><br><span class="line">w代表写</span><br><span class="line">x代表执行</span><br><span class="line">-代表没有权限</span><br></pre></td></tr></table></figure>
+<p>chmod的选项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">u 代表该文件的所有者user</span><br><span class="line">g 代表用户组的用户group</span><br><span class="line">o 代表其他 other</span><br><span class="line">a 代表所有人 all</span><br><span class="line">+ 增加权限</span><br><span class="line">- 减少权限</span><br><span class="line">= 把当前权限改为现在的权限   =左边是u/g/o/a =右边是 r/w/x</span><br></pre></td></tr></table></figure>
+<p>示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">chmod u+x 1.txt 用户增加执行权限</span><br><span class="line">chmod g-w 1.txt 同组者去掉写入权限</span><br><span class="line">chmod u=rwx 1.txt</span><br></pre></td></tr></table></figure>
+<h4 id="数字代表权限"><a href="#数字代表权限" class="headerlink" title="数字代表权限"></a>数字代表权限</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">r读 ==&gt; 对应数字4</span><br><span class="line">w写 ==&gt; 对应数字2</span><br><span class="line">x执行 ==&gt; 对应数字1</span><br><span class="line"></span><br><span class="line">chmod 444  1.txt 可读权限</span><br><span class="line">chmod 761 1.txt 用户=可读可写可执行 用户组=可读可写 其他用户=可执行权限</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">chmod 777 aa 只会修改aa文件夹的权限</span><br><span class="line">chmod 777 aa -R aa目录里的东西全部权限</span><br></pre></td></tr></table></figure>
+<h3 id="cal和date查看时间（自行百度）"><a href="#cal和date查看时间（自行百度）" class="headerlink" title="cal和date查看时间（自行百度）"></a>cal和date查看时间（自行百度）</h3><h3 id="ps查看进程"><a href="#ps查看进程" class="headerlink" title="ps查看进程"></a>ps查看进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps</span><br><span class="line">ps -aux 显示全部信息</span><br><span class="line"></span><br><span class="line">PID代表程序运行的进程号</span><br></pre></td></tr></table></figure>
+<h3 id="kill终止进程"><a href="#kill终止进程" class="headerlink" title="kill终止进程"></a>kill终止进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kill pid</span><br><span class="line">kill 进程号</span><br></pre></td></tr></table></figure>
+<h4 id="关机重启"><a href="#关机重启" class="headerlink" title="关机重启"></a>关机重启</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">reboot 重启</span><br><span class="line">shutdown -r now 重启 但是会给用户提示</span><br><span class="line">shutdown -h now 立刻关机</span><br><span class="line">shutdown -h 20:25 系统在 20:25关机</span><br><span class="line">shutdown -h +10 10分钟后关机</span><br></pre></td></tr></table></figure>
+<h3 id="查看磁盘占用-du"><a href="#查看磁盘占用-du" class="headerlink" title="查看磁盘占用 du"></a>查看磁盘占用 du</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">du -h</span><br></pre></td></tr></table></figure>
+<h3 id="用文本编辑器gedit"><a href="#用文本编辑器gedit" class="headerlink" title="用文本编辑器gedit"></a>用文本编辑器gedit</h3>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/linux/">linux</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/06/14/Linux003多用户多任务操作/" data-title="Linux003多用户多任务操作 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/06/14/Vim001编辑器使用/" title="Vim001编辑器使用">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Vim001编辑器使用</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/13/Linux002难点命令/"  title="Linux002难点命令">
+ <strong>下一篇：</strong><br/> 
+ <span>Linux002难点命令
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#多用户"><span class="toc-number">1.</span> <span class="toc-text">多用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多任务"><span class="toc-number">2.</span> <span class="toc-text">多任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ifconfig"><span class="toc-number">3.</span> <span class="toc-text">ifconfig</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#vmware虚拟机的网络设置"><span class="toc-number">3.1.</span> <span class="toc-text">vmware虚拟机的网络设置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping"><span class="toc-number">4.</span> <span class="toc-text">ping</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh远程登录"><span class="toc-number">5.</span> <span class="toc-text">ssh远程登录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#who命令"><span class="toc-number">6.</span> <span class="toc-text">who命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加用户账号useradd"><span class="toc-number">7.</span> <span class="toc-text">添加用户账号useradd</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#su切换用户"><span class="toc-number">8.</span> <span class="toc-text">su切换用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#userdel删除用户"><span class="toc-number">9.</span> <span class="toc-text">userdel删除用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sudo添加权限"><span class="toc-number">10.</span> <span class="toc-text">sudo添加权限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用户组的查看"><span class="toc-number">11.</span> <span class="toc-text">用户组的查看</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#添加用户组"><span class="toc-number">11.1.</span> <span class="toc-text">添加用户组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#修改用户所在用户组"><span class="toc-number">11.2.</span> <span class="toc-text">修改用户所在用户组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chmod修改文件权限"><span class="toc-number">12.</span> <span class="toc-text">chmod修改文件权限</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数字代表权限"><span class="toc-number">12.1.</span> <span class="toc-text">数字代表权限</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cal和date查看时间（自行百度）"><span class="toc-number">13.</span> <span class="toc-text">cal和date查看时间（自行百度）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ps查看进程"><span class="toc-number">14.</span> <span class="toc-text">ps查看进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kill终止进程"><span class="toc-number">15.</span> <span class="toc-text">kill终止进程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#关机重启"><span class="toc-number">15.1.</span> <span class="toc-text">关机重启</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查看磁盘占用-du"><span class="toc-number">16.</span> <span class="toc-text">查看磁盘占用 du</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用文本编辑器gedit"><span class="toc-number">17.</span> <span class="toc-text">用文本编辑器gedit</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

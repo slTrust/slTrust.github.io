@@ -1,0 +1,592 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>mongoose是什么鬼 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="什么是mongoose 在之前的文章中我们都是命令行操作mongodb   而实际使用中肯定不能让客户操作命令行录入数据 mongoose是一个可以让我们通过node来操作 mongoDB的模块 mongoose是一个ODM库（对象文档模型）  官网  moogoose实际作用是让我们以「对象的形式」操作数据库  好处  可以为文档创建一个模式结构（Schema） 可以对模型中的对象进行验证 数据">
+<meta name="keywords" content="mongodb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoose是什么鬼">
+<meta property="og:url" content="http://yoursite.com/2018/05/10/MONGODB_006_mongoose/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="什么是mongoose 在之前的文章中我们都是命令行操作mongodb   而实际使用中肯定不能让客户操作命令行录入数据 mongoose是一个可以让我们通过node来操作 mongoDB的模块 mongoose是一个ODM库（对象文档模型）  官网  moogoose实际作用是让我们以「对象的形式」操作数据库  好处  可以为文档创建一个模式结构（Schema） 可以对模型中的对象进行验证 数据">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.251Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mongoose是什么鬼">
+<meta name="twitter:description" content="什么是mongoose 在之前的文章中我们都是命令行操作mongodb   而实际使用中肯定不能让客户操作命令行录入数据 mongoose是一个可以让我们通过node来操作 mongoDB的模块 mongoose是一个ODM库（对象文档模型）  官网  moogoose实际作用是让我们以「对象的形式」操作数据库  好处  可以为文档创建一个模式结构（Schema） 可以对模型中的对象进行验证 数据">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/05/10/MONGODB_006_mongoose/" title="mongoose是什么鬼" itemprop="url">mongoose是什么鬼</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-05-10T14:38:55.000Z" itemprop="datePublished"> Published 2018-05-10</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是mongoose"><span class="toc-number">1.</span> <span class="toc-text">什么是mongoose</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mongoose提供的对象"><span class="toc-number">2.</span> <span class="toc-text">mongoose提供的对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用mongoose"><span class="toc-number">3.</span> <span class="toc-text">使用mongoose</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#和mysql区别"><span class="toc-number">3.1.</span> <span class="toc-text">和mysql区别</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="什么是mongoose"><a href="#什么是mongoose" class="headerlink" title="什么是mongoose"></a>什么是mongoose</h3><blockquote>
+<p>在之前的文章中我们都是命令行操作mongodb</p>
+</blockquote>
+<ul>
+<li>而实际使用中肯定不能让客户操作命令行录入数据</li>
+<li>mongoose是一个可以让我们通过node来操作 mongoDB的模块</li>
+<li>mongoose是一个ODM库（对象文档模型）</li>
+</ul>
+<p><a href="http://mongoosejs.com/" target="_blank" rel="noopener">官网</a></p>
+<blockquote>
+<p>moogoose实际作用是让我们以「对象的形式」操作数据库</p>
+</blockquote>
+<p>好处</p>
+<ol>
+<li>可以为文档创建一个模式结构（Schema）</li>
+<li>可以对模型中的对象进行验证</li>
+<li>数据可以通过类型转换为对象模型</li>
+<li>可以使用中间件来与业务逻辑挂钩</li>
+<li>比Node原生的mongodb驱动更容易</li>
+</ol>
+<h3 id="mongoose提供的对象"><a href="#mongoose提供的对象" class="headerlink" title="mongoose提供的对象"></a>mongoose提供的对象</h3><ul>
+<li>Schema （模式对象） 对字段进行约束</li>
+<li>Model 作为集合中所有文档的表示，相当于MongoDB中的collections</li>
+<li>Document 表示集合中的具体文档，相当于MongoDB中的document</li>
+</ul>
+<h3 id="使用mongoose"><a href="#使用mongoose" class="headerlink" title="使用mongoose"></a>使用mongoose</h3><ol>
+<li>下载安装 mongoose </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 创建项目目录</span><br><span class="line">mkdir demo</span><br><span class="line"># 切换目录</span><br><span class="line">cd demo</span><br><span class="line"># 初始化package.json</span><br><span class="line">npm init 一路回车</span><br><span class="line"># 安装依赖</span><br><span class="line">npm i mongoose --save</span><br><span class="line"># 新建test.js</span><br><span class="line">touch test.js</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>引入mongoose</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const mongoose = require(&apos;mongoose&apos;)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>连接数据库</li>
+</ol>
+<blockquote>
+<p>如果端口号是27017可以省略</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//引入mongoose模块</span><br><span class="line">const mongoose = require(&apos;mongoose&apos;)</span><br><span class="line">mongoose.connect(&quot;mongodb://数据库的ip地址:端口号/数据库名&quot;)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>监听数据库的连接状态</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mongoose.disconnect() //一般不使用</span><br></pre></td></tr></table></figure>
+<p>全部代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">const mongoose = require(&apos;mongoose&apos;);</span><br><span class="line">const db = mongoose.connect(&apos;mongodb://localhost/test&apos;);</span><br><span class="line">db.on(&apos;open&apos;,()=&gt;&#123;console.log(&quot;数据库连接成功&quot;)&#125;)</span><br><span class="line"></span><br><span class="line">db.on(&apos;close&apos;,()=&gt;&#123;console.log(&quot;数据库连接断开&quot;)&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="和mysql区别"><a href="#和mysql区别" class="headerlink" title="和mysql区别"></a>和mysql区别</h4><ul>
+<li>mongoDB一般只连接一次，不会主动断开（没有事务控制）除非服务器宕机</li>
+<li>mysql是关系型数据库，每操作数据就要进行事务控制，以至于 连接一次关闭一次 连接一次关闭一次</li>
+</ul>
+<blockquote>
+<p>所以一般不会调用 mongoose.disconnect() </p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/05/10/MONGODB_006_mongoose/" data-title="mongoose是什么鬼 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/05/10/MONGODB_007_Schema和Model/" title="Schema和Model">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Schema和Model</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/05/10/MONGODB_005_练习3/"  title="mongoDb练习三">
+ <strong>下一篇：</strong><br/> 
+ <span>mongoDb练习三
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是mongoose"><span class="toc-number">1.</span> <span class="toc-text">什么是mongoose</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mongoose提供的对象"><span class="toc-number">2.</span> <span class="toc-text">mongoose提供的对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用mongoose"><span class="toc-number">3.</span> <span class="toc-text">使用mongoose</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#和mysql区别"><span class="toc-number">3.1.</span> <span class="toc-text">和mysql区别</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

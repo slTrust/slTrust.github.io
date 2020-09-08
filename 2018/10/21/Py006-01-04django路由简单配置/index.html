@@ -1,0 +1,599 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py006-01-04django路由简单配置 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="此逻辑建立在上一篇博客的代码基础上，请自行拷贝  URLconfURL配置(URLconf)就像Django 所支撑网站的目录。它的本质是URL与要为该URL调用的视图函数之间的映射表；你就是以这种方式告诉Django，对于客户端发来的某个URL调用哪一段逻辑代码对应执行。  re_path是django1里的一个函数   urls.py里  默认引入的是 from django.urls i">
+<meta name="keywords" content="M06">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py006-01-04django路由简单配置">
+<meta property="og:url" content="http://yoursite.com/2018/10/21/Py006-01-04django路由简单配置/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="此逻辑建立在上一篇博客的代码基础上，请自行拷贝  URLconfURL配置(URLconf)就像Django 所支撑网站的目录。它的本质是URL与要为该URL调用的视图函数之间的映射表；你就是以这种方式告诉Django，对于客户端发来的某个URL调用哪一段逻辑代码对应执行。  re_path是django1里的一个函数   urls.py里  默认引入的是 from django.urls i">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.293Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py006-01-04django路由简单配置">
+<meta name="twitter:description" content="此逻辑建立在上一篇博客的代码基础上，请自行拷贝  URLconfURL配置(URLconf)就像Django 所支撑网站的目录。它的本质是URL与要为该URL调用的视图函数之间的映射表；你就是以这种方式告诉Django，对于客户端发来的某个URL调用哪一段逻辑代码对应执行。  re_path是django1里的一个函数   urls.py里  默认引入的是 from django.urls i">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/21/Py006-01-04django路由简单配置/" title="Py006-01-04django路由简单配置" itemprop="url">Py006-01-04django路由简单配置</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-20T16:34:04.000Z" itemprop="datePublished"> Published 2018-10-21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#URLconf"><span class="toc-number">1.</span> <span class="toc-text">URLconf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#正则动态匹配路由"><span class="toc-number">1.1.</span> <span class="toc-text">正则动态匹配路由</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#匹配两个动态路由-不仅接受年还支持月份"><span class="toc-number">1.2.</span> <span class="toc-text">匹配两个动态路由   不仅接受年还支持月份</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#有名分组"><span class="toc-number">1.3.</span> <span class="toc-text">有名分组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#路由分发"><span class="toc-number">1.4.</span> <span class="toc-text">路由分发</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>此逻辑建立在上一篇博客的代码基础上，请自行拷贝</p>
+</blockquote>
+<h3 id="URLconf"><a href="#URLconf" class="headerlink" title="URLconf"></a>URLconf</h3><p>URL配置(URLconf)就像Django 所支撑网站的目录。它的本质是URL与要为该URL调用的视图函数之间的映射表；你就是以这种方式告诉Django，对于客户端发来的某个URL调用哪一段逻辑代码对应执行。</p>
+<blockquote>
+<p>re_path是django1里的一个函数</p>
+</blockquote>
+<ul>
+<li>urls.py里  默认引入的是 from django.urls import path</li>
+<li>django2向前兼容也可以引入re_path</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># step001 修改  urls.py</span><br><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line"></span><br><span class="line">    # 路由配置    路径------》视图函数</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive),</span><br><span class="line">    # re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/([0-9]+)/$&apos;, views.article_detail),</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># step002 在 app001/views.py里定义 special_case_2003函数</span><br><span class="line"></span><br><span class="line"># 引入HttpResponse函数</span><br><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line">def special_case_2003(request):</span><br><span class="line">    return HttpResponse(&quot;special_case_2003&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># step003 打开链接  http://localhost:8000/articles/2003/</span><br><span class="line">你会看到 special_case_2003</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>很明显 r’^articles/2003/$ 是一个正则匹配</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;$&quot;  </span><br><span class="line">-就可以匹配 articles/2003/01/11</span><br><span class="line"></span><br><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;^&quot;  </span><br><span class="line">-就可以匹配 aaa/articles/2003/</span><br><span class="line"></span><br><span class="line">如果你去掉 r&apos;^articles/2003/$&quot; 里的&quot;^&quot;和&quot;$&quot;  </span><br><span class="line">-就可以匹配 aaa/articles/2003/01/22</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：</p>
+</blockquote>
+<ul>
+<li>若要从URL 中捕获一个值，只需要在它周围放置一对圆括号。</li>
+<li>不需要添加一个前导的反斜杠，因为每个URL 都有。例如，应该是^articles 而不是 ^/articles。</li>
+<li>每个正则表达式前面的’r’ 是可选的但是建议加上。它告诉Python 这个字符串是“原始的” —— 字符串中任何字符都不应该转义</li>
+</ul>
+<blockquote>
+<p>新需求：刚刚的articles/2003 不一定永远是这样的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">你会有</span><br><span class="line">articles/2003</span><br><span class="line">articles/2004</span><br><span class="line">articles/2005</span><br><span class="line">articles/2006</span><br><span class="line">articles/2007</span><br><span class="line">...</span><br><span class="line">articles/2018</span><br><span class="line">这样每个都配置就很恶心了</span><br></pre></td></tr></table></figure>
+<h4 id="正则动态匹配路由"><a href="#正则动态匹配路由" class="headerlink" title="正则动态匹配路由"></a>正则动态匹配路由</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 路由修改如下</span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    # 路由配置    路径------》视图函数</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003), # 实际是调用 special_case_2003(request)</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive), # 实际是调用 year_archive(request,1999)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive) 中  </span><br><span class="line"></span><br><span class="line">([0-9]&#123;4&#125;) 代表——分组(匹配四位数字) 此时就会多传递一个参数</span><br><span class="line">只要有()就代表分组 就会多传递一个参数 形如 year_archive(request,1999)</span><br><span class="line"></span><br><span class="line">[0-9]&#123;4&#125; 如果没有&quot;()&quot;代表不分组，这样调用视图函数的时候这个动态的值就不会当作位置参数传递</span><br><span class="line">形如 year_archive(request)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line"># views.py里 更新对应的视图函数</span><br><span class="line">def year_archive(request,year):</span><br><span class="line">    return HttpResponse(&quot;year is %s&quot;%year)</span><br><span class="line"></span><br><span class="line"># 访问 http://localhost:8000/articles/2021/</span><br><span class="line">得到内容  year is 2021</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意访问 <a href="http://localhost:8000/articles/2003/" target="_blank" rel="noopener">http://localhost:8000/articles/2003/</a> </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">返回的是 special_case_2003</span><br><span class="line">因为路由里会按规则顺序进行匹配 刚好第一条规则在我们动态匹配年份的前面</span><br><span class="line"></span><br><span class="line">re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003), </span><br><span class="line">re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br></pre></td></tr></table></figure>
+<h4 id="匹配两个动态路由-不仅接受年还支持月份"><a href="#匹配两个动态路由-不仅接受年还支持月份" class="headerlink" title="匹配两个动态路由   不仅接受年还支持月份"></a>匹配两个动态路由   不仅接受年还支持月份</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 在修改 urls.py</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive), # # 实际是调用 month_archive(request,1999,12)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 在views.py 进行视图函数的定义</span><br><span class="line"></span><br><span class="line">def month_archive(request,year,month):</span><br><span class="line">    return HttpResponse(&quot;year is %s ,month is %s&quot;%(year,month))</span><br><span class="line"></span><br><span class="line"># 此时访问 http://localhost:8000/articles/2003/02/ </span><br><span class="line">返回 year is 2003 ,month is 02</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 注意</span><br><span class="line"># 注意</span><br><span class="line"># 注意</span><br><span class="line"># 此时如果你去掉 re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive), 的 &quot;$&quot; 就会导致月份没法匹配了</span><br></pre></td></tr></table></figure>
+<h4 id="有名分组"><a href="#有名分组" class="headerlink" title="有名分组"></a>有名分组</h4><p>参考刚才最后一个例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 在修改 urls.py</span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive), # # 实际是调用 month_archive(request,1999,12)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 在views.py 进行视图函数的定义</span><br><span class="line"></span><br><span class="line">def month_archive(request,year,month):</span><br><span class="line">    return HttpResponse(&quot;year is %s ,month is %s&quot;%(year,month))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果此时你修改month_archive(request,year,month)中的参数 year和month的位置那么 返回的结果就颠倒了</p>
+</blockquote>
+<ul>
+<li>关键字传参</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">修改路由如下</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    re_path(r&apos;^articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/$&apos;, views.month_archive)</span><br><span class="line">    #  实际是调用 month_archive(request,year=1999,month=12)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>再也不担心参数位置变更导致的问题了</p>
+<h4 id="路由分发"><a href="#路由分发" class="headerlink" title="路由分发"></a>路由分发</h4><p>现在就一个应用，假如以后多了呢？ 这样路由都写在 mydb002/urls.py里就很恶心 了</p>
+<ul>
+<li>1.在app001目录里建立  urls.py</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 每个应用的url独立</span><br><span class="line"># </span><br><span class="line">from django.contrib import admin</span><br><span class="line">from django.urls import path,re_path</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    re_path(r&apos;^articles/2003/$&apos;, views.special_case_2003),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/$&apos;, views.year_archive),</span><br><span class="line">    re_path(r&apos;^articles/([0-9]&#123;4&#125;)/([0-9]&#123;2&#125;)/$&apos;, views.month_archive),</span><br><span class="line">    re_path(r&apos;^articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/$&apos;, views.month_archive)</span><br><span class="line">    #  实际是调用 month_archive(request,year=1999,month=12)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><ol start="2">
+<li>修改 主(mydj002目录的) urls.py</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from django.contrib import admin</span><br><span class="line"># 引入 include函数</span><br><span class="line">from django.urls import path,re_path,include</span><br><span class="line"></span><br><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;timer/&apos;, views.timer),</span><br><span class="line">    # 内容分发</span><br><span class="line">    re_path(r&quot;app001/&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 此时你访问就都可以了</span><br><span class="line">http://localhost:8000/app001/articles/2003/</span><br><span class="line">http://localhost:8000/app001/articles/2004/12/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但是带着app001不太好看</p>
+</blockquote>
+<p>修改主 urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">urlpatterns = [</span><br><span class="line">    ...</span><br><span class="line">    # 内容分发</span><br><span class="line">    # re_path(r&quot;app001/&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">    re_path(r&quot;^&quot;,include(&quot;app001.urls&quot;))</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 访问就正常了</span><br><span class="line"># http://localhost:8000/articles/2003/</span><br><span class="line"># http://localhost:8000/articles/2003/12/</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/10/21/Py006-01-04django路由简单配置/" data-title="Py006-01-04django路由简单配置 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/10/21/Py006-01-05django路由反向解析/" title="Py006-01-05django路由反向解析">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py006-01-05django路由反向解析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/10/21/Py006-01-03django静态文件配置/"  title="Py006-01-03django静态文件配置">
+ <strong>下一篇：</strong><br/> 
+ <span>Py006-01-03django静态文件配置
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#URLconf"><span class="toc-number">1.</span> <span class="toc-text">URLconf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#正则动态匹配路由"><span class="toc-number">1.1.</span> <span class="toc-text">正则动态匹配路由</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#匹配两个动态路由-不仅接受年还支持月份"><span class="toc-number">1.2.</span> <span class="toc-text">匹配两个动态路由   不仅接受年还支持月份</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#有名分组"><span class="toc-number">1.3.</span> <span class="toc-text">有名分组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#路由分发"><span class="toc-number">1.4.</span> <span class="toc-text">路由分发</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

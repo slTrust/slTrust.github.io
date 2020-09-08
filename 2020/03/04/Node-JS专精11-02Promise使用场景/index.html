@@ -1,0 +1,614 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-JS专精11_02Promise使用场景 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Promise使用场景多次处理一个结果 摇骰子.then(v =&amp;gt; v1).then(v1 =&amp;gt; v2) 1 2 3 返回小 / 4 5 6 返回大   在BOSS直聘上投递阿里简历流程：  必须先有网 有网才能使用 BOSS直聘app或 pc 登录 从众多公司里搜索 阿里的 岗位 投递简历    串行 一道网传面试题  12345页面有两个按A和B,以及一个输入框，A按钮点击后发">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-JS专精11_02Promise使用场景">
+<meta property="og:url" content="http://yoursite.com/2020/03/04/Node-JS专精11-02Promise使用场景/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Promise使用场景多次处理一个结果 摇骰子.then(v =&amp;gt; v1).then(v1 =&amp;gt; v2) 1 2 3 返回小 / 4 5 6 返回大   在BOSS直聘上投递阿里简历流程：  必须先有网 有网才能使用 BOSS直聘app或 pc 登录 从众多公司里搜索 阿里的 岗位 投递简历    串行 一道网传面试题  12345页面有两个按A和B,以及一个输入框，A按钮点击后发">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-JS专精11_02Promise使用场景">
+<meta name="twitter:description" content="Promise使用场景多次处理一个结果 摇骰子.then(v =&amp;gt; v1).then(v1 =&amp;gt; v2) 1 2 3 返回小 / 4 5 6 返回大   在BOSS直聘上投递阿里简历流程：  必须先有网 有网才能使用 BOSS直聘app或 pc 登录 从众多公司里搜索 阿里的 岗位 投递简历    串行 一道网传面试题  12345页面有两个按A和B,以及一个输入框，A按钮点击后发">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/04/Node-JS专精11-02Promise使用场景/" title="Node-JS专精11_02Promise使用场景" itemprop="url">Node-JS专精11_02Promise使用场景</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T03:23:03.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise使用场景"><span class="toc-number">1.</span> <span class="toc-text">Promise使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#多次处理一个结果"><span class="toc-number">1.1.</span> <span class="toc-text">多次处理一个结果</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#串行"><span class="toc-number">1.2.</span> <span class="toc-text">串行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#并行"><span class="toc-number">1.3.</span> <span class="toc-text">并行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise的错误处理"><span class="toc-number">2.</span> <span class="toc-text">Promise的错误处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#但是有人对-Promise-不满意"><span class="toc-number">2.1.</span> <span class="toc-text">但是有人对 Promise 不满意</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="Promise使用场景"><a href="#Promise使用场景" class="headerlink" title="Promise使用场景"></a>Promise使用场景</h3><h4 id="多次处理一个结果"><a href="#多次处理一个结果" class="headerlink" title="多次处理一个结果"></a>多次处理一个结果</h4><ul>
+<li><code>摇骰子.then(v =&gt; v1).then(v1 =&gt; v2)</code><ul>
+<li>1 2 3 返回小 / 4 5 6 返回大</li>
+</ul>
+</li>
+<li>在BOSS直聘上投递阿里简历流程： <ul>
+<li>必须先有网</li>
+<li>有网才能使用 BOSS直聘app或 pc</li>
+<li>登录</li>
+<li>从众多公司里搜索 阿里的 岗位</li>
+<li>投递简历</li>
+</ul>
+</li>
+</ul>
+<h4 id="串行"><a href="#串行" class="headerlink" title="串行"></a>串行</h4><blockquote>
+<p>一道网传面试题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">页面有两个按A和B,以及一个输入框，</span><br><span class="line">A按钮点击后发送一个请求，返回一个字符串A</span><br><span class="line">B按钮点击后也发送一个请求，返回一个字符串B</span><br><span class="line">返回后会把返回的字符串赋值给输入框，但是 A 和 B发送的请求时间点不同，</span><br><span class="line">点击按钮的顺序也不一定，B要比A先返回，而最终效果要求是 输入框字符的顺序是 AB</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这道题实际就是日常你做的如下需求</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">你打开了  百度搜索，先输入 vue,(此时已经发送了 请求a ) ,然后输入 react (此时已经发送了 请求b)</span><br><span class="line"></span><br><span class="line">好巧不巧的是  请求a 10秒返回结果  请求b 1秒返回结果</span><br><span class="line">此时 你如果按照正常的展示逻辑</span><br><span class="line"></span><br><span class="line">你肯定先展示 react的结果 ， 然后在展示 vue的结果</span><br><span class="line">此时用户觉得你神经病 ， 我明明搜的 react 你给我展示 vue的结果</span><br><span class="line"></span><br><span class="line">此时你就要保证就算 react的结果先回来，我也要等到 vue的结果展示了之后在展示</span><br></pre></td></tr></table></figure>
+<p>正确处理的姿势：只要有一个结果返回了 就把之前的请求取消掉 ajax.cancel</p>
+<blockquote>
+<p>生活中的高铁进站例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a 和 b 两个人，分别去高铁app上买了去 北京的票 如C2212</span><br><span class="line">b 比 a先买到票，但是检票的时候，a站在 b前面。</span><br><span class="line">所以 无论如何，b都要在 a之后进入车厢</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>代码实例</p>
+</blockquote>
+<ul>
+<li>点击 a 按钮后立刻点击 b按钮</li>
+<li>3秒后 输入框显示 “bbb”  </li>
+<li>5秒后显示 “aaa”</li>
+</ul>
+<p><strong>我们想要的结果是，不管那个结果回来，都最后显示”bbb”</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;  </span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>生活中的点餐取餐例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">餐厅有两个窗口 点餐 / 取餐</span><br><span class="line">a 和 b 两个人 先后进入餐厅的点餐队列进行点餐 a 在 b 之前点餐了</span><br><span class="line">a 点餐制作耗时 15分钟</span><br><span class="line">b 点餐制作耗时 10分钟</span><br><span class="line"></span><br><span class="line">a 和 b 点餐完成后， 又依次站在 取餐队列里 a在 b之前</span><br><span class="line">10分钟后 b的餐好了，</span><br><span class="line">但是 a 在 b之前， b 无法取餐</span><br><span class="line">15分钟 a 的餐好了</span><br><span class="line">a 取餐成功</span><br><span class="line">于是轮到 b ， b取餐成功</span><br></pre></td></tr></table></figure>
+<p>代码示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var 取餐队伍 = [];</span><br><span class="line">var 吧台 = [];</span><br><span class="line">var 问 = ()=&gt;&#123;</span><br><span class="line">  var lastN = 吧台[吧台.length -1][0];</span><br><span class="line">  var lastS = 吧台[吧台.length -1][1];</span><br><span class="line">  if(取餐队伍[0][0] === lastN)&#123;</span><br><span class="line">    取餐队伍[0][1](lastS);</span><br><span class="line">    取餐队伍.shift();</span><br><span class="line">    吧台.pop();</span><br><span class="line">    问();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="并行"><a href="#并行" class="headerlink" title="并行"></a>并行</h4><ul>
+<li>Promise.all([task1,task2]) 不好用(可以自己写一个，参考上一篇文章)</li>
+<li>Promise.allSettled 又太新</li>
+</ul>
+<h3 id="Promise的错误处理"><a href="#Promise的错误处理" class="headerlink" title="Promise的错误处理"></a>Promise的错误处理</h3><blockquote>
+<p>其实挺好用的</p>
+</blockquote>
+<ul>
+<li>promise.then(s1,f1) 即可</li>
+<li>如果我想全局处理(以 axios 为例 参考它的拦截器)<ul>
+<li><a href="https://juejin.im/post/5a9cddb46fb9a028bc2d3c2f" target="_blank" rel="noopener">axios 作弊表</a> 拦截器章节<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(function (response) &#123;</span><br><span class="line">    // Do something with response data</span><br><span class="line">    return response;</span><br><span class="line">&#125;, function (error) &#123;</span><br><span class="line">    // Do something with response error</span><br><span class="line">    return Promise.reject(error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>语法糖</p>
+</blockquote>
+<ul>
+<li><code>promise.then(s1).catch(f1)</code></li>
+</ul>
+<blockquote>
+<p>错误处理之后</p>
+</blockquote>
+<ul>
+<li>如果你没有继续抛错，那么错误不再出现</li>
+<li>如果你继续抛出错误， 那么后续回调就继续处理错误</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// </span><br><span class="line">Promise.resolve(`&#123;&apos;name&apos;:&apos;frank&apos;&#125;`)</span><br><span class="line">    .then( s =&gt; JSON.parse(s)) // parse 失败 json 的 key必须是双引号</span><br><span class="line">    .then( null, (reason) =&gt; console.log(&quot;err:&quot; + reason)) // 继续 promise 里处理</span><br></pre></td></tr></table></figure>
+<h4 id="但是有人对-Promise-不满意"><a href="#但是有人对-Promise-不满意" class="headerlink" title="但是有人对 Promise 不满意"></a>但是有人对 Promise 不满意</h4><ul>
+<li><a href="https://blog.fundebug.com/2017/04/04/nodejs-async-await/" target="_blank" rel="noopener">Async/Await替代Promise的6个理由</a></li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/04/Node-JS专精11-02Promise使用场景/" data-title="Node-JS专精11_02Promise使用场景 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/03/04/Node-JS专精11-03async-await/" title="Node-JS专精11_03async_await">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node-JS专精11_03async_await</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/04/Node-JS专精11-01Promise精讲/"  title="Node-JS专精11_01Promise精讲">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精11_01Promise精讲
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise使用场景"><span class="toc-number">1.</span> <span class="toc-text">Promise使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#多次处理一个结果"><span class="toc-number">1.1.</span> <span class="toc-text">多次处理一个结果</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#串行"><span class="toc-number">1.2.</span> <span class="toc-text">串行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#并行"><span class="toc-number">1.3.</span> <span class="toc-text">并行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Promise的错误处理"><span class="toc-number">2.</span> <span class="toc-text">Promise的错误处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#但是有人对-Promise-不满意"><span class="toc-number">2.1.</span> <span class="toc-text">但是有人对 Promise 不满意</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

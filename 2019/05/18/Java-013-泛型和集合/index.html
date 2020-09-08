@@ -1,0 +1,584 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Java-013-泛型和集合 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="泛型先看代码 123456789101112131415161718192021public class Demo01泛型 &amp;#123;    // 泛型    // 定义了hash表 key是 String类型 value是 Integer类型    static HashMap&amp;lt;String,Integer&amp;gt; counts = new HashMap&amp;lt;&amp;gt;();    s">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-013-泛型和集合">
+<meta property="og:url" content="http://yoursite.com/2019/05/18/Java-013-泛型和集合/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="泛型先看代码 123456789101112131415161718192021public class Demo01泛型 &amp;#123;    // 泛型    // 定义了hash表 key是 String类型 value是 Integer类型    static HashMap&amp;lt;String,Integer&amp;gt; counts = new HashMap&amp;lt;&amp;gt;();    s">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java-013-泛型和集合">
+<meta name="twitter:description" content="泛型先看代码 123456789101112131415161718192021public class Demo01泛型 &amp;#123;    // 泛型    // 定义了hash表 key是 String类型 value是 Integer类型    static HashMap&amp;lt;String,Integer&amp;gt; counts = new HashMap&amp;lt;&amp;gt;();    s">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/05/18/Java-013-泛型和集合/" title="Java-013-泛型和集合" itemprop="url">Java-013-泛型和集合</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-05-18T02:42:12.000Z" itemprop="datePublished"> Published 2019-05-18</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#泛型"><span class="toc-number">1.</span> <span class="toc-text">泛型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么有泛型"><span class="toc-number">1.1.</span> <span class="toc-text">为什么有泛型?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次"><span class="toc-number">1.2.</span> <span class="toc-text">很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！"><span class="toc-number">1.3.</span> <span class="toc-text">泛型出现了！</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！-1"><span class="toc-number">1.4.</span> <span class="toc-text">泛型出现了！</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！-2"><span class="toc-number">1.5.</span> <span class="toc-text">泛型出现了！</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集合-List"><span class="toc-number">2.</span> <span class="toc-text">集合 List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Set"><span class="toc-number">2.1.</span> <span class="toc-text">Set</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习题"><span class="toc-number">3.</span> <span class="toc-text">练习题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#汉诺塔问题"><span class="toc-number">3.1.</span> <span class="toc-text">汉诺塔问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#找不同"><span class="toc-number">3.2.</span> <span class="toc-text">找不同</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Min-Stack"><span class="toc-number">3.3.</span> <span class="toc-text">Min Stack</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#推荐一个-idea的插件"><span class="toc-number">4.</span> <span class="toc-text">推荐一个 idea的插件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#推荐书籍"><span class="toc-number">5.</span> <span class="toc-text">推荐书籍</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>先看代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Demo01泛型 &#123;</span><br><span class="line">    // 泛型</span><br><span class="line">    // 定义了hash表 key是 String类型 value是 Integer类型</span><br><span class="line">    static HashMap&lt;String,Integer&gt; counts = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;String&gt; stringStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;Integer&gt; intStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        stringStack.push(&quot;abc&quot;);</span><br><span class="line"></span><br><span class="line">        String one = stringStack.pop();</span><br><span class="line"></span><br><span class="line">        intStack.push(1);</span><br><span class="line">        Integer two = intStack.pop();</span><br><span class="line"></span><br><span class="line">        // intStack.push(&quot;ssss&quot;);  规定了Stack 内的类型是 int的 所以无法 加入 String类型的</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="为什么有泛型"><a href="#为什么有泛型" class="headerlink" title="为什么有泛型?"></a>为什么有泛型?</h4></blockquote>
+<p>假如我们想要实现一个只接受 Integer 和一个只接受String 的栈</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class IntStack &#123;</span><br><span class="line">    ArrayList&lt;Integer&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(Integer item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Integer pop()&#123;</span><br><span class="line">        Integer tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class StringStack &#123;</span><br><span class="line">    ArrayList&lt;String&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(String item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String pop()&#123;</span><br><span class="line">        String tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次"><a href="#很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次" class="headerlink" title="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次"></a>很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次</h4></blockquote>
+<h4 id="泛型出现了！"><a href="#泛型出现了！" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-1"><a href="#泛型出现了！-1" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-2"><a href="#泛型出现了！-2" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// 自己实现一个泛型，支持任意类型的Stack ，</span><br><span class="line">// 把数据类型变成参数，把重复代码去除了 如 IntStack / StringStack</span><br><span class="line">// T 是 类型参数</span><br><span class="line">public class Stack2&lt;T&gt; &#123;</span><br><span class="line">    ArrayList&lt;T&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(T item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T pop()&#123;</span><br><span class="line">        T tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="集合-List"><a href="#集合-List" class="headerlink" title="集合 List"></a>集合 List</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 列表</span><br><span class="line">List&lt;String&gt; arrayList = new ArrayList&lt;&gt;();</span><br><span class="line">List&lt;String&gt; linkedList = new LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">// 操作 在尾部添加</span><br><span class="line">arrayList.add(&quot;hello&quot;);</span><br><span class="line">arrayList.add(&quot;world&quot;);</span><br><span class="line">arrayList.add(&quot;~~~~&quot;);</span><br><span class="line"></span><br><span class="line">// 通过索引去访问</span><br><span class="line">arrayList.get(0);</span><br><span class="line"></span><br><span class="line">//arrayList.subList(0,5); // 取出 索引从 0 到 5 位置的列表  内容不够就报错</span><br><span class="line"></span><br><span class="line">// 通过索引 删除</span><br><span class="line">arrayList.remove(0);</span><br><span class="line"></span><br><span class="line">// 访问 列表的长度</span><br><span class="line">int size = arrayList.size();</span><br><span class="line"></span><br><span class="line">// for循环里的语法糖</span><br><span class="line"></span><br><span class="line">for (String item: arrayList) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Set 主要用来去重复</span><br><span class="line">Set&lt;String&gt; set = new HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;);</span><br><span class="line">set.add(&quot;b&quot;);</span><br><span class="line">set.add(&quot;c&quot;);</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;); // 去重复</span><br><span class="line"></span><br><span class="line">for (String item: set) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="练习题"><a href="#练习题" class="headerlink" title="练习题"></a>练习题</h3><blockquote>
+<h4 id="汉诺塔问题"><a href="#汉诺塔问题" class="headerlink" title="汉诺塔问题"></a>汉诺塔问题</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">在经典的汉诺塔问题中，有 3 个塔和 N 个可用来堆砌成塔的不同大小的盘子。要求盘子必须按照从小到大的顺序从上往下堆 （如，任意一个盘子，其必须堆在比它大的盘子上面）。同时，你必须满足以下限制条件：</span><br><span class="line"></span><br><span class="line">(1) 每次只能移动一个盘子。</span><br><span class="line">(2) 每个盘子从堆的顶部被移动后，只能置放于下一个堆中。</span><br><span class="line">(3) 每个盘子只能放在比它大的盘子上面。</span><br><span class="line"></span><br><span class="line">请写一段程序，实现将第一个堆的盘子移动到最后一个堆中.</span><br><span class="line"></span><br><span class="line">在编程训练网站完成训练: https://www.lintcode.com/problem/mock-hanoi-tower-by-stacks/description</span><br></pre></td></tr></table></figure>
+<p>代码实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public class Tower &#123;</span><br><span class="line">    private Stack&lt;Integer&gt; disks;</span><br><span class="line">  </span><br><span class="line">    public Tower(int i) &#123;</span><br><span class="line">        // create three towers</span><br><span class="line">        disks = new Stack();</span><br><span class="line">    &#125;</span><br><span class="line">    public void add(int d) &#123;</span><br><span class="line">        // Add a disk into this tower</span><br><span class="line">        if (!disks.isEmpty() &amp;&amp; disks.peek() &lt;= d) &#123;</span><br><span class="line">            System.out.println(&quot;Error placing disk &quot; + d);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            disks.push(d);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveTopTo(Tower t) &#123;</span><br><span class="line">        // Move the top disk of this tower to the top of t.</span><br><span class="line">        if(t.disks.isEmpty() || (!disks.isEmpty() &amp;&amp; t.disks.peek() &gt;= disks.peek())) &#123;</span><br><span class="line">            t.disks.push(disks.pop());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveDisks(int n, Tower destination, Tower buffer) &#123;</span><br><span class="line">        // Move n Disks from this tower to destination by buffer tower</span><br><span class="line">        if(n &lt;= 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125; else if(n == 1) &#123;</span><br><span class="line">            moveTopTo(destination);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            moveDisks(n-1, buffer, destination);</span><br><span class="line">            moveDisks(1, destination, buffer);</span><br><span class="line">            buffer.moveDisks(n-1, destination, this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public Stack&lt;Integer&gt; getDisks() &#123;</span><br><span class="line">        // write your code here</span><br><span class="line">        return disks;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="找不同"><a href="#找不同" class="headerlink" title="找不同"></a>找不同</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Given two strings s and t which consist of only lowercase letters.</span><br><span class="line"></span><br><span class="line">String t is generated by random shuffling string s and then add one more letter at a random position.</span><br><span class="line"></span><br><span class="line">Find the letter that was added in t.</span><br><span class="line"></span><br><span class="line">输入给两个只包含小写字母的字符串 S 和 T.</span><br><span class="line"></span><br><span class="line">字符串 T 是在字符串 S 基础上添加一个小写字母, 然后随机打乱之后生成.</span><br><span class="line"></span><br><span class="line">请找出那个被加入的小写字母.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">Input:</span><br><span class="line">s = &quot;abcd&quot;</span><br><span class="line">t = &quot;abcde&quot;</span><br><span class="line"></span><br><span class="line">Output:</span><br><span class="line">e</span><br><span class="line"></span><br><span class="line">Explanation:</span><br><span class="line">&apos;e&apos; is the letter that was added.</span><br><span class="line">在线测试网站: https://leetcode.com/problems/find-the-difference/description</span><br></pre></td></tr></table></figure>
+<p>代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">public class Test02 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        char a = findTheDifference(&quot;abc&quot;,&quot;abcd&quot;);</span><br><span class="line">        System.out.println(a);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static  char findTheDifference(String s, String t) &#123;</span><br><span class="line">        HashMap&lt;Character,Integer&gt; hash = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        String tmp = s + t;</span><br><span class="line">        for(int i = 0;i&lt;tmp.length();i++)&#123;</span><br><span class="line">            char current = tmp.charAt(i);</span><br><span class="line">            if(hash.containsKey(current))&#123;</span><br><span class="line">                hash.put(current,hash.get(current) + 1);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                hash.put(current,1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Set&lt;Character&gt; a = hash.keySet();</span><br><span class="line">        Character res = null;</span><br><span class="line">        for (Character item: a) &#123;</span><br><span class="line">            if(hash.get(item)==1)&#123;</span><br><span class="line">                res = item;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="Min-Stack"><a href="#Min-Stack" class="headerlink" title="Min Stack"></a>Min Stack</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.</span><br><span class="line"></span><br><span class="line">push(x) -- Push element x onto stack.</span><br><span class="line">pop() -- Removes the element on top of the stack.</span><br><span class="line">top() -- Get the top element.</span><br><span class="line">getMin() -- Retrieve the minimum element in the stack.</span><br><span class="line">设计一个栈, 支持4种操作: push, pop, top和getMin, 关键是getMin是获取栈中的最小值.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">MinStack minStack = new MinStack();</span><br><span class="line">minStack.push(-2);</span><br><span class="line">minStack.push(0);</span><br><span class="line">minStack.push(-3);</span><br><span class="line">minStack.getMin();   --&gt; Returns -3.</span><br><span class="line">minStack.pop();</span><br><span class="line">minStack.top();      --&gt; Returns 0.</span><br><span class="line">minStack.getMin();   --&gt; Returns -2.</span><br><span class="line">基本代码框架:</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line"></span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line">    private ArrayList&lt;Integer&gt; store;</span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line">        store = new ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line">        store.add(x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        store.remove(store.get(store.size()-1));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return store.get(store.size()-1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int res = store.get(0);</span><br><span class="line">        for (int i = 1; i &lt; store.size(); i++) &#123;</span><br><span class="line">            if( res &gt; store.get(i) )&#123;</span><br><span class="line">                res = store.get(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="推荐一个-idea的插件"><a href="#推荐一个-idea的插件" class="headerlink" title="推荐一个 idea的插件"></a>推荐一个 idea的插件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">首选项- plugins-搜索 rainbow brackets</span><br></pre></td></tr></table></figure>
+<h3 id="推荐书籍"><a href="#推荐书籍" class="headerlink" title="推荐书籍"></a>推荐书籍</h3><ul>
+<li>Efective java</li>
+<li>设计模式</li>
+<li>算法**(强烈推荐)</li>
+<li>if web开发 推荐<ul>
+<li>Spring</li>
+<li>Play</li>
+</ul>
+</li>
+<li>分布式系统开发<ul>
+<li>Hadoop</li>
+<li>MapReduce</li>
+</ul>
+</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/05/18/Java-013-泛型和集合/" data-title="Java-013-泛型和集合 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/05/18/Java-014-maven和包管理/" title="Java-014-maven和包管理">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Java-014-maven和包管理</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/05/18/Java-012-算法入门/"  title="Java-012-算法入门">
+ <strong>下一篇：</strong><br/> 
+ <span>Java-012-算法入门
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#泛型"><span class="toc-number">1.</span> <span class="toc-text">泛型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么有泛型"><span class="toc-number">1.1.</span> <span class="toc-text">为什么有泛型?</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次"><span class="toc-number">1.2.</span> <span class="toc-text">很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！"><span class="toc-number">1.3.</span> <span class="toc-text">泛型出现了！</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！-1"><span class="toc-number">1.4.</span> <span class="toc-text">泛型出现了！</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#泛型出现了！-2"><span class="toc-number">1.5.</span> <span class="toc-text">泛型出现了！</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集合-List"><span class="toc-number">2.</span> <span class="toc-text">集合 List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Set"><span class="toc-number">2.1.</span> <span class="toc-text">Set</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习题"><span class="toc-number">3.</span> <span class="toc-text">练习题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#汉诺塔问题"><span class="toc-number">3.1.</span> <span class="toc-text">汉诺塔问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#找不同"><span class="toc-number">3.2.</span> <span class="toc-text">找不同</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Min-Stack"><span class="toc-number">3.3.</span> <span class="toc-text">Min Stack</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#推荐一个-idea的插件"><span class="toc-number">4.</span> <span class="toc-text">推荐一个 idea的插件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#推荐书籍"><span class="toc-number">5.</span> <span class="toc-text">推荐书籍</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

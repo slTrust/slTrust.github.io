@@ -1,0 +1,742 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-016-命令行详解01 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="什么是命令行 什么是 Kernel  负责和计算机硬件交互的，负责CPU调度和进程相关的调度/IO之类的操作。操作系统最底层  我们如何操作内核呢？  Linux 通过命令行里(终端)来与内核进行交互 通过命令行操作内核的过程 叫做 Shell  Kernel(内核) 与 Shell(壳) 广义的命令行一切通过字符终端控制计算机的方式 Windows cmd/PowerShell/Git bash">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-016-命令行详解01">
+<meta property="og:url" content="http://yoursite.com/2019/07/15/ZB-016-命令行详解01/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="什么是命令行 什么是 Kernel  负责和计算机硬件交互的，负责CPU调度和进程相关的调度/IO之类的操作。操作系统最底层  我们如何操作内核呢？  Linux 通过命令行里(终端)来与内核进行交互 通过命令行操作内核的过程 叫做 Shell  Kernel(内核) 与 Shell(壳) 广义的命令行一切通过字符终端控制计算机的方式 Windows cmd/PowerShell/Git bash">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.334Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-016-命令行详解01">
+<meta name="twitter:description" content="什么是命令行 什么是 Kernel  负责和计算机硬件交互的，负责CPU调度和进程相关的调度/IO之类的操作。操作系统最底层  我们如何操作内核呢？  Linux 通过命令行里(终端)来与内核进行交互 通过命令行操作内核的过程 叫做 Shell  Kernel(内核) 与 Shell(壳) 广义的命令行一切通过字符终端控制计算机的方式 Windows cmd/PowerShell/Git bash">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/07/15/ZB-016-命令行详解01/" title="ZB-016-命令行详解01" itemprop="url">ZB-016-命令行详解01</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-07-15T12:08:57.000Z" itemprop="datePublished"> Published 2019-07-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是命令行"><span class="toc-number">1.</span> <span class="toc-text">什么是命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么需要命令行"><span class="toc-number">2.</span> <span class="toc-text">为什么需要命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命令行的历史和流派"><span class="toc-number">3.</span> <span class="toc-text">命令行的历史和流派</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命令的全部要素"><span class="toc-number">4.</span> <span class="toc-text">命令的全部要素</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#环境变量"><span class="toc-number">4.1.</span> <span class="toc-text">环境变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#环境变量实战"><span class="toc-number">4.2.</span> <span class="toc-text">环境变量实战</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可执⾏程序"><span class="toc-number">5.</span> <span class="toc-text">可执⾏程序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#写一个-node脚本"><span class="toc-number">5.1.</span> <span class="toc-text">写一个 node脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参数"><span class="toc-number">5.2.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#坑人的-单双引号"><span class="toc-number">5.3.</span> <span class="toc-text">坑人的 单双引号</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#扩展的参数"><span class="toc-number">5.4.</span> <span class="toc-text">扩展的参数</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="什么是命令行"><a href="#什么是命令行" class="headerlink" title="什么是命令行"></a>什么是命令行</h3><blockquote>
+<p>什么是 Kernel</p>
+</blockquote>
+<p>负责和计算机硬件交互的，负责CPU调度和进程相关的调度/IO之类的操作。操作系统最底层</p>
+<blockquote>
+<p>我们如何操作内核呢？</p>
+</blockquote>
+<p>Linux 通过命令行里(终端)来与内核进行交互</p>
+<p>通过命令行操作内核的过程 叫做 Shell</p>
+<ul>
+<li>Kernel(内核) 与 Shell(壳)</li>
+<li>广义的命令行一切通过字符终端控制计算机的方式<ul>
+<li>Windows cmd/PowerShell/Git bash</li>
+<li>UNIX/Linux系列 sh/zsh/Terminal etc</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>为什么需要 Shell</p>
+</blockquote>
+<ul>
+<li>因为你不能直接和操作系统内核进行交互</li>
+</ul>
+<h3 id="为什么需要命令行"><a href="#为什么需要命令行" class="headerlink" title="为什么需要命令行"></a>为什么需要命令行</h3><ul>
+<li>因为你不得不用<ul>
+<li>几乎所有的服务器都运行在 linux 上 </li>
+</ul>
+</li>
+<li>将工作自动化<ul>
+<li>自动化是一切生产力的来源(提高生产力)</li>
+<li>你一台机子需要 点点点操作，10000台呢？</li>
+</ul>
+</li>
+<li>相比GUI,命令行更容易开发和维护<ul>
+<li>bug少</li>
+</ul>
+</li>
+<li>远程连接命令行占用资源远远低于GUI</li>
+<li>命令行上的开发者工具更丰富</li>
+</ul>
+<h3 id="命令行的历史和流派"><a href="#命令行的历史和流派" class="headerlink" title="命令行的历史和流派"></a>命令行的历史和流派</h3><ul>
+<li>UNIX家族<ul>
+<li>POSIX标准</li>
+<li>macOS </li>
+<li>Linux</li>
+<li>Windows Subsystem for Linux</li>
+</ul>
+</li>
+<li>Windows<ul>
+<li>奇葩</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Windows 和 UNIX 系统的区别</p>
+</blockquote>
+<ul>
+<li>UNIX遵循<strong>POSIX标准</strong>，只要遵循POSIX标准就可以以同样的方式工作<ul>
+<li>默认命令行交互</li>
+<li>GUI只是个扩展</li>
+<li>只有一个盘符</li>
+</ul>
+</li>
+<li>Windows<ul>
+<li>GUI主要</li>
+<li>命令行是扩展的(导致命令行在windows上是个残废)</li>
+<li>多个盘符 cdef</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>如何安装 windows 的 linux 子系统</p>
+</blockquote>
+<ul>
+<li>搜索 Windows Subsystem for Linux </li>
+</ul>
+<h3 id="命令的全部要素"><a href="#命令的全部要素" class="headerlink" title="命令的全部要素"></a>命令的全部要素</h3><ul>
+<li>可执⾏程序（Executable）</li>
+<li>参数</li>
+<li>环境变量（Environment variable）</li>
+<li>⼯作⽬录（Working directory）<ul>
+<li>启动命令的路径</li>
+<li>相对路径都是相对于这个路径</li>
+<li>在Java中的应⽤</li>
+</ul>
+</li>
+</ul>
+<p><strong>以上四个要素相同，就可以完全地“重现”⼀个命令</strong></p>
+<p><strong>你碰到的各种各样古怪的问题，原因⼀定是上述四个要素之⼀</strong></p>
+<blockquote>
+<p>可执行程序和参数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -al </span><br><span class="line"># ls就是可执行程序</span><br><span class="line"># -al就是参数</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>工作目录</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwd 就是当前的目录</span><br></pre></td></tr></table></figure>
+<h4 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h4><ul>
+<li>进程（Process）<ul>
+<li>进程是计算机程序运⾏的最⼩单位</li>
+<li>独占⾃⼰的内存空间和⽂件资源</li>
+</ul>
+</li>
+<li><p>每个进程都和⼀组变量相绑定</p>
+<ul>
+<li><p>传递不同的环境变量可以让程序表现出不同的⾏为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 当前终端里</span><br><span class="line">export aa=1</span><br><span class="line"></span><br><span class="line"># 当前终端进入node环境</span><br><span class="line">node</span><br><span class="line"># 获取环境变量</span><br><span class="line">&gt; process.env.aa</span><br><span class="line"># 输出 &apos;1&apos;</span><br><span class="line">&apos;1&apos;</span><br><span class="line"></span><br><span class="line"># 此时新开一个终端</span><br><span class="line">node</span><br><span class="line">&gt; process.env.aa</span><br><span class="line">undefined</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CLASSPATH/GOPATH</p>
+</li>
+</ul>
+</li>
+<li>在进程的fork过程中，环境变量可以被完全继承(fork 就是生进程的过程)</li>
+<li>所有的操作系统/编程语⾔都⽀持环境变量</li>
+<li>局部和全局的环境变量</li>
+</ul>
+<blockquote>
+<p>进程是那里来的</p>
+</blockquote>
+<ul>
+<li>进程是它爹生的，最开始系统启动的时候只有一个进程，在 Linux 中叫做 init进程，它生了一堆孩子 桌面/终端 </li>
+<li>在终端里输入 node 就导致 终端产生一个孩子 node进程</li>
+<li>这就形成了一棵树——进程树</li>
+<li>环境变量会一级一级的向下继承</li>
+<li>意思是 父进程里有一个环境变量 a=1 那么它的子进程也有这个 a=1</li>
+</ul>
+<h4 id="环境变量实战"><a href="#环境变量实战" class="headerlink" title="环境变量实战"></a>环境变量实战</h4><ul>
+<li>通过export/set设置环境变量，通过echo读取环境变量</li>
+<li>从Java/Go/Python/Node.js中读取环境变量</li>
+<li><p>向Docker容器传递环境变量</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># -e 代表环境变量</span><br><span class="line">docker run -it -e AAA=1 ubunt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>快速传递⼀个环境变量</p>
+</li>
+<li>使⽤环境变量控制程序的⾏为</li>
+</ul>
+<blockquote>
+<p>java中读取环境变量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class Main&#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        System.out.println(System.getenv(&quot;aa&quot;));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>局部和全局的环境变量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 只在当前终端里有效，新开 终端无效</span><br><span class="line">export a = 1</span><br><span class="line"></span><br><span class="line"># 只对当前的命令有效</span><br><span class="line">a=1 node aa.js</span><br><span class="line"></span><br><span class="line"># 全局的环境变量</span><br><span class="line"># 编辑你的 ~/.bash_profile </span><br><span class="line">vi ~/.bash_profile </span><br><span class="line"># 输入如下内容</span><br><span class="line">export aaa = 123456</span><br><span class="line"></span><br><span class="line"># 然后新开终端输入</span><br><span class="line">echo $aaa</span><br><span class="line"></span><br><span class="line"># 你可能遇到，为什么刚改了现在没生效</span><br><span class="line"># 你要 source 一下</span><br><span class="line">source ~/.bash_profile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 注意！！！ bash_profile只对 bash有效 </span><br><span class="line"># 注意！！！ bash_profile只对 bash有效 </span><br><span class="line"># 注意！！！ bash_profile只对 bash有效 </span><br><span class="line"></span><br><span class="line">取决于你用的终端是 bash 还是 zsh</span><br></pre></td></tr></table></figure>
+<h3 id="可执⾏程序"><a href="#可执⾏程序" class="headerlink" title="可执⾏程序"></a>可执⾏程序</h3><ul>
+<li>Windows：exe/bat/com</li>
+<li>UNIX/Linux：x权限 - 可执⾏权限</li>
+<li><p>去哪⾥找程序？</p>
+<ul>
+<li>Windows：Path环境变量 + 当前⽬录</li>
+<li>UNIX/Linux：PATH环境变量 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo $PATH</span><br><span class="line"></span><br><span class="line">/Users/huangjiaxi/flutter/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/huangjiaxi/Desktop/soft/apache-maven-3.6.1/bin</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>在脚本的第⼀⾏指定解释器（shebang）</p>
+</li>
+<li>别名（alias）</li>
+</ul>
+<blockquote>
+<p>设置环境变量</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># windows</span><br><span class="line">set ABC=123</span><br><span class="line">echo %ABC%</span><br><span class="line"></span><br><span class="line"># linux</span><br><span class="line">export ABC=123</span><br><span class="line">echo $ABC</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>初学命令行的困扰</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 执行命令时，windows会在 PATH 和 当前目录里找，</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 而 linux 只会在 PATH 里找</span><br><span class="line"># 假设当前目录有 main 脚本</span><br><span class="line"># 直接 main 不会执行 因为 linux 只会在 PATH里找</span><br><span class="line">./main 才执行</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如何执行一个文本文件</p>
+</blockquote>
+<p><code>echo.sh</code> 内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo 123</span><br><span class="line">echo 456</span><br></pre></td></tr></table></figure>
+<p>分配执行权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chmod 777 echo.sh</span><br><span class="line"></span><br><span class="line"># 执行你的脚本</span><br><span class="line">./echo.sh</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="写一个-node脚本"><a href="#写一个-node脚本" class="headerlink" title="写一个 node脚本"></a>写一个 node脚本</h4></blockquote>
+<p><code>echo.sh</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">console.log(123);</span><br><span class="line">console.log(456);</span><br></pre></td></tr></table></figure>
+<p>但是操作系统不认识 node！！！</p>
+<p><strong>教操作系统认识node</strong></p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/24253027/node-and-shebang-help-executing-via-command-line" target="_blank" rel="noopener">搜索 node shebang</a></li>
+</ul>
+<p><code>echo.sh</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/local/bin/node</span><br><span class="line">console.log(123);</span><br><span class="line">console.log(456);</span><br></pre></td></tr></table></figure>
+<p>shell的约定</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">shell中 “#” 代表注释</span><br><span class="line"></span><br><span class="line">首行 代表指定当前的文件由谁来解释和执行</span><br><span class="line"># 从当前的上下文环境中查找 node 命令</span><br><span class="line">#!/usr/local/bin/node </span><br><span class="line"></span><br><span class="line">为什么不推荐写绝对路径，因为你不知道别人的node是不是安装在这个路径</span><br><span class="line">#!/usr/local/bin/node</span><br></pre></td></tr></table></figure>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul>
+<li><p>UNIX参数的约定——然鹅Java并不⻦这个约定</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">‘-’ 约定</span><br><span class="line">ls -alth</span><br><span class="line"># 约定，以一个 ‘-’ 开头的可以 -a -l -t -h 也可以合并为 -alth</span><br><span class="line"># 意思就是 &apos;-&apos; 后面跟一个字符</span><br><span class="line"></span><br><span class="line">&apos;--&apos; 约定 后面跟单词</span><br><span class="line">ls -a &lt;==&gt; ls --all</span><br><span class="line">git push -f &lt;==&gt; git push --force</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">但是 java 不遵守这个</span><br><span class="line">java -version</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>参数中包含空格或者字符串</p>
+<ul>
+<li>单引号</li>
+<li>双引号</li>
+</ul>
+</li>
+<li>参数的展开</li>
+</ul>
+<blockquote>
+<h4 id="坑人的-单双引号"><a href="#坑人的-单双引号" class="headerlink" title="坑人的 单双引号"></a>坑人的 单双引号</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 当前环境里没有 A 变量，运行正常</span><br><span class="line">javap Main$A.class</span><br><span class="line"></span><br><span class="line"># 此时 </span><br><span class="line">export A=123</span><br><span class="line">javap Main$A.class 报错了</span><br><span class="line">实际执行的是  javap Main123.class</span><br><span class="line"></span><br><span class="line"># 默认情况下 “$” 是把命令展开的符号</span><br><span class="line"></span><br><span class="line"># 通过单引号来包裹它，运行正常，除了可以让多个空格分开的字符串连接在一起，还可以告诉命令行 里面的内容全不要替换</span><br><span class="line">javap &apos;Main$A.class&apos; </span><br><span class="line"></span><br><span class="line"># 换个 &quot;双引号&quot; 试试</span><br><span class="line">javap &quot;Main$A.class&quot;</span><br><span class="line"></span><br><span class="line">双引号会把 里面的变量展开 ==&gt; javap Main$123.class</span><br><span class="line"></span><br><span class="line"># 想给程序传递 单引号怎么办？</span><br><span class="line"># 包双引号</span><br><span class="line">./main &quot;&apos;I am a boy&apos;&quot;</span><br><span class="line"># 转义</span><br><span class="line">./main \&apos;I am a boy\&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="扩展的参数"><a href="#扩展的参数" class="headerlink" title="扩展的参数"></a>扩展的参数</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ls *.java</span><br><span class="line">此时会把所有 .java扩展名的文件罗列出来</span><br><span class="line"></span><br><span class="line"># 如何想不被扩展原样执行呢？</span><br><span class="line"></span><br><span class="line">ls &apos;*.java&apos;</span><br><span class="line"></span><br><span class="line"># * 代表通配符 默认会展开，如果你不想它自动扩展 就包含 单引号</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/07/15/ZB-016-命令行详解01/" data-title="ZB-016-命令行详解01 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/07/15/ZB-016-命令行详解02/" title="ZB-016-命令行详解02">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-016-命令行详解02</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/07/10/ZB-014-java接口和抽象类02/"  title="ZB-014-java接口和抽象类02">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-014-java接口和抽象类02
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是命令行"><span class="toc-number">1.</span> <span class="toc-text">什么是命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么需要命令行"><span class="toc-number">2.</span> <span class="toc-text">为什么需要命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命令行的历史和流派"><span class="toc-number">3.</span> <span class="toc-text">命令行的历史和流派</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#命令的全部要素"><span class="toc-number">4.</span> <span class="toc-text">命令的全部要素</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#环境变量"><span class="toc-number">4.1.</span> <span class="toc-text">环境变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#环境变量实战"><span class="toc-number">4.2.</span> <span class="toc-text">环境变量实战</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可执⾏程序"><span class="toc-number">5.</span> <span class="toc-text">可执⾏程序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#写一个-node脚本"><span class="toc-number">5.1.</span> <span class="toc-text">写一个 node脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#参数"><span class="toc-number">5.2.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#坑人的-单双引号"><span class="toc-number">5.3.</span> <span class="toc-text">坑人的 单双引号</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#扩展的参数"><span class="toc-number">5.4.</span> <span class="toc-text">扩展的参数</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

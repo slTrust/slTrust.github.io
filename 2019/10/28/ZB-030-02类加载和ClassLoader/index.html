@@ -1,0 +1,595 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-030-02类加载和ClassLoader | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="不止一份说明书你的程序扩展了 此时 你有了如下多的类型  Cat Dog Pig … 或者内置的 ArrayList  它们都是从 对应的说明书创建的？  问题来了？这个 说明书，这个Class对象 那里来的   绝不可能是凭空出现，一定是从什么地方拿到的  Class对象的生命周期 它在第一次被使用的时候加载  Class对象就是一个 类型(如Cat) 的说明书 上篇文章的例子 1234567">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-030-02类加载和ClassLoader">
+<meta property="og:url" content="http://yoursite.com/2019/10/28/ZB-030-02类加载和ClassLoader/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="不止一份说明书你的程序扩展了 此时 你有了如下多的类型  Cat Dog Pig … 或者内置的 ArrayList  它们都是从 对应的说明书创建的？  问题来了？这个 说明书，这个Class对象 那里来的   绝不可能是凭空出现，一定是从什么地方拿到的  Class对象的生命周期 它在第一次被使用的时候加载  Class对象就是一个 类型(如Cat) 的说明书 上篇文章的例子 1234567">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.340Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-030-02类加载和ClassLoader">
+<meta name="twitter:description" content="不止一份说明书你的程序扩展了 此时 你有了如下多的类型  Cat Dog Pig … 或者内置的 ArrayList  它们都是从 对应的说明书创建的？  问题来了？这个 说明书，这个Class对象 那里来的   绝不可能是凭空出现，一定是从什么地方拿到的  Class对象的生命周期 它在第一次被使用的时候加载  Class对象就是一个 类型(如Cat) 的说明书 上篇文章的例子 1234567">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/28/ZB-030-02类加载和ClassLoader/" title="ZB-030-02类加载和ClassLoader" itemprop="url">ZB-030-02类加载和ClassLoader</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-28T14:19:56.000Z" itemprop="datePublished"> Published 2019-10-28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#不止一份说明书"><span class="toc-number">1.</span> <span class="toc-text">不止一份说明书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class对象的生命周期"><span class="toc-number">2.</span> <span class="toc-text">Class对象的生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HelloWorld-运行过程"><span class="toc-number">2.1.</span> <span class="toc-text">HelloWorld 运行过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？"><span class="toc-number">2.2.</span> <span class="toc-text">回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第三个问题？说明书被谁加载的"><span class="toc-number">2.3.</span> <span class="toc-text">第三个问题？说明书被谁加载的</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class和-Classloader"><span class="toc-number">3.</span> <span class="toc-text">Class和 Classloader</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Classloader-负责从外部系统中加载一个类"><span class="toc-number">3.1.</span> <span class="toc-text">Classloader 负责从外部系统中加载一个类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#双亲委派加载模型"><span class="toc-number">3.2.</span> <span class="toc-text">双亲委派加载模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这个模型的好处？"><span class="toc-number">3.3.</span> <span class="toc-text">这个模型的好处？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java语言规范-JLS-和Java虚拟机规范-JVMS"><span class="toc-number">3.4.</span> <span class="toc-text">Java语言规范(JLS)和Java虚拟机规范(JVMS)</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="不止一份说明书"><a href="#不止一份说明书" class="headerlink" title="不止一份说明书"></a>不止一份说明书</h3><p>你的程序扩展了</p>
+<p>此时 你有了如下多的类型</p>
+<ul>
+<li>Cat</li>
+<li>Dog</li>
+<li>Pig</li>
+<li>…</li>
+<li>或者内置的 ArrayList</li>
+</ul>
+<p>它们都是从 对应的说明书创建的？</p>
+<blockquote>
+<p>问题来了？这个 <strong>说明书，这个Class对象</strong> 那里来的</p>
+</blockquote>
+<ul>
+<li>绝不可能是凭空出现，一定是从什么地方拿到的</li>
+</ul>
+<h3 id="Class对象的生命周期"><a href="#Class对象的生命周期" class="headerlink" title="Class对象的生命周期"></a>Class对象的生命周期</h3><ul>
+<li><strong>它在第一次被使用的时候加载</strong></li>
+</ul>
+<p>Class对象就是一个 类型(如Cat) 的说明书</p>
+<p>上篇文章的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Animal</span><br><span class="line">-|Cat</span><br><span class="line">--|WhiteCat</span><br><span class="line"></span><br><span class="line">在内存中初始的时候，</span><br><span class="line">一个 WhiteCat 它的一部分区域是 Cat,在一部分是 Animal</span><br><span class="line"></span><br><span class="line">意思就是 </span><br><span class="line">你要创建一个 WhiteCat 就必须 先创建 Cat，创建 Cat 就必须 先创建Animal</span><br><span class="line"></span><br><span class="line">换句话说，</span><br><span class="line">你想要一个 WhiteCat，你首先要用到 Cat,然后创建 Cat 又必须用到 Animal</span><br><span class="line">这个过程是一层一层递归的</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="HelloWorld-运行过程"><a href="#HelloWorld-运行过程" class="headerlink" title="HelloWorld 运行过程"></a>HelloWorld 运行过程</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;HelloWorld&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// IDEA里 右键运行</span><br><span class="line"></span><br><span class="line">你以为的</span><br><span class="line">运行------》 HelloWorld</span><br><span class="line"></span><br><span class="line">实际上</span><br><span class="line"></span><br><span class="line">运行---》</span><br><span class="line">    第一步 编译 从 Main.java--&gt; Main.class</span><br><span class="line">    第二步 帮你拼了一个 java命令 运行你的 Main.class </span><br><span class="line">    打印出 HelloWorld</span><br><span class="line"></span><br><span class="line">// 复制这行拼接的命令</span><br><span class="line">在终端里执行，你发现跟你点 运行 没区别</span><br><span class="line"></span><br><span class="line">// 我们可以给这个命令行加参数</span><br><span class="line"></span><br><span class="line">让他打印 类加载 顺序</span><br><span class="line"></span><br><span class="line">-verbose:class</span><br><span class="line"></span><br><span class="line">// 在这个后面</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  ...</span><br><span class="line"></span><br><span class="line">但是非常啰嗦</span><br><span class="line"></span><br><span class="line">你可以在命令的最后 加上 管道操作</span><br><span class="line"></span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  </span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">| grep 过滤词（我们自己类的包名如 com.xxx）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">你会看到 形如</span><br><span class="line">[Loaded com.io.demo.Animal from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.Cat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.WhiteCat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line"></span><br><span class="line">意思就是这个类 从那里来</span><br></pre></td></tr></table></figure>
+<h4 id="回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？"><a href="#回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？" class="headerlink" title="回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？"></a>回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？</h4><p>上面的过程解释了，说明书什么时候被加载。</p>
+<p><strong>那它是那里来的呢？</strong></p>
+<p>答案是你自己写的类 从你编写的 xxx.java 编译后的 xxx.class里来(target目录里)</p>
+<blockquote>
+<p>你看到的是瞬间加载你的类，实际做了很多事</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">加载之前是 xxx.class</span><br><span class="line"></span><br><span class="line">加载 Loading (读取)===&gt; </span><br><span class="line">                进行一系列操作</span><br><span class="line"></span><br><span class="line">                验证==》防止恶意代码搞坏jvm</span><br><span class="line">                准备==》</span><br><span class="line">                解析===》</span><br><span class="line">                        初始化</span><br><span class="line">                        把一个 class文件 变到 内存里  </span><br><span class="line">                        使得根据对应的说明书 可以创建对应的对象</span><br></pre></td></tr></table></figure>
+<h4 id="第三个问题？说明书被谁加载的"><a href="#第三个问题？说明书被谁加载的" class="headerlink" title="第三个问题？说明书被谁加载的"></a>第三个问题？说明书被谁加载的</h4><p>答案就是 <strong>Classloader</strong></p>
+<h3 id="Class和-Classloader"><a href="#Class和-Classloader" class="headerlink" title="Class和 Classloader"></a>Class和 Classloader</h3><h4 id="Classloader-负责从外部系统中加载一个类"><a href="#Classloader-负责从外部系统中加载一个类" class="headerlink" title="Classloader 负责从外部系统中加载一个类"></a>Classloader 负责从外部系统中加载一个类</h4><ul>
+<li>这个类对应的Java文件并不需要存在 <code>你可以没有Cat.java,你可以通过Cat.class</code></li>
+<li>这个类(字节码))并不一定需要存在<code>你也可以没有Cat.class,你可以从网上下载，文件的本质是字节流，可以动态生产</code></li>
+<li><p>这是java世界丰富多彩的基石</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">比如我想要一个 五条腿的猫</span><br><span class="line">动态创建一个 Cat5 </span><br><span class="line">Cat5 extends Cat </span><br><span class="line">这个Cat5的说明书 你可以直接在内存里捏造出来，不需要和外界打交道</span><br><span class="line"></span><br><span class="line">这个操作就是 动态字节码增强</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Classloader的双亲委派加载模型</p>
+<ul>
+<li>首先 <strong>Classloader 负责从外部系统中加载一个类</strong></li>
+<li>外部是不安全的，总会有恶意的代码，比如 他想搞坏你的String<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// src/main下建立如下代码</span><br><span class="line">package java.lang;</span><br><span class="line"></span><br><span class="line">public class String &#123;</span><br><span class="line">    // 我是一个坏人</span><br><span class="line">    // 我在自己定义的 String 里 做坏事</span><br><span class="line"></span><br><span class="line">    public String() &#123;</span><br><span class="line">        throw new IllegalStateException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// </span><br><span class="line">package com.xxx.demo;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        new String();</span><br><span class="line">        // 此时 点进去发现 会优先选择官方的 String</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 答案就是 双亲委派加载模型</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="双亲委派加载模型"><a href="#双亲委派加载模型" class="headerlink" title="双亲委派加载模型"></a>双亲委派加载模型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</span><br><span class="line">    throws ClassNotFoundException</span><br><span class="line">&#123;</span><br><span class="line">    synchronized (getClassLoadingLock(name)) &#123;</span><br><span class="line">        // First, check if the class has already been loaded</span><br><span class="line">        Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">        if (c == null) &#123;</span><br><span class="line">            long t0 = System.nanoTime();</span><br><span class="line">            try &#123;</span><br><span class="line">                // 它有父亲的话，首先从父亲加载</span><br><span class="line">                if (parent != null) &#123;</span><br><span class="line">                    c = parent.loadClass(name, false);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    c = findBootstrapClassOrNull(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                // ClassNotFoundException thrown if class not found</span><br><span class="line">                // from the non-null parent class loader</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 父亲加载失败，尝试自己加载</span><br><span class="line">            if (c == null) &#123;</span><br><span class="line">                </span><br><span class="line">                // If still not found, then invoke findClass in order</span><br><span class="line">                // to find the class.</span><br><span class="line">                long t1 = System.nanoTime();</span><br><span class="line">                c = findClass(name);</span><br><span class="line"></span><br><span class="line">                // this is the defining class loader; record the stats</span><br><span class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                sun.misc.PerfCounter.getFindClasses().increment();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="这个模型的好处？"><a href="#这个模型的好处？" class="headerlink" title="这个模型的好处？"></a>这个模型的好处？</h4></blockquote>
+<p>比如刚刚的<code>new String();</code>这样的基础的类，出于安全性的考虑都是由最顶端的启动类加载器加载的，这样就保证了安全</p>
+<p>所以我们自造的恶意的 类无法被加载。</p>
+<h4 id="Java语言规范-JLS-和Java虚拟机规范-JVMS"><a href="#Java语言规范-JLS-和Java虚拟机规范-JVMS" class="headerlink" title="Java语言规范(JLS)和Java虚拟机规范(JVMS)"></a>Java语言规范(JLS)和Java虚拟机规范(JVMS)</h4><ul>
+<li>java 和 jvm实际是分离的，它们的联系就是字节码，而字节码可以不由java生成</li>
+<li>这种分离提供了JVM上运行其他语言的可能</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/10/28/ZB-030-02类加载和ClassLoader/" data-title="ZB-030-02类加载和ClassLoader | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/10/28/ZB-030-03反射/" title="ZB-030-03反射">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-030-03反射</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/10/28/ZB-030-01Java的类与Class/"  title="ZB-030-01Java的类与Class">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-030-01Java的类与Class
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#不止一份说明书"><span class="toc-number">1.</span> <span class="toc-text">不止一份说明书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class对象的生命周期"><span class="toc-number">2.</span> <span class="toc-text">Class对象的生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HelloWorld-运行过程"><span class="toc-number">2.1.</span> <span class="toc-text">HelloWorld 运行过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？"><span class="toc-number">2.2.</span> <span class="toc-text">回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#第三个问题？说明书被谁加载的"><span class="toc-number">2.3.</span> <span class="toc-text">第三个问题？说明书被谁加载的</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class和-Classloader"><span class="toc-number">3.</span> <span class="toc-text">Class和 Classloader</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Classloader-负责从外部系统中加载一个类"><span class="toc-number">3.1.</span> <span class="toc-text">Classloader 负责从外部系统中加载一个类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#双亲委派加载模型"><span class="toc-number">3.2.</span> <span class="toc-text">双亲委派加载模型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这个模型的好处？"><span class="toc-number">3.3.</span> <span class="toc-text">这个模型的好处？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java语言规范-JLS-和Java虚拟机规范-JVMS"><span class="toc-number">3.4.</span> <span class="toc-text">Java语言规范(JLS)和Java虚拟机规范(JVMS)</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

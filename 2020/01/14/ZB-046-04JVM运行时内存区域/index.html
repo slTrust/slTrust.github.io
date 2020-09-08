@@ -1,0 +1,604 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-046-04JVM运行时内存区域 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="JVM运行时内存区域方法区 被整个虚拟机所共享的Class信息等 运行时常量池 Java7之前：永久代(PermGen) Java8之后：元空间(Metaspace)   我们知道每当你 new Object() 或者 new Cat()的时候，都会在堆内开辟空间，而在你分配空间之前   你首先得知道 Object 长什么样子，也就是 Class，Class就是那个模子，那个说明书，它指明了这个对">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-046-04JVM运行时内存区域">
+<meta property="og:url" content="http://yoursite.com/2020/01/14/ZB-046-04JVM运行时内存区域/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="JVM运行时内存区域方法区 被整个虚拟机所共享的Class信息等 运行时常量池 Java7之前：永久代(PermGen) Java8之后：元空间(Metaspace)   我们知道每当你 new Object() 或者 new Cat()的时候，都会在堆内开辟空间，而在你分配空间之前   你首先得知道 Object 长什么样子，也就是 Class，Class就是那个模子，那个说明书，它指明了这个对">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.347Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-046-04JVM运行时内存区域">
+<meta name="twitter:description" content="JVM运行时内存区域方法区 被整个虚拟机所共享的Class信息等 运行时常量池 Java7之前：永久代(PermGen) Java8之后：元空间(Metaspace)   我们知道每当你 new Object() 或者 new Cat()的时候，都会在堆内开辟空间，而在你分配空间之前   你首先得知道 Object 长什么样子，也就是 Class，Class就是那个模子，那个说明书，它指明了这个对">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/01/14/ZB-046-04JVM运行时内存区域/" title="ZB-046-04JVM运行时内存区域" itemprop="url">ZB-046-04JVM运行时内存区域</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-01-14T13:32:45.000Z" itemprop="datePublished"> Published 2020-01-14</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM运行时内存区域"><span class="toc-number">1.</span> <span class="toc-text">JVM运行时内存区域</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方法区"><span class="toc-number">1.0.1.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#基本数据类型的值是放在堆常量池还是栈的常量池？"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">基本数据类型的值是放在堆常量池还是栈的常量池？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#永久代-PermGen-：Java7之前"><span class="toc-number">1.0.1.3.</span> <span class="toc-text">永久代(PermGen)：Java7之前</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#元空间-Metaspace-Java8之后"><span class="toc-number">1.0.1.4.</span> <span class="toc-text">元空间(Metaspace):Java8之后</span></a></li></ol></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="JVM运行时内存区域"><a href="#JVM运行时内存区域" class="headerlink" title="JVM运行时内存区域"></a>JVM运行时内存区域</h1><h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><ul>
+<li>被整个虚拟机所共享的Class信息等</li>
+<li>运行时常量池</li>
+<li>Java7之前：永久代(PermGen)</li>
+<li>Java8之后：元空间(Metaspace)</li>
+</ul>
+<blockquote>
+<p>我们知道每当你 <code>new Object()</code> 或者 <code>new Cat()</code>的时候，都会在堆内开辟空间，而在你分配空间之前</p>
+</blockquote>
+<ul>
+<li>你首先得知道 Object 长什么样子，也就是 Class，Class就是那个模子，那个说明书，它指明了这个对象如何被创建</li>
+<li>因此 Object.class 和 Cat.class 就是你创建 Object / Cat 对象时候参照的说明书</li>
+<li>这个说明书放在哪里呢？ 我们称之为 <strong>方法区</strong></li>
+</ul>
+<blockquote>
+<p>方法区中存的一般都是这些类型信息，被JVM所有人所共享，一般来说是只读的</p>
+</blockquote>
+<ul>
+<li>意外情况就是 运行时常量池</li>
+</ul>
+<blockquote>
+<p>看一个例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String s1 = new String(&quot;abc&quot;);</span><br><span class="line">        String s2 = new String(&quot;abc&quot;);</span><br><span class="line">        String s3 = s1.intern();</span><br><span class="line">        String s4 = s2.intern();</span><br><span class="line"></span><br><span class="line">        System.out.println( s1 == s2); // false</span><br><span class="line">        System.out.println( s3 == s4); // true</span><br><span class="line">        System.out.println( s3.equals(s4)); // 进入 equals if 分支</span><br><span class="line">        System.out.println( s1.equals(s2)); // 进入 equals else 分支</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">s1 == s2 返回 false可以理解 因为它比较的是引用 ——-》 地址</span><br><span class="line">s3 == s4 为什么 true ？ 点击 intern() 进入发现 它是一个 native 方法 意思是它没有java代码的由 java虚拟机帮你实现</span><br><span class="line">intern() 意思是 在一个你看不到的地方 一个池子 Pool 存了很多字符串 ，如 &quot;abc&quot; ，保证你每次调用的时候返回的都是同一个字符串实例</span><br><span class="line">所以 intern() 你可以理解为 内联化，内部表示</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<p><code>intern()</code>的注释非常好</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">     * Returns a canonical representation for the string object.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * A pool of strings, initially empty, is maintained privately by the</span><br><span class="line">     * class &#123;@code String&#125;.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * When the intern method is invoked, if the pool already contains a</span><br><span class="line">     * string equal to this &#123;@code String&#125; object as determined by</span><br><span class="line">     * the &#123;@link #equals(Object)&#125; method, then the string from the pool is</span><br><span class="line">     * returned. Otherwise, this &#123;@code String&#125; object is added to the</span><br><span class="line">     * pool and a reference to this &#123;@code String&#125; object is returned.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * It follows that for any two strings &#123;@code s&#125; and &#123;@code t&#125;,</span><br><span class="line">     * &#123;@code s.intern() == t.intern()&#125; is &#123;@code true&#125;</span><br><span class="line">     * if and only if &#123;@code s.equals(t)&#125; is &#123;@code true&#125;.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * All literal strings and string-valued constant expressions are</span><br><span class="line">     * interned. String literals are defined in section 3.10.5 of the</span><br><span class="line">     * &lt;cite&gt;The Java&amp;trade; Language Specification&lt;/cite&gt;.</span><br><span class="line">     *</span><br><span class="line">     * @return  a string that has the same contents as this string, but is</span><br><span class="line">     *          guaranteed to be from a pool of unique strings.</span><br><span class="line">     */</span><br><span class="line">    public native String intern();</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">*返回字符串对象的规范表示形式。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*一个字符串池，最初是空的，由</span><br><span class="line">*类&#123;@code字符串&#125;。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*如果池中已经包含了</span><br><span class="line">* string等于这个&#123;@code string&#125;对象</span><br><span class="line">* &#123;@link #equals(Object)&#125;方法，则池中的字符串为</span><br><span class="line">*返回。否则，将此&#123;@code字符串&#125;对象添加到</span><br><span class="line">*池和这个&#123;@code String&#125;对象的引用被返回。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*对于任意两个字符串&#123;@code s&#125;和&#123;@code t&#125;，</span><br><span class="line">* &#123;@code s.intern () = = t.intern()&#125;是&#123;@code真的&#125;</span><br><span class="line">*当且仅当&#123;@code s.equals(t)&#125;为&#123;@code true&#125;时。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*所有字符串和字符串值常量表达式都是</span><br><span class="line">*实习。的第3.10.5节定义了字符串字面量</span><br><span class="line">* &lt;引用&gt; Java™语言规范&lt; /引用&gt;。</span><br><span class="line">*</span><br><span class="line">* @返回一个与该字符串内容相同的字符串，但是</span><br><span class="line">*保证来自唯一字符串池。</span><br><span class="line">* /</span><br><span class="line">public native String intern();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么要 <code>intern()</code> 答案就在 <code>String.equals()</code>里</p>
+</blockquote>
+<p>equals 方法实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public boolean equals(Object anObject) &#123;</span><br><span class="line">    if (this == anObject) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    if (anObject instanceof String) &#123;</span><br><span class="line">        String anotherString = (String)anObject;</span><br><span class="line">        int n = value.length;</span><br><span class="line">        if (n == anotherString.value.length) &#123;</span><br><span class="line">            char v1[] = value;</span><br><span class="line">            char v2[] = anotherString.value;</span><br><span class="line">            int i = 0;</span><br><span class="line">            while (n-- != 0) &#123;</span><br><span class="line">                if (v1[i] != v2[i])</span><br><span class="line">                    return false;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果你要比较两个字符串 它就会跑一个循环，比较每个字符。假如你这个字符串有 几百个几千个字符，意味着你运行 equals 就要比较那么多的次数，效率非常低</span><br><span class="line"></span><br><span class="line">假如碰巧这两个对象是同一个对象的话，它的地址是一样的话，只需要一次就可以完成</span><br><span class="line">所以Java的 Collection 体系非常依赖 equals </span><br><span class="line">如你把 String 声明的东西 当作 map的 key 。做成 Set / List 它们比较的时候都会使用 equals</span><br><span class="line">有这样字符串常量池的意义就在于，如果有个常量池，可以对于每个字符串都返回一摸一样对象的时候，用来比较它们相等性的时候就可以通过一个 指令 this == anObject 就完成，效率高很多</span><br></pre></td></tr></table></figure>
+<h4 id="子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？"><a href="#子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？" class="headerlink" title="子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？"></a>子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？</h4><p>是也不是</p>
+<p>假如你有以下类,请分别创建 Base.java 和 Sub.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">public class Base&#123;</span><br><span class="line">    int i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Base对应字节码</span><br><span class="line">// class version 49.0 (49)</span><br><span class="line">// access flags 0x21</span><br><span class="line">public class Base &#123;</span><br><span class="line"></span><br><span class="line">  // compiled from: Base.java</span><br><span class="line"></span><br><span class="line">  // access flags 0x0</span><br><span class="line">  I i</span><br><span class="line"></span><br><span class="line">  // access flags 0x1</span><br><span class="line">  public &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 1 L0</span><br><span class="line">    ALOAD 0</span><br><span class="line">    INVOKESPECIAL java/lang/Object.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE this LBase; L0 L1 0</span><br><span class="line">    MAXSTACK = 1</span><br><span class="line">    MAXLOCALS = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">------------------分割线------------------------</span><br><span class="line">public class Sub extends Base&#123;</span><br><span class="line">    int j;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Sub对应字节码</span><br><span class="line">// class version 49.0 (49)</span><br><span class="line">// access flags 0x21</span><br><span class="line">public class Sub extends Base  &#123;</span><br><span class="line"></span><br><span class="line">  // compiled from: Sub.java</span><br><span class="line"></span><br><span class="line">  // access flags 0x0</span><br><span class="line">  I j</span><br><span class="line"></span><br><span class="line">  // access flags 0x1</span><br><span class="line">  public &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 1 L0</span><br><span class="line">    ALOAD 0</span><br><span class="line">    INVOKESPECIAL Base.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE this LSub; L0 L1 0</span><br><span class="line">    MAXSTACK = 1</span><br><span class="line">    MAXLOCALS = 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每当你 <code>new Sub()</code>的时候实际上它会先偷偷帮你调用父类的构造器 也就是偷偷帮你调用<code>new Base()</code>，而你去看 Base 发现它会偷偷调用 <code>new Object()</code></p>
+<ul>
+<li>这样对象就是一层一层的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">_____________________</span><br><span class="line">object|             |</span><br><span class="line">______|             |</span><br><span class="line">                    |  </span><br><span class="line">    Base 的数据 i    |</span><br><span class="line">--------------------|</span><br><span class="line">        Sub 的数据 j |</span><br><span class="line">--------------------|</span><br><span class="line"></span><br><span class="line">同时也解释了 为什么面向对象里你总是可以把一个 子类转换成 父类</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="基本数据类型的值是放在堆常量池还是栈的常量池？"><a href="#基本数据类型的值是放在堆常量池还是栈的常量池？" class="headerlink" title="基本数据类型的值是放在堆常量池还是栈的常量池？"></a>基本数据类型的值是放在堆常量池还是栈的常量池？</h4><ul>
+<li>基本数据类型不放常量池</li>
+<li><p>放在堆还是栈取决于你这个东西是什么东西</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int i = 0;</span><br><span class="line">        // 这个 i 放在 main 的栈帧里</span><br><span class="line"></span><br><span class="line">        Base base = new Base();</span><br><span class="line">        // 这个 base会在 堆上开辟一块内存</span><br><span class="line">        // base 里有个 i 初始化是 0</span><br><span class="line">        // base 指向这块空间  base = 一个地址(指向堆上开辟的base对象)</span><br><span class="line">    &#125;</span><br><span class="line">    static class Base&#123;</span><br><span class="line">        int i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果是局部变量放在 栈里</li>
+<li>如果是一个类的成员它就放在堆里面</li>
+</ul>
+</li>
+</ul>
+<h4 id="永久代-PermGen-：Java7之前"><a href="#永久代-PermGen-：Java7之前" class="headerlink" title="永久代(PermGen)：Java7之前"></a>永久代(PermGen)：Java7之前</h4><ul>
+<li>OutOfMemory  <ul>
+<li>有的时候看到的是 heap space</li>
+<li>有的时候是 perm gen （java8之后把它移出来了，移到元空间里了）</li>
+</ul>
+</li>
+</ul>
+<h4 id="元空间-Metaspace-Java8之后"><a href="#元空间-Metaspace-Java8之后" class="headerlink" title="元空间(Metaspace):Java8之后"></a>元空间(Metaspace):Java8之后</h4><ul>
+<li>元空间和Native是共享内存</li>
+</ul>
+<blockquote>
+<p>为什么 Java8之后把 <code>perm gen</code> 放在元空间里</p>
+</blockquote>
+<ul>
+<li>永久代在之前的过程中，是和堆放在一起的，会和堆抢内存。很容易碰到 OutOfMemory</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/01/14/ZB-046-04JVM运行时内存区域/" data-title="ZB-046-04JVM运行时内存区域 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/01/14/ZB-046-05JVM字节码/" title="ZB-046-05JVM字节码">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-046-05JVM字节码</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/12/26/Node-JS专精08手写bind02/"  title="Node-JS专精08手写bind02">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精08手写bind02
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM运行时内存区域"><span class="toc-number">1.</span> <span class="toc-text">JVM运行时内存区域</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方法区"><span class="toc-number">1.0.1.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#基本数据类型的值是放在堆常量池还是栈的常量池？"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">基本数据类型的值是放在堆常量池还是栈的常量池？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#永久代-PermGen-：Java7之前"><span class="toc-number">1.0.1.3.</span> <span class="toc-text">永久代(PermGen)：Java7之前</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#元空间-Metaspace-Java8之后"><span class="toc-number">1.0.1.4.</span> <span class="toc-text">元空间(Metaspace):Java8之后</span></a></li></ol></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

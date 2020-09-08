@@ -1,0 +1,688 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>MVC之VC | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="项目引入链接如下基础版代码 引入轮播后 模块化之后 立即执行函数的使用避免全局污染 模块间通信与闭包的使用 初步提取view和controller 进阶后的vc 引入轮播 在啥都不清楚下引入 swiper    swiper插件 get Started 安装 1npm install swiper //安装这个swiper 或者直接用cdn的链接  引入相关文件   1234567891011&amp;l">
+<meta name="keywords" content="前端知识点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MVC之VC">
+<meta property="og:url" content="http://yoursite.com/2017/12/08/N036_MVC之VC/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="项目引入链接如下基础版代码 引入轮播后 模块化之后 立即执行函数的使用避免全局污染 模块间通信与闭包的使用 初步提取view和controller 进阶后的vc 引入轮播 在啥都不清楚下引入 swiper    swiper插件 get Started 安装 1npm install swiper //安装这个swiper 或者直接用cdn的链接  引入相关文件   1234567891011&amp;l">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/note036_1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/note036_2.png">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.262Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MVC之VC">
+<meta name="twitter:description" content="项目引入链接如下基础版代码 引入轮播后 模块化之后 立即执行函数的使用避免全局污染 模块间通信与闭包的使用 初步提取view和controller 进阶后的vc 引入轮播 在啥都不清楚下引入 swiper    swiper插件 get Started 安装 1npm install swiper //安装这个swiper 或者直接用cdn的链接  引入相关文件   1234567891011&amp;l">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/note036_1.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/12/08/N036_MVC之VC/" title="MVC之VC" itemprop="url">MVC之VC</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-12-08T07:43:46.000Z" itemprop="datePublished"> Published 2017-12-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#项目引入链接如下"><span class="toc-number">1.</span> <span class="toc-text">项目引入链接如下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#引入轮播"><span class="toc-number">1.1.</span> <span class="toc-text">引入轮播</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#get-Started"><span class="toc-number">1.1.1.</span> <span class="toc-text">get Started</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#美化你的作品集-肯定不能直接截图你的作品除非很好看"><span class="toc-number">1.1.2.</span> <span class="toc-text">美化你的作品集 肯定不能直接截图你的作品除非很好看</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模块化"><span class="toc-number">1.1.3.</span> <span class="toc-text">模块化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模块化之后"><span class="toc-number">1.1.4.</span> <span class="toc-text">模块化之后</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#立即执行函数的使用"><span class="toc-number">1.1.5.</span> <span class="toc-text">立即执行函数的使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auto-slide-up-js"><span class="toc-number">1.2.</span> <span class="toc-text">auto-slide-up.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#错误示范使用花括号包裹你的代码-gt-这是错的-js里没有块级作用域"><span class="toc-number">1.3.</span> <span class="toc-text">错误示范使用花括号包裹你的代码 ==&gt;这是错的 js里没有块级作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用函数作用域"><span class="toc-number">1.4.</span> <span class="toc-text">使用函数作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新的问题是-这个函数”xxx”又成了全局变量也是会被污染"><span class="toc-number">1.5.</span> <span class="toc-text">新的问题是  这个函数”xxx”又成了全局变量也是会被污染</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐第一种"><span class="toc-number">1.5.1.</span> <span class="toc-text">推荐第一种</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#闭包的使用"><span class="toc-number">1.6.</span> <span class="toc-text">闭包的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#模块间通信-mod1想访问-mod2的变量"><span class="toc-number">1.7.</span> <span class="toc-text">模块间通信  mod1想访问 mod2的变量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#module-1-js"><span class="toc-number">1.7.1.</span> <span class="toc-text">module_1.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#module-2-js"><span class="toc-number">1.7.2.</span> <span class="toc-text">module_2.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包的使用-1"><span class="toc-number">1.7.3.</span> <span class="toc-text">闭包的使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-1-1-js"><span class="toc-number">1.8.</span> <span class="toc-text">module_1_1.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-2-2-js"><span class="toc-number">1.9.</span> <span class="toc-text">module_2_2.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MVC的V和C"><span class="toc-number">1.10.</span> <span class="toc-text">MVC的V和C</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加controller"><span class="toc-number">1.11.</span> <span class="toc-text">添加controller</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sticky-topbar-js"><span class="toc-number">1.11.1.</span> <span class="toc-text">sticky-topbar.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决this问题-使用箭头函数"><span class="toc-number">1.11.2.</span> <span class="toc-text">解决this问题 使用箭头函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#箭头函数内外this不变"><span class="toc-number">1.12.</span> <span class="toc-text">箭头函数内外this不变</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="项目引入链接如下"><a href="#项目引入链接如下" class="headerlink" title="项目引入链接如下"></a>项目引入链接如下</h2><p><a href="https://sltrust.github.io/cv/017mycv_show_animate.html" target="_blank" rel="noopener">基础版代码</a></p>
+<p><a href="https://sltrust.github.io/cv/020mycv.html" target="_blank" rel="noopener">引入轮播后</a></p>
+<p><a href="https://sltrust.github.io/cv/021mycv.html" target="_blank" rel="noopener">模块化之后</a></p>
+<p><a href="https://sltrust.github.io/cv/022mycv_mvc.html" target="_blank" rel="noopener">立即执行函数的使用避免全局污染</a></p>
+<p><a href="https://sltrust.github.io/cv/023mycv_mvc.html" target="_blank" rel="noopener">模块间通信与闭包的使用</a></p>
+<p><a href="https://sltrust.github.io/cv/024mycv_mvc.html" target="_blank" rel="noopener">初步提取view和controller</a></p>
+<p><a href="https://sltrust.github.io/cv/025mycv_mvc.html" target="_blank" rel="noopener">进阶后的vc</a></p>
+<h3 id="引入轮播"><a href="#引入轮播" class="headerlink" title="引入轮播"></a>引入轮播</h3><blockquote>
+<p>在啥都不清楚下引入 swiper </p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note036_1.png" alt></p>
+<p><a href="http://idangero.us/swiper/demos/" target="_blank" rel="noopener">swiper插件</a></p>
+<h4 id="get-Started"><a href="#get-Started" class="headerlink" title="get Started"></a>get Started</h4><ol>
+<li><p>安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install swiper //安装这个swiper 或者直接用cdn的链接</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>引入相关文件</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;link rel=&quot;stylesheet&quot; href=&quot;path/to/swiper.min.css&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;script src=&quot;path/to/swiper.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><p>添加页面模板html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- Slider main container --&gt;</span><br><span class="line">&lt;div class=&quot;swiper-container&quot;&gt;</span><br><span class="line">    &lt;!-- Additional required wrapper --&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-wrapper&quot;&gt;</span><br><span class="line">        &lt;!-- Slides --&gt;</span><br><span class="line">        &lt;div class=&quot;swiper-slide&quot;&gt;Slide 1&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;swiper-slide&quot;&gt;Slide 2&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;swiper-slide&quot;&gt;Slide 3&lt;/div&gt;</span><br><span class="line">        ...</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;!-- If we need pagination --&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-pagination&quot;&gt;&lt;/div&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- If we need navigation buttons --&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-button-prev&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-button-next&quot;&gt;&lt;/div&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- If we need scrollbar --&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-scrollbar&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>加入样式文件</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.swiper-container &#123;</span><br><span class="line">    width: 600px;</span><br><span class="line">    height: 300px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>初始化JS代码</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">var mySwiper = new Swiper (&apos;.swiper-container&apos;, &#123;</span><br><span class="line">    // Optional parameters</span><br><span class="line">    direction: &apos;vertical&apos;,</span><br><span class="line">    loop: true,</span><br><span class="line"></span><br><span class="line">    // If we need pagination</span><br><span class="line">    pagination: &#123;</span><br><span class="line">        el: &apos;.swiper-pagination&apos;,</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    // Navigation arrows</span><br><span class="line">    navigation: &#123;</span><br><span class="line">        nextEl: &apos;.swiper-button-next&apos;,</span><br><span class="line">        prevEl: &apos;.swiper-button-prev&apos;,</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    // And if we need scrollbar</span><br><span class="line">    scrollbar: &#123;</span><br><span class="line">        el: &apos;.swiper-scrollbar&apos;,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="美化你的作品集-肯定不能直接截图你的作品除非很好看"><a href="#美化你的作品集-肯定不能直接截图你的作品除非很好看" class="headerlink" title="美化你的作品集 肯定不能直接截图你的作品除非很好看"></a>美化你的作品集 肯定不能直接截图你的作品除非很好看</h4><blockquote>
+<p><a href="https://unsplash.com/" target="_blank" rel="noopener">https://unsplash.com/</a>  去这里搜你作品的关键字 一定能找到你要的精美图片</p>
+</blockquote>
+<blockquote>
+<p>注意图片的比例 如果是轮播要一致</p>
+</blockquote>
+<blockquote>
+<p>不要吝惜你原来无用的代码直接删掉</p>
+</blockquote>
+<blockquote>
+<p>不断的调修磨你的作品集样式 调到你觉得满意为止</p>
+</blockquote>
+<p><a href="https://sltrust.github.io/cv/020mycv.html" target="_blank" rel="noopener">代码链接</a></p>
+<h4 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h4><ol>
+<li><p>将style里的CSS放到一个地方 main.css</p>
+</li>
+<li><p>将如下的各个功能独立成对应的js模块</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.1.0/js/swiper.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">     var mySwiper = new Swiper (&apos;.swiper-container&apos;, &#123;</span><br><span class="line">        // Optional parameters</span><br><span class="line">        //direction: &apos;vertical&apos;,</span><br><span class="line">        loop: true,</span><br><span class="line"></span><br><span class="line">        // If we need pagination</span><br><span class="line">        pagination: &#123;</span><br><span class="line">        el: &apos;.swiper-pagination&apos;,</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        // Navigation arrows</span><br><span class="line">        navigation: &#123;</span><br><span class="line">        nextEl: &apos;.swiper-button-next&apos;,</span><br><span class="line">        prevEl: &apos;.swiper-button-prev&apos;,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    siteWelcome.classList.remove(&apos;active&apos;);</span><br><span class="line">    // setTimeout(function()&#123;</span><br><span class="line">    //     siteWelcome.classList.remove(&apos;active&apos;);</span><br><span class="line">    // &#125;,100);</span><br><span class="line"></span><br><span class="line">    //给每个模块添加偏移距离的样式    然后当页面滚到对应模块时 去除该样式</span><br><span class="line">    let specialTags = document.querySelectorAll(&apos;[data-x]&apos;);</span><br><span class="line">    for(let i=0;i&lt;specialTags.length;i++)&#123;</span><br><span class="line">        specialTags[i].classList.add(&apos;offset&apos;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    setTimeout(() =&gt; &#123;</span><br><span class="line">        yyy();</span><br><span class="line">    &#125;, 0);</span><br><span class="line"></span><br><span class="line">    window.onscroll = function()&#123;</span><br><span class="line">        //console.log(window.scrollY)</span><br><span class="line">        // 添加粘性导航</span><br><span class="line">        if(window.scrollY&gt;0)&#123;</span><br><span class="line">            topNavBar.classList.add(&apos;sticky&apos;);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            topNavBar.classList.remove(&apos;sticky&apos;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        yyy();</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function yyy()&#123;</span><br><span class="line">        //滚动到对应位置  高亮对应标签      </span><br><span class="line">        let specialTags = document.querySelectorAll(&apos;[data-x]&apos;);</span><br><span class="line">        //找到现在位置距离顶部最近的那个</span><br><span class="line">        let minIndex = 0; </span><br><span class="line">        for(let i=1;i&lt;specialTags.length;i++)&#123;</span><br><span class="line">            //console.log(specialTags[i].offsetTop)</span><br><span class="line">            if(Math.abs(specialTags[i].offsetTop -window.scrollY) &lt; Math.abs(specialTags[minIndex].offsetTop -window.scrollY))&#123;</span><br><span class="line">                minIndex = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        //每个出现的模块添加过渡效果   该元素就是离顶部最近的模块  移除偏移的样式</span><br><span class="line">        specialTags[minIndex].classList.remove(&apos;offset&apos;);</span><br><span class="line">        </span><br><span class="line">        //选中当前模块对应的a标签</span><br><span class="line">        let id = specialTags[minIndex].id;</span><br><span class="line">        let aTag = document.querySelector(&apos;a[href=&quot;#&apos;+id+&apos;&quot;]&apos;);</span><br><span class="line">        //找到aTag的爸爸 就是 li 给它加 active 同时去除其他li的active</span><br><span class="line">        let li = aTag.parentNode;</span><br><span class="line">        let aLi = li.parentNode.children;</span><br><span class="line">        for(var i=0;i&lt;aLi.length;i++)&#123;</span><br><span class="line">            // aLi[i].classList.remove(&apos;active&apos;);</span><br><span class="line">            //操作两个 样式</span><br><span class="line">            aLi[i].classList.remove(&apos;highlight&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        //li.classList.add(&apos;active&apos;);</span><br><span class="line">        li.classList.add(&apos;highlight&apos;);</span><br><span class="line">        // **解决bug的关键在于不要让两个不相干的动作操作同一个样式</span><br><span class="line">        //此时已经有bug了  </span><br><span class="line">        //  当前位置高亮了 但是 鼠标移入移出后  就不高亮了  因为移入移出和 滚动都是操作一个active</span><br><span class="line">        //滚动到技能时候 虽然选中了  但是他的列表出现了</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    //这样找只有子菜单的li有 边框效果  ==》找所有li</span><br><span class="line">    // let liTags = document.getElementsByClassName(&apos;menuTigger&apos;);</span><br><span class="line">    let liTags = document.querySelectorAll(&apos;nav.menu &gt; ul &gt; li&apos;);</span><br><span class="line">    //监听含有子菜单的topNavBar menu</span><br><span class="line">    for(let i=0;i&lt;liTags.length;i++)&#123;</span><br><span class="line">        liTags[i].onmouseenter = function(e)&#123;</span><br><span class="line">            let li = e.currentTarget;</span><br><span class="line">            li.classList.add(&apos;active&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        liTags[i].onmouseleave = function(e)&#123;</span><br><span class="line">            let li = e.currentTarget;</span><br><span class="line">            li.classList.remove(&apos;active&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function animate(time) &#123;</span><br><span class="line">        requestAnimationFrame(animate);</span><br><span class="line">        TWEEN.update(time);</span><br><span class="line">    &#125;</span><br><span class="line">    requestAnimationFrame(animate);</span><br><span class="line"></span><br><span class="line">    //监听导航菜单定位到对应位置</span><br><span class="line">    let aTags = document.querySelectorAll(&apos;nav.menu &gt; ul &gt; li &gt; a&apos;);</span><br><span class="line">    for(let i=0;i&lt;aTags.length;i++)&#123;</span><br><span class="line">        aTags[i].onclick = function(e)&#123;</span><br><span class="line">            //阻止默认行为  就是a标签的 锚点</span><br><span class="line">            e.preventDefault();</span><br><span class="line">            let a = e.currentTarget;</span><br><span class="line">            let href = a.getAttribute(&apos;href&apos;);</span><br><span class="line">            let element = document.querySelector(href);</span><br><span class="line">           </span><br><span class="line">            let top = element.offsetTop;</span><br><span class="line">            //当前位置</span><br><span class="line">            let currentTop = window.scrollY;</span><br><span class="line">            //目标点</span><br><span class="line">            let targetTop = top - 80;</span><br><span class="line">            //总路程</span><br><span class="line">            let s = targetTop - currentTop;</span><br><span class="line">            //总时间   因为路程可能是负数  但是 时间不能是负的</span><br><span class="line">            let t = Math.abs((s/100)*300);</span><br><span class="line">            t = t&gt;500?500:t;</span><br><span class="line">            var coords = &#123; x:currentTop&#125;; </span><br><span class="line">            var tween = new TWEEN.Tween(coords) </span><br><span class="line">                    .to(&#123; x: targetTop &#125;,t) </span><br><span class="line">                    .easing(TWEEN.Easing.Quadratic.Out) </span><br><span class="line">                    .onUpdate(function() &#123; </span><br><span class="line">                        window.scrollTo(0,coords.x);</span><br><span class="line">                    &#125;)</span><br><span class="line">                    .start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="模块化之后"><a href="#模块化之后" class="headerlink" title="模块化之后"></a>模块化之后</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.1.0/js/swiper.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.1.1/Tween.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;./js/init-swiper.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;./js/auto-slide-up.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;./js/sticky-topbar.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;./js/smoothly-navigation.js&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p><a href="https://sltrust.github.io/cv/021mycv.html" target="_blank" rel="noopener">代码链接</a></p>
+<h4 id="立即执行函数的使用"><a href="#立即执行函数的使用" class="headerlink" title="立即执行函数的使用"></a>立即执行函数的使用</h4><h3 id="auto-slide-up-js"><a href="#auto-slide-up-js" class="headerlink" title="auto-slide-up.js"></a>auto-slide-up.js</h3><blockquote>
+<p>里有这样一个变量 specialTags  只要在其他js里重新赋值这个js里的代码就有问题了</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">let specialTags = document.querySelectorAll(&apos;[data-x]&apos;);</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其他js文件里  specialTags = ‘我偏手贱改这个值’ 上面就废了</p>
+</blockquote>
+<h3 id="错误示范使用花括号包裹你的代码-gt-这是错的-js里没有块级作用域"><a href="#错误示范使用花括号包裹你的代码-gt-这是错的-js里没有块级作用域" class="headerlink" title="错误示范使用花括号包裹你的代码 ==&gt;这是错的 js里没有块级作用域"></a>错误示范使用花括号包裹你的代码 ==&gt;这是错的 js里没有块级作用域</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    var mySwiper = new Swiper (&apos;.swiper-container&apos;, &#123;</span><br><span class="line">       ...</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用函数作用域"><a href="#使用函数作用域" class="headerlink" title="使用函数作用域"></a>使用函数作用域</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function xxx()&#123;</span><br><span class="line">    模块的代码</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">xxx.call();</span><br></pre></td></tr></table></figure>
+<h3 id="新的问题是-这个函数”xxx”又成了全局变量也是会被污染"><a href="#新的问题是-这个函数”xxx”又成了全局变量也是会被污染" class="headerlink" title="新的问题是  这个函数”xxx”又成了全局变量也是会被污染"></a>新的问题是  这个函数”xxx”又成了全局变量也是会被污染</h3><blockquote>
+<p>匿名函数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 这样会报错  这样会报错  这样会报错 </span><br><span class="line">function()&#123;</span><br><span class="line">    模块的代码</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">  模块的代码</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<ol>
+<li>我们不想要全局变量</li>
+<li>我们要使用局部变量</li>
+<li>ES5里，只有函数有局部变量</li>
+<li>于是我们声明了一个 function xxx,然后xxx.call()</li>
+<li>这个时候xxx是全局变量(全局函数)</li>
+<li>所以我们不能给这个函数名字</li>
+<li>function(){}.call() </li>
+<li>但是chrome不支持直接这样调用会报错</li>
+<li><p>试出来一个方法可以不报错 </p>
+<h4 id="推荐第一种"><a href="#推荐第一种" class="headerlink" title="推荐第一种"></a>推荐第一种</h4><ul>
+<li>(1) !function(){}.call() 用来改变函数的返回值但是我们根本不在乎这个返回值</li>
+<li><p>(2) (function(){}).call() 在函数外面加个()</p>
+<blockquote>
+<p>第二种有bug   </p>
+</blockquote>
+</li>
+<li><p>(3) fn31231231231231212.call() 不推荐  随机数的方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a  </span><br><span class="line">()</span><br><span class="line"></span><br><span class="line">// 等价于  a()</span><br><span class="line"></span><br><span class="line">xxx </span><br><span class="line">(function()&#123;&#125;).call() 相当于调用xxx 报错  所以不推荐</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<p><a href="https://sltrust.github.io/cv/022mycv_mvc.html" target="_blank" rel="noopener">立即执行函数的使用避免全局污染</a></p>
+<h3 id="闭包的使用"><a href="#闭包的使用" class="headerlink" title="闭包的使用"></a>闭包的使用</h3><blockquote>
+<h3 id="模块间通信-mod1想访问-mod2的变量"><a href="#模块间通信-mod1想访问-mod2的变量" class="headerlink" title="模块间通信  mod1想访问 mod2的变量"></a>模块间通信  mod1想访问 mod2的变量</h3></blockquote>
+<blockquote>
+<p>js引入</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;./js3/module_1.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;./js3/module_2.js&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="module-1-js"><a href="#module-1-js" class="headerlink" title="module_1.js"></a>module_1.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var person = window.person = &#123;</span><br><span class="line">        name:&apos;hjx&apos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<h4 id="module-2-js"><a href="#module-2-js" class="headerlink" title="module_2.js"></a>module_2.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var person = window.person;</span><br><span class="line">    console.log(person);</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<h4 id="闭包的使用-1"><a href="#闭包的使用-1" class="headerlink" title="闭包的使用"></a>闭包的使用</h4><blockquote>
+<h3 id="module-1-1-js"><a href="#module-1-1-js" class="headerlink" title="module_1_1.js"></a>module_1_1.js</h3></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var person = window.person = &#123;</span><br><span class="line">        name:&apos;hjx&apos;,</span><br><span class="line">        age:18</span><br><span class="line">    &#125;</span><br><span class="line">    window.personAgeGrowUp = function()&#123;</span><br><span class="line">        person.age += 1;</span><br><span class="line">        return person.age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="module-2-2-js"><a href="#module-2-2-js" class="headerlink" title="module_2_2.js"></a>module_2_2.js</h3></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var newAge = window.personAgeGrowUp();</span><br><span class="line">    console.log(newAge)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<ol>
+<li>立即执行函数使得 person 无法被外部访问</li>
+<li>闭包使得匿名函数可以操作 person</li>
+<li>window.personAgeGrowUp 保存了匿名函数的地址</li>
+<li>任何地方都可以使用 window.personAgeGrowUp<br>=&gt;任何地方都可以使用 window.personAgeGrowUp 操作person<br> ，但是不能直接访问person</li>
+</ol>
+<p><a href="https://sltrust.github.io/cv/023mycv_mvc.html" target="_blank" rel="noopener">代码链接</a></p>
+<h3 id="MVC的V和C"><a href="#MVC的V和C" class="headerlink" title="MVC的V和C"></a>MVC的V和C</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note036_2.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--作品集的轮播   这就是view --&gt;</span><br><span class="line">&lt;div id=&quot;mySlides&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-container&quot;&gt;</span><br><span class="line">        &lt;!-- Additional required wrapper --&gt;</span><br><span class="line">        &lt;div class=&quot;swiper-wrapper&quot;&gt;</span><br><span class="line">            &lt;!-- Slides --&gt;</span><br><span class="line">            &lt;img src=&quot;./images/nav-page.jpg&quot; class=&quot;swiper-slide&quot; alt=&quot;&quot;&gt;</span><br><span class="line">            &lt;img src=&quot;./images/canvas.png&quot; class=&quot;swiper-slide&quot; alt=&quot;&quot;&gt;</span><br><span class="line">            &lt;img src=&quot;./images/slides.png&quot; class=&quot;swiper-slide&quot; alt=&quot;&quot;&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;!-- If we need pagination --&gt;</span><br><span class="line">        &lt;div class=&quot;swiper-pagination&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-button-prev&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;swiper-button-next&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    //提取view</span><br><span class="line">    var view = document.querySelector(&apos;#mySlides&apos;);</span><br><span class="line">    var mySwiper = new Swiper (view.querySelector(&apos;.swiper-container&apos;), &#123;</span><br><span class="line">            loop: true,</span><br><span class="line">            pagination: &#123;</span><br><span class="line">            el: &apos;.swiper-pagination&apos;,</span><br><span class="line">        &#125;,</span><br><span class="line">        navigation: &#123;</span><br><span class="line">            nextEl: &apos;.swiper-button-next&apos;,</span><br><span class="line">            prevEl: &apos;.swiper-button-prev&apos;,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其他的模块同样提取view </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var view = document.querySelector(&apos;#topNavBar&apos;);</span><br><span class="line">    window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">        if(window.scrollY&gt;0)&#123;</span><br><span class="line">            view.classList.add(&apos;sticky&apos;);</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<h3 id="添加controller"><a href="#添加controller" class="headerlink" title="添加controller"></a>添加controller</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var view = document.querySelector(&apos;#topNavBar&apos;);</span><br><span class="line">    var controller = function(view)&#123;</span><br><span class="line">        window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">            if(window.scrollY&gt;0)&#123;</span><br><span class="line">                view.classList.add(&apos;sticky&apos;);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    controller.call(null,view)</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其余模块同上</p>
+</blockquote>
+<p><a href="https://sltrust.github.io/cv/024mycv_mvc.html" target="_blank" rel="noopener">代码链接</a></p>
+<h4 id="sticky-topbar-js"><a href="#sticky-topbar-js" class="headerlink" title="sticky-topbar.js"></a>sticky-topbar.js</h4><blockquote>
+<p>初级版<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var view = document.querySelector(&apos;#topNavBar&apos;);</span><br><span class="line">    var controller = function(view)&#123;</span><br><span class="line">        window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">            if(window.scrollY&gt;0)&#123;</span><br><span class="line">                view.classList.add(&apos;sticky&apos;);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    controller.call(null,view);</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>进阶一点</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">var controller = &#123;</span><br><span class="line">    view:null,</span><br><span class="line">    init:function(view)&#123;</span><br><span class="line">        this.view = view;</span><br><span class="line">        window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">            if(window.scrollY&gt;0)&#123;</span><br><span class="line">                view.classList.add(&apos;sticky&apos;);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">controller.init.call(null,view);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>再次进阶一点点 bindEvents里面的this有问题传递的是window</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var controller = &#123;</span><br><span class="line">    view:null,</span><br><span class="line">    init:function(view)&#123;</span><br><span class="line">        this.view = view;</span><br><span class="line">        this.bindEvents();</span><br><span class="line">        //this.bindEvents.call(this)</span><br><span class="line">    &#125;,</span><br><span class="line">    bindEvents:function()&#123;</span><br><span class="line">        var view = this.view;</span><br><span class="line">        window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">            if(window.scrollY&gt;0)&#123;</span><br><span class="line">                view.classList.add(&apos;sticky&apos;);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">controller.init.call(null,view);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>再次进阶一点点2 bindEvents里面的this有问题传递的是window</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    var view = document.querySelector(&apos;#topNavBar&apos;);</span><br><span class="line">    var controller = &#123;</span><br><span class="line">        view:null,</span><br><span class="line">        init:function(view)&#123;</span><br><span class="line">            this.view = view;</span><br><span class="line">            this.bindEvents();</span><br><span class="line">            //this.bindEvents.call(this)</span><br><span class="line">        &#125;,</span><br><span class="line">        bindEvents:function()&#123;</span><br><span class="line">            var view = this.view;</span><br><span class="line">            window.addEventListener(&apos;scroll&apos;,function()&#123;</span><br><span class="line">                console.log(this)</span><br><span class="line">                var view = this.view;</span><br><span class="line">                if(window.scrollY&gt;0)&#123;</span><br><span class="line">                    this.active();</span><br><span class="line">                &#125;else&#123;</span><br><span class="line">                    this.deactive();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).bind(this);</span><br><span class="line">            //箭头函数没有this</span><br><span class="line">        &#125;,</span><br><span class="line">        active:function()&#123;</span><br><span class="line">            this.view.classList.add(&apos;sticky&apos;);</span><br><span class="line">        &#125;,</span><br><span class="line">        deactive:function()&#123;</span><br><span class="line">            view.classList.remove(&apos;sticky&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    controller.init(view);</span><br><span class="line">&#125;.call()</span><br></pre></td></tr></table></figure>
+<h4 id="解决this问题-使用箭头函数"><a href="#解决this问题-使用箭头函数" class="headerlink" title="解决this问题 使用箭头函数"></a>解决this问题 使用箭头函数</h4><blockquote>
+<p>示例代码 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var f = ()=&gt; console.log(this);</span><br><span class="line"></span><br><span class="line">f() //window</span><br><span class="line">f.call(&#123;name:&apos;hjx&apos;&#125;) // window</span><br></pre></td></tr></table></figure>
+<h3 id="箭头函数内外this不变"><a href="#箭头函数内外this不变" class="headerlink" title="箭头函数内外this不变"></a>箭头函数内外this不变</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">bindEvents:function()&#123;</span><br><span class="line">    var view = this.view;</span><br><span class="line">    window.addEventListener(&apos;scroll&apos;,()=&gt;&#123;</span><br><span class="line">        if(window.scrollY&gt;0)&#123;</span><br><span class="line">            this.active();</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            this.deactive();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    //箭头函数没有this</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://sltrust.github.io/cv/025mycv_mvc.html" target="_blank" rel="noopener">代码链接</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2017/12/08/N036_MVC之VC/" data-title="MVC之VC | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2017/12/09/N037_CRM之从零搭建一个数据库系统/" title="CRM之从零搭建一个数据库系统">
+  <strong>上一篇：</strong><br/>
+  <span>
+  CRM之从零搭建一个数据库系统</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/12/07/N035_自己实现AJAX/"  title="自己实现AJAX">
+ <strong>下一篇：</strong><br/> 
+ <span>自己实现AJAX
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#项目引入链接如下"><span class="toc-number">1.</span> <span class="toc-text">项目引入链接如下</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#引入轮播"><span class="toc-number">1.1.</span> <span class="toc-text">引入轮播</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#get-Started"><span class="toc-number">1.1.1.</span> <span class="toc-text">get Started</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#美化你的作品集-肯定不能直接截图你的作品除非很好看"><span class="toc-number">1.1.2.</span> <span class="toc-text">美化你的作品集 肯定不能直接截图你的作品除非很好看</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模块化"><span class="toc-number">1.1.3.</span> <span class="toc-text">模块化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模块化之后"><span class="toc-number">1.1.4.</span> <span class="toc-text">模块化之后</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#立即执行函数的使用"><span class="toc-number">1.1.5.</span> <span class="toc-text">立即执行函数的使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auto-slide-up-js"><span class="toc-number">1.2.</span> <span class="toc-text">auto-slide-up.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#错误示范使用花括号包裹你的代码-gt-这是错的-js里没有块级作用域"><span class="toc-number">1.3.</span> <span class="toc-text">错误示范使用花括号包裹你的代码 ==&gt;这是错的 js里没有块级作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用函数作用域"><span class="toc-number">1.4.</span> <span class="toc-text">使用函数作用域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新的问题是-这个函数”xxx”又成了全局变量也是会被污染"><span class="toc-number">1.5.</span> <span class="toc-text">新的问题是  这个函数”xxx”又成了全局变量也是会被污染</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐第一种"><span class="toc-number">1.5.1.</span> <span class="toc-text">推荐第一种</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#闭包的使用"><span class="toc-number">1.6.</span> <span class="toc-text">闭包的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#模块间通信-mod1想访问-mod2的变量"><span class="toc-number">1.7.</span> <span class="toc-text">模块间通信  mod1想访问 mod2的变量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#module-1-js"><span class="toc-number">1.7.1.</span> <span class="toc-text">module_1.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#module-2-js"><span class="toc-number">1.7.2.</span> <span class="toc-text">module_2.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#闭包的使用-1"><span class="toc-number">1.7.3.</span> <span class="toc-text">闭包的使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-1-1-js"><span class="toc-number">1.8.</span> <span class="toc-text">module_1_1.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-2-2-js"><span class="toc-number">1.9.</span> <span class="toc-text">module_2_2.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MVC的V和C"><span class="toc-number">1.10.</span> <span class="toc-text">MVC的V和C</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#添加controller"><span class="toc-number">1.11.</span> <span class="toc-text">添加controller</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sticky-topbar-js"><span class="toc-number">1.11.1.</span> <span class="toc-text">sticky-topbar.js</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决this问题-使用箭头函数"><span class="toc-number">1.11.2.</span> <span class="toc-text">解决this问题 使用箭头函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#箭头函数内外this不变"><span class="toc-number">1.12.</span> <span class="toc-text">箭头函数内外this不变</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

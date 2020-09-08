@@ -1,0 +1,540 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Java-011-03Queue实现 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Queue123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-011-03Queue实现">
+<meta property="og:url" content="http://yoursite.com/2019/05/17/Java-011-03Queue实现/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Queue123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java-011-03Queue实现">
+<meta name="twitter:description" content="Queue123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/05/17/Java-011-03Queue实现/" title="Java-011-03Queue实现" itemprop="url">Java-011-03Queue实现</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-05-17T15:22:52.000Z" itemprop="datePublished"> Published 2019-05-17</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Queue"><span class="toc-number">1.</span> <span class="toc-text">Queue</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="Queue"><a href="#Queue" class="headerlink" title="Queue"></a>Queue</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br></pre></td><td class="code"><pre><span class="line">/******************************************************************************</span><br><span class="line"> *  Compilation:  javac Queue.java</span><br><span class="line"> *  Execution:    java Queue &lt; input.txt</span><br><span class="line"> *  Dependencies: StdIn.java StdOut.java</span><br><span class="line"> *  Data files:   https://algs4.cs.princeton.edu/13stacks/tobe.txt  </span><br><span class="line"> *</span><br><span class="line"> *  A generic queue, implemented using a linked list.</span><br><span class="line"> *</span><br><span class="line"> *  % java Queue &lt; tobe.txt </span><br><span class="line"> *  to be or not to be (2 left on queue)</span><br><span class="line"> *</span><br><span class="line"> ******************************************************************************/</span><br><span class="line"></span><br><span class="line">package edu.princeton.cs.algs4;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.NoSuchElementException;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> *  The &#123;@code Queue&#125; class represents a first-in-first-out (FIFO)</span><br><span class="line"> *  queue of generic items.</span><br><span class="line"> *  It supports the usual &lt;em&gt;enqueue&lt;/em&gt; and &lt;em&gt;dequeue&lt;/em&gt;</span><br><span class="line"> *  operations, along with methods for peeking at the first item,</span><br><span class="line"> *  testing if the queue is empty, and iterating through</span><br><span class="line"> *  the items in FIFO order.</span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  This implementation uses a singly linked list with a static nested class for</span><br><span class="line"> *  linked-list nodes. See &#123;@link LinkedQueue&#125; for the version from the</span><br><span class="line"> *  textbook that uses a non-static nested class.</span><br><span class="line"> *  See &#123;@link ResizingArrayQueue&#125; for a version that uses a resizing array.</span><br><span class="line"> *  The &lt;em&gt;enqueue&lt;/em&gt;, &lt;em&gt;dequeue&lt;/em&gt;, &lt;em&gt;peek&lt;/em&gt;, &lt;em&gt;size&lt;/em&gt;, and &lt;em&gt;is-empty&lt;/em&gt;</span><br><span class="line"> *  operations all take constant time in the worst case.</span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  For additional documentation, see &lt;a href=&quot;https://algs4.cs.princeton.edu/13stacks&quot;&gt;Section 1.3&lt;/a&gt; of</span><br><span class="line"> *  &lt;i&gt;Algorithms, 4th Edition&lt;/i&gt; by Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  @author Robert Sedgewick</span><br><span class="line"> *  @author Kevin Wayne</span><br><span class="line"> *</span><br><span class="line"> *  @param &lt;Item&gt; the generic type of an item in this queue</span><br><span class="line"> */</span><br><span class="line">public class Queue&lt;Item&gt; implements Iterable&lt;Item&gt; &#123;</span><br><span class="line">    private Node&lt;Item&gt; first;    // beginning of queue</span><br><span class="line">    private Node&lt;Item&gt; last;     // end of queue</span><br><span class="line">    private int n;               // number of elements on queue</span><br><span class="line"></span><br><span class="line">    // helper linked list class</span><br><span class="line">    private static class Node&lt;Item&gt; &#123;</span><br><span class="line">        private Item item;</span><br><span class="line">        private Node&lt;Item&gt; next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Initializes an empty queue.</span><br><span class="line">     */</span><br><span class="line">    public Queue() &#123;</span><br><span class="line">        first = null;</span><br><span class="line">        last  = null;</span><br><span class="line">        n = 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns true if this queue is empty.</span><br><span class="line">     *</span><br><span class="line">     * @return &#123;@code true&#125; if this queue is empty; &#123;@code false&#125; otherwise</span><br><span class="line">     */</span><br><span class="line">    public boolean isEmpty() &#123;</span><br><span class="line">        return first == null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the number of items in this queue.</span><br><span class="line">     *</span><br><span class="line">     * @return the number of items in this queue</span><br><span class="line">     */</span><br><span class="line">    public int size() &#123;</span><br><span class="line">        return n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the item least recently added to this queue.</span><br><span class="line">     *</span><br><span class="line">     * @return the item least recently added to this queue</span><br><span class="line">     * @throws NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item peek() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        return first.item;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Adds the item to this queue.</span><br><span class="line">     *</span><br><span class="line">     * @param  item the item to add</span><br><span class="line">     */</span><br><span class="line">    public void enqueue(Item item) &#123;</span><br><span class="line">        Node&lt;Item&gt; oldlast = last;</span><br><span class="line">        last = new Node&lt;Item&gt;();</span><br><span class="line">        last.item = item;</span><br><span class="line">        last.next = null;</span><br><span class="line">        if (isEmpty()) first = last;</span><br><span class="line">        else           oldlast.next = last;</span><br><span class="line">        n++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Removes and returns the item on this queue that was least recently added.</span><br><span class="line">     *</span><br><span class="line">     * @return the item on this queue that was least recently added</span><br><span class="line">     * @throws NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item dequeue() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        Item item = first.item;</span><br><span class="line">        first = first.next;</span><br><span class="line">        n--;</span><br><span class="line">        if (isEmpty()) last = null;   // to avoid loitering</span><br><span class="line">        return item;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns a string representation of this queue.</span><br><span class="line">     *</span><br><span class="line">     * @return the sequence of items in FIFO order, separated by spaces</span><br><span class="line">     */</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        StringBuilder s = new StringBuilder();</span><br><span class="line">        for (Item item : this) &#123;</span><br><span class="line">            s.append(item);</span><br><span class="line">            s.append(&apos; &apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        return s.toString();</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns an iterator that iterates over the items in this queue in FIFO order.</span><br><span class="line">     *</span><br><span class="line">     * @return an iterator that iterates over the items in this queue in FIFO order</span><br><span class="line">     */</span><br><span class="line">    public Iterator&lt;Item&gt; iterator()  &#123;</span><br><span class="line">        return new ListIterator&lt;Item&gt;(first);  </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // an iterator, doesn&apos;t implement remove() since it&apos;s optional</span><br><span class="line">    private class ListIterator&lt;Item&gt; implements Iterator&lt;Item&gt; &#123;</span><br><span class="line">        private Node&lt;Item&gt; current;</span><br><span class="line"></span><br><span class="line">        public ListIterator(Node&lt;Item&gt; first) &#123;</span><br><span class="line">            current = first;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        public boolean hasNext()  &#123; return current != null;                     &#125;</span><br><span class="line">        public void remove()      &#123; throw new UnsupportedOperationException();  &#125;</span><br><span class="line"></span><br><span class="line">        public Item next() &#123;</span><br><span class="line">            if (!hasNext()) throw new NoSuchElementException();</span><br><span class="line">            Item item = current.item;</span><br><span class="line">            current = current.next; </span><br><span class="line">            return item;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Unit tests the &#123;@code Queue&#125; data type.</span><br><span class="line">     *</span><br><span class="line">     * @param args the command-line arguments</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Queue&lt;String&gt; queue = new Queue&lt;String&gt;();</span><br><span class="line">        while (!StdIn.isEmpty()) &#123;</span><br><span class="line">            String item = StdIn.readString();</span><br><span class="line">            if (!item.equals(&quot;-&quot;))</span><br><span class="line">                queue.enqueue(item);</span><br><span class="line">            else if (!queue.isEmpty())</span><br><span class="line">                StdOut.print(queue.dequeue() + &quot; &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        StdOut.println(&quot;(&quot; + queue.size() + &quot; left on queue)&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/******************************************************************************</span><br><span class="line"> *  Copyright 2002-2018, Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  This file is part of algs4.jar, which accompanies the textbook</span><br><span class="line"> *</span><br><span class="line"> *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,</span><br><span class="line"> *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.</span><br><span class="line"> *      http://algs4.cs.princeton.edu</span><br><span class="line"> *</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is free software: you can redistribute it and/or modify</span><br><span class="line"> *  it under the terms of the GNU General Public License as published by</span><br><span class="line"> *  the Free Software Foundation, either version 3 of the License, or</span><br><span class="line"> *  (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is distributed in the hope that it will be useful,</span><br><span class="line"> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> *  GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> *  You should have received a copy of the GNU General Public License</span><br><span class="line"> *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.</span><br><span class="line"> ******************************************************************************/</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/05/17/Java-011-03Queue实现/" data-title="Java-011-03Queue实现 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/05/17/Java-011-04LinkedQueue实现/" title="Java-011-04LinkedQueue实现">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Java-011-04LinkedQueue实现</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/05/17/Java-011-02LinkedStack实现/"  title="Java-011-02LinkedStack实现">
+ <strong>下一篇：</strong><br/> 
+ <span>Java-011-02LinkedStack实现
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Queue"><span class="toc-number">1.</span> <span class="toc-text">Queue</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

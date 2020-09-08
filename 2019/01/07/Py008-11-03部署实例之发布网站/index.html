@@ -1,0 +1,582 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py008-11-03部署实例之发布网站 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="部署web发布环境我们先前已经安装了 nginx/mysql/python/django 但是仍然不能算完成  因为nginx只能处理 静态文件   处理python的数据要使用其他模块   wsgi uwsgi   安装 UWSGI UWSGI是服务器和服务器端应用程序通信协议，规定了如何把请求转发给应用程序和返回 uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。">
+<meta name="keywords" content="M08">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py008-11-03部署实例之发布网站">
+<meta property="og:url" content="http://yoursite.com/2019/01/07/Py008-11-03部署实例之发布网站/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="部署web发布环境我们先前已经安装了 nginx/mysql/python/django 但是仍然不能算完成  因为nginx只能处理 静态文件   处理python的数据要使用其他模块   wsgi uwsgi   安装 UWSGI UWSGI是服务器和服务器端应用程序通信协议，规定了如何把请求转发给应用程序和返回 uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.309Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py008-11-03部署实例之发布网站">
+<meta name="twitter:description" content="部署web发布环境我们先前已经安装了 nginx/mysql/python/django 但是仍然不能算完成  因为nginx只能处理 静态文件   处理python的数据要使用其他模块   wsgi uwsgi   安装 UWSGI UWSGI是服务器和服务器端应用程序通信协议，规定了如何把请求转发给应用程序和返回 uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/07/Py008-11-03部署实例之发布网站/" title="Py008-11-03部署实例之发布网站" itemprop="url">Py008-11-03部署实例之发布网站</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-07T14:11:35.000Z" itemprop="datePublished"> Published 2019-01-07</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#部署web发布环境"><span class="toc-number">1.</span> <span class="toc-text">部署web发布环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装-UWSGI"><span class="toc-number">2.</span> <span class="toc-text">安装 UWSGI</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#管理-uwsgi服务"><span class="toc-number">2.1.</span> <span class="toc-text">管理 uwsgi服务</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#发布我们的网站"><span class="toc-number">3.</span> <span class="toc-text">发布我们的网站</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#此时-访问-我的ip结果返回-Internal-Server-Error-报错了"><span class="toc-number">3.1.</span> <span class="toc-text">此时 访问  我的ip结果返回 Internal Server Error  报错了</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="部署web发布环境"><a href="#部署web发布环境" class="headerlink" title="部署web发布环境"></a>部署web发布环境</h3><p>我们先前已经安装了 nginx/mysql/python/django</p>
+<p>但是仍然不能算完成</p>
+<ul>
+<li>因为nginx只能处理 静态文件</li>
+</ul>
+<blockquote>
+<p>处理python的数据要使用其他模块</p>
+</blockquote>
+<ul>
+<li>wsgi</li>
+<li>uwsgi </li>
+</ul>
+<h3 id="安装-UWSGI"><a href="#安装-UWSGI" class="headerlink" title="安装 UWSGI"></a>安装 UWSGI</h3><ul>
+<li>UWSGI是服务器和服务器端应用程序通信协议，规定了如何把请求转发给应用程序和返回</li>
+<li>uWSGI是一个Web服务器，它实现了WSGI协议、uwsgi、http等协议。Nginx中HttpUwsgiModule的作用是与uWSGI服务器进⾏交换。</li>
+<li>nginx 和 uWSGI交互就必须使⽤同一个协议，而上⾯说了uwsgi支持fastcgi,uwsgi,http协议，这些都是nginx⽀持的协议，只要大家沟通好使用哪个协议，就可以正常运行了。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install uwsgi</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>编辑uwsgi配置⽂文件!</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"># 新建目录</span><br><span class="line">mkdir /etc/uwsgi</span><br><span class="line"></span><br><span class="line">vi /etc/uwsgi/uwsgi.ini</span><br><span class="line"># 内容如下</span><br><span class="line">[uwsgi]</span><br><span class="line">uid = root</span><br><span class="line">gid = root</span><br><span class="line">socket = 127.0.0.1:9090</span><br><span class="line">master = true //启动主进程</span><br><span class="line">vhost = true //多站模式</span><br><span class="line">no-site = true //多站模式时不设置⼊口模块和⽂文件</span><br><span class="line">workers = 2 //⼦进程数</span><br><span class="line">reload-mercy = 10 //平滑的重启 </span><br><span class="line">vacuum = true //退出、重启时清理文件</span><br><span class="line">max-requests = 1000 //开启10000个进程后, ⾃动respawn下 </span><br><span class="line">limit-as = 512 // 将进程的总内存量控制在512M </span><br><span class="line">buffer-size = 30000  </span><br><span class="line">pidfile = /var/run/uwsgi9090.pid //pid⽂文件，⽤于下面的脚本启动、停止该进程 </span><br><span class="line">daemonize = /var/log/uwsgi9090.log</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 移除注释</span><br><span class="line">[uwsgi]</span><br><span class="line">uid = root</span><br><span class="line">gid = root</span><br><span class="line">socket = 127.0.0.1:9090</span><br><span class="line">master = true </span><br><span class="line">vhost = true </span><br><span class="line">no-site = true </span><br><span class="line">workers = 2 </span><br><span class="line">reload-mercy = 10 </span><br><span class="line">vacuum = true </span><br><span class="line">max-requests = 1000  </span><br><span class="line">limit-as = 512  </span><br><span class="line">buffer-size = 30000  </span><br><span class="line">pidfile = /var/run/uwsgi9090.pid  </span><br><span class="line">daemonize = /var/log/uwsgi9090.log</span><br><span class="line"></span><br><span class="line"># 启动uwsgi</span><br><span class="line">uwsgi --ini /etc/uwsgi/uwsgi.int</span><br><span class="line"></span><br><span class="line"># 验证是否启动</span><br><span class="line">netstat -ntpl</span><br><span class="line"></span><br><span class="line"># 如何关闭 uwsgi</span><br><span class="line"># 获取进程号</span><br><span class="line">cat /var/run/uwsgi9090.pid</span><br><span class="line"># 进程号</span><br><span class="line">10111</span><br><span class="line"># 杀掉进程</span><br><span class="line">kill -9  10111</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="管理-uwsgi服务"><a href="#管理-uwsgi服务" class="headerlink" title="管理 uwsgi服务"></a>管理 uwsgi服务</h4></blockquote>
+<p>一个脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/init.d/uwsgi</span><br></pre></td></tr></table></figure>
+<p>内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">  DESC=&quot;uwsgi daemon&quot;</span><br><span class="line">  NAME=uwsgi</span><br><span class="line">  DAEMON=/usr/local/bin/uwsgi</span><br><span class="line">  CONFIGFILE=/etc/uwsgi/$NAME.ini</span><br><span class="line">  PIDFILE=/var/run/$NAME.pid</span><br><span class="line">  SCRIPTNAME=/etc/init.d/$NAME</span><br><span class="line">  FIFOFILE=/tmp/uwsgififo</span><br><span class="line">  set -e</span><br><span class="line">  [ -x &quot;$DAEMON&quot; ] || exit 0</span><br><span class="line">do_start() &#123;</span><br><span class="line">    if [ ! -f $PIDFILE ];then</span><br><span class="line">        $DAEMON $CONFIGFILE || echo -n &quot;uwsgi  running&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;The PID is exist...&quot;</span><br><span class="line">        fi</span><br><span class="line">&#125;</span><br><span class="line">do_stop() &#123;</span><br><span class="line">    if [ -f $PIDFILE ];then</span><br><span class="line">        $DAEMON --stop $PIDFILE || echo -n &quot;uwsgi not running&quot;</span><br><span class="line">        rm -f $PIDFILE</span><br><span class="line">        echo &quot;$DAEMON STOPED.&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;The $PIDFILE doesn&apos;t found&quot;</span><br><span class="line">    fi </span><br><span class="line">&#125;</span><br><span class="line">do_reload() &#123;</span><br><span class="line">    if [ -p $FIFOFILE ];then</span><br><span class="line">        echo w &gt; $FIFOFILE</span><br><span class="line">    else</span><br><span class="line">        $DAEMON --touch-workers-reload $PIDFILE || echo -n &quot;uwsgi</span><br><span class="line">        can&apos;t reload&quot;</span><br><span class="line">    fi </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">do_status() &#123;</span><br><span class="line">    ps aux|grep $DAEMON</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">case &quot;$1&quot; in</span><br><span class="line">status)</span><br><span class="line">    echo -en &quot;Status $NAME: \n&quot;</span><br><span class="line">    do_status </span><br><span class="line">;;</span><br><span class="line">start)</span><br><span class="line">    echo -en &quot;Starting $NAME: \n&quot;</span><br><span class="line">    do_start</span><br><span class="line">;; </span><br><span class="line">stop)</span><br><span class="line">    echo -en &quot;Stopping $NAME: \n&quot;</span><br><span class="line">    do_stop </span><br><span class="line">;;</span><br><span class="line">reload|graceful)</span><br><span class="line">    echo -en &quot;Reloading $NAME: \n&quot;</span><br><span class="line">    do_reload</span><br><span class="line">;; </span><br><span class="line">*)</span><br><span class="line">    echo &quot;Usage: $SCRIPTNAME &#123;start|stop|reload&#125;&quot; &gt;&amp;2</span><br><span class="line">    exit 3 </span><br><span class="line">;;</span><br><span class="line">esac </span><br><span class="line">exit 0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分配执行权限</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">chmod 755 /etc/init.d/uwsgi </span><br><span class="line"></span><br><span class="line"># 查看状态</span><br><span class="line">/etc/init.d/uwsgi status</span><br><span class="line"># 启动</span><br><span class="line">/etc/init.d/uwsgi start</span><br><span class="line"># 关闭</span><br><span class="line">/etc/init.d/uwsgi stop</span><br><span class="line"></span><br><span class="line"># 关闭的时候可能会报错 </span><br><span class="line">因为 PIDFILE=/var/run/$NAME.pid 里指定的文件 </span><br><span class="line">我们配置的时候改了 pidfile = /var/run/uwsgi9090.pid  </span><br><span class="line">PIDFILE=/var/run/$&#123;NAME&#125;9090.pid</span><br></pre></td></tr></table></figure>
+<h3 id="发布我们的网站"><a href="#发布我们的网站" class="headerlink" title="发布我们的网站"></a>发布我们的网站</h3><blockquote>
+<p>修改nginx</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/local/nginx/conf/nginx.conf</span><br><span class="line"></span><br><span class="line"># 将 server 里的内容删掉 最后如下</span><br><span class="line">server &#123;</span><br><span class="line">        listen       80;</span><br><span class="line">        server_name  localhost;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 将server修改如下</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line">    #access_log   logs/abc.log main;</span><br><span class="line">    location / &#123;</span><br><span class="line">        include  uwsgi_params;</span><br><span class="line">        uwsgi_pass  127.0.0.1:9090;</span><br><span class="line">        uwsgi_param UWSGI_SCRIPT myweb.wsgi;</span><br><span class="line">        uwsgi_param UWSGI_CHDIR  /usr/local/nginx/html/myweb;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">        client_max_body_size 35m;</span><br><span class="line">        #uwsgi_cache_valid 1m;</span><br><span class="line">        #uwsgi_temp_file_write_size 64k;</span><br><span class="line">        #uwsgi_busy_buffers_size 64k;</span><br><span class="line">        #uwsgi_buffers 8 64k;</span><br><span class="line">        #uwsgi_buffer_size 64k;</span><br><span class="line">        #uwsgi_read_timeout 300;</span><br><span class="line">        #uwsgi_send_timeout 300;</span><br><span class="line">        #uwsgi_connect_timeout 300;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 注释部分为优化方案</span><br><span class="line"># include  uwsgi_params; 包含 uwsgi的参数</span><br><span class="line"># 设置端口  uwsgi_pass  127.0.0.1:9090;</span><br><span class="line"># 设置目录  uwsgi_param UWSGI_SCRIPT myweb.wsgi;</span><br><span class="line"># 设置目录(注意不能在root下 没权限)  uwsgi_param UWSGI_CHDIR  /usr/local/nginx/html/myweb;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>移动我们之前创建的 django项目 到 nginx下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mv myweb  /usr/local/nginx/html/</span><br><span class="line"></span><br><span class="line"># 先关闭nginx</span><br><span class="line">/etc/init.d/uwsgi stop</span><br><span class="line"># 启动 nginx</span><br><span class="line">/etc/init.d/uwsgi start</span><br><span class="line"></span><br><span class="line"># 启动nginx</span><br><span class="line">/usr/local/nginx/sbin/nginx</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="此时-访问-我的ip结果返回-Internal-Server-Error-报错了"><a href="#此时-访问-我的ip结果返回-Internal-Server-Error-报错了" class="headerlink" title="此时 访问  我的ip结果返回 Internal Server Error  报错了"></a>此时 访问  我的ip结果返回 Internal Server Error  报错了</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"># 切换到项目文件目录里</span><br><span class="line">cd /usr/local/nginx/html</span><br><span class="line"></span><br><span class="line"># 查看日志</span><br><span class="line">tailf /var/log/uwsgi9090.log</span><br><span class="line"></span><br><span class="line"># 浏览器里刷新 地址看看日志显示什么</span><br><span class="line">No module named &apos;django&apos;</span><br><span class="line"></span><br><span class="line"># 意思是  你没有指定python对应的环境</span><br><span class="line">vi /etc/uwsgi/uwsgi.ini</span><br><span class="line"></span><br><span class="line"># 查看 python包环境</span><br><span class="line">ls /usr/local/lib/python3.7/site-packages</span><br><span class="line">发现没有django</span><br><span class="line"></span><br><span class="line"># 因为我们安装在虚拟环境了  就是 虚拟环境的 web</span><br><span class="line">切换到web目录  我的是在 /usr/local/src/web</span><br><span class="line">cd lib/python3.7</span><br><span class="line"></span><br><span class="line">ls /usr/local/src/web/lib/python3.7/site-packages</span><br><span class="line">里面有我们安装的django</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#####################################</span><br><span class="line"># 修改我们的uwsgi配置文件</span><br><span class="line"># 添加一行</span><br><span class="line">pythonpath = /usr/local/src/web/lib/python3.7/site-packages</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">######################################</span><br><span class="line"># 关闭uwsgi</span><br><span class="line">/etc/init.d/uwsgi stop</span><br><span class="line"># 启动</span><br><span class="line">/etc/init.d/uwsgi start</span><br><span class="line"></span><br><span class="line"># 然后刷新网页 访问你的服务器ip</span><br><span class="line">这个是假的IP</span><br><span class="line">50.77.161.112</span><br><span class="line"></span><br><span class="line">### 成功</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M08/">M08</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/01/07/Py008-11-03部署实例之发布网站/" data-title="Py008-11-03部署实例之发布网站 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/01/09/React入门001之React诞生/" title="React入门001之React诞生">
+  <strong>上一篇：</strong><br/>
+  <span>
+  React入门001之React诞生</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/01/07/Py008-11-02部署实例之安装python/"  title="Py008-11-02部署实例之安装python">
+ <strong>下一篇：</strong><br/> 
+ <span>Py008-11-02部署实例之安装python
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#部署web发布环境"><span class="toc-number">1.</span> <span class="toc-text">部署web发布环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装-UWSGI"><span class="toc-number">2.</span> <span class="toc-text">安装 UWSGI</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#管理-uwsgi服务"><span class="toc-number">2.1.</span> <span class="toc-text">管理 uwsgi服务</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#发布我们的网站"><span class="toc-number">3.</span> <span class="toc-text">发布我们的网站</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#此时-访问-我的ip结果返回-Internal-Server-Error-报错了"><span class="toc-number">3.1.</span> <span class="toc-text">此时 访问  我的ip结果返回 Internal Server Error  报错了</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

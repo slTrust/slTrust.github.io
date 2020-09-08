@@ -1,0 +1,617 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>P013_01_python迭代器 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="迭代器初识123456789a = [1,2,3]# 索引# 循环forfor i in a:    print(i)for k in dic:    pass  list dic str set tuple f = open()文件 range() enumerate  迭代器的概念 先来一个小知识点，查看一个对象可用的方法 dir  dir(对象) 1234print(dir([])) #告诉">
+<meta name="keywords" content="fullstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P013_01_python迭代器">
+<meta property="og:url" content="http://yoursite.com/2018/07/24/P013_01_python迭代器和生成器/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="迭代器初识123456789a = [1,2,3]# 索引# 循环forfor i in a:    print(i)for k in dic:    pass  list dic str set tuple f = open()文件 range() enumerate  迭代器的概念 先来一个小知识点，查看一个对象可用的方法 dir  dir(对象) 1234print(dir([])) #告诉">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.275Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="P013_01_python迭代器">
+<meta name="twitter:description" content="迭代器初识123456789a = [1,2,3]# 索引# 循环forfor i in a:    print(i)for k in dic:    pass  list dic str set tuple f = open()文件 range() enumerate  迭代器的概念 先来一个小知识点，查看一个对象可用的方法 dir  dir(对象) 1234print(dir([])) #告诉">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/24/P013_01_python迭代器和生成器/" title="P013_01_python迭代器" itemprop="url">P013_01_python迭代器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-24T11:42:30.000Z" itemprop="datePublished"> Published 2018-07-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代器初识"><span class="toc-number">1.</span> <span class="toc-text">迭代器初识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代器的概念"><span class="toc-number">2.</span> <span class="toc-text">迭代器的概念</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#一个列表执行了iter-之后的返回值就是一个迭代器"><span class="toc-number">2.1.</span> <span class="toc-text">一个列表执行了iter()之后的返回值就是一个迭代器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器的概念-1"><span class="toc-number">2.2.</span> <span class="toc-text">迭代器的概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器协议和可迭代协议"><span class="toc-number">2.3.</span> <span class="toc-text">迭代器协议和可迭代协议</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#for循环的本质"><span class="toc-number">2.4.</span> <span class="toc-text">for循环的本质</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器的好处："><span class="toc-number">2.5.</span> <span class="toc-text">迭代器的好处：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#生成器"><span class="toc-number">3.</span> <span class="toc-text">生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器函数"><span class="toc-number">3.1.</span> <span class="toc-text">生成器函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器函数-：-执行之后会得到一个生成器作为返回值"><span class="toc-number">3.2.</span> <span class="toc-text">生成器函数 ： 执行之后会得到一个生成器作为返回值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器真的省内存吗？"><span class="toc-number">3.3.</span> <span class="toc-text">生成器真的省内存吗？</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="迭代器初识"><a href="#迭代器初识" class="headerlink" title="迭代器初识"></a>迭代器初识</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = [1,2,3]</span><br><span class="line"># 索引</span><br><span class="line"># 循环for</span><br><span class="line"></span><br><span class="line">for i in a:</span><br><span class="line">    print(i)</span><br><span class="line"></span><br><span class="line">for k in dic:</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+<ul>
+<li>list</li>
+<li>dic</li>
+<li>str</li>
+<li>set</li>
+<li>tuple</li>
+<li>f = open()文件</li>
+<li>range()</li>
+<li>enumerate</li>
+</ul>
+<h3 id="迭代器的概念"><a href="#迭代器的概念" class="headerlink" title="迭代器的概念"></a>迭代器的概念</h3><blockquote>
+<p>先来一个小知识点，查看一个对象可用的方法 dir</p>
+</blockquote>
+<p>dir(对象)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(dir([])) #告诉我列表拥有的方法</span><br><span class="line">print(dir(&#123;&#125;)) #告诉我字典拥有的方法</span><br><span class="line">print(dir(&apos;&apos;)) #告诉我字符串拥有的方法</span><br><span class="line">print(dir(range(10))) #告诉我range(10)拥有的方法</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们知道数组相加如下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[1] + [2] # [1,2]</span><br><span class="line">实际上就是调用  [1].__add__([2])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>找这些能被for循环使用的方法的交集</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 取这些可被for循环的数据类型的交集</span><br><span class="line">ret = set(dir([]))&amp;set(dir(&#123;&#125;))&amp;set(dir(&apos;&apos;))&amp;set(dir(range(10)))</span><br><span class="line">print(ret)  #iterable</span><br></pre></td></tr></table></figure>
+<p>只要能被for循环的数据类型，就一定有<strong>iter</strong>方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">print(&apos;__iter__&apos; in dir(int))</span><br><span class="line">print(&apos;__iter__&apos; in dir(bool))</span><br><span class="line">print(&apos;__iter__&apos; in dir(list))</span><br><span class="line">print(&apos;__iter__&apos; in dir(dict))</span><br><span class="line">print(&apos;__iter__&apos; in dir(set))</span><br><span class="line">print(&apos;__iter__&apos; in dir(tuple))</span><br><span class="line">print(&apos;__iter__&apos; in dir(enumerate([])))</span><br><span class="line">print(&apos;__iter__&apos; in dir(range(1)))</span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">False</span><br><span class="line">False</span><br><span class="line">True</span><br><span class="line">True</span><br><span class="line">True</span><br><span class="line">True</span><br><span class="line">True</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
+<h4 id="一个列表执行了iter-之后的返回值就是一个迭代器"><a href="#一个列表执行了iter-之后的返回值就是一个迭代器" class="headerlink" title="一个列表执行了iter()之后的返回值就是一个迭代器"></a>一个列表执行了<strong>iter</strong>()之后的返回值就是一个迭代器</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(dir([]))</span><br><span class="line">print(dir([].__iter__()))</span><br><span class="line">print(set(dir([].__iter__())) - set(dir([])))</span><br><span class="line">print([1,&apos;a&apos;,&apos;bbb&apos;].__iter__().__length_hint__())  #元素个数</span><br></pre></td></tr></table></figure>
+<p>再看双下划线 next方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">l = [1,2,3]</span><br><span class="line">iterator = l.__iter__()</span><br><span class="line">print(iterator.__next__()) # 1</span><br><span class="line">print(iterator.__next__()) # 2</span><br><span class="line">print(iterator.__next__()) # 3</span><br><span class="line">print(iterator.__next__()) # 报错</span><br><span class="line"></span><br><span class="line">[].__iter__() 迭代器  -- &gt; __next__  #通过next就可以从迭代器中一个一个的取值</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>迭代器要点：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Iterable  可迭代的    -- &gt; __iter__  #只要含有__iter__方法的都是可迭代的</span><br><span class="line"> </span><br><span class="line">只要含有__iter__方法的都是可迭代的 —— 可迭代协议</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">l = [1,2,3,4]</span><br><span class="line">for i in l.__iter__():</span><br><span class="line">    print(i)</span><br></pre></td></tr></table></figure>
+<h4 id="迭代器的概念-1"><a href="#迭代器的概念-1" class="headerlink" title="迭代器的概念"></a>迭代器的概念</h4><blockquote>
+<p>迭代器协议 —— 内部含有<strong>next</strong>和<strong>iter</strong>方法的就是迭代器</p>
+</blockquote>
+<h4 id="迭代器协议和可迭代协议"><a href="#迭代器协议和可迭代协议" class="headerlink" title="迭代器协议和可迭代协议"></a>迭代器协议和可迭代协议</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">可以被for循环的都是可迭代的</span><br><span class="line">可迭代的内部都有__iter__方法</span><br><span class="line">只要是迭代器 一定可迭代</span><br><span class="line">可迭代的.__iter__()方法就可以得到一个迭代器</span><br><span class="line">迭代器中的__next__()方法可以一个一个的获取值</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for循环其实就是在使用迭代器</span><br><span class="line">iterator</span><br><span class="line">可迭代对象</span><br><span class="line">直接给你内存地址</span><br><span class="line">print([].__iter__())</span><br><span class="line">print(range(10))</span><br></pre></td></tr></table></figure>
+<h4 id="for循环的本质"><a href="#for循环的本质" class="headerlink" title="for循环的本质"></a>for循环的本质</h4><blockquote>
+<p>只有 是可迭代对象的时候 才能用for<br>当我们遇到一个新的变量，不确定能不能for循环的时候，就判断它是否可迭代</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for i in l:</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"># for循环的本质就是迭代器</span><br><span class="line">#iterator = l.__iter__()</span><br><span class="line">#iterator.__next__()</span><br></pre></td></tr></table></figure>
+<h4 id="迭代器的好处："><a href="#迭代器的好处：" class="headerlink" title="迭代器的好处："></a>迭代器的好处：</h4><ul>
+<li>从容器类型中一个一个的取值，会把所有的值都取到。</li>
+<li>节省内存空间<br>  迭代器并不会在内存中再占用一大块内存，<br>  而是随着循环 每次生成一个<br>  每次next每次给我一个</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">range(10000000000000000)  # 并不是立即生成，否则很浪费内存空间</span><br><span class="line"></span><br><span class="line">list(range(10000000000000000)) # 估计内存炸了，把迭代器转为列表</span><br></pre></td></tr></table></figure>
+<h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><p>本质是个迭代器</p>
+<h4 id="生成器函数"><a href="#生成器函数" class="headerlink" title="生成器函数"></a>生成器函数</h4><blockquote>
+<p>1.我们先实现一个普通方法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def generator():</span><br><span class="line">    print(1)</span><br><span class="line">    return &apos;a&apos;</span><br><span class="line"></span><br><span class="line">xxx = generator()</span><br><span class="line">print(xxx)</span><br><span class="line"></span><br><span class="line">结果</span><br><span class="line">1</span><br><span class="line">a</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>2.yield关键字</p>
+</blockquote>
+<p>将刚刚的return 换成 yield</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def generator():</span><br><span class="line">    print(1)</span><br><span class="line">    yield &apos;a&apos;</span><br><span class="line"></span><br><span class="line">xxx = generator()</span><br><span class="line">print(xxx)</span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">&lt;generator object generator at 0x000000000238C518&gt;</span><br><span class="line"></span><br><span class="line">------------------------------------------------------------</span><br><span class="line">print(xxx.__next__())</span><br><span class="line">结果：</span><br><span class="line">1</span><br><span class="line">a</span><br></pre></td></tr></table></figure>
+<p>####　什么是生成器</p>
+<ul>
+<li>只要含有yield关键字的函数都是生成器函数</li>
+<li>yield不能和return共用而且需要写在函数内部</li>
+<li>函数内部有yield关键字，这个函数执行返回的结果就是生成器，并且不会执行函数内部代码</li>
+</ul>
+<blockquote>
+<h4 id="生成器函数-：-执行之后会得到一个生成器作为返回值"><a href="#生成器函数-：-执行之后会得到一个生成器作为返回值" class="headerlink" title="生成器函数 ： 执行之后会得到一个生成器作为返回值"></a>生成器函数 ： 执行之后会得到一个生成器作为返回值</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">def xxx():</span><br><span class="line">    print(&apos;====&gt;a&apos;)</span><br><span class="line">    yield 1</span><br><span class="line">    print(&apos;====&gt;b&apos;)</span><br><span class="line">    yield 2</span><br><span class="line">    print(&apos;====&gt;c&apos;)</span><br><span class="line">    yield 3</span><br><span class="line">    print(&apos;====&gt;end&apos;)</span><br><span class="line"></span><br><span class="line">g=xxx()</span><br><span class="line"></span><br><span class="line">print(g.__next__()) # 返回第一次yield关键字后面的值</span><br><span class="line">print(g.__next__()) # 返回第二次yield关键字后面的值</span><br><span class="line">print(g.__next__()) # 返回第三次yield关键字后面的值</span><br><span class="line">print(g.__next__()) # 报错 </span><br><span class="line"></span><br><span class="line">====&gt;a</span><br><span class="line">1</span><br><span class="line">====&gt;b</span><br><span class="line">2</span><br><span class="line">====&gt;c</span><br><span class="line">3</span><br><span class="line">====&gt;end</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;D:/python_code/py20180718/001.py&quot;, line 18, in &lt;module&gt;</span><br><span class="line">    print(g.__next__())</span><br><span class="line">StopIteration</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>需求打印 200,0000次 哇哈哈1==》哇哈哈2000000，而我现在只要50个</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#娃哈哈%i</span><br><span class="line">def wahaha():</span><br><span class="line">    for i in range(2000000):</span><br><span class="line">        yield &apos;娃哈哈%s&apos;%i</span><br><span class="line"></span><br><span class="line">g = wahaha()</span><br><span class="line">count = 0</span><br><span class="line">for i in g:</span><br><span class="line">    count +=1</span><br><span class="line">    if count &gt; 50:</span><br><span class="line">        break</span><br><span class="line">    print(&apos;```````````&apos;+i+&apos;`````````````&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="生成器真的省内存吗？"><a href="#生成器真的省内存吗？" class="headerlink" title="生成器真的省内存吗？"></a>生成器真的省内存吗？</h4><blockquote>
+<p>碰巧前面我们刚学过如何测试效率和装饰器，正好拿来练习！！！</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line"></span><br><span class="line">def test(func):</span><br><span class="line">    def inner(*args,**kwargs):</span><br><span class="line">        start_time = time.time()</span><br><span class="line">        res = func(*args,**kwargs)</span><br><span class="line">        end_time = time.time()</span><br><span class="line">        print(&quot;测试效率:&quot;, end_time - start_time)</span><br><span class="line">        return res</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@test</span><br><span class="line">def getList(n):</span><br><span class="line">    l1 = list(range(n))</span><br><span class="line">@test</span><br><span class="line">def getGenerator(n):</span><br><span class="line">    for i in range(n):</span><br><span class="line">        yield i</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">getList(100000)</span><br><span class="line">getGenerator(100000)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">结果：</span><br><span class="line">测试效率: 0.004000663757324219</span><br><span class="line">测试效率: 0.0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分析下就可以知道，列表是将0-99999都生成后放进列表里了，所以用时比较多。<br>而生成器只是封装了算法，每次调用在去调用算法，这样做就可以做到节省内存了。</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/fullstack/">fullstack</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/07/24/P013_01_python迭代器和生成器/" data-title="P013_01_python迭代器 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/07/25/P014_01_python生成器进阶及生成器表达式、列表推导式/" title="P014_01_python生成器进阶及生成器表达式、列表推导式">
+  <strong>上一篇：</strong><br/>
+  <span>
+  P014_01_python生成器进阶及生成器表达式、列表推导式</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/07/24/P012_01_python装饰器进阶/"  title="P012_01_python装饰器进阶">
+ <strong>下一篇：</strong><br/> 
+ <span>P012_01_python装饰器进阶
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代器初识"><span class="toc-number">1.</span> <span class="toc-text">迭代器初识</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#迭代器的概念"><span class="toc-number">2.</span> <span class="toc-text">迭代器的概念</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#一个列表执行了iter-之后的返回值就是一个迭代器"><span class="toc-number">2.1.</span> <span class="toc-text">一个列表执行了iter()之后的返回值就是一个迭代器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器的概念-1"><span class="toc-number">2.2.</span> <span class="toc-text">迭代器的概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器协议和可迭代协议"><span class="toc-number">2.3.</span> <span class="toc-text">迭代器协议和可迭代协议</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#for循环的本质"><span class="toc-number">2.4.</span> <span class="toc-text">for循环的本质</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#迭代器的好处："><span class="toc-number">2.5.</span> <span class="toc-text">迭代器的好处：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#生成器"><span class="toc-number">3.</span> <span class="toc-text">生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器函数"><span class="toc-number">3.1.</span> <span class="toc-text">生成器函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器函数-：-执行之后会得到一个生成器作为返回值"><span class="toc-number">3.2.</span> <span class="toc-text">生成器函数 ： 执行之后会得到一个生成器作为返回值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器真的省内存吗？"><span class="toc-number">3.3.</span> <span class="toc-text">生成器真的省内存吗？</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

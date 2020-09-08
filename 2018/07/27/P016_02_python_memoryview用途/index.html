@@ -1,0 +1,566 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>P016_02_python_memoryview用途 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="注意：非重点知识点(几乎用不到) memoryview bytearray是可变(mutable)的字节序列，相对于Python2中的str，但str是不可变(immutable)的。 在Python3中由于str默认是unicode编码，所以只有通过bytearray才能按字节访问。   memoryview为支持buffer protocol[1,2]的对象提供了按字节的内存访问接口，好处是">
+<meta name="keywords" content="fullstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="P016_02_python_memoryview用途">
+<meta property="og:url" content="http://yoursite.com/2018/07/27/P016_02_python_memoryview用途/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="注意：非重点知识点(几乎用不到) memoryview bytearray是可变(mutable)的字节序列，相对于Python2中的str，但str是不可变(immutable)的。 在Python3中由于str默认是unicode编码，所以只有通过bytearray才能按字节访问。   memoryview为支持buffer protocol[1,2]的对象提供了按字节的内存访问接口，好处是">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.276Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="P016_02_python_memoryview用途">
+<meta name="twitter:description" content="注意：非重点知识点(几乎用不到) memoryview bytearray是可变(mutable)的字节序列，相对于Python2中的str，但str是不可变(immutable)的。 在Python3中由于str默认是unicode编码，所以只有通过bytearray才能按字节访问。   memoryview为支持buffer protocol[1,2]的对象提供了按字节的内存访问接口，好处是">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/27/P016_02_python_memoryview用途/" title="P016_02_python_memoryview用途" itemprop="url">P016_02_python_memoryview用途</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-27T04:33:25.000Z" itemprop="datePublished"> Published 2018-07-27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#注意：非重点知识点-几乎用不到"><span class="toc-number">1.</span> <span class="toc-text">注意：非重点知识点(几乎用不到)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#memoryview"><span class="toc-number">1.1.</span> <span class="toc-text">memoryview</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#下面两种行为的对比："><span class="toc-number">1.1.1.</span> <span class="toc-text">下面两种行为的对比：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-不使用memoryview"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1.不使用memoryview</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-使用memoryview"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">2.使用memoryview</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#我的使用场景是网络程序中socket接收和接收数据的解析："><span class="toc-number">1.1.2.</span> <span class="toc-text">我的使用场景是网络程序中socket接收和接收数据的解析：</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<h2 id="注意：非重点知识点-几乎用不到"><a href="#注意：非重点知识点-几乎用不到" class="headerlink" title="注意：非重点知识点(几乎用不到)"></a>注意：非重点知识点(几乎用不到)</h2></blockquote>
+<h3 id="memoryview"><a href="#memoryview" class="headerlink" title="memoryview"></a>memoryview</h3><ul>
+<li>bytearray是可变(mutable)的字节序列，相对于Python2中的str，但str是不可变(immutable)的。</li>
+<li>在Python3中由于str默认是unicode编码，所以只有通过bytearray才能按字节访问。</li>
+</ul>
+<blockquote>
+<p>memoryview为支持buffer protocol[1,2]的对象提供了按字节的内存访问接口，好处是不会有内存拷贝。</p>
+</blockquote>
+<p>默认str和bytearray支持buffer procotol。</p>
+<h4 id="下面两种行为的对比："><a href="#下面两种行为的对比：" class="headerlink" title="下面两种行为的对比："></a>下面两种行为的对比：</h4><blockquote>
+<p>简单点就是，str和bytearray的切片操作会产生新的切片str和bytearry并拷贝数据，使用memoryview之后不会。</p>
+</blockquote>
+<h5 id="1-不使用memoryview"><a href="#1-不使用memoryview" class="headerlink" title="1.不使用memoryview"></a>1.不使用memoryview</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; a = &apos;aaaaaa&apos;</span><br><span class="line">&gt;&gt; b = a[:2]    # 会产生新的字符串</span><br><span class="line"></span><br><span class="line">&gt;&gt; a = bytearray(&apos;aaaaaa&apos;)</span><br><span class="line">&gt;&gt; b = a[:2]    # 会产生新的bytearray</span><br><span class="line">&gt;&gt; b[:2] = &apos;bb&apos; # 对b的改动不影响a</span><br><span class="line">&gt;&gt; a</span><br><span class="line">bytearray(b&apos;aaaaaa&apos;)</span><br><span class="line">&gt;&gt; b</span><br><span class="line">bytearray(b&apos;bb&apos;)</span><br></pre></td></tr></table></figure>
+<h5 id="2-使用memoryview"><a href="#2-使用memoryview" class="headerlink" title="2.使用memoryview"></a>2.使用memoryview</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; a = &apos;aaaaaa&apos;</span><br><span class="line">&gt;&gt; ma = memoryview(a)</span><br><span class="line">&gt;&gt; ma.readonly  # 只读的memoryview</span><br><span class="line">True</span><br><span class="line">&gt;&gt; mb = ma[:2]  # 不会产生新的字符串</span><br><span class="line"></span><br><span class="line">&gt;&gt; a = bytearray(&apos;aaaaaa&apos;)</span><br><span class="line">&gt;&gt; ma = memoryview(a)</span><br><span class="line">&gt;&gt; ma.readonly  # 可写的memoryview</span><br><span class="line">False</span><br><span class="line">&gt;&gt; mb = ma[:2]      # 不会会产生新的bytearray</span><br><span class="line">&gt;&gt; mb[:2] = &apos;bb&apos;    # 对mb的改动就是对ma的改动</span><br><span class="line">&gt;&gt; mb.tobytes()</span><br><span class="line">&apos;bb&apos;</span><br><span class="line">&gt;&gt; ma.tobytes()</span><br><span class="line">&apos;bbaaaa&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="我的使用场景是网络程序中socket接收和接收数据的解析："><a href="#我的使用场景是网络程序中socket接收和接收数据的解析：" class="headerlink" title="我的使用场景是网络程序中socket接收和接收数据的解析："></a>我的使用场景是网络程序中socket接收和接收数据的解析：</h4><ol>
+<li>使用memoryview之前的sock接收代码简化如下</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def read(size):</span><br><span class="line">    ret = &apos;&apos; </span><br><span class="line">    remain = size</span><br><span class="line">    while True:</span><br><span class="line">        data = sock.recv(remain)</span><br><span class="line">        ret += data     # 这里不断会有新的str对象产生</span><br><span class="line">        if len(data) == remain:</span><br><span class="line">            break</span><br><span class="line">        remain -= len(data)</span><br><span class="line">    return ret</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>使用meoryview之后，避免了不断的字符串拼接和新对象的产生</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def read(size):</span><br><span class="line">    ret = memoryview(bytearray(size)) </span><br><span class="line">    remain = size</span><br><span class="line">    while True:</span><br><span class="line">        data = sock.recv(remain)</span><br><span class="line">        length = len(data)</span><br><span class="line">        ret[size - remain: size - remain + length] = data</span><br><span class="line">        if len(data) == remain:</span><br><span class="line">            break</span><br><span class="line">        remain -= len(data)</span><br><span class="line">    return ret</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>返回memoryview还有一个优点，在使用struct进行unpack解析时可以直接接收memoryview对象，非常高效（避免大的str进行分段解析时大量的切片操作）。</p>
+</blockquote>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mv = memoryview(&apos;\x00\x01\x02\x00\x00\xff...&apos;)</span><br><span class="line">type, len = struct.unpack(&apos;!BI&apos;, mv[:5])</span><br><span class="line">...</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/fullstack/">fullstack</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/07/27/P016_02_python_memoryview用途/" data-title="P016_02_python_memoryview用途 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/07/28/P016_03_python匿名函数/" title="P016_03_python匿名函数">
+  <strong>上一篇：</strong><br/>
+  <span>
+  P016_03_python匿名函数</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/07/26/P016_01_python内置函数收尾/"  title="P016_01_python内置函数收尾">
+ <strong>下一篇：</strong><br/> 
+ <span>P016_01_python内置函数收尾
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#注意：非重点知识点-几乎用不到"><span class="toc-number">1.</span> <span class="toc-text">注意：非重点知识点(几乎用不到)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#memoryview"><span class="toc-number">1.1.</span> <span class="toc-text">memoryview</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#下面两种行为的对比："><span class="toc-number">1.1.1.</span> <span class="toc-text">下面两种行为的对比：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-不使用memoryview"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1.不使用memoryview</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-使用memoryview"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">2.使用memoryview</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#我的使用场景是网络程序中socket接收和接收数据的解析："><span class="toc-number">1.1.2.</span> <span class="toc-text">我的使用场景是网络程序中socket接收和接收数据的解析：</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

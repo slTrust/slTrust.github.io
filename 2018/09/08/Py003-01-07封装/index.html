@@ -1,0 +1,575 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py003-01-07封装 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="封装属性和方法的隐藏,外部不能直接通过属性和方法名访问  双下划线前缀的属性和方法,在类外部无法直接这样访问 但在类的内部可以访问这些“双下划线前缀的属性和方法”  123456789101112131415161718192021222324252627282930313233343536class A:    __x = 1    def __init__(self,name):">
+<meta name="keywords" content="M03">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py003-01-07封装">
+<meta property="og:url" content="http://yoursite.com/2018/09/08/Py003-01-07封装/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="封装属性和方法的隐藏,外部不能直接通过属性和方法名访问  双下划线前缀的属性和方法,在类外部无法直接这样访问 但在类的内部可以访问这些“双下划线前缀的属性和方法”  123456789101112131415161718192021222324252627282930313233343536class A:    __x = 1    def __init__(self,name):">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.285Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py003-01-07封装">
+<meta name="twitter:description" content="封装属性和方法的隐藏,外部不能直接通过属性和方法名访问  双下划线前缀的属性和方法,在类外部无法直接这样访问 但在类的内部可以访问这些“双下划线前缀的属性和方法”  123456789101112131415161718192021222324252627282930313233343536class A:    __x = 1    def __init__(self,name):">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/08/Py003-01-07封装/" title="Py003-01-07封装" itemprop="url">Py003-01-07封装</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-08T15:06:03.000Z" itemprop="datePublished"> Published 2018-09-08</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#封装"><span class="toc-number">1.</span> <span class="toc-text">封装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#这种变形的特点"><span class="toc-number">1.1.</span> <span class="toc-text">这种变形的特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这种变形需要注意的问题："><span class="toc-number">1.2.</span> <span class="toc-text">这种变形需要注意的问题：</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><p>属性和方法的隐藏,外部不能直接通过属性和方法名访问</p>
+<ul>
+<li>双下划线前缀的属性和方法,在类外部无法直接这样访问</li>
+<li>但在类的内部可以访问这些“双下划线前缀的属性和方法”</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">class A:</span><br><span class="line">    __x = 1</span><br><span class="line"></span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.__name = name</span><br><span class="line"></span><br><span class="line">    def __foo(self):</span><br><span class="line">        print(&apos;run foo&apos;)</span><br><span class="line">    </span><br><span class="line">    def bar(self):</span><br><span class="line">        self.__foo()</span><br><span class="line">        print(&apos;from bar&apos;)</span><br><span class="line"></span><br><span class="line"># print(A.__x)  报错</span><br><span class="line"># print(A.__foo())  报错</span><br><span class="line"># print(A.bar()) 不报错</span><br><span class="line"></span><br><span class="line"># 即使创建该类对象 也无法访问双下划线的属性和方法</span><br><span class="line">a = A(&apos;hjx&apos;)</span><br><span class="line"># print(a.__name)  报错</span><br><span class="line"># print(a.__foo())  报错</span><br><span class="line"></span><br><span class="line"># 可以通过 __dict__ 访问A类的相关属性信息</span><br><span class="line">print(A.__dict__)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&#123;</span><br><span class="line">    &apos;__module__&apos;: &apos;__main__&apos;,</span><br><span class="line">    &apos;_A__x&apos;: 1,</span><br><span class="line">    &apos;__init__&apos;: &lt;function A.__init__ at 0x00000187A059AF28&gt;, </span><br><span class="line">    &apos;_A__foo&apos;: &lt;function A.__foo at 0x00000187A059AEA0&gt;, </span><br><span class="line">    &apos;__dict__&apos;: &lt;attribute &apos;__dict__&apos; of &apos;A&apos; objects&gt;, </span><br><span class="line">    &apos;__weakref__&apos;: &lt;attribute &apos;__weakref__&apos; of &apos;A&apos; objects&gt;, </span><br><span class="line">    &apos;__doc__&apos;: None</span><br><span class="line">&#125;</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们发现 dict信息里属性通过一种方式——变形</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    __x = 1 # _A__x = 1</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.__name = name # _A__name = name</span><br><span class="line">    def __foo(self): # def _A__foo(self)</span><br><span class="line">        print(&apos;run foo&apos;)</span><br><span class="line"></span><br><span class="line">类中的 __x 会变为  _A__x</span><br><span class="line">类中的 __foo 会变为  _A__foo</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="这种变形的特点"><a href="#这种变形的特点" class="headerlink" title="这种变形的特点"></a>这种变形的特点</h4></blockquote>
+<ul>
+<li>在类外部无法直接obj.__属性名</li>
+<li>类内部可以通过:obj.__属性名</li>
+<li><p>子类无法覆盖父类双下划线前缀的属性和方法<br>  (因为在类执行前 双下划线前缀的属性和方<br>  法会产生变形)</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    __x = 1 # 变形为 _A__x</span><br><span class="line">    def __foo(self): # 变形为 def _A__foo(self):</span><br><span class="line">        print(&apos;from foo A&apos;)</span><br><span class="line"></span><br><span class="line">class B(A):</span><br><span class="line">    __x = 2 # 变形为 _B__x</span><br><span class="line">    def __foo(self): # 变形为 def _B__foo(self):</span><br><span class="line">        print(&apos;from foo B&apos;)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>知道变形规则后你可以这样投机的访问这些双下划线前缀的属性和方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 这样就不报错了</span><br><span class="line">a = A(&apos;hjx&apos;)</span><br><span class="line">print(a._A__x)</span><br><span class="line">a._A__foo()</span><br></pre></td></tr></table></figure>
+<h4 id="这种变形需要注意的问题："><a href="#这种变形需要注意的问题：" class="headerlink" title="这种变形需要注意的问题："></a>这种变形需要注意的问题：</h4><ul>
+<li>如果想隐藏属性和方法你就添加双下划线前缀，你知道了变形规则和访问方式还想直接访问那索性不如不加双下划线前缀</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class B:</span><br><span class="line">    __x = 1</span><br><span class="line">    y = 2</span><br><span class="line"></span><br><span class="line">print(B._B__x) # 你都隐藏了还这样访问？ 是不是傻？</span><br><span class="line">print(B.y) # 既然想访问就别费劲了 还加双下划线前缀</span><br></pre></td></tr></table></figure>
+<ul>
+<li>双下划线前缀的属性和方法只在类定义的时候变形，后续添加的双下划线前缀属性或方法不会进行——变形</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class B:</span><br><span class="line">    __x = 1</span><br><span class="line"></span><br><span class="line">B.__y = 2</span><br><span class="line">print(B.__dict__)</span><br><span class="line">print(B.__y) # 像普通属性一样访问</span><br><span class="line"># 自己看吧！</span><br></pre></td></tr></table></figure>
+<p>所以说你要隐藏属性或方法，要在类定义的时候进行</p>
+<ul>
+<li>在继承中，父类如果不想让子类覆盖自己的方法，可以将方法定义为私有的</li>
+</ul>
+<p>先看我们之前的学习</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    def foo(self):</span><br><span class="line">        print(&apos;from a foo&apos;)</span><br><span class="line">    def bar(self):</span><br><span class="line">        print(&apos;from a bar&apos;)</span><br><span class="line">        self.foo()</span><br><span class="line">        </span><br><span class="line">class B(A):</span><br><span class="line">    def foo(self):</span><br><span class="line">        print(&apos;from b foo&apos;)</span><br><span class="line"></span><br><span class="line">b = B()</span><br><span class="line">b.bar()</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">执行结果： </span><br><span class="line">from a bar</span><br><span class="line">from b foo</span><br><span class="line">1. b本身没有bar方法</span><br><span class="line">2. 于是从父类A查找 bar方法 找到了</span><br><span class="line">3. 执行 bar的时候 调用 self.foo() 此时的self是 b对象 所以 self.foo() 相当于 b.foo()</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<p>实现我们的需求 子类调用父类的同名方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    def __foo(self): # _A__foo</span><br><span class="line">        print(&apos;from a foo&apos;)</span><br><span class="line">    def bar(self):</span><br><span class="line">        print(&apos;from a bar&apos;)</span><br><span class="line">        self.__foo() # self._A_foo</span><br><span class="line"></span><br><span class="line">class B(A):</span><br><span class="line">    def __foo(self):</span><br><span class="line">        print(&apos;from b foo&apos;)</span><br><span class="line"></span><br><span class="line">b = B()</span><br><span class="line">b.bar()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">执行结果</span><br><span class="line">from a bar</span><br><span class="line">from a foo</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M03/">M03</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/09/08/Py003-01-07封装/" data-title="Py003-01-07封装 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/09/08/Py003-01-08封装的意义/" title="Py003-01-08封装的意义">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py003-01-08封装的意义</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/09/08/Py003-01-06多态与多态性/"  title="Py003-01-06多态与多态性">
+ <strong>下一篇：</strong><br/> 
+ <span>Py003-01-06多态与多态性
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#封装"><span class="toc-number">1.</span> <span class="toc-text">封装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#这种变形的特点"><span class="toc-number">1.1.</span> <span class="toc-text">这种变形的特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#这种变形需要注意的问题："><span class="toc-number">1.2.</span> <span class="toc-text">这种变形需要注意的问题：</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

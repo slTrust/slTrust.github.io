@@ -1,0 +1,577 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py007-01-12selenium使用 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="selenium使用 问题：处理页面动态加载数据的爬取   selenium phantomJs  selenium安装三方库，可以实现让浏览器完成自动化操作  环境搭建  1234567# 1 安装依赖pip install selenium# 2 获取某一款浏览器的驱动程序（以谷歌浏览器为例）# 谷歌浏览器驱动下载地址：http://chromedriver.storage.googleapi">
+<meta name="keywords" content="M07">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py007-01-12selenium使用">
+<meta property="og:url" content="http://yoursite.com/2018/12/01/Py007-01-12selenium和phantomJs使用/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="selenium使用 问题：处理页面动态加载数据的爬取   selenium phantomJs  selenium安装三方库，可以实现让浏览器完成自动化操作  环境搭建  1234567# 1 安装依赖pip install selenium# 2 获取某一款浏览器的驱动程序（以谷歌浏览器为例）# 谷歌浏览器驱动下载地址：http://chromedriver.storage.googleapi">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.301Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py007-01-12selenium使用">
+<meta name="twitter:description" content="selenium使用 问题：处理页面动态加载数据的爬取   selenium phantomJs  selenium安装三方库，可以实现让浏览器完成自动化操作  环境搭建  1234567# 1 安装依赖pip install selenium# 2 获取某一款浏览器的驱动程序（以谷歌浏览器为例）# 谷歌浏览器驱动下载地址：http://chromedriver.storage.googleapi">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/01/Py007-01-12selenium和phantomJs使用/" title="Py007-01-12selenium使用" itemprop="url">Py007-01-12selenium使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-01T03:12:18.000Z" itemprop="datePublished"> Published 2018-12-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#selenium使用"><span class="toc-number">1.</span> <span class="toc-text">selenium使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#selenium安装"><span class="toc-number">1.1.</span> <span class="toc-text">selenium安装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码介绍"><span class="toc-number">1.2.</span> <span class="toc-text">代码介绍</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#phantomJs-不推荐使用，官网已经停更了"><span class="toc-number">2.</span> <span class="toc-text">phantomJs(不推荐使用，官网已经停更了)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#重点"><span class="toc-number">2.1.</span> <span class="toc-text">重点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#综合操作：需求是尽可能多的爬取豆瓣网中的电影信息"><span class="toc-number">2.2.</span> <span class="toc-text">综合操作：需求是尽可能多的爬取豆瓣网中的电影信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#谷歌无头浏览器"><span class="toc-number">2.3.</span> <span class="toc-text">谷歌无头浏览器</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="selenium使用"><a href="#selenium使用" class="headerlink" title="selenium使用"></a>selenium使用</h3><ul>
+<li>问题：处理页面动态加载数据的爬取</li>
+</ul>
+<ol>
+<li>selenium</li>
+<li>phantomJs</li>
+</ol>
+<h4 id="selenium安装"><a href="#selenium安装" class="headerlink" title="selenium安装"></a>selenium安装</h4><p>三方库，可以实现让浏览器完成自动化操作</p>
+<ul>
+<li>环境搭建</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 1 安装依赖</span><br><span class="line">pip install selenium</span><br><span class="line"># 2 获取某一款浏览器的驱动程序（以谷歌浏览器为例）</span><br><span class="line"># 谷歌浏览器驱动下载地址：http://chromedriver.storage.googleapis.com/index.html</span><br><span class="line"># </span><br><span class="line">下载的驱动程序必须和浏览器的版本统一，大家可以根据http://blog.csdn.net/huilan_same/article/details/51896672</span><br><span class="line">中提供的版本映射表进行对应</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="代码介绍"><a href="#代码介绍" class="headerlink" title="代码介绍"></a>代码介绍</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#导包</span><br><span class="line">from selenium import webdriver  </span><br><span class="line">#创建浏览器对象，通过该对象可以操作浏览器</span><br><span class="line">browser = webdriver.Chrome(&apos;驱动路径&apos;)</span><br><span class="line">#使用浏览器发起指定请求</span><br><span class="line">browser.get(url)</span><br><span class="line"></span><br><span class="line">#使用下面的方法，查找指定的元素进行操作即可</span><br><span class="line">    find_element_by_id            根据id找节点</span><br><span class="line">    find_elements_by_name         根据name找</span><br><span class="line">    find_elements_by_xpath        根据xpath查找</span><br><span class="line">    find_elements_by_tag_name     根据标签名找</span><br><span class="line">    find_elements_by_class_name   根据class名字查找</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>自动化打开百度搜索关键字后页面</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># 编码流程</span><br><span class="line">from selenium import webdriver</span><br><span class="line">from time import sleep</span><br><span class="line"># 创建一个浏览器对象 executable_path为驱动的路径</span><br><span class="line">bro = webdriver.Chrome(executable_path=&apos;./chromedriver&apos;)</span><br><span class="line"># get 方法可以指定一个url，让浏览器进行请求</span><br><span class="line">bro.get(&apos;https://www.baidu.com&apos;)</span><br><span class="line">sleep(3)</span><br><span class="line"># 让百度根据指定 搜索词进行搜索</span><br><span class="line">text = bro.find_element_by_id(&apos;kw&apos;) # 定位文本框</span><br><span class="line">text.send_keys(&apos;abc&apos;) # 向文本框录入指定内容</span><br><span class="line">sleep(1)</span><br><span class="line">button = bro.find_element_by_id(&apos;su&apos;)</span><br><span class="line">button.click() # 表示点击操作</span><br><span class="line">sleep(3)</span><br><span class="line"></span><br><span class="line">bro.quit()# 退出浏览器</span><br></pre></td></tr></table></figure>
+<h3 id="phantomJs-不推荐使用，官网已经停更了"><a href="#phantomJs-不推荐使用，官网已经停更了" class="headerlink" title="phantomJs(不推荐使用，官网已经停更了)"></a>phantomJs(不推荐使用，官网已经停更了)</h3><ul>
+<li>下载</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://phantomjs.org/download.html</span><br></pre></td></tr></table></figure>
+<p>PhantomJS是一款无界面的浏览器，其自动化操作流程和上述操作谷歌浏览器是一致的。由于是无界面的，为了能够展示自动化操作流程，PhantomJS为用户提供了一个截屏的功能，使用save_screenshot函数实现。<br>代码演示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">#-*- encoding:utf-8 -*-</span><br><span class="line"></span><br><span class="line">from selenium import webdriver</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line"># phantomjs路径</span><br><span class="line">path = r&apos;/Users/almost/Downloads/phantomjs-2.1.1-macosx/bin/phantomjs&apos;</span><br><span class="line">browser = webdriver.PhantomJS(path)</span><br><span class="line"></span><br><span class="line"># 打开百度</span><br><span class="line">url = &apos;http://www.baidu.com/&apos;</span><br><span class="line">browser.get(url)</span><br><span class="line"></span><br><span class="line">time.sleep(3)</span><br><span class="line"></span><br><span class="line">browser.save_screenshot(r&apos;phantomjs\baidu.png&apos;)</span><br><span class="line"></span><br><span class="line"># 查找input输入框</span><br><span class="line">my_input = browser.find_element_by_id(&apos;kw&apos;)</span><br><span class="line"># 往框里面写文字</span><br><span class="line">my_input.send_keys(&apos;美女&apos;)</span><br><span class="line">time.sleep(3)</span><br><span class="line">#截屏</span><br><span class="line">browser.save_screenshot(r&apos;phantomjs\meinv.png&apos;)</span><br><span class="line"></span><br><span class="line"># 查找搜索按钮</span><br><span class="line">button = browser.find_elements_by_class_name(&apos;s_btn&apos;)[0]</span><br><span class="line">button.click()</span><br><span class="line"></span><br><span class="line">time.sleep(3)</span><br><span class="line"></span><br><span class="line">browser.save_screenshot(r&apos;phantomjs\show.png&apos;)</span><br><span class="line"></span><br><span class="line">time.sleep(3)</span><br><span class="line"></span><br><span class="line">browser.quit()</span><br></pre></td></tr></table></figure>
+<h4 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h4><blockquote>
+<p>selenium+phantomjs 就是爬虫终极解决方案:有些网站上的内容信息是通过动态加载js形成的，所以使用普通爬虫程序无法回去动态加载的js内容。例如豆瓣电影中的电影信息是通过下拉操作动态加载更多的电影信息。</p>
+</blockquote>
+<blockquote>
+<h4 id="综合操作：需求是尽可能多的爬取豆瓣网中的电影信息"><a href="#综合操作：需求是尽可能多的爬取豆瓣网中的电影信息" class="headerlink" title="综合操作：需求是尽可能多的爬取豆瓣网中的电影信息"></a>综合操作：需求是尽可能多的爬取豆瓣网中的电影信息</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">from selenium import webdriver</span><br><span class="line">from time import sleep</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    url = &apos;https://movie.douban.com/typerank?type_name=%E6%81%90%E6%80%96&amp;type=20&amp;interval_id=100:90&amp;action=&apos;</span><br><span class="line">    # 发起请求前，可以让url表示的页面动态加载出更多的数据</span><br><span class="line">    path = r&apos;你的phantomjs路径&apos;</span><br><span class="line">    # 创建无界面的浏览器对象</span><br><span class="line">    bro = webdriver.PhantomJS(path)</span><br><span class="line">    # 发起url请求</span><br><span class="line">    bro.get(url)</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    # 截图</span><br><span class="line">    bro.save_screenshot(&apos;1.png&apos;)</span><br><span class="line"></span><br><span class="line">    # 执行js代码（让滚动条向下偏移n个像素（作用：动态加载了更多的电影信息））</span><br><span class="line">    js = &apos;window.scrollTo(0,document.body.scrollHeight)&apos;</span><br><span class="line">    bro.execute_script(js)  # 该函数可以执行一组字符串形式的js代码</span><br><span class="line">    time.sleep(2)</span><br><span class="line"></span><br><span class="line">    bro.execute_script(js)  # 该函数可以执行一组字符串形式的js代码</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    bro.save_screenshot(&apos;2.png&apos;) </span><br><span class="line">    time.sleep(2) </span><br><span class="line">    # 使用爬虫程序爬去当前url中的内容 </span><br><span class="line">    html_source = bro.page_source # 该属性可以获取当前浏览器的当前页的源码（html） </span><br><span class="line">    with open(&apos;./source.html&apos;, &apos;w&apos;, encoding=&apos;utf-8&apos;) as fp: </span><br><span class="line">        fp.write(html_source) </span><br><span class="line">    bro.quit()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="谷歌无头浏览器"><a href="#谷歌无头浏览器" class="headerlink" title="谷歌无头浏览器"></a>谷歌无头浏览器</h4></blockquote>
+<p>由于PhantomJs最近已经停止了更新和维护，所以推荐大家可以使用谷歌的无头浏览器，是一款无界面的谷歌浏览器。</p>
+<ul>
+<li>代码展示：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">from selenium import webdriver</span><br><span class="line">from selenium.webdriver.chrome.options import Options</span><br><span class="line">import time</span><br><span class="line"> </span><br><span class="line"># 创建一个参数对象，用来控制chrome以无界面模式打开</span><br><span class="line">chrome_options = Options()</span><br><span class="line">chrome_options.add_argument(&apos;--headless&apos;)</span><br><span class="line">chrome_options.add_argument(&apos;--disable-gpu&apos;)</span><br><span class="line"># 驱动路径</span><br><span class="line">path = r&apos;你的路径chromedriver.exe&apos;</span><br><span class="line"> </span><br><span class="line"># 创建浏览器对象</span><br><span class="line">browser = webdriver.Chrome(executable_path=path, chrome_options=chrome_options)</span><br><span class="line"> </span><br><span class="line"># 上网</span><br><span class="line">url = &apos;http://www.baidu.com/&apos;</span><br><span class="line">browser.get(url)</span><br><span class="line">time.sleep(3)</span><br><span class="line"> </span><br><span class="line">browser.save_screenshot(&apos;baidu.png&apos;)</span><br><span class="line"> </span><br><span class="line">browser.quit()</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M07/">M07</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/12/01/Py007-01-12selenium和phantomJs使用/" data-title="Py007-01-12selenium使用 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/12/01/Py007-02-01scrapy简介/" title="Py007-02-01scrapy简介">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py007-02-01scrapy简介</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/12/01/Py007-01-11bs4使用/"  title="Py007-01-11bs4使用">
+ <strong>下一篇：</strong><br/> 
+ <span>Py007-01-11bs4使用
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#selenium使用"><span class="toc-number">1.</span> <span class="toc-text">selenium使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#selenium安装"><span class="toc-number">1.1.</span> <span class="toc-text">selenium安装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码介绍"><span class="toc-number">1.2.</span> <span class="toc-text">代码介绍</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#phantomJs-不推荐使用，官网已经停更了"><span class="toc-number">2.</span> <span class="toc-text">phantomJs(不推荐使用，官网已经停更了)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#重点"><span class="toc-number">2.1.</span> <span class="toc-text">重点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#综合操作：需求是尽可能多的爬取豆瓣网中的电影信息"><span class="toc-number">2.2.</span> <span class="toc-text">综合操作：需求是尽可能多的爬取豆瓣网中的电影信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#谷歌无头浏览器"><span class="toc-number">2.3.</span> <span class="toc-text">谷歌无头浏览器</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

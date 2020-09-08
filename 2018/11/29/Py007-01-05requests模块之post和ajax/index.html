@@ -1,0 +1,568 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py007-01-05requests模块之post和ajax | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="requests模块之post请求 简单需求，登录豆瓣网，获取成功后的数据  123456789101112131415161718192021222324252627import requests# 1.post请求的urlurl = &amp;apos;https://accounts.douban.com/login&amp;apos;# 封装post请求参数数据data = &amp;#123;    &amp;quot">
+<meta name="keywords" content="M07">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py007-01-05requests模块之post和ajax">
+<meta property="og:url" content="http://yoursite.com/2018/11/29/Py007-01-05requests模块之post和ajax/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="requests模块之post请求 简单需求，登录豆瓣网，获取成功后的数据  123456789101112131415161718192021222324252627import requests# 1.post请求的urlurl = &amp;apos;https://accounts.douban.com/login&amp;apos;# 封装post请求参数数据data = &amp;#123;    &amp;quot">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.300Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py007-01-05requests模块之post和ajax">
+<meta name="twitter:description" content="requests模块之post请求 简单需求，登录豆瓣网，获取成功后的数据  123456789101112131415161718192021222324252627import requests# 1.post请求的urlurl = &amp;apos;https://accounts.douban.com/login&amp;apos;# 封装post请求参数数据data = &amp;#123;    &amp;quot">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/29/Py007-01-05requests模块之post和ajax/" title="Py007-01-05requests模块之post和ajax" itemprop="url">Py007-01-05requests模块之post和ajax</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-29T15:52:05.000Z" itemprop="datePublished"> Published 2018-11-29</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#requests模块之post请求"><span class="toc-number">1.</span> <span class="toc-text">requests模块之post请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ajax的请求"><span class="toc-number">2.</span> <span class="toc-text">ajax的请求</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#基于ajax的get请求"><span class="toc-number">2.1.</span> <span class="toc-text">基于ajax的get请求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#基于ajax的post请求"><span class="toc-number">2.2.</span> <span class="toc-text">基于ajax的post请求</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="requests模块之post请求"><a href="#requests模块之post请求" class="headerlink" title="requests模块之post请求"></a>requests模块之post请求</h3><blockquote>
+<p>简单需求，登录豆瓣网，获取成功后的数据</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line"># 1.post请求的url</span><br><span class="line">url = &apos;https://accounts.douban.com/login&apos;</span><br><span class="line"></span><br><span class="line"># 封装post请求参数数据</span><br><span class="line">data = &#123;</span><br><span class="line">    &quot;source&quot;:&apos;movie&apos;,</span><br><span class="line">    &apos;redir&apos;:&apos;https://movie.douban.com/&apos;,</span><br><span class="line">    &apos;form_email&apos;:&apos;15027900535&apos;,</span><br><span class="line">    &apos;form_password&apos;:&apos;bobo@15027900535&apos;,</span><br><span class="line">    &apos;login&apos;:&apos;登录&apos;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#自定义请求头信息</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line"># 2 发起post请求</span><br><span class="line">response = requests.post(url=url,data=data,headers=headers)</span><br><span class="line"></span><br><span class="line"># 3 获取响应对象中的页面数据</span><br><span class="line">page_text = response.text</span><br><span class="line"></span><br><span class="line"># 4 持久化存储</span><br><span class="line">with open(&apos;movie.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as f:</span><br><span class="line">    f.write(page_text)</span><br></pre></td></tr></table></figure>
+<h3 id="ajax的请求"><a href="#ajax的请求" class="headerlink" title="ajax的请求"></a>ajax的请求</h3><h4 id="基于ajax的get请求"><a href="#基于ajax的get请求" class="headerlink" title="基于ajax的get请求"></a>基于ajax的get请求</h4><blockquote>
+<p>抓取豆瓣电影首页-排行榜-某一分类的电影的下拉加载数据</p>
+</blockquote>
+<ul>
+<li>排行榜 <a href="https://movie.douban.com/chart" target="_blank" rel="noopener">https://movie.douban.com/chart</a></li>
+<li>喜剧分类 <a href="https://movie.douban.com/typerank?type_name=%E5%96%9C%E5%89%A7&amp;type=24&amp;interval_id=100:90&amp;action=" target="_blank" rel="noopener">https://movie.douban.com/typerank?type_name=%E5%96%9C%E5%89%A7&amp;type=24&amp;interval_id=100:90&amp;action=</a></li>
+<li>下拉加载的动态数据接口 <a href="https://movie.douban.com/j/chart/top_list?type=24&amp;interval_id=100%3A90&amp;action=&amp;start=40&amp;limit=20" target="_blank" rel="noopener">https://movie.douban.com/j/chart/top_list?type=24&amp;interval_id=100%3A90&amp;action=&amp;start=40&amp;limit=20</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line"># 原始url</span><br><span class="line"># baseurl = &apos;https://movie.douban.com/j/chart/top_list?type=24&amp;interval_id=100%3A90&amp;action=&amp;start=40&amp;limit=20&apos;</span><br><span class="line"></span><br><span class="line"># 指定url</span><br><span class="line">url = &apos;https://movie.douban.com/j/chart/top_list&apos;</span><br><span class="line"></span><br><span class="line"># 封装ajax中  get参数</span><br><span class="line">params = &#123;</span><br><span class="line">    &apos;type&apos;:24,</span><br><span class="line">    &apos;interval_id&apos;:&apos;100:90&apos;,</span><br><span class="line">    &apos;action&apos;:&apos;&apos;,</span><br><span class="line">    &apos;start&apos;:40,</span><br><span class="line">    &apos;limit&apos;:20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 自定义请求头信息</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response = requests.get(url=url,params=params,headers=headers)</span><br><span class="line"></span><br><span class="line">print(response.text)</span><br></pre></td></tr></table></figure>
+<h4 id="基于ajax的post请求"><a href="#基于ajax的post请求" class="headerlink" title="基于ajax的post请求"></a>基于ajax的post请求</h4><p>获取肯德基城市餐厅位置数据</p>
+<ul>
+<li>肯德基官网 <a href="http://www.kfc.com.cn/kfccda/index.aspx" target="_blank" rel="noopener">http://www.kfc.com.cn/kfccda/index.aspx</a></li>
+<li>餐厅位置查询页面 <a href="http://www.kfc.com.cn/kfccda/storelist/index.aspx" target="_blank" rel="noopener">http://www.kfc.com.cn/kfccda/storelist/index.aspx</a></li>
+<li>搜索查询 北京 餐厅列表  看浏览器里的network里的抓包信息 获得url = <a href="http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword" target="_blank" rel="noopener">http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword</a></li>
+<li>餐厅列表有分页但是是  post的 继续分析他的请求参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword</span><br><span class="line"></span><br><span class="line">参数</span><br><span class="line">cname: </span><br><span class="line">pid: </span><br><span class="line">keyword: 上海</span><br><span class="line">pageIndex: 2</span><br><span class="line">pageSize: 10</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">url = &apos;http://www.kfc.com.cn/kfccda/ashx/GetStoreList.ashx?op=keyword&apos;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 封装ajax中  post参数</span><br><span class="line">data = &#123;</span><br><span class="line">    &apos;cname&apos;:&apos;&apos;,</span><br><span class="line">    &apos;pid&apos;:&apos;&apos;,</span><br><span class="line">    &apos;keyword&apos;: &apos;上海&apos;,</span><br><span class="line">    &apos;pageIndex&apos;:2,</span><br><span class="line">    &apos;pageSize&apos;:10</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#自定义请求头信息</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response = requests.post(url=url,data=data,headers=headers)</span><br><span class="line"></span><br><span class="line">print(response.text)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结论</p>
+</blockquote>
+<ul>
+<li>如果使用requests发起ajax请求 跟普通get/post请求是一样的</li>
+<li>无法通过地址栏请求，通过浏览器开发者工具抓包信息获取请求的url</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M07/">M07</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/11/29/Py007-01-05requests模块之post和ajax/" data-title="Py007-01-05requests模块之post和ajax | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/11/30/Py007-01-06requests综合实战/" title="Py007-01-06requests综合实战">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py007-01-06requests综合实战</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/11/29/Py007-01-04requests模块/"  title="Py007-01-04requests模块">
+ <strong>下一篇：</strong><br/> 
+ <span>Py007-01-04requests模块
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#requests模块之post请求"><span class="toc-number">1.</span> <span class="toc-text">requests模块之post请求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ajax的请求"><span class="toc-number">2.</span> <span class="toc-text">ajax的请求</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#基于ajax的get请求"><span class="toc-number">2.1.</span> <span class="toc-text">基于ajax的get请求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#基于ajax的post请求"><span class="toc-number">2.2.</span> <span class="toc-text">基于ajax的post请求</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

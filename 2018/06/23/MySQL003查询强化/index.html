@@ -1,0 +1,758 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>MySQL003查询强化 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="查询 占据90%的业务  1select * from 表名 ;  from关键字后面写表名，表示数据来源于是这张表 select后面写表中的列名，如果是*表示在结果中显示表中所有列 在select后面的列名部分，可以使用as为列起别名，这个别名出现在结果集中 如果要查询多个列，之间使用逗号分隔   查询所有  12345678select * from students;############">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL003查询强化">
+<meta property="og:url" content="http://yoursite.com/2018/06/23/MySQL003查询强化/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="查询 占据90%的业务  1select * from 表名 ;  from关键字后面写表名，表示数据来源于是这张表 select后面写表中的列名，如果是*表示在结果中显示表中所有列 在select后面的列名部分，可以使用as为列起别名，这个别名出现在结果集中 如果要查询多个列，之间使用逗号分隔   查询所有  12345678select * from students;############">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.252Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL003查询强化">
+<meta name="twitter:description" content="查询 占据90%的业务  1select * from 表名 ;  from关键字后面写表名，表示数据来源于是这张表 select后面写表中的列名，如果是*表示在结果中显示表中所有列 在select后面的列名部分，可以使用as为列起别名，这个别名出现在结果集中 如果要查询多个列，之间使用逗号分隔   查询所有  12345678select * from students;############">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/23/MySQL003查询强化/" title="MySQL003查询强化" itemprop="url">MySQL003查询强化</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-23T14:58:16.000Z" itemprop="datePublished"> Published 2018-06-23</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#查询"><span class="toc-number">1.</span> <span class="toc-text">查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#条件"><span class="toc-number">1.1.</span> <span class="toc-text">条件</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#比较运算符"><span class="toc-number">1.1.1.</span> <span class="toc-text">比较运算符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#逻辑运算符"><span class="toc-number">1.1.2.</span> <span class="toc-text">逻辑运算符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#模糊查询"><span class="toc-number">1.1.3.</span> <span class="toc-text">模糊查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#范围查询"><span class="toc-number">1.1.4.</span> <span class="toc-text">范围查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#空判断"><span class="toc-number">1.1.5.</span> <span class="toc-text">空判断</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#优先级"><span class="toc-number">1.1.6.</span> <span class="toc-text">优先级</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#聚合"><span class="toc-number">2.</span> <span class="toc-text">聚合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分组"><span class="toc-number">3.</span> <span class="toc-text">分组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#分组后筛选"><span class="toc-number">3.1.</span> <span class="toc-text">分组后筛选</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#对比where与having"><span class="toc-number">3.2.</span> <span class="toc-text">对比where与having</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#排序"><span class="toc-number">4.</span> <span class="toc-text">排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分页"><span class="toc-number">5.</span> <span class="toc-text">分页</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#示例：分页"><span class="toc-number">5.0.1.</span> <span class="toc-text">示例：分页</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><blockquote>
+<p>占据90%的业务</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 ;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>from关键字后面写表名，表示数据来源于是这张表</li>
+<li>select后面写表中的列名，如果是*表示在结果中显示表中所有列</li>
+<li>在select后面的列名部分，可以使用as为列起别名，这个别名出现在结果集中</li>
+<li>如果要查询多个列，之间使用逗号分隔</li>
+</ul>
+<blockquote>
+<p>查询所有</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">select * from students;</span><br><span class="line">##########################################################</span><br><span class="line">| id | name | birthday              | gender | isDelete |</span><br><span class="line">##########################################################</span><br><span class="line">  1    郭靖   2017-01-01 00:00:00       1</span><br><span class="line">  2    黄蓉   2017-01-01 00:00:00       0</span><br><span class="line">  3    郭芙   2017-01-01 00:00:00       0</span><br><span class="line">  4    杨过   2017-01-01 00:00:00       1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询 id和name列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select id,name from students;</span><br><span class="line">##########################################################</span><br><span class="line">  id   name</span><br><span class="line">  1    郭靖  </span><br><span class="line">  2    黄蓉   </span><br><span class="line">  3    郭芙   </span><br><span class="line">  4    杨过</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询gender</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select gender from students;</span><br><span class="line">##########################################################</span><br><span class="line">gender</span><br><span class="line">1</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>想看gender有多少种(去重复)</p>
+</blockquote>
+<ul>
+<li>distinct消除重复的行</li>
+<li>如果是多列比较的整个一行的每列进行去重复(如果你查了id肯定没法去重)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select distinct gender from students;</span><br><span class="line">##########################################################</span><br><span class="line">gender</span><br><span class="line">1</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+<h4 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 where 条件;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>where之后的内容为条件，它是对行进行筛选</p>
+</blockquote>
+<h5 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id=3;</span><br><span class="line">select * from students where id&gt;3;</span><br><span class="line">select * from students where id&gt;=3;</span><br><span class="line">select * from students where id&lt;3;</span><br><span class="line">select * from students where id&lt;=3;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询名字为「黄蓉」和的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name=&apos;黄蓉&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询名字不为「黄蓉」和的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name!=&apos;黄蓉&apos;;</span><br></pre></td></tr></table></figure>
+<h5 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h5><ul>
+<li>and</li>
+<li>or</li>
+<li>not</li>
+</ul>
+<blockquote>
+<p>学号大于3的女同学</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id&gt;3 and gender=0;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>编号小于4或没被删除的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id&lt;4 or isdelete=0;</span><br></pre></td></tr></table></figure>
+<h5 id="模糊查询"><a href="#模糊查询" class="headerlink" title="模糊查询"></a>模糊查询</h5><ul>
+<li>like</li>
+<li>%任意个字符</li>
+<li>_一个任意字符</li>
+</ul>
+<blockquote>
+<p>查询姓黄的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄%&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄且总共两个字的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄_&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄且总共三个字的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄__&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄或者叫靖的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄%&apos; or name like &apos;%靖&apos;;</span><br></pre></td></tr></table></figure>
+<h5 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h5><ul>
+<li>连续的范围</li>
+<li>不连续的范围</li>
+</ul>
+<blockquote>
+<p>in表示不连续的范围</p>
+</blockquote>
+<p>查询编号是1,3,8的学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id in(1,3,8);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>between … and …表示连续的范围</p>
+</blockquote>
+<p>查询编号是3-8的学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id between 3 and 8;</span><br></pre></td></tr></table></figure>
+<p>查询编号是3-8的「男」学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id between 3 and 8 and gender=1;</span><br></pre></td></tr></table></figure>
+<h5 id="空判断"><a href="#空判断" class="headerlink" title="空判断"></a>空判断</h5><ul>
+<li>null与’’是不同的</li>
+<li>判空is null</li>
+</ul>
+<blockquote>
+<p>查询没写地址的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is null;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询写了地址的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is not null;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询写了地址的女学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is not null and gender=0;</span><br></pre></td></tr></table></figure>
+<h5 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h5><ul>
+<li>小括号,not,比较运算符,逻辑运算符</li>
+<li>and比or先运算，如果同时出现并希望先算or,需要使用()</li>
+</ul>
+<h3 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h3><p>将现有的多行数据进行统计，统计的结果是你看不到任何原始数据了，只看到结果</p>
+<ul>
+<li>count</li>
+<li>max</li>
+<li>min</li>
+<li>sum</li>
+<li>avg</li>
+</ul>
+<blockquote>
+<p>count(*)表示计算总行数，括号中写星与列名，结果是相同的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">查询学生总数</span><br><span class="line">select count(*) from students;</span><br><span class="line"></span><br><span class="line">查询学生总数未被删除的</span><br><span class="line">select count(*) from students where isdelete=0;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>max(列)表示求此列的最大值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询女生的编号最大值</span><br><span class="line">select max(id) from students where gender=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>min(列)表示求此列的最小值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询未删除的学生最小编号</span><br><span class="line">select min(id) from students where isdelete=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>sum(列)表示求此列的和<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询男生的编号之后</span><br><span class="line">select sum(id) from students where gender=1;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>avg(列)表示求此列的平均值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询未删除女生的编号平均值</span><br><span class="line">select avg(id) from students where isdelete=0 and gender=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">查询最小编号的学生信息  ————子查询</span><br><span class="line">select * from students where id =(</span><br><span class="line">    select min(id) from students where isdelete=0</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><ul>
+<li>按照字段分组，表示此字段相同的数据会被放到一个组中</li>
+<li>分组后，只能查询出相同的数据列，对于有差异的数据列无法出现在结果集中</li>
+<li>可以对分组后的数据进行统计，做聚合运算</li>
+</ul>
+<p>语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select 列1,列2,聚合... from 表名 group by 列1,列2,列3...</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>查询男女生总数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select gender as 性别,count(*)</span><br><span class="line">from students</span><br><span class="line">group by gender;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>查询各城市人数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select hometown as 家乡,count(*)</span><br><span class="line">from students</span><br><span class="line">group by hometown;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="分组后筛选"><a href="#分组后筛选" class="headerlink" title="分组后筛选"></a>分组后筛选</h4><p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select 列1,列2,聚合... from 表名</span><br><span class="line">group by 列1,列2,列3...</span><br><span class="line">having 列1,...聚合...</span><br></pre></td></tr></table></figure>
+<ul>
+<li>having后面的条件运算符与where的相同</li>
+</ul>
+<blockquote>
+<p>查询男生总人数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">方案一</span><br><span class="line">select count(*)</span><br><span class="line">from students</span><br><span class="line">where gender=1;</span><br><span class="line">-----------------------------------</span><br><span class="line">方案二：</span><br><span class="line">select gender as 性别,count(*)</span><br><span class="line">from students</span><br><span class="line">group by gender</span><br><span class="line">having gender=1;</span><br></pre></td></tr></table></figure>
+<h4 id="对比where与having"><a href="#对比where与having" class="headerlink" title="对比where与having"></a>对比where与having</h4><ul>
+<li>where是对from后面指定的表进行数据筛选，属于对原始数据的筛选</li>
+<li>having是对group by的结果进行筛选</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">原始集合——&gt;where——&gt;结果集——&gt;分组&gt;结果集——&gt;having——&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><blockquote>
+<p>为了方便查看数据，可以对数据进行排序</p>
+</blockquote>
+<p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名</span><br><span class="line">order by 列1 asc|desc,列2 asc|desc,...</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将行数据按照列1进行排序，如果某些行列1的值相同时，则按照列2排序，以此类推</li>
+<li>默认按照列值从小到大排列</li>
+<li>asc从小到大排列，即升序</li>
+<li>desc从大到小排序，即降序</li>
+</ul>
+<blockquote>
+<p>查询未删除男生学生信息，按学号降序<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from students</span><br><span class="line">where gender=1 and isdelete=0</span><br><span class="line">order by id desc;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>查询未删除科目信息，按名称升序<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from subject</span><br><span class="line">where isdelete=0</span><br><span class="line">order by stitle;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="分页"><a href="#分页" class="headerlink" title="分页"></a>分页</h3><p>获取部分行</p>
+<blockquote>
+<p>当数据量过大时，在一页中查看数据是一件非常麻烦的事情</p>
+</blockquote>
+<p>语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 limit start,count;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>从start开始，获取count条数据</li>
+<li>start索引从0开始</li>
+</ul>
+<h5 id="示例：分页"><a href="#示例：分页" class="headerlink" title="示例：分页"></a>示例：分页</h5><blockquote>
+<p>已知：每页显示m条数据，当前显示第n页</p>
+</blockquote>
+<blockquote>
+<p>求总页数：此段逻辑后面会在python中实现</p>
+</blockquote>
+<ul>
+<li>查询总条数p1</li>
+<li>使用p1除以m得到p2</li>
+<li>如果整除则p2为总数页</li>
+<li>如果不整除则p2+1为总页数</li>
+</ul>
+<p>求第n页的数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from students</span><br><span class="line">where isdelete=0</span><br><span class="line">limit (n-1)*m,m</span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>完整的select语句</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名</span><br><span class="line">where ...</span><br><span class="line">group by ... having ...</span><br><span class="line">order by ...</span><br><span class="line">limit start,count</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>执行顺序</p>
+</blockquote>
+<ul>
+<li>from 表名</li>
+<li>where 条件</li>
+<li>group by 列名</li>
+<li>select distinct *</li>
+<li>having …</li>
+<li>order by …</li>
+<li>limit start,count</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mysql/">mysql</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/06/23/MySQL003查询强化/" data-title="MySQL003查询强化 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/06/24/MySQL004关系/" title="MySQL004关系">
+  <strong>上一篇：</strong><br/>
+  <span>
+  MySQL004关系</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/23/MySQL002增删查改/"  title="MySQL002CRUD">
+ <strong>下一篇：</strong><br/> 
+ <span>MySQL002CRUD
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#查询"><span class="toc-number">1.</span> <span class="toc-text">查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#条件"><span class="toc-number">1.1.</span> <span class="toc-text">条件</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#比较运算符"><span class="toc-number">1.1.1.</span> <span class="toc-text">比较运算符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#逻辑运算符"><span class="toc-number">1.1.2.</span> <span class="toc-text">逻辑运算符</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#模糊查询"><span class="toc-number">1.1.3.</span> <span class="toc-text">模糊查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#范围查询"><span class="toc-number">1.1.4.</span> <span class="toc-text">范围查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#空判断"><span class="toc-number">1.1.5.</span> <span class="toc-text">空判断</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#优先级"><span class="toc-number">1.1.6.</span> <span class="toc-text">优先级</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#聚合"><span class="toc-number">2.</span> <span class="toc-text">聚合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分组"><span class="toc-number">3.</span> <span class="toc-text">分组</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#分组后筛选"><span class="toc-number">3.1.</span> <span class="toc-text">分组后筛选</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#对比where与having"><span class="toc-number">3.2.</span> <span class="toc-text">对比where与having</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#排序"><span class="toc-number">4.</span> <span class="toc-text">排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分页"><span class="toc-number">5.</span> <span class="toc-text">分页</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#示例：分页"><span class="toc-number">5.0.1.</span> <span class="toc-text">示例：分页</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">6.</span> <span class="toc-text">总结</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

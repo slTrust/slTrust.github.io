@@ -1,0 +1,634 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py008-10-02nginx安装 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="前置工作(强烈建议买个服务器，省时省心) 不要买国内 (备案又一堆国情限制) https://www.vultr.com/ 去这个网站注册一个 充值10刀   购买服务器 登录 https://www.vultr.com/   选中左侧 Servers 进入 Servers页面 点击 蓝色按钮 “+” 选择一个服务器的位置  选择 服务器种类 CentOs 7x64  Serve Size 建立选">
+<meta name="keywords" content="M08">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py008-10-02nginx安装">
+<meta property="og:url" content="http://yoursite.com/2018/12/27/Py008-10-02nginx安装/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="前置工作(强烈建议买个服务器，省时省心) 不要买国内 (备案又一堆国情限制) https://www.vultr.com/ 去这个网站注册一个 充值10刀   购买服务器 登录 https://www.vultr.com/   选中左侧 Servers 进入 Servers页面 点击 蓝色按钮 “+” 选择一个服务器的位置  选择 服务器种类 CentOs 7x64  Serve Size 建立选">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.308Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py008-10-02nginx安装">
+<meta name="twitter:description" content="前置工作(强烈建议买个服务器，省时省心) 不要买国内 (备案又一堆国情限制) https://www.vultr.com/ 去这个网站注册一个 充值10刀   购买服务器 登录 https://www.vultr.com/   选中左侧 Servers 进入 Servers页面 点击 蓝色按钮 “+” 选择一个服务器的位置  选择 服务器种类 CentOs 7x64  Serve Size 建立选">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/27/Py008-10-02nginx安装/" title="Py008-10-02nginx安装" itemprop="url">Py008-10-02nginx安装</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-27T13:34:11.000Z" itemprop="datePublished"> Published 2018-12-27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前置工作-强烈建议买个服务器，省时省心"><span class="toc-number">1.</span> <span class="toc-text">前置工作(强烈建议买个服务器，省时省心)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#购买服务器"><span class="toc-number">1.1.</span> <span class="toc-text">购买服务器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx获取"><span class="toc-number">2.</span> <span class="toc-text">nginx获取</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-安装"><span class="toc-number">2.1.</span> <span class="toc-text">nginx 安装</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#源码安装三部曲"><span class="toc-number">2.1.1.</span> <span class="toc-text">源码安装三部曲</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#相关文件"><span class="toc-number">2.2.</span> <span class="toc-text">相关文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-启动"><span class="toc-number">2.3.</span> <span class="toc-text">nginx 启动</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="前置工作-强烈建议买个服务器，省时省心"><a href="#前置工作-强烈建议买个服务器，省时省心" class="headerlink" title="前置工作(强烈建议买个服务器，省时省心)"></a>前置工作(强烈建议买个服务器，省时省心)</h3><ul>
+<li>不要买国内 (备案又一堆国情限制)</li>
+<li><a href="https://www.vultr.com/" target="_blank" rel="noopener">https://www.vultr.com/</a> 去这个网站注册一个 充值10刀 </li>
+</ul>
+<h4 id="购买服务器"><a href="#购买服务器" class="headerlink" title="购买服务器"></a>购买服务器</h4><ol>
+<li>登录 <a href="https://www.vultr.com/" target="_blank" rel="noopener">https://www.vultr.com/</a>  </li>
+<li>选中左侧 Servers 进入 Servers页面</li>
+<li>点击 蓝色按钮 “+” 选择一个服务器的位置 </li>
+<li>选择 服务器种类 CentOs 7x64 </li>
+<li>Serve Size 建立选3.5刀的  </li>
+<li>添加你的ssh key 这样你本机如果有公钥 就可以免密登录</li>
+<li>Server Hostname &amp; Label 填个 test</li>
+<li>deploy now  开始帮你部署</li>
+<li>Running 代表你的机器部署好了</li>
+</ol>
+<blockquote>
+<p>如果选错了 或者觉得机器装的软件有问题 ，你可以选择销毁这个服务器 Server Destroy</p>
+</blockquote>
+<blockquote>
+<p>选择你的服务器</p>
+</blockquote>
+<ul>
+<li>IP Address 就是可以登录的ip</li>
+<li>Username root 用户名</li>
+<li>Password 登录的密码</li>
+</ul>
+<blockquote>
+<p>远程登录服务器</p>
+</blockquote>
+<ul>
+<li>我的是mac 可以直接 命令行操作</li>
+<li>如果是window 请自行安装 xshell（建议5版本）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ssh root@45.32.35.132 </span><br><span class="line">然后输入密码</span><br><span class="line"></span><br><span class="line">如果你添加了 ssh key就可以不用密码  直接</span><br><span class="line">ssh root@45.32.35.132</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>坑之ssh登录不上</p>
+</blockquote>
+<ul>
+<li><p>可能被墙了 推荐去 这个网站扫描一下测试一下 <a href="http://tool.chinaz.com/port/" target="_blank" rel="noopener">http://tool.chinaz.com/port/</a></p>
+</li>
+<li><p>报超时</p>
+</li>
+<li><p>错误(意思就是把你known_hosts 清空)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @</span><br><span class="line">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!</span><br><span class="line">Someone could be eavesdropping on you right now (man-in-the-middle attack)!</span><br><span class="line">It is also possible that a host key has just been changed.</span><br><span class="line">The fingerprint for the ECDSA key sent by the remote host is</span><br><span class="line">SHA256:IfqkeAv7S54WxWzUG1AwYW75Ihzc3WUyP3D2eiCvTpw.</span><br><span class="line">Please contact your system administrator.</span><br><span class="line">Add correct host key in /Users/huangjiaxi/.ssh/known_hosts to get rid of this message.</span><br><span class="line">Offending ECDSA key in /Users/huangjiaxi/.ssh/known_hosts:6</span><br><span class="line">ECDSA host key for 45.77.47.0 has changed and you have requested strict checking.</span><br><span class="line">Host key verification failed.</span><br><span class="line"></span><br><span class="line"># 切换到你的 .ssh目录</span><br><span class="line">/Users/huangjiaxi/.ssh/</span><br><span class="line">把 known_hosts 里的内容清空</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a href="https://ningandjiao.iteye.com/blog/1517793" target="_blank" rel="noopener">https://ningandjiao.iteye.com/blog/1517793</a></p>
+</blockquote>
+<h3 id="nginx获取"><a href="#nginx获取" class="headerlink" title="nginx获取"></a>nginx获取</h3><ul>
+<li>官方源码包 <a href="http://nginx.org/" target="_blank" rel="noopener">http://nginx.org/</a></li>
+<li>下载页 <a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">http://nginx.org/en/download.html</a> 选择1.15.x版本 复制地址</li>
+<li>wget <a href="http://www.nginx.org/download/nginx-1.15.5.tar.gz" target="_blank" rel="noopener">http://www.nginx.org/download/nginx-1.15.5.tar.gz</a> -P /usr/src</li>
+</ul>
+<h4 id="nginx-安装"><a href="#nginx-安装" class="headerlink" title="nginx 安装"></a>nginx 安装</h4><blockquote>
+<h5 id="源码安装三部曲"><a href="#源码安装三部曲" class="headerlink" title="源码安装三部曲"></a>源码安装三部曲</h5></blockquote>
+<ul>
+<li>配置</li>
+<li>编译</li>
+<li>安装</li>
+</ul>
+<blockquote>
+<p>配置 configure</p>
+</blockquote>
+<ul>
+<li>prefix=path 安装路径</li>
+<li>–help 配置参数</li>
+</ul>
+<blockquote>
+<p>编译</p>
+</blockquote>
+<ul>
+<li>make</li>
+</ul>
+<blockquote>
+<p>安装</p>
+</blockquote>
+<ul>
+<li>make install</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"># 远程登录你的服务器</span><br><span class="line"># 如果你有 ssh key 就可以免密登录</span><br><span class="line">ssh root@xxx.xx.xx.xx  </span><br><span class="line"></span><br><span class="line"># 查看 hostname </span><br><span class="line">hostname</span><br><span class="line"></span><br><span class="line">##### 下载nginx源码包</span><br><span class="line"># 下载 nginx源码包 安装到 /usr/src 目录 是一个压缩包</span><br><span class="line">wget http://www.nginx.org/download/nginx-1.15.5.tar.gz -P /usr/src</span><br><span class="line"># 如果 提示没有 wget命令 你就</span><br><span class="line"># yum -y install wget</span><br><span class="line"></span><br><span class="line"># 查看是否下载内容大小</span><br><span class="line"># du -h /usr/src/nginx-1.15.5.tar.gz</span><br><span class="line"></span><br><span class="line"># 切换到源码包目录</span><br><span class="line">cd /usr/src </span><br><span class="line"># 解压源码包</span><br><span class="line">tar xf nginx-1.15.5.tar.gz</span><br><span class="line"># 查看当前目录文件</span><br><span class="line">ls</span><br><span class="line">debug  kernels  nginx-1.15.5  nginx-1.15.5.tar.gz</span><br><span class="line"></span><br><span class="line"># 切换到 解压后的源码包目录</span><br><span class="line">cd nginx-1.15.5</span><br><span class="line"># ls有如下文件</span><br><span class="line">auto     CHANGES.ru  configure  html     man     src</span><br><span class="line">CHANGES  conf        contrib    LICENSE  README</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># configure 就类似 window下的exe文件</span><br><span class="line"># 查看安装参数解释</span><br><span class="line">./configure --help</span><br><span class="line"></span><br><span class="line"># 指定nginx 安装路径</span><br><span class="line">./configure --prefix=/usr/local/nginx</span><br><span class="line"></span><br><span class="line"># 此时一定报错，因为你是最小化安装 ，所以源码需要一个编译器</span><br><span class="line"># checking for OS</span><br><span class="line"># + Linux 3.10.0-957.1.3.el7.x86_64 x86_64</span><br><span class="line"># checking for C compiler ... not found</span><br><span class="line"># ./configure: error: C compiler cc is not found</span><br><span class="line"></span><br><span class="line"># 安装 cc编译器 gcc</span><br><span class="line"># 后期nginx url重写的包 pcre-devel </span><br><span class="line"># 解压缩的包 zlib zlib-devel</span><br><span class="line">yum -y install  gcc pcre-devel zlib zlib-devel</span><br><span class="line"></span><br><span class="line"># 再次执行 configure命令 ，如果没有error安装成功 有error 一定要解决 不然后患无穷</span><br><span class="line">./configure --prefix=/usr/local/nginx</span><br><span class="line"></span><br><span class="line"># 编译源码 将源码变成可执行文件 没有error代表 成功</span><br><span class="line">make</span><br><span class="line"></span><br><span class="line"># 安装 </span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<h4 id="相关文件"><a href="#相关文件" class="headerlink" title="相关文件"></a>相关文件</h4><ul>
+<li>安装路径nginx path prefix : /usr/local/nginx </li>
+<li>启动文件nginx binary file: /usr/local/nginx/sbin/nginx</li>
+<li>nginx模块 nginx modules path: /usr/local/nginx/modules</li>
+<li>配置文件目录 nginx configuration prefix: /usr/local/nginx/conf</li>
+<li>配置文件 nginx configuration file: /usr/local/nginx/conf/nginx.conf</li>
+<li>进程号文件 pid file: /usr/local/nginx/logs/nginx.pid</li>
+<li>错误日志 nginx error log file : /usr/local/nginx/logs/error.log</li>
+<li>访问日志 nginx http access log file: /usr/local/nginx/logs/access.log</li>
+</ul>
+<h4 id="nginx-启动"><a href="#nginx-启动" class="headerlink" title="nginx 启动"></a>nginx 启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/nginx/sbin/nginx 端口 监听地址 协议</span><br><span class="line"></span><br><span class="line"># 直接这样是很冒险的 因为你不知道端口是不是占用了</span><br><span class="line">/usr/local/nginx/sbin/nginx</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看端口有没有人占用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">lsof -i :80</span><br><span class="line"># 如果提示没有 lsof命令 请安装</span><br><span class="line">yum -y install lsof</span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">netstat -ntpl</span><br><span class="line"># 如果提示没有 netstat命令 请安装</span><br><span class="line">yum install net-tools</span><br><span class="line"># 安装这个模块 后 ifconfig 命令也有了</span><br><span class="line"></span><br><span class="line"># 查看nginx服务是否启动成功 安装命令行下的 文本浏览器 elinks </span><br><span class="line"># yum -y install elinks</span><br><span class="line"># 除此之外还有一个 curl</span><br><span class="line"># 查看启动是否成功</span><br><span class="line"></span><br><span class="line">elinks http://你的ip地址 --dump</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M08/">M08</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/12/27/Py008-10-02nginx安装/" data-title="Py008-10-02nginx安装 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/12/27/Py008-10-03nginx配置详解/" title="Py008-10-03nginx配置详解">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py008-10-03nginx配置详解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/12/27/Py008-10-01nginx介绍/"  title="Py008-10-01nginx介绍">
+ <strong>下一篇：</strong><br/> 
+ <span>Py008-10-01nginx介绍
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前置工作-强烈建议买个服务器，省时省心"><span class="toc-number">1.</span> <span class="toc-text">前置工作(强烈建议买个服务器，省时省心)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#购买服务器"><span class="toc-number">1.1.</span> <span class="toc-text">购买服务器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nginx获取"><span class="toc-number">2.</span> <span class="toc-text">nginx获取</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-安装"><span class="toc-number">2.1.</span> <span class="toc-text">nginx 安装</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#源码安装三部曲"><span class="toc-number">2.1.1.</span> <span class="toc-text">源码安装三部曲</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#相关文件"><span class="toc-number">2.2.</span> <span class="toc-text">相关文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#nginx-启动"><span class="toc-number">2.3.</span> <span class="toc-text">nginx 启动</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

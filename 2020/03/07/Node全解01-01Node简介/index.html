@@ -1,0 +1,686 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node全解01_01Node简介 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Node.js是什么 是一个平台   将多种技术组合起来 让JS 也能调用系统接口，开发后端应用   Node.js用到那些技术   V8引擎 libuv C/C++实现的 c-ares、http-parser、OpenSSL、zlib等库  Node.js的技术架构123456Node.js API (http模块 fs stream 等)----------------------------">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node全解01_01Node简介">
+<meta property="og:url" content="http://yoursite.com/2020/03/07/Node全解01-01Node简介/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Node.js是什么 是一个平台   将多种技术组合起来 让JS 也能调用系统接口，开发后端应用   Node.js用到那些技术   V8引擎 libuv C/C++实现的 c-ares、http-parser、OpenSSL、zlib等库  Node.js的技术架构123456Node.js API (http模块 fs stream 等)----------------------------">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.270Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node全解01_01Node简介">
+<meta name="twitter:description" content="Node.js是什么 是一个平台   将多种技术组合起来 让JS 也能调用系统接口，开发后端应用   Node.js用到那些技术   V8引擎 libuv C/C++实现的 c-ares、http-parser、OpenSSL、zlib等库  Node.js的技术架构123456Node.js API (http模块 fs stream 等)----------------------------">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/07/Node全解01-01Node简介/" title="Node全解01_01Node简介" itemprop="url">Node全解01_01Node简介</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-07T02:56:44.000Z" itemprop="datePublished"> Published 2020-03-07</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Node-js是什么"><span class="toc-number">1.</span> <span class="toc-text">Node.js是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Node-js的技术架构"><span class="toc-number">1.0.1.</span> <span class="toc-text">Node.js的技术架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是-bindings"><span class="toc-number">1.0.2.</span> <span class="toc-text">什么是 bindings</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JS-和-C-交互"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">JS 和 C++ 交互</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#先看下-0-10版的-Node-依赖了什么"><span class="toc-number">1.0.3.</span> <span class="toc-text">先看下 0.10版的 Node 依赖了什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libuv是什么"><span class="toc-number">1.0.4.</span> <span class="toc-text">libuv是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#V8是什么"><span class="toc-number">1.0.5.</span> <span class="toc-text">V8是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Event-Loop-是什么"><span class="toc-number">1.0.6.</span> <span class="toc-text">Event Loop 是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Event-loop"><span class="toc-number">1.0.6.1.</span> <span class="toc-text">Event loop</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.0.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Node-js是什么"><a href="#Node-js是什么" class="headerlink" title="Node.js是什么"></a>Node.js是什么</h1><blockquote>
+<p>是一个平台</p>
+</blockquote>
+<ul>
+<li>将多种技术组合起来</li>
+<li>让JS 也能调用系统接口，开发后端应用</li>
+</ul>
+<blockquote>
+<p>Node.js用到那些技术</p>
+</blockquote>
+<ul>
+<li>V8引擎</li>
+<li>libuv</li>
+<li>C/C++实现的 c-ares、http-parser、OpenSSL、zlib等库</li>
+</ul>
+<h3 id="Node-js的技术架构"><a href="#Node-js的技术架构" class="headerlink" title="Node.js的技术架构"></a>Node.js的技术架构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Node.js API (http模块 fs stream 等)</span><br><span class="line">-------------------------------------</span><br><span class="line">Node.js bindings |  c/c++插件</span><br><span class="line">让JS和 c/c++通讯  ｜  自定义其他能力</span><br><span class="line">------------------------------------------------------------------</span><br><span class="line">JS引擎 v8 | 跨平台的异步IO能力 libuv | DNS解析｜加密解密OpenSSL | 其他。。。</span><br></pre></td></tr></table></figure>
+<p>随着Node.js的版本从 0.8升级到 12.11.1 架构也一直变化<br>如果你想看源代码，推进看 <a href="https://github.com/nodejs/node/tree/v0.10" target="_blank" rel="noopener">0.10版本</a><br>因为这一版使用了很长的时间，而且源代码比最新版少很多</p>
+<blockquote>
+<p>如果你想了解更多，可以看 <a href="https://github.com/yjhjstz/deep-into-node" target="_blank" rel="noopener">yjhjstz/deep-into-node</a></p>
+</blockquote>
+<h3 id="什么是-bindings"><a href="#什么是-bindings" class="headerlink" title="什么是 bindings"></a>什么是 bindings</h3><blockquote>
+<p>背景</p>
+</blockquote>
+<ul>
+<li>C/C++实现了一个 http_parser 库，很高效</li>
+<li>你只会写JS,但是你想调用这个库</li>
+<li>直接调用肯定不行，你需要一个中间的桥梁</li>
+</ul>
+<blockquote>
+<p>bindings</p>
+</blockquote>
+<ul>
+<li>Node.js 用C++ 对 http_parser 进行封装，使它符合某些要求，封装的的文件叫做 http_parser_bindings.cpp</li>
+<li>用 Node.js提供的编译工具将其编译为 .node文件</li>
+<li>JS代码可以直接 require 这个 .node文件</li>
+<li>这样JS就可以 调用 C++库,中间的桥梁就是 bindings</li>
+<li>由于 Node.js 提供了很多 binding， 所以叫做 bindings</li>
+<li>这就是 bindings</li>
+</ul>
+<h4 id="JS-和-C-交互"><a href="#JS-和-C-交互" class="headerlink" title="JS 和 C++ 交互"></a>JS 和 C++ 交互</h4><ul>
+<li>JS调用 C++ 代码<ul>
+<li><a href="http://nodejs.cn/api/addons.html#addons_function_arguments" target="_blank" rel="noopener">官方例子</a></li>
+</ul>
+</li>
+<li>C++调用 JS回调<ul>
+<li><a href="http://nodejs.cn/api/addons.html#addons_callbacks" target="_blank" rel="noopener">官方例子</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="先看下-0-10版的-Node-依赖了什么"><a href="#先看下-0-10版的-Node-依赖了什么" class="headerlink" title="先看下 0.10版的 Node 依赖了什么"></a>先看下 0.10版的 Node 依赖了什么</h3><ul>
+<li><a href="https://github.com/nodejs/node/tree/v0.10/deps" target="_blank" rel="noopener">node0.10版 deps目录</a></li>
+</ul>
+<h3 id="libuv是什么"><a href="#libuv是什么" class="headerlink" title="libuv是什么"></a>libuv是什么</h3><blockquote>
+<p>背景</p>
+</blockquote>
+<ul>
+<li>FreeBSD 系统有个 kqueue</li>
+<li>Linux 有个 epoll</li>
+<li>Windows 有个 IOCP</li>
+<li>Ryan 为了一个跨平台的异步IO库，开始写 libuv</li>
+<li>libuv 会根据系统自动选择合适的方案</li>
+</ul>
+<blockquote>
+<p>功能</p>
+</blockquote>
+<ul>
+<li>可以用于TCP/UDP/DNS 文件等的异步操作</li>
+</ul>
+<h3 id="V8是什么"><a href="#V8是什么" class="headerlink" title="V8是什么"></a>V8是什么</h3><blockquote>
+<p>功能</p>
+</blockquote>
+<ul>
+<li>将JS源代码变成本地代码并执行</li>
+<li>维护调用栈，确保JS函数的执行顺序</li>
+<li>内存管理，为所有对象分配内存</li>
+<li>垃圾回收，重复利用无用的内存</li>
+<li>实现JS的标准库</li>
+</ul>
+<blockquote>
+<p>注意</p>
+</blockquote>
+<ul>
+<li>V8不提供DOM API</li>
+<li>V8执行 JS 是单线程的， V8本身是多线程的</li>
+<li>可以开启两个线程分别执行JS</li>
+<li>V8本身是包含多个线程的，如垃圾回收为单独线程</li>
+<li>自带 eventloop 但 Node.js 基于 libuv 自己做了一个</li>
+</ul>
+<h3 id="Event-Loop-是什么"><a href="#Event-Loop-是什么" class="headerlink" title="Event Loop 是什么"></a>Event Loop 是什么</h3><blockquote>
+<p>什么是 Event</p>
+</blockquote>
+<ul>
+<li>setTimeout 的时间到了，就会产生一个事件</li>
+<li>文件可以读取了，读取出错了</li>
+<li>socket 有内容了，关闭了</li>
+</ul>
+<blockquote>
+<p>什么是 Loop</p>
+</blockquote>
+<ul>
+<li>loop 就是循环，比如 while(true) 循环</li>
+<li>由于事件是分优先级的，所以处理起来也是分先后的<ul>
+<li>setTimeout(f1,100)</li>
+<li>fs.readFile(‘1.txt’,f2)</li>
+<li>server.on(‘close’,f3)</li>
+</ul>
+</li>
+<li>所以 Node.js 需要按顺序轮询每种事件</li>
+<li>这种轮询往往都是循环的， 1=&gt;2=&gt;3=&gt;1=&gt;2=&gt;3</li>
+</ul>
+<blockquote>
+<p>Event Loop</p>
+</blockquote>
+<ul>
+<li>操作系统可以触发事件，JS可以处理事件</li>
+<li>Event Loop 就是对事件处理顺序的管理</li>
+</ul>
+<h4 id="Event-loop"><a href="#Event-loop" class="headerlink" title="Event loop"></a>Event loop</h4><ul>
+<li><a href="https://juejin.im/post/5ab7677f6fb9a028d56711d0" target="_blank" rel="noopener">翻译版官方文档</a></li>
+<li>读官方文档是最好的方式</li>
+</ul>
+<blockquote>
+<p>重点阶段 </p>
+</blockquote>
+<ul>
+<li>times 检查计时器</li>
+<li>poll 轮询，检查系统事件</li>
+<li>check 检查 setImmediate 回调</li>
+<li>其他阶段可暂时不考虑</li>
+</ul>
+<blockquote>
+<p>注意</p>
+</blockquote>
+<ul>
+<li>大部分时间， Node.js 都停留在 poll 轮询阶段</li>
+<li>大部分事件都在 poll 阶段被处理，如文件、网络请求</li>
+</ul>
+<p><strong>前面总结过Event loop 的知识点，可参考 Node-JS专精里的Eventloop章节</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>用 libuv 进行异步I/O操作</li>
+<li>用 eventloop 管理事件处理顺序</li>
+<li>用 C/C++ 库高效处理 DNS/HTTP …</li>
+<li>用 bindings 让 JS 和 C/C++ 沟通</li>
+<li>用 V8 运行 JS</li>
+<li>用 Node.js 标准库简化 JS 代码</li>
+<li>这就是 Node.js</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/07/Node全解01-01Node简介/" data-title="Node全解01_01Node简介 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/03/07/Node全解01-02如何学习Node/" title="Node全解01_02如何学习Node">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node全解01_02如何学习Node</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/06/Node-JS专精13-02继承和组合/"  title="Node-JS专精13_02继承和组合">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精13_02继承和组合
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Node-js是什么"><span class="toc-number">1.</span> <span class="toc-text">Node.js是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Node-js的技术架构"><span class="toc-number">1.0.1.</span> <span class="toc-text">Node.js的技术架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是-bindings"><span class="toc-number">1.0.2.</span> <span class="toc-text">什么是 bindings</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JS-和-C-交互"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">JS 和 C++ 交互</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#先看下-0-10版的-Node-依赖了什么"><span class="toc-number">1.0.3.</span> <span class="toc-text">先看下 0.10版的 Node 依赖了什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libuv是什么"><span class="toc-number">1.0.4.</span> <span class="toc-text">libuv是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#V8是什么"><span class="toc-number">1.0.5.</span> <span class="toc-text">V8是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Event-Loop-是什么"><span class="toc-number">1.0.6.</span> <span class="toc-text">Event Loop 是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Event-loop"><span class="toc-number">1.0.6.1.</span> <span class="toc-text">Event loop</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#总结"><span class="toc-number">1.0.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

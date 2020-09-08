@@ -1,0 +1,598 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py008-10-06反向代理 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="反向代理介绍客户机发送请求时，不会直接发送给目的主机，而是先发送给代理服务器，代理服务客户机请求之后，再向主机发出，并接收目的主机返回的数据，存放在代理服务器的硬盘中，再发送给客户端。  正向代理  1代替用户上网，如长城宽带有很多代理服务器，你访问新浪的时候就会把这个内容缓存到代理服务器上，下次再有用户访问新浪的时候就不用直接去新浪了，直接去代理服务器  反向代理  1234567代理服务器，就">
+<meta name="keywords" content="M08">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py008-10-06反向代理">
+<meta property="og:url" content="http://yoursite.com/2019/01/02/Py008-10-06反向代理/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="反向代理介绍客户机发送请求时，不会直接发送给目的主机，而是先发送给代理服务器，代理服务客户机请求之后，再向主机发出，并接收目的主机返回的数据，存放在代理服务器的硬盘中，再发送给客户端。  正向代理  1代替用户上网，如长城宽带有很多代理服务器，你访问新浪的时候就会把这个内容缓存到代理服务器上，下次再有用户访问新浪的时候就不用直接去新浪了，直接去代理服务器  反向代理  1234567代理服务器，就">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.308Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py008-10-06反向代理">
+<meta name="twitter:description" content="反向代理介绍客户机发送请求时，不会直接发送给目的主机，而是先发送给代理服务器，代理服务客户机请求之后，再向主机发出，并接收目的主机返回的数据，存放在代理服务器的硬盘中，再发送给客户端。  正向代理  1代替用户上网，如长城宽带有很多代理服务器，你访问新浪的时候就会把这个内容缓存到代理服务器上，下次再有用户访问新浪的时候就不用直接去新浪了，直接去代理服务器  反向代理  1234567代理服务器，就">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/02/Py008-10-06反向代理/" title="Py008-10-06反向代理" itemprop="url">Py008-10-06反向代理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-02T12:41:14.000Z" itemprop="datePublished"> Published 2019-01-02</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#反向代理介绍"><span class="toc-number">1.</span> <span class="toc-text">反向代理介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#反向代理的好处"><span class="toc-number">1.1.</span> <span class="toc-text">反向代理的好处</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#应用场景"><span class="toc-number">1.2.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#堡垒机场景"><span class="toc-number">1.3.</span> <span class="toc-text">堡垒机场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#内网服务器发布场景（就一个公网ip）"><span class="toc-number">1.4.</span> <span class="toc-text">内网服务器发布场景（就一个公网ip）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#缓存场景"><span class="toc-number">1.5.</span> <span class="toc-text">缓存场景</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#反向代理原理"><span class="toc-number">2.</span> <span class="toc-text">反向代理原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#反向代理实践"><span class="toc-number">2.1.</span> <span class="toc-text">反向代理实践</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#优化反向代理的配置"><span class="toc-number">3.</span> <span class="toc-text">优化反向代理的配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#proxy-set-header设置请求头"><span class="toc-number">3.1.</span> <span class="toc-text">proxy_set_header设置请求头</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="反向代理介绍"><a href="#反向代理介绍" class="headerlink" title="反向代理介绍"></a>反向代理介绍</h3><p>客户机发送请求时，不会直接发送给目的主机，而是先发送给代理服务器，代理服务客户机请求之后，再向主机发出，并接收目的主机返回的数据，存放在代理服务器的硬盘中，再发送给客户端。</p>
+<blockquote>
+<p>正向代理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代替用户上网，如长城宽带有很多代理服务器，你访问新浪的时候就会把这个内容缓存到代理服务器上，下次再有用户访问新浪的时候就不用直接去新浪了，直接去代理服务器</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>反向代理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">代理服务器，就是把服务器发布出去。</span><br><span class="line"></span><br><span class="line">如：买车 的4S店  它就是厂家的代理</span><br><span class="line">你 ------&gt; 4s店 ------&gt; 汽车厂家</span><br><span class="line"></span><br><span class="line">在以前没有4S店，你就只能去厂家下单提车，</span><br><span class="line">如果有4S店，去4S店发起购买请求，然后下单，等待4S店把车拿来。</span><br></pre></td></tr></table></figure>
+<h4 id="反向代理的好处"><a href="#反向代理的好处" class="headerlink" title="反向代理的好处"></a>反向代理的好处</h4><p>就4S店的例子</p>
+<ul>
+<li>对我们来说：4S店 让我们买车更方便，在家门口，而且不用应对海量用户。同时也是一个问题收集窗口(出了问题你肯定去4S店闹，不会去厂家)</li>
+<li>对厂家来说：可以专心生产汽车</li>
+</ul>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><blockquote>
+<h4 id="堡垒机场景"><a href="#堡垒机场景" class="headerlink" title="堡垒机场景"></a>堡垒机场景</h4></blockquote>
+<blockquote>
+<p>前段时间，汉某酒店的住户数据被盗了，用户数据泄漏</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">客户端--------&gt; 反向代理服务器(公网)(堡垒机)--------&gt;业务服务器(私网)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">业务服务器：安全配置只接受来自堡垒机的链接访问，其他拒绝(客户端公网无法访问私网服务器)</span><br><span class="line">只接收堡垒机ip和xx端口的访问</span><br><span class="line"></span><br><span class="line">堡垒机：没有数据。防止拖库</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="内网服务器发布场景（就一个公网ip）"><a href="#内网服务器发布场景（就一个公网ip）" class="headerlink" title="内网服务器发布场景（就一个公网ip）"></a>内网服务器发布场景（就一个公网ip）</h4></blockquote>
+<p>适用于公网IP地址不足的场景</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">            (虚拟主机的方式配置三个代理)</span><br><span class="line">客户端--------&gt; 反向代理服务器(公网)--------&gt;业务服务器(私网) Php</span><br><span class="line">                        |---------------&gt; 业务服务器(私网) Java</span><br><span class="line">                        |---------------&gt; 业务服务器(私网) Python</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="缓存场景"><a href="#缓存场景" class="headerlink" title="缓存场景"></a>缓存场景</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">客户端--------&gt; 缓存服务器(公网)(缓存静态服务器)--------&gt;业务服务器(私网)</span><br><span class="line"></span><br><span class="line">静态数据直接从缓存服务器拿</span><br><span class="line">动态数据从业务服务器拿</span><br><span class="line"></span><br><span class="line">当用户访问一个网站时，就会瞬间得到静态数据，这个时候网站已经开始渲染了</span><br><span class="line">动态数据可能过来慢一点，当渲染完静态数据时，动态数据也过来了。这个时候你就看到整个页面了</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一个页面你选择5s后一次返回结果</li>
+<li>还是你访问的时候数据不断的开始展示。(更好的用户体验，减小业务服务器压力)</li>
+</ul>
+<h3 id="反向代理原理"><a href="#反向代理原理" class="headerlink" title="反向代理原理"></a>反向代理原理</h3><ol>
+<li>客户端通过浏览器器 发起请求 代理理服务器器</li>
+<li>代理理服务器器 接受请求</li>
+<li>代理理服务器器 发起请求 业务服务器器</li>
+<li>业务服务器器 接受请求</li>
+<li>业务服务器器 处理理请求</li>
+<li>业务服务器器 响应请求 代理理服务器器</li>
+<li>代理理服务器器 响应请求 客户端</li>
+<li>客户端通过浏览器器渲染请求并展示给⽤用户</li>
+</ol>
+<h4 id="反向代理实践"><a href="#反向代理实践" class="headerlink" title="反向代理实践"></a>反向代理实践</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">client mac</span><br><span class="line"></span><br><span class="line">反向代理 nginx </span><br><span class="line"></span><br><span class="line">业务机器 book.ayitula.com   http://118.190.209.153:4000/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>前提保证你的nginx能上网，不然代理是不行的</p>
+</blockquote>
+<ul>
+<li>proxy_pass配置 你的代理地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nginx/conf</span><br><span class="line"></span><br><span class="line"># 备份配置</span><br><span class="line">cp nginx.conf nginx.conf.2</span><br><span class="line">cp nginx.conf.default nginx.conf</span><br><span class="line"></span><br><span class="line"># 修改配置文件</span><br><span class="line">vi nginx.conf</span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">        # 代理的ip地址</span><br><span class="line">        proxy_pass http://118.190.209.153:4000/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 杀掉nginx进程</span><br><span class="line">killall nginx</span><br><span class="line"># 重启nginx</span><br><span class="line">/usr/local/nginx/sbin/nginx </span><br><span class="line"></span><br><span class="line"># 访问你的服务器ip就ok了</span><br></pre></td></tr></table></figure>
+<h3 id="优化反向代理的配置"><a href="#优化反向代理的配置" class="headerlink" title="优化反向代理的配置"></a>优化反向代理的配置</h3><blockquote>
+<h4 id="proxy-set-header设置请求头"><a href="#proxy-set-header设置请求头" class="headerlink" title="proxy_set_header设置请求头"></a>proxy_set_header设置请求头</h4></blockquote>
+<ul>
+<li>你访问代理的时候所有请求信息都在 代理服务器，对于代理服务器的日志它能知道谁访问了它</li>
+<li>但是对于 业务服务来说，只知道是代理服务器访问了，如果想知道 客户端是谁就要设置请求头 来告诉业务服务器是谁拿的数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">设置</span><br><span class="line">proxy_set_header X-Real-IP</span><br><span class="line">proxy_set_header X-Forwarded-For </span><br><span class="line">是因为不同厂家 设置的头不一样</span><br><span class="line">有的针对 X-Real-IP 有的针对  X-Forwarded-For 提取用户</span><br><span class="line">都加上就能满足所有需求</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>#### </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">    index index.php index.html index.htm; #定义⾸首⻚页索引⽂文件的名称</span><br><span class="line">    proxy_pass http://mysvr ;#请求转向mysvr 定义的服务器器列列表 proxy_set_header Host $host;</span><br><span class="line">    proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; </span><br><span class="line">    client_max_body_size 10m; #允许客户端请求的最⼤大单⽂文件字节数 </span><br><span class="line">    client_body_buffer_size 128k; #缓冲区代理理缓冲⽤用户端请求的最⼤大字节数， proxy_connect_timeout 90; #nginx跟后端服务器器连接超时时间(代理理连接超时)</span><br><span class="line">    #后端服务器器数据回传时间(代理理发送超时) #连接成功后，后端服务器器响应时间(代理理接收超时) #设置代理理服务器器(nginx)保存⽤用户头信息的缓冲区⼤大⼩小</span><br><span class="line">    proxy_send_timeout 90;</span><br><span class="line">    proxy_read_timeout 90;</span><br><span class="line">    proxy_buffer_size 4k;</span><br><span class="line">    proxy_buffers 4 32k;</span><br><span class="line">    proxy_busy_buffers_size 64k; #⾼高负荷下缓冲⼤大⼩小(proxy_buffers*2) proxy_temp_file_write_size 64k; #设定缓存⽂文件夹⼤大⼩小，⼤大于这个值，将从upstream服务器器传 </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M08/">M08</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/01/02/Py008-10-06反向代理/" data-title="Py008-10-06反向代理 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/01/02/Py008-10-07限速/" title="Py008-10-07限速">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py008-10-07限速</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/12/28/Py008-10-05虚拟主机/"  title="Py008-10-05虚拟主机">
+ <strong>下一篇：</strong><br/> 
+ <span>Py008-10-05虚拟主机
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#反向代理介绍"><span class="toc-number">1.</span> <span class="toc-text">反向代理介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#反向代理的好处"><span class="toc-number">1.1.</span> <span class="toc-text">反向代理的好处</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#应用场景"><span class="toc-number">1.2.</span> <span class="toc-text">应用场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#堡垒机场景"><span class="toc-number">1.3.</span> <span class="toc-text">堡垒机场景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#内网服务器发布场景（就一个公网ip）"><span class="toc-number">1.4.</span> <span class="toc-text">内网服务器发布场景（就一个公网ip）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#缓存场景"><span class="toc-number">1.5.</span> <span class="toc-text">缓存场景</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#反向代理原理"><span class="toc-number">2.</span> <span class="toc-text">反向代理原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#反向代理实践"><span class="toc-number">2.1.</span> <span class="toc-text">反向代理实践</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#优化反向代理的配置"><span class="toc-number">3.</span> <span class="toc-text">优化反向代理的配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#proxy-set-header设置请求头"><span class="toc-number">3.1.</span> <span class="toc-text">proxy_set_header设置请求头</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

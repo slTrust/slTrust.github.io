@@ -1,0 +1,575 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py006-01-17基于对象的跨表查询 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="核心知识(重点)  跨表查询 基于对象查询 基于双下滑线查询 聚合和分组查询 F 和 Q 查询   orm模型  12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667from django.db im">
+<meta name="keywords" content="M06">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py006-01-17基于对象的跨表查询">
+<meta property="og:url" content="http://yoursite.com/2018/11/01/Py006-01-17基于对象的跨表查询/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="核心知识(重点)  跨表查询 基于对象查询 基于双下滑线查询 聚合和分组查询 F 和 Q 查询   orm模型  12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667from django.db im">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1601.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1602.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1603.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1604.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1605.png">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.296Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py006-01-17基于对象的跨表查询">
+<meta name="twitter:description" content="核心知识(重点)  跨表查询 基于对象查询 基于双下滑线查询 聚合和分组查询 F 和 Q 查询   orm模型  12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667from django.db im">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1601.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/01/Py006-01-17基于对象的跨表查询/" title="Py006-01-17基于对象的跨表查询" itemprop="url">Py006-01-17基于对象的跨表查询</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-01T12:47:18.000Z" itemprop="datePublished"> Published 2018-11-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#跨表查询"><span class="toc-number">1.</span> <span class="toc-text">跨表查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#基于对象跨表查询-子查询"><span class="toc-number">1.1.</span> <span class="toc-text">基于对象跨表查询(子查询)</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<blockquote>
+<p>核心知识(重点)</p>
+</blockquote>
+<h3 id="跨表查询"><a href="#跨表查询" class="headerlink" title="跨表查询"></a>跨表查询</h3><ul>
+<li>基于对象查询</li>
+<li>基于双下滑线查询</li>
+<li>聚合和分组查询</li>
+<li>F 和 Q 查询</li>
+</ul>
+<blockquote>
+<p>orm模型</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models</span><br><span class="line"></span><br><span class="line"># 作者表</span><br><span class="line">class Author(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    name=models.CharField( max_length=32)</span><br><span class="line">    age=models.IntegerField()</span><br><span class="line">    # 一对一  OneToOneField相当于指定 外间关联时设置  unique</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    ad_id int unique,</span><br><span class="line">    foreign key(ad_id) references authorDetail(nid)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    authordetail=models.OneToOneField(to=&quot;AuthorDetail&quot;,to_field=&quot;nid&quot;,on_delete=models.CASCADE)</span><br><span class="line"></span><br><span class="line"># 作者详情表</span><br><span class="line">class AuthorDetail(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    birthday=models.DateField()</span><br><span class="line">    telephone=models.BigIntegerField()</span><br><span class="line">    addr=models.CharField( max_length=64)</span><br><span class="line"></span><br><span class="line"># 出版社表</span><br><span class="line">class Publish(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    name=models.CharField( max_length=32)</span><br><span class="line">    city=models.CharField( max_length=32)</span><br><span class="line">    email=models.EmailField()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">Book  ----   Publish 一对多</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">class Book(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    title = models.CharField( max_length=32)</span><br><span class="line">    publishDate=models.DateField()</span><br><span class="line">    price=models.DecimalField(max_digits=5,decimal_places=2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 一对多关系  一本书对应多个出版社</span><br><span class="line">    publish=models.ForeignKey(to=&quot;Publish&quot;,to_field=&quot;nid&quot;,on_delete=models.CASCADE,)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">        publish_id int,</span><br><span class="line">        foreign key(publish_id) references publish(nid)</span><br><span class="line"></span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    #多对多</span><br><span class="line">    authors =models.ManyToManyField(to=&quot;Author&quot;)</span><br><span class="line"></span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 书籍作者关系表</span><br><span class="line">    create table book_authors(</span><br><span class="line">        nid int primary key auto_increment,</span><br><span class="line">        book_id int,</span><br><span class="line">        author_id int,</span><br><span class="line">        foreign key(book_id) references book(nid),</span><br><span class="line">        foreign key(author_id) references author(nid)</span><br><span class="line">    );</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line"># 多对多关系时 不需要这个模型类   django会依据 authors =models.ManyToManyField(to=&quot;Author&quot;)帮我们生成这张表</span><br><span class="line"># class Book2Author(models.Model):</span><br><span class="line">#</span><br><span class="line">#     nid = models.AutoField(primary_key=True)</span><br><span class="line">#     book=models.ForeignKey(to=&quot;Book&quot;)</span><br><span class="line">#     author=models.ForeignKey(to=&quot;Author&quot;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>生成表如下：</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1601.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1602.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1603.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1604.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1605.png" alt></p>
+<h4 id="基于对象跨表查询-子查询"><a href="#基于对象跨表查询-子查询" class="headerlink" title="基于对象跨表查询(子查询)"></a>基于对象跨表查询(子查询)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A-B</span><br><span class="line">关联属性在A表中</span><br><span class="line"></span><br><span class="line">正向查询: A------&gt;B</span><br><span class="line">反向查询: B------&gt;A</span><br><span class="line"></span><br><span class="line">基于对象的跨表查询(子查询)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一对多查询</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">正向查询:按字段</span><br><span class="line">反向查询:表名小写_set.all()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                            book_obj.publish</span><br><span class="line">Book(关联属性:publish)对象  --------------&gt; Publish对象</span><br><span class="line">                            &lt;--------------</span><br><span class="line">                        publish_obj.book_set.all()  # queryset</span><br><span class="line"></span><br><span class="line"># 一对多查询：正向查询  ==》查询金瓶梅这本书的出版社的名字</span><br><span class="line">book_obj = Book.objects.filter(title=&apos;金瓶梅&apos;).first()</span><br><span class="line">book_obj.publish # 与这本书关联的出版社对象</span><br><span class="line">book_obj.publish.name </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 一对多查询：反向查询  ==》查询人民出版社出版的书籍名称</span><br><span class="line">publish_obj = Publish.objects.filter(name=&apos;人民出版社&apos;).first()</span><br><span class="line">publish_obj.book_set.all() # queryset 与出版社关联的书籍集合</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>多对多查询</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">正向查询:按字段</span><br><span class="line">反向查询:表名小写_set.all()</span><br><span class="line"></span><br><span class="line">                            book_obj.authors.all()</span><br><span class="line">Book(关联属性:authors)对象  ------------------------&gt; Author对象</span><br><span class="line">                            &lt;------------------------</span><br><span class="line">                            author_obj.book_set.all() # queryset</span><br><span class="line"></span><br><span class="line"># 多对多查询：正向查询  ==》查询金瓶梅这本书的所有作者的名字</span><br><span class="line">book_obj = Book.objects.filter(title=&apos;金瓶梅&apos;).first()</span><br><span class="line">author_list = book_obj.authors.all() # queryset 对象 [au1,au2,....]</span><br><span class="line">for author in author_list:</span><br><span class="line">    print(author.name)</span><br><span class="line"></span><br><span class="line"># 多对多查询：反向查询  ==》查询alex作者出版的所有书籍名称</span><br><span class="line">author_obj = Author.objects.filter(name=&apos;alex&apos;).first()</span><br><span class="line">book_list = author_obj.book_set.all() # queryset 与作者关联的书籍集合</span><br><span class="line">for book in book_list:</span><br><span class="line">    print(book.name)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一对一查询</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">正向查询:按字段</span><br><span class="line">反向查询:表名小写(不带_set了因为一对一了)</span><br><span class="line"></span><br><span class="line">                                    author.authordetail</span><br><span class="line">Author(关联属性:authordetail)对象  ------------------------&gt;AuthorDetail对象</span><br><span class="line">                                    &lt;------------------------</span><br><span class="line">                                    authordetail.author</span><br><span class="line"></span><br><span class="line"># 一对一查询：正向查询  ==》查询作者alex的手机号</span><br><span class="line">alex = Author.objects.filter(title=&apos;alex&apos;).first()</span><br><span class="line">alex.authordetail.telephone </span><br><span class="line"></span><br><span class="line"># 多对多查询：反向查询  ==》查询手机号为110的作者姓名和年龄</span><br><span class="line">ad = AuthorDetail.objects.filter(telephone=110).first()</span><br><span class="line">ad.author.name</span><br><span class="line">ad.author.age</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/11/01/Py006-01-17基于对象的跨表查询/" data-title="Py006-01-17基于对象的跨表查询 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/11/01/Py006-01-18基于双下划线的跨表查询/" title="Py006-01-18基于双下划线的跨表查询">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py006-01-18基于双下划线的跨表查询</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/10/31/Py006-01-16关系型orm模型/"  title="Py006-01-16关系型orm模型">
+ <strong>下一篇：</strong><br/> 
+ <span>Py006-01-16关系型orm模型
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#跨表查询"><span class="toc-number">1.</span> <span class="toc-text">跨表查询</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#基于对象跨表查询-子查询"><span class="toc-number">1.1.</span> <span class="toc-text">基于对象跨表查询(子查询)</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

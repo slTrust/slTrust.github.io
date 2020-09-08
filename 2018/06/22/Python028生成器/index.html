@@ -1,0 +1,586 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Python028生成器 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="生成器 根据规则生成你要的东西，在你实际需要的时候生成  12a = [x*2 for x in range(10)]# [0,2,4,6,8,10,12,14,16,18] 有的时候你需要一个很大的列表这样内存就会需要很多，但是不希望现在就生成，而是使用其中某些个 12# 基本会死掉a = [x*2 for x in range(100000000000000000)]  生成器如何表达  生成">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python028生成器">
+<meta property="og:url" content="http://yoursite.com/2018/06/22/Python028生成器/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="生成器 根据规则生成你要的东西，在你实际需要的时候生成  12a = [x*2 for x in range(10)]# [0,2,4,6,8,10,12,14,16,18] 有的时候你需要一个很大的列表这样内存就会需要很多，但是不希望现在就生成，而是使用其中某些个 12# 基本会死掉a = [x*2 for x in range(100000000000000000)]  生成器如何表达  生成">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.315Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python028生成器">
+<meta name="twitter:description" content="生成器 根据规则生成你要的东西，在你实际需要的时候生成  12a = [x*2 for x in range(10)]# [0,2,4,6,8,10,12,14,16,18] 有的时候你需要一个很大的列表这样内存就会需要很多，但是不希望现在就生成，而是使用其中某些个 12# 基本会死掉a = [x*2 for x in range(100000000000000000)]  生成器如何表达  生成">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/22/Python028生成器/" title="Python028生成器" itemprop="url">Python028生成器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-22T10:10:16.000Z" itemprop="datePublished"> Published 2018-06-22</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#生成器"><span class="toc-number">1.</span> <span class="toc-text">生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器生成方式一"><span class="toc-number">1.1.</span> <span class="toc-text">生成器生成方式一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器生成方式二"><span class="toc-number">1.2.</span> <span class="toc-text">生成器生成方式二</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#send"><span class="toc-number">1.3.</span> <span class="toc-text">send</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#send-和-next的区别"><span class="toc-number">1.3.1.</span> <span class="toc-text">send 和 next的区别</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#使用send的注意点"><span class="toc-number">1.3.2.</span> <span class="toc-text">使用send的注意点</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器的应用"><span class="toc-number">1.4.</span> <span class="toc-text">生成器的应用</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><blockquote>
+<p>根据规则生成你要的东西，在你实际需要的时候生成</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = [x*2 for x in range(10)]</span><br><span class="line"># [0,2,4,6,8,10,12,14,16,18]</span><br></pre></td></tr></table></figure>
+<p>有的时候你需要一个很大的列表这样内存就会需要很多，但是不希望现在就生成，而是使用其中某些个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 基本会死掉</span><br><span class="line">a = [x*2 for x in range(100000000000000000)]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>生成器如何表达</p>
+</blockquote>
+<h4 id="生成器生成方式一"><a href="#生成器生成方式一" class="headerlink" title="生成器生成方式一"></a>生成器生成方式一</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">原来的方式(列表生成式)</span><br><span class="line">a = [x*2 for x in range(10)]</span><br><span class="line"># [0,2,4,6,8,10,12,14,16,18]</span><br><span class="line"></span><br><span class="line">生成器的方式  ==&gt; 将列表生成式的[]改成 ()</span><br><span class="line">b = (x*2 for x in range(10))</span><br><span class="line"># &lt;generator object &lt;genexpr&gt; at 0x79898312312&gt;</span><br></pre></td></tr></table></figure>
+<p>如何使用生成器里的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">next(b) # 0</span><br><span class="line">next(b) # 2</span><br><span class="line">next(b) # 4</span><br><span class="line">next(b) # 6</span><br><span class="line">next(b) # 8</span><br><span class="line">next(b) # 10</span><br><span class="line">next(b) # 12</span><br><span class="line">next(b) # 14</span><br><span class="line">next(b) # 16</span><br><span class="line">next(b) # 18</span><br><span class="line">next(b) # 异常 如果生成器已经到了最后一个值就罢工了。。。直接异常了</span><br></pre></td></tr></table></figure>
+<h4 id="生成器生成方式二"><a href="#生成器生成方式二" class="headerlink" title="生成器生成方式二"></a>生成器生成方式二</h4><ul>
+<li>yield 执行到它的时候,creatNum执行就结束了,返回 yield 后的值</li>
+</ul>
+<blockquote>
+<p>如果一个函数里有yield那么 它返回的就是生成器对象</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def creatNum():</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    for i in range(5)</span><br><span class="line">        yield b</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    print(&apos;stop&apos;)</span><br><span class="line"></span><br><span class="line"># 创建了一个生成器对象   creatNum()已经不像函数了，而是一个生成器对象</span><br><span class="line">a = creatNum()</span><br><span class="line"></span><br><span class="line"># 第一种方式：使用循环执行迭代器</span><br><span class="line">for num in a:</span><br><span class="line">    print(num)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">第二种方式：</span><br><span class="line">两种next方式执行生成器 前提是你要指定生成的次数</span><br><span class="line">res = a.__next__()</span><br><span class="line">res =  next(a)</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>详解 yield</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">def creatNum():</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    for i in range(5)</span><br><span class="line">        yield b</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    print(&apos;stop&apos;)</span><br><span class="line"></span><br><span class="line">a =  creatNum() # 生成器对象</span><br><span class="line"></span><br><span class="line">next(a)</span><br><span class="line"># 此时 a是生成器对象  但是是第一次执行 所以就会执行</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    初始化部分</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    然后执行循环第一次  返回yield 后的值 b (b = 1)</span><br><span class="line">    函数停止在 yield</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"># 第二次调用 next</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    会从上次停止的地方执行 也就是 yield b (b = 1) 开始</span><br><span class="line">    a,b = b,a+b</span><br><span class="line">    然后根据循环条件看是否继续循环</span><br><span class="line">    发现yield b (b = 1)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">next(a)</span><br><span class="line"></span><br><span class="line"># 第三次同第二次的结果 。。。</span><br><span class="line"># 第四次同第二次的结果 。。。</span><br><span class="line"># 第五次同第二次的结果 。。。 由于循环已经结束 所以最后会打印 stop</span><br></pre></td></tr></table></figure>
+<h4 id="send"><a href="#send" class="headerlink" title="send"></a>send</h4><p>先看如下程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line"></span><br><span class="line">a = next(t) #  a为0</span><br><span class="line"></span><br><span class="line">a = next(t) #  打印 None ,a为1 </span><br><span class="line"></span><br><span class="line">a = next(t) #  打印 None ,a为2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为啥是None</p>
+</blockquote>
+<ul>
+<li>如果 yield 前有如下形式 temp = yield i,并不是把 yield值给了temp 而是在下一次执行生成器的时候给它传递一个值</li>
+<li>之所以为None 因为 yield i 的时候函数就停止了 temp没有执行到<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">temp = yield i </span><br><span class="line">要看为两部分  左边 temp  和右边 yield i </span><br><span class="line">程序执行的时候会从右往左</span><br><span class="line">但是yield i的时候就结束返回了</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>再看</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line">a = next(t) #  a为0</span><br><span class="line">a = next(t) #  打印 None ,a为1 </span><br><span class="line">a = t.send(&apos;haha&apos;) # 打印 haha ,a 为2</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">t.send(&apos;haha&apos;) 是把 haha 作为 yield i 的返回结果赋值为temp</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h5 id="send-和-next的区别"><a href="#send-和-next的区别" class="headerlink" title="send 和 next的区别"></a>send 和 next的区别</h5><ul>
+<li>相同点：都可以让生成器向下走一步</li>
+<li>异同点： send可以给一个值，这个值作为 yield i 的整体的结果</li>
+</ul>
+<h5 id="使用send的注意点"><a href="#使用send的注意点" class="headerlink" title="使用send的注意点"></a>使用send的注意点</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line"></span><br><span class="line">t.send(&apos;haha&apos;) # 报错</span><br><span class="line"></span><br><span class="line">##########################################</span><br><span class="line">因为第一次从程序开头执行</span><br><span class="line">即i = 0执行 但是 send(&apos;haha&apos;)是把值给 yield i的整体的返回结果</span><br><span class="line"></span><br><span class="line">解决方式就是 第一次先调用 一次 t.next() 然后在 t.send(&apos;haha&apos;)</span><br><span class="line"></span><br><span class="line">第二种方式 if/else</span><br><span class="line"></span><br><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        if i == 0:</span><br><span class="line">            temp = yield i</span><br><span class="line">        else:</span><br><span class="line">            yield i</span><br><span class="line">        i += 1</span><br></pre></td></tr></table></figure>
+<h4 id="生成器的应用"><a href="#生成器的应用" class="headerlink" title="生成器的应用"></a>生成器的应用</h4><p>相当于一起执行(就像单核的CPU进程里时间片的概念看上去执行多个应用实际上是假象)</p>
+<blockquote>
+<p>多任务应用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">def test1():</span><br><span class="line">    while True:</span><br><span class="line">        print(&apos;--1--&apos;)</span><br><span class="line">        yield None</span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    while True:</span><br><span class="line">        print(&apos;--2--&apos;)</span><br><span class="line">        yield None</span><br><span class="line"></span><br><span class="line">t1 = test1()</span><br><span class="line">t2 = test2()</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    t1.__next__()</span><br><span class="line">    t2.__next__()</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/python/">python</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/06/22/Python028生成器/" data-title="Python028生成器 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/06/23/Python029类装饰器/" title="Python029类装饰器">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Python029类装饰器</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/22/Python027动态添加属性及方法/"  title="Python027动态添加属性及方法">
+ <strong>下一篇：</strong><br/> 
+ <span>Python027动态添加属性及方法
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#生成器"><span class="toc-number">1.</span> <span class="toc-text">生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器生成方式一"><span class="toc-number">1.1.</span> <span class="toc-text">生成器生成方式一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器生成方式二"><span class="toc-number">1.2.</span> <span class="toc-text">生成器生成方式二</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#send"><span class="toc-number">1.3.</span> <span class="toc-text">send</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#send-和-next的区别"><span class="toc-number">1.3.1.</span> <span class="toc-text">send 和 next的区别</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#使用send的注意点"><span class="toc-number">1.3.2.</span> <span class="toc-text">使用send的注意点</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生成器的应用"><span class="toc-number">1.4.</span> <span class="toc-text">生成器的应用</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

@@ -1,0 +1,667 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node全解09_01stream | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Stream第一个 Stream 例子1234567const fs = require(&amp;apos;fs&amp;apos;)const stream = fs.createWriteStream(&amp;apos;./big_file.txt&amp;apos;)for (let i = 0; i &amp;lt; 1000000; i++) &amp;#123;    stream.write(`这是第$&amp;#123;i&amp;#125">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node全解09_01stream">
+<meta property="og:url" content="http://yoursite.com/2020/03/13/Node全解09-01stream/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Stream第一个 Stream 例子1234567const fs = require(&amp;apos;fs&amp;apos;)const stream = fs.createWriteStream(&amp;apos;./big_file.txt&amp;apos;)for (let i = 0; i &amp;lt; 1000000; i++) &amp;#123;    stream.write(`这是第$&amp;#123;i&amp;#125">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.272Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node全解09_01stream">
+<meta name="twitter:description" content="Stream第一个 Stream 例子1234567const fs = require(&amp;apos;fs&amp;apos;)const stream = fs.createWriteStream(&amp;apos;./big_file.txt&amp;apos;)for (let i = 0; i &amp;lt; 1000000; i++) &amp;#123;    stream.write(`这是第$&amp;#123;i&amp;#125">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/13/Node全解09-01stream/" title="Node全解09_01stream" itemprop="url">Node全解09_01stream</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-13T00:05:20.000Z" itemprop="datePublished"> Published 2020-03-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Stream"><span class="toc-number">1.</span> <span class="toc-text">Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一个-Stream-例子"><span class="toc-number">1.0.1.</span> <span class="toc-text">第一个 Stream 例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二个-stream-例子"><span class="toc-number">1.0.2.</span> <span class="toc-text">第二个 stream 例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第三个例子"><span class="toc-number">1.0.3.</span> <span class="toc-text">第三个例子</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#管道-Pipe"><span class="toc-number">1.0.3.1.</span> <span class="toc-text">管道 Pipe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#管道可以通过事件实现"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">管道可以通过事件实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stream-对象的原型链"><span class="toc-number">1.0.4.</span> <span class="toc-text">Stream 对象的原型链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#支持的事件和方法"><span class="toc-number">1.0.5.</span> <span class="toc-text">支持的事件和方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Readable-Stream"><span class="toc-number">1.0.5.1.</span> <span class="toc-text">Readable Stream</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Writeable-Stream"><span class="toc-number">1.0.5.2.</span> <span class="toc-text">Writeable Stream</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stream-分类"><span class="toc-number">1.0.6.</span> <span class="toc-text">Stream 分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Readable-Stream-1"><span class="toc-number">1.0.7.</span> <span class="toc-text">Readable Stream</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Writeable-Stream-1"><span class="toc-number">1.0.8.</span> <span class="toc-text">Writeable Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#drain-流干了事件"><span class="toc-number">1.0.8.1.</span> <span class="toc-text">drain 流干了事件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#finish-事件"><span class="toc-number">1.0.8.2.</span> <span class="toc-text">finish 事件</span></a></li></ol></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h1><h3 id="第一个-Stream-例子"><a href="#第一个-Stream-例子" class="headerlink" title="第一个 Stream 例子"></a>第一个 Stream 例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;)</span><br><span class="line">const stream = fs.createWriteStream(&apos;./big_file.txt&apos;)</span><br><span class="line">for (let i = 0; i &lt; 1000000; i++) &#123;</span><br><span class="line">    stream.write(`这是第$&#123;i&#125;行内容，我们需要很多内容，要不停的写文件啊啊啊啊啊啊啊回车\n`)</span><br><span class="line">&#125;</span><br><span class="line">stream.end() // 别忘了关闭 stream</span><br><span class="line">console.log(&apos;done&apos;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分析</p>
+</blockquote>
+<ul>
+<li>打开流，多次往里面塞内容，关闭流</li>
+<li>看起来就是可以写多次嘛，没什么大不了</li>
+<li>最终我们得到一个 100M 左右的文件</li>
+</ul>
+<blockquote>
+<p>释义</p>
+</blockquote>
+<ul>
+<li>stream 是流，但默认没有水，</li>
+<li>stream.write 可以让水流中有水(数据)</li>
+<li>每次写的小数据叫做 chunk (块)</li>
+<li>产生数据的一段叫做 source (源头)</li>
+<li>得到数据的一段叫做 sink (水池)  上面例子的水池就是big_file.txt</li>
+</ul>
+<h3 id="第二个-stream-例子"><a href="#第二个-stream-例子" class="headerlink" title="第二个 stream 例子"></a>第二个 stream 例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line">const http = require(&apos;http&apos;);</span><br><span class="line">const server = http.createServer()</span><br><span class="line">server.on(&apos;request&apos;, (request, response) =&gt; &#123;</span><br><span class="line">    fs.readFile(&apos;./big_file.txt&apos;, (error,</span><br><span class="line">        data) =&gt; &#123;</span><br><span class="line">        if (error) throw error</span><br><span class="line">        response.end(data)</span><br><span class="line">        console.log(&apos;done&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br><span class="line">server.listen(8888)</span><br><span class="line">console.log(8888)</span><br></pre></td></tr></table></figure>
+<p><strong>运行这个例子</strong> 并在浏览器打开 <a href="http://localhost:8888/" target="_blank" rel="noopener">http://localhost:8888/</a></p>
+<p><strong>打开活动监视器 / 任务管理器 搜索 node</strong> 查看内存占用 一下飙升到110M左右</p>
+<blockquote>
+<p>这个例子的结论</p>
+</blockquote>
+<ul>
+<li>如果用户请求过来，由于big_file.txt 的大小是 100M左右，再加上 Node.js 本身占用的几兆，所以Node.js 总体占用的内存是 110兆内存</li>
+<li>一个用户占用 100M左右 10个呢？ 服务器内存是不是就不够用了</li>
+</ul>
+<h3 id="第三个例子"><a href="#第三个例子" class="headerlink" title="第三个例子"></a>第三个例子</h3><p>用 stream 改写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line">const http = require(&apos;http&apos;);</span><br><span class="line">const server = http.createServer()</span><br><span class="line">server.on(&apos;request&apos;, (request, response) =&gt; &#123;</span><br><span class="line">    const stream =</span><br><span class="line">        fs.createReadStream(&apos;./big_file.txt&apos;)</span><br><span class="line">    stream.pipe(response)</span><br><span class="line">&#125;)</span><br><span class="line">server.listen(8888)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 Node.js 内存占用，基本不会超过 30MB</li>
+<li>文件 steam 和 response stream 是通过管道相连的</li>
+<li><strong>流 可以使你的内存降的非常低</strong></li>
+</ul>
+<h4 id="管道-Pipe"><a href="#管道-Pipe" class="headerlink" title="管道 Pipe"></a>管道 Pipe</h4><p>两个流可以用一个管道相连<br>stream1 的末尾接上 stream2 的开端<br>只要 stream1 有数据，就会流到 stream2</p>
+<blockquote>
+<p>常用代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stream1.pipe(stream2)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>链式调用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a.pipe(b).pipe(c)</span><br><span class="line"></span><br><span class="line">// 等价于</span><br><span class="line">a.pipe(b)</span><br><span class="line">b.pipe(c)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="管道可以通过事件实现"><a href="#管道可以通过事件实现" class="headerlink" title="管道可以通过事件实现"></a>管道可以通过事件实现</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// stream1 一有数据就塞给 stream2</span><br><span class="line">stream1.on(&apos;data&apos;, (chunk)=&gt;&#123;</span><br><span class="line">    stream2.write(chunk)</span><br><span class="line">&#125;)</span><br><span class="line">// stream1 停了 ，就停了 stream2</span><br><span class="line">stream1.on(&apos;end&apos;, ()=&gt;&#123;</span><br><span class="line">    stream2.end()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Stream-对象的原型链"><a href="#Stream-对象的原型链" class="headerlink" title="Stream 对象的原型链"></a>Stream 对象的原型链</h3><p><code>s = fs.createReadStream(path)</code></p>
+<ul>
+<li>那么它的对象层级为</li>
+<li>自身属性(fs.createReadStream 构造)</li>
+<li>原型： stream.Readable.prototype</li>
+<li>二级原型： stream.Stream.prototype</li>
+<li>三级原型： events.EventEmitter.prototype</li>
+<li>四级原型： Object.prototype</li>
+</ul>
+<p><strong>Stream对象 都继承了 EventEmitter</strong></p>
+<blockquote>
+<p>如何查看它的原型</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line">const stream = require(&apos;stream&apos;);</span><br><span class="line">const events = require(&apos;events&apos;);</span><br><span class="line">const s = fs.createReadStream(&apos;./big_file.txt&apos;)</span><br><span class="line"></span><br><span class="line">console.log(s)</span><br><span class="line"></span><br><span class="line">console.log(stream.Readable.prototype);</span><br><span class="line"></span><br><span class="line">console.log(events.EventEmitter.prototype);</span><br><span class="line"></span><br><span class="line">// 运行技巧</span><br><span class="line">node --inspect-brk xxx.js</span><br><span class="line">// 打开浏览器 点击 step over</span><br></pre></td></tr></table></figure>
+<h3 id="支持的事件和方法"><a href="#支持的事件和方法" class="headerlink" title="支持的事件和方法"></a>支持的事件和方法</h3><h4 id="Readable-Stream"><a href="#Readable-Stream" class="headerlink" title="Readable Stream"></a>Readable Stream</h4><blockquote>
+<p>事件</p>
+</blockquote>
+<ul>
+<li><strong>data,end</strong></li>
+<li>error,close,readable</li>
+</ul>
+<blockquote>
+<p>方法</p>
+</blockquote>
+<ul>
+<li><strong>pipe()</strong></li>
+<li>unpipe()</li>
+<li>wrap()</li>
+<li>destroy()</li>
+<li>read()</li>
+<li>unshift()</li>
+<li>resume() / pause() </li>
+<li>isPaused()</li>
+<li>setEncoding()</li>
+</ul>
+<h4 id="Writeable-Stream"><a href="#Writeable-Stream" class="headerlink" title="Writeable Stream"></a>Writeable Stream</h4><blockquote>
+<p>事件 </p>
+</blockquote>
+<ul>
+<li><p><strong>drain</strong> 面试爱问</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 假设 stream1 开始 一秒写 10M数据 后来 stream1 一秒写 1000M数据</span><br><span class="line">// 这样就会堵车 ， 所有有了 drain 不堵车了</span><br><span class="line">stream1.on(&apos;data&apos;, (chunk)=&gt;&#123;</span><br><span class="line">    const flag = stream2.write(chunk)</span><br><span class="line">    if(flag === false)&#123;</span><br><span class="line">        // done write  堵车了，你别写了</span><br><span class="line">    &#125;</span><br><span class="line">    // 不堵车了</span><br><span class="line">    stream2.on(&apos;drain&apos;,()=&gt;&#123;</span><br><span class="line">        // go on write</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line">// stream1 停了 ，就停了 stream2</span><br><span class="line">stream1.on(&apos;end&apos;, ()=&gt;&#123;</span><br><span class="line">    stream2.end()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>finish</strong></p>
+</li>
+<li>error,close,pipe,unpipe</li>
+</ul>
+<blockquote>
+<p>方法</p>
+</blockquote>
+<ul>
+<li><code>write(),destroy(),end(),cork(),uncork(),setDefaultcoding()</code></li>
+</ul>
+<h3 id="Stream-分类"><a href="#Stream-分类" class="headerlink" title="Stream 分类"></a>Stream 分类</h3><ul>
+<li>Readable 可读</li>
+<li>Writeable 可写</li>
+<li>Duplex 可读可写(双向) 同时读和写，注意 其实就是两个管道 但是两个管道没有交叉点</li>
+<li>Transform 可读可写(变化) <code>例子 webpack  你写的是ES6 读到的是 ES5</code></li>
+</ul>
+<h3 id="Readable-Stream-1"><a href="#Readable-Stream-1" class="headerlink" title="Readable Stream"></a>Readable Stream</h3><p><strong>静止态 paused 和 流动态 flowing</strong></p>
+<ul>
+<li>默认处于 paused 态</li>
+<li>添加 data 事件监听，它就变成 flowing</li>
+<li>删掉 data 事件监听， 它就变成 paused</li>
+<li>paused() 可以让它 变为 paused</li>
+<li>resume() 可以让它 变为 flowing</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line">const stream = fs.createReadStream(&apos;./big_file.txt&apos;)</span><br><span class="line">stream.pipe(response)</span><br><span class="line">stream.pause();</span><br><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">    stream.resume</span><br><span class="line">&#125;,3000)</span><br></pre></td></tr></table></figure>
+<h3 id="Writeable-Stream-1"><a href="#Writeable-Stream-1" class="headerlink" title="Writeable Stream"></a>Writeable Stream</h3><h4 id="drain-流干了事件"><a href="#drain-流干了事件" class="headerlink" title="drain 流干了事件"></a>drain 流干了事件</h4><ul>
+<li>表示可以加水了</li>
+<li>我们调用 stream.write(chunk)的时候，可能会得到 false</li>
+<li>false 代表写的太快了，数据积压了</li>
+<li>这个时候不能在 write 了，要监听 drain</li>
+<li>等 drain 事件触发了，才能继续 write</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">const fs = require(&apos;fs&apos;)</span><br><span class="line"></span><br><span class="line">function writeOneMillionTimes(writer, data) &#123;</span><br><span class="line">    let i = 1000000</span><br><span class="line">    write()</span><br><span class="line"></span><br><span class="line">    function write() &#123;</span><br><span class="line">        let ok = true</span><br><span class="line">        do &#123;</span><br><span class="line">            i--</span><br><span class="line">            if (i === 0) &#123;</span><br><span class="line">                // Last time!</span><br><span class="line">                writer.write(data)</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // See if we should continue, or wait.</span><br><span class="line">                // Don&apos;t pass the callback, because we&apos;re not done yet.</span><br><span class="line">                ok = writer.write(data)</span><br><span class="line">                if (ok === false) &#123;</span><br><span class="line">                    console.log(&apos;不能再写了&apos;)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; while (i &gt; 0 &amp;&amp; ok)</span><br><span class="line">        if (i &gt; 0) &#123;</span><br><span class="line">            // Had to stop early!</span><br><span class="line">            // Write some more once it drains.</span><br><span class="line">            writer.once(&apos;drain&apos;, () =&gt; &#123;</span><br><span class="line">                console.log(&apos;干涸了&apos;)</span><br><span class="line">                write()</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const writer = fs.createWriteStream(&apos;./big_file.txt&apos;)</span><br><span class="line">writeOneMillionTimes(writer, &apos;hello world&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="finish-事件"><a href="#finish-事件" class="headerlink" title="finish 事件"></a>finish 事件</h4><ul>
+<li>调用 steam.end() 之后 而且</li>
+<li>缓冲区数据已经传给底层系统之后</li>
+<li>触发 finish 事件</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/13/Node全解09-01stream/" data-title="Node全解09_01stream | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/03/13/Node全解09-02Stream自定义/" title="Node全解09_02Stream自定义">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node全解09_02Stream自定义</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/12/Node全解08-01sql进阶/"  title="Node全解08_01sql进阶">
+ <strong>下一篇：</strong><br/> 
+ <span>Node全解08_01sql进阶
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Stream"><span class="toc-number">1.</span> <span class="toc-text">Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一个-Stream-例子"><span class="toc-number">1.0.1.</span> <span class="toc-text">第一个 Stream 例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二个-stream-例子"><span class="toc-number">1.0.2.</span> <span class="toc-text">第二个 stream 例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第三个例子"><span class="toc-number">1.0.3.</span> <span class="toc-text">第三个例子</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#管道-Pipe"><span class="toc-number">1.0.3.1.</span> <span class="toc-text">管道 Pipe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#管道可以通过事件实现"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">管道可以通过事件实现</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stream-对象的原型链"><span class="toc-number">1.0.4.</span> <span class="toc-text">Stream 对象的原型链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#支持的事件和方法"><span class="toc-number">1.0.5.</span> <span class="toc-text">支持的事件和方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Readable-Stream"><span class="toc-number">1.0.5.1.</span> <span class="toc-text">Readable Stream</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Writeable-Stream"><span class="toc-number">1.0.5.2.</span> <span class="toc-text">Writeable Stream</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stream-分类"><span class="toc-number">1.0.6.</span> <span class="toc-text">Stream 分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Readable-Stream-1"><span class="toc-number">1.0.7.</span> <span class="toc-text">Readable Stream</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Writeable-Stream-1"><span class="toc-number">1.0.8.</span> <span class="toc-text">Writeable Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#drain-流干了事件"><span class="toc-number">1.0.8.1.</span> <span class="toc-text">drain 流干了事件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#finish-事件"><span class="toc-number">1.0.8.2.</span> <span class="toc-text">finish 事件</span></a></li></ol></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

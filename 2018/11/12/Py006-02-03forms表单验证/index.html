@@ -1,0 +1,627 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Py006-02-03forms表单验证 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="forms组件校验字段  针对一个实例：注册用户讲解。  前置准备  创建项目，创建一个orm表，一个注册页面 模型：models.py 123456789101112class UserInfo(models.Model):    name=models.CharField(max_length=32)    pwd=models.CharField(max_length=32)    emai">
+<meta name="keywords" content="M06">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Py006-02-03forms表单验证">
+<meta property="og:url" content="http://yoursite.com/2018/11/12/Py006-02-03forms表单验证/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="forms组件校验字段  针对一个实例：注册用户讲解。  前置准备  创建项目，创建一个orm表，一个注册页面 模型：models.py 123456789101112class UserInfo(models.Model):    name=models.CharField(max_length=32)    pwd=models.CharField(max_length=32)    emai">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.298Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Py006-02-03forms表单验证">
+<meta name="twitter:description" content="forms组件校验字段  针对一个实例：注册用户讲解。  前置准备  创建项目，创建一个orm表，一个注册页面 模型：models.py 123456789101112class UserInfo(models.Model):    name=models.CharField(max_length=32)    pwd=models.CharField(max_length=32)    emai">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/12/Py006-02-03forms表单验证/" title="Py006-02-03forms表单验证" itemprop="url">Py006-02-03forms表单验证</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-12T15:28:13.000Z" itemprop="datePublished"> Published 2018-11-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#forms组件"><span class="toc-number">1.</span> <span class="toc-text">forms组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#针对一个实例：注册用户讲解。"><span class="toc-number">1.1.</span> <span class="toc-text">针对一个实例：注册用户讲解。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#forms简单使用"><span class="toc-number">1.2.</span> <span class="toc-text">forms简单使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#错写校验字段会如何？"><span class="toc-number">1.3.</span> <span class="toc-text">错写校验字段会如何？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多出校验字段会咋样？"><span class="toc-number">1.4.</span> <span class="toc-text">多出校验字段会咋样？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#form-cleaned-data"><span class="toc-number">1.5.</span> <span class="toc-text">form.cleaned_data</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#form-errors"><span class="toc-number">1.6.</span> <span class="toc-text">form.errors</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重写我们的UserForm对应实际的表单"><span class="toc-number">1.7.</span> <span class="toc-text">重写我们的UserForm对应实际的表单</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染标签方式一"><span class="toc-number">2.</span> <span class="toc-text">forms渲染标签方式一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染方式二"><span class="toc-number">3.</span> <span class="toc-text">forms渲染方式二</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染方式三"><span class="toc-number">4.</span> <span class="toc-text">forms渲染方式三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染错误信息"><span class="toc-number">5.</span> <span class="toc-text">forms渲染错误信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms参数配置"><span class="toc-number">6.</span> <span class="toc-text">forms参数配置</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="forms组件"><a href="#forms组件" class="headerlink" title="forms组件"></a>forms组件</h3><p>校验字段</p>
+<blockquote>
+<h4 id="针对一个实例：注册用户讲解。"><a href="#针对一个实例：注册用户讲解。" class="headerlink" title="针对一个实例：注册用户讲解。"></a>针对一个实例：注册用户讲解。</h4></blockquote>
+<ul>
+<li>前置准备</li>
+</ul>
+<p>创建项目，创建一个orm表，一个注册页面</p>
+<p>模型：models.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class UserInfo(models.Model):</span><br><span class="line">    name=models.CharField(max_length=32)</span><br><span class="line">    pwd=models.CharField(max_length=32)</span><br><span class="line">    email=models.EmailField()</span><br><span class="line">    tel=models.CharField(max_length=32)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"># 别忘了settings.py里 注册 应用如 app01</span><br><span class="line"># 数据库迁徙</span><br><span class="line">python3 manage.py  makemigrations</span><br><span class="line">python3 manage.py  migrate</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<p>注册路由配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from app01 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;reg/&apos;,views.reg) # 注册页</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>reg.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;user&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; id=&quot;name&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;pwd&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;password&quot; name=&quot;pwd&quot; id=&quot;pwd&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;r_pwd&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;password&quot; name=&quot;r_pwd&quot; id=&quot;r_pwd&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">     &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;email&quot;&gt;邮箱&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;email&quot; id=&quot;email&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;tel&quot;&gt;手机号&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;tel&quot; id=&quot;tel&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line"></span><br><span class="line">        print(request.POST)</span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>至此，准备工作完毕，</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 依次填写表单1，2，3，4,5。</span><br><span class="line"># 打印如下信息</span><br><span class="line">&lt;QueryDict: &#123;&apos;csrfmiddlewaretoken&apos;: [&apos;dTj3JNHHoZKrLZEXAJsoty9UxZ8vCJ3zqZH3gvIor4Lp1bKp8GFfmYS1Q4A58fji&apos;], &apos;name&apos;: [&apos;1&apos;], &apos;pwd&apos;: [&apos;2&apos;], &apos;r_pwd&apos;: [&apos;3&apos;], &apos;email&apos;: [&apos;4&apos;],&apos;tel&apos;:[&apos;5&apos;]&#125;&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="forms简单使用"><a href="#forms简单使用" class="headerlink" title="forms简单使用"></a>forms简单使用</h4><ul>
+<li>引入forms</li>
+<li>定义一个校验类如UserForm继承forms.Form</li>
+<li>自定义校验规则name = forms.CharField(min_length=4)</li>
+<li>根据校验字段生成UserForm初始化对象</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 引入forms</span><br><span class="line">from django import forms</span><br><span class="line"></span><br><span class="line"># 自定义表单校验</span><br><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        </span><br><span class="line">        form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123&apos;&#125;)</span><br><span class="line">        # 所有值校验字段通过返回 true 10个字段其中一个失败返回false</span><br><span class="line">        print(form.is_valid()) # 返回布尔值 返回False email没有通过校验</span><br><span class="line"></span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;&#125;)</span><br><span class="line">form.is_valid() # True</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="错写校验字段会如何？"><a href="#错写校验字段会如何？" class="headerlink" title="错写校验字段会如何？"></a>错写校验字段会如何？</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;names&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;&#125;)</span><br><span class="line"># 定义的UserForm里 为name 你传递names 显然不匹配</span><br><span class="line">form.is_valid() # False</span><br><span class="line"></span><br><span class="line"># 校验字段必须和定义里的字段相同</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="多出校验字段会咋样？"><a href="#多出校验字段会咋样？" class="headerlink" title="多出校验字段会咋样？"></a>多出校验字段会咋样？</h4></blockquote>
+<p>多了无所谓，只要定义的字段全匹配就ok</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:22&#125;)</span><br><span class="line"># 定义的UserForm里 为name,email 你多传递的key会被忽略</span><br><span class="line">form.is_valid() # True</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="form-cleaned-data"><a href="#form-cleaned-data" class="headerlink" title="form.cleaned_data"></a>form.cleaned_data</h4></blockquote>
+<p>这里是校验合法字段的字典</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 部分校验通过</span><br><span class="line">form = UserForm(&#123;&quot;names&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.cleaned_data)</span><br><span class="line"># &#123;&apos;email&apos;: &apos;123@qq.com&apos;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># -------------------</span><br><span class="line"># 全部校验通过</span><br><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.cleaned_data)</span><br><span class="line"># &#123;&apos;name&apos;: &apos;abcd&apos;, &apos;email&apos;: &apos;123@qq.com&apos;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="form-errors"><a href="#form-errors" class="headerlink" title="form.errors"></a>form.errors</h4></blockquote>
+<p>校验失败字段对应的错误信息 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abc&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.errors)</span><br><span class="line"># &lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;name&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;Ensure this value has at least 4 characters (it has 3).&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<p>别看返回的是个ul实际是个字典类型</p>
+<h4 id="重写我们的UserForm对应实际的表单"><a href="#重写我们的UserForm对应实际的表单" class="headerlink" title="重写我们的UserForm对应实际的表单"></a>重写我们的UserForm对应实际的表单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line">    tel = forms.CharField()</span><br></pre></td></tr></table></figure>
+<p>重写views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        # 表单会携带csrf_token字段 但是未在UserForm里定义所以会忽略</span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict 字典</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList 列表</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息 </span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br><span class="line"></span><br><span class="line"># reg页面表单什么都不填写直接提交</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&#123;&#125;</span><br><span class="line">&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;name&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;pwd&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;r_pwd&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;email&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;tel&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</span><br><span class="line">&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;</span><br><span class="line">This field is required.</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染标签方式一"><a href="#forms渲染标签方式一" class="headerlink" title="forms渲染标签方式一"></a>forms渲染标签方式一</h3><p>修改views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line"></span><br><span class="line">from django import forms</span><br><span class="line"></span><br><span class="line"># 自定义表单校验</span><br><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line">    tel = forms.CharField()</span><br><span class="line"></span><br><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line"></span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息</span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    # get请求的时候</span><br><span class="line">    form = UserForm() </span><br><span class="line">    </span><br><span class="line">    return render(request,&apos;reg.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不传递参数初始化表单校验对象form = UserForm() 传递到模版里就以定义的字段可以生成表单标签</p>
+</blockquote>
+<p>reg.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.name &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.pwd &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.r_pwd &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 邮箱&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.email &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 手机&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.tel &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn btn-default pull-right&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染方式二"><a href="#forms渲染方式二" class="headerlink" title="forms渲染方式二"></a>forms渲染方式二</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;% for field in form %&#125;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;label for=&quot;&quot;&gt;&#123;&#123; field.label &#125;&#125;&lt;/label&gt;</span><br><span class="line">            &#123;&#123; field &#125;&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line"></span><br><span class="line"># 这样渲染的label名是首字母大写的字段</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我就要显示中文</p>
+</blockquote>
+<p>设置label值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4,label=&apos;用户名&apos;) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField(label=&apos;邮箱&apos;) # 邮箱校验</span><br><span class="line">    tel = forms.CharField(label=&apos;电话&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染方式三"><a href="#forms渲染方式三" class="headerlink" title="forms渲染方式三"></a>forms渲染方式三</h3><blockquote>
+<p>不建议使用,因为dom结构是定义死的。不够灵活</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;&#123; form.as_p &#125;&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染错误信息"><a href="#forms渲染错误信息" class="headerlink" title="forms渲染错误信息"></a>forms渲染错误信息</h3><blockquote>
+<p>在校验失败的地方 返回 HttpResponse(request,’reg.html’,locals())</p>
+</blockquote>
+<p>为啥？</p>
+<ul>
+<li>你已经填写了表单，不管校验成功还是失败</li>
+<li>此时已经提交，页面会重刷，但是UserForm对象里有你传递的值，所以通过UserForm对象渲染标签的时候同时会把传递的值渲染到里面</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    </span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息</span><br><span class="line">            </span><br><span class="line">        return render(request,&apos;reg.html&apos;,locals())</span><br><span class="line"></span><br><span class="line">    form = UserForm()</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>错误信息form.字段.errors.0</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.name &#125;&#125; &lt;span&gt;&#123;&#123; form.name.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.pwd &#125;&#125; &lt;span&gt;&#123;&#123; form.pwd.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.r_pwd &#125;&#125; &lt;span&gt;&#123;&#123; form.r_pwd.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 邮箱&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.email &#125;&#125; &lt;span&gt;&#123;&#123; form.email.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">     &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 手机&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.tel &#125;&#125; &lt;span&gt;&#123;&#123; form.tel.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot; novalidate&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;% for field in form %&#125;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;label for=&quot;&quot;&gt;&#123;&#123; field.label &#125;&#125;&lt;/label&gt;</span><br><span class="line">            &#123;&#123; field &#125;&#125; &lt;span class=&quot;pull-right&quot; style=&quot;color: red&quot;&gt;&#123;&#123; field.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms参数配置"><a href="#forms参数配置" class="headerlink" title="forms参数配置"></a>forms参数配置</h3><ul>
+<li>错误信息定义为自己想要的</li>
+<li>渲染不同类型的表单select/password</li>
+</ul>
+<blockquote>
+<p>渲染其他类型标签要引入widgets</p>
+</blockquote>
+<blockquote>
+<p>定义错误信息要设置error_messages={“选项”:”错误信息”}   required代表必填</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4,label=&apos;用户名&apos;,error_messages=&#123;&quot;required&quot;:&apos;该字段不能为空&apos;&#125;,</span><br><span class="line">                        widgets = widgets.TextInput(attrs=&#123;&quot;class&quot;:&apos;form-control&apos;&#125;))</span><br><span class="line">    pwd = forms.CharField(min_length=4,label=&apos;密码&apos;,</span><br><span class="line">                          widgets=widgets.PasswordInput())</span><br><span class="line">    r_pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField(label=&apos;邮箱&apos;,error_messages=&#123;&quot;required&quot;:&apos;该字段不能为空&apos;,&quot;invalid&quot;:&quot;格式错误&quot;&#125;) # 邮箱校验</span><br><span class="line">    tel = forms.CharField(label=&apos;电话&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">widgets = widgets.TextInput(attrs=&#123;&quot;class&quot;:&apos;form-control&apos;&#125;))</span><br><span class="line">给标签设置属性</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2018/11/12/Py006-02-03forms表单验证/" data-title="Py006-02-03forms表单验证 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/11/13/Py006-02-04forms局部和全局钩子使用/" title="Py006-02-04forms局部和全局钩子使用">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Py006-02-04forms局部和全局钩子使用</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/11/05/Py006-02-02分页器Paginator/"  title="Py006-02-02分页器Paginator">
+ <strong>下一篇：</strong><br/> 
+ <span>Py006-02-02分页器Paginator
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#forms组件"><span class="toc-number">1.</span> <span class="toc-text">forms组件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#针对一个实例：注册用户讲解。"><span class="toc-number">1.1.</span> <span class="toc-text">针对一个实例：注册用户讲解。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#forms简单使用"><span class="toc-number">1.2.</span> <span class="toc-text">forms简单使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#错写校验字段会如何？"><span class="toc-number">1.3.</span> <span class="toc-text">错写校验字段会如何？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多出校验字段会咋样？"><span class="toc-number">1.4.</span> <span class="toc-text">多出校验字段会咋样？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#form-cleaned-data"><span class="toc-number">1.5.</span> <span class="toc-text">form.cleaned_data</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#form-errors"><span class="toc-number">1.6.</span> <span class="toc-text">form.errors</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重写我们的UserForm对应实际的表单"><span class="toc-number">1.7.</span> <span class="toc-text">重写我们的UserForm对应实际的表单</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染标签方式一"><span class="toc-number">2.</span> <span class="toc-text">forms渲染标签方式一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染方式二"><span class="toc-number">3.</span> <span class="toc-text">forms渲染方式二</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染方式三"><span class="toc-number">4.</span> <span class="toc-text">forms渲染方式三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms渲染错误信息"><span class="toc-number">5.</span> <span class="toc-text">forms渲染错误信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forms参数配置"><span class="toc-number">6.</span> <span class="toc-text">forms参数配置</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

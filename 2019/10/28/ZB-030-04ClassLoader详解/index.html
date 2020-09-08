@@ -1,0 +1,649 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>ZB-030-04ClassLoader详解 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="ClassLoader 做什么的？顾名思义，它是用来 加载 Class 的 。 它负责将 Class 的字节码形式转换成内存形式的 Class 对象。  字节码的来源   来自于磁盘文件 *.class jar 包里的 *.class 来自远程服务器提供的字节流  字节码的本质就是一个字节数组 []byte，它有特定的复杂的内部格式。  有很多字节码加密技术就是依靠定制 ClassLoader 来">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-030-04ClassLoader详解">
+<meta property="og:url" content="http://yoursite.com/2019/10/28/ZB-030-04ClassLoader详解/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="ClassLoader 做什么的？顾名思义，它是用来 加载 Class 的 。 它负责将 Class 的字节码形式转换成内存形式的 Class 对象。  字节码的来源   来自于磁盘文件 *.class jar 包里的 *.class 来自远程服务器提供的字节流  字节码的本质就是一个字节数组 []byte，它有特定的复杂的内部格式。  有很多字节码加密技术就是依靠定制 ClassLoader 来">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_01.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_02.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_03.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_04.png">
+<meta property="og:updated_time" content="2020-09-08T12:50:20.341Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-030-04ClassLoader详解">
+<meta name="twitter:description" content="ClassLoader 做什么的？顾名思义，它是用来 加载 Class 的 。 它负责将 Class 的字节码形式转换成内存形式的 Class 对象。  字节码的来源   来自于磁盘文件 *.class jar 包里的 *.class 来自远程服务器提供的字节流  字节码的本质就是一个字节数组 []byte，它有特定的复杂的内部格式。  有很多字节码加密技术就是依靠定制 ClassLoader 来">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_01.png">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/28/ZB-030-04ClassLoader详解/" title="ZB-030-04ClassLoader详解" itemprop="url">ZB-030-04ClassLoader详解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-28T15:52:36.000Z" itemprop="datePublished"> Published 2019-10-28</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ClassLoader-做什么的？"><span class="toc-number">1.</span> <span class="toc-text">ClassLoader 做什么的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#延迟加载"><span class="toc-number">2.</span> <span class="toc-text">延迟加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#各司其职"><span class="toc-number">3.</span> <span class="toc-text">各司其职</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JVM-中内置了三个重要的-ClassLoader，分别是"><span class="toc-number">3.1.</span> <span class="toc-text">JVM 中内置了三个重要的 ClassLoader，分别是</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#BootstrapClassLoader"><span class="toc-number">3.1.1.</span> <span class="toc-text">BootstrapClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ExtensionClassLoader"><span class="toc-number">3.1.2.</span> <span class="toc-text">ExtensionClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AppClassLoader"><span class="toc-number">3.1.3.</span> <span class="toc-text">AppClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#URLClassLoader"><span class="toc-number">3.1.4.</span> <span class="toc-text">URLClassLoader</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ClassLoader-传递性"><span class="toc-number">4.</span> <span class="toc-text">ClassLoader 传递性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双亲委派"><span class="toc-number">5.</span> <span class="toc-text">双亲委派</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#加载过程"><span class="toc-number">5.1.</span> <span class="toc-text">加载过程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class-forName"><span class="toc-number">6.</span> <span class="toc-text">Class.forName</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自定义加载器"><span class="toc-number">7.</span> <span class="toc-text">自定义加载器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class-forName-vs-ClassLoader-loadClass"><span class="toc-number">8.</span> <span class="toc-text">Class.forName vs ClassLoader.loadClass</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#钻石依赖"><span class="toc-number">9.</span> <span class="toc-text">钻石依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分工与合作"><span class="toc-number">10.</span> <span class="toc-text">分工与合作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread-contextClassLoader"><span class="toc-number">11.</span> <span class="toc-text">Thread.contextClassLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#原文链接"><span class="toc-number">12.</span> <span class="toc-text">原文链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">13.</span> <span class="toc-text">练习</span></a></li></ol>
+		
+		</div>
+		
+		<h3 id="ClassLoader-做什么的？"><a href="#ClassLoader-做什么的？" class="headerlink" title="ClassLoader 做什么的？"></a>ClassLoader 做什么的？</h3><p>顾名思义，它是用来 <strong>加载 Class 的</strong> 。</p>
+<p>它负责将 Class 的字节码形式转换成内存形式的 Class 对象。</p>
+<blockquote>
+<p>字节码的来源</p>
+</blockquote>
+<ul>
+<li>来自于磁盘文件 *.class</li>
+<li>jar 包里的 *.class</li>
+<li>来自远程服务器提供的字节流</li>
+</ul>
+<p>字节码的本质就是一个字节数组 []byte，它有特定的复杂的内部格式。</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_01.png" alt="占位"></p>
+<p>有很多字节码加密技术就是依靠定制 ClassLoader 来实现的。先使用工具对字节码文件进行加密，运行时使用定制的 ClassLoader 先解密文件内容再加载这些解密后的字节码。</p>
+<p>每个 Class 对象的内部都有一个 classLoader 字段来标识自己是由哪个 ClassLoader 加载的。ClassLoader 就像一个容器，里面装了很多已经加载的 Class 对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Class&lt;T&gt; &#123;</span><br><span class="line">  ...</span><br><span class="line">  private final ClassLoader classLoader;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="延迟加载"><a href="#延迟加载" class="headerlink" title="延迟加载"></a>延迟加载</h3><p>JVM 运行并不是一次性加载所需要的全部类的，它是按需加载，也就是延迟加载。程序在运行的过程中会逐渐遇到很多不认识的新类，这时候就会调用 ClassLoader 来加载这些类。加载完成后就会将 Class 对象存在 ClassLoader 里面，下次就不需要重新加载了。</p>
+<p>比如你在调用某个类的静态方法时，首先这个类肯定是需要被加载的，但是并不会触及这个类的实例字段，那么实例字段的类别 Class 就可以暂时不必去加载，但是它可能会加载静态字段相关的类别，因为静态方法会访问静态字段。而实例字段的类别需要等到你实例化对象的时候才可能会加载。</p>
+<h3 id="各司其职"><a href="#各司其职" class="headerlink" title="各司其职"></a>各司其职</h3><blockquote>
+<p>JVM 运行实例中会存在多个 ClassLoader，不同的 ClassLoader 会从不同的地方加载字节码文件</p>
+</blockquote>
+<ul>
+<li>它可以从不同的文件目录加载，</li>
+<li>也可以从不同的 jar 文件中加载</li>
+<li>也可以从网络上不同的静态文件服务器来下载字节码再加载。</li>
+</ul>
+<blockquote>
+<h4 id="JVM-中内置了三个重要的-ClassLoader，分别是"><a href="#JVM-中内置了三个重要的-ClassLoader，分别是" class="headerlink" title="JVM 中内置了三个重要的 ClassLoader，分别是"></a>JVM 中内置了三个重要的 ClassLoader，分别是</h4></blockquote>
+<ul>
+<li>BootstrapClassLoader</li>
+<li>ExtensionClassLoader</li>
+<li>AppClassLoader。</li>
+</ul>
+<blockquote>
+<h5 id="BootstrapClassLoader"><a href="#BootstrapClassLoader" class="headerlink" title="BootstrapClassLoader"></a>BootstrapClassLoader</h5></blockquote>
+<p>负责加载 JVM 运行时核心类，这些类位于 <code>$JAVA_HOME/lib/rt.jar</code> 文件中，我们常用内置库 <code>java.xxx.*</code> 都在里面，比如 java.util.、java.io.、java.nio.、java.lang. 等等。这个 ClassLoader 比较特殊，它是由 C 代码实现的，我们将它称之为「根加载器」。</p>
+<blockquote>
+<h5 id="ExtensionClassLoader"><a href="#ExtensionClassLoader" class="headerlink" title="ExtensionClassLoader"></a>ExtensionClassLoader</h5></blockquote>
+<p>负责加载 JVM 扩展类，比如 swing 系列、内置的 js 引擎、xml 解析器 等等，这些库名通常以 javax 开头，它们的 jar 包位于 <code>$JAVA_HOME/lib/ext/*.jar</code> 中，有很多 jar 包。</p>
+<blockquote>
+<h5 id="AppClassLoader"><a href="#AppClassLoader" class="headerlink" title="AppClassLoader"></a>AppClassLoader</h5></blockquote>
+<p>才是直接面向我们用户的加载器，它会加载 Classpath 环境变量里定义的路径中的 jar 包和目录。我们自己编写的代码以及使用的第三方 jar 包通常都是由它来加载的。</p>
+<blockquote>
+<h5 id="URLClassLoader"><a href="#URLClassLoader" class="headerlink" title="URLClassLoader"></a>URLClassLoader</h5></blockquote>
+<p>那些位于网络上静态文件服务器提供的 jar 包和 class文件，jdk 内置了一个 URLClassLoader，用户只需要传递规范的网络路径给构造器，就可以使用  URLClassLoader 来加载远程类库了。</p>
+<p>URLClassLoader 不但可以加载远程类库，还可以加载本地路径的类库，取决于构造器中不同的地址形式。</p>
+<p>ExtensionClassLoader 和 AppClassLoader 都是 URLClassLoader 的子类，它们都是从本地文件系统里加载类库。</p>
+<p>AppClassLoader 可以由 ClassLoader 类提供的静态方法 getSystemClassLoader() 得到，它就是我们所说的「系统类加载器」，我们用户平时编写的类代码通常都是由它加载的。当我们的 main 方法执行的时候，这第一个用户类的加载器就是 AppClassLoader。</p>
+<h3 id="ClassLoader-传递性"><a href="#ClassLoader-传递性" class="headerlink" title="ClassLoader 传递性"></a>ClassLoader 传递性</h3><p>程序在运行过程中，遇到了一个未知的类，它会选择哪个 ClassLoader 来加载它呢？虚拟机的策略是使用调用者 Class 对象的 ClassLoader 来加载当前未知的类。何为调用者 Class 对象？就是在遇到这个未知的类时，虚拟机肯定正在运行一个方法调用（静态方法或者实例方法），这个方法挂在哪个类上面，那这个类就是调用者 Class 对象。前面我们提到每个 Class 对象里面都有一个 classLoader 属性记录了当前的类是由谁来加载的。</p>
+<p>因为 ClassLoader 的传递性，所有延迟加载的类都会由初始调用 main 方法的这个 ClassLoader 全全负责，它就是 AppClassLoader。</p>
+<h3 id="双亲委派"><a href="#双亲委派" class="headerlink" title="双亲委派"></a>双亲委派</h3><p>前面我们提到 AppClassLoader 只负责加载 Classpath 下面的类库，如果遇到没有加载的系统类库怎么办，AppClassLoader 必须将系统类库的加载工作交给 BootstrapClassLoader 和 ExtensionClassLoader 来做，这就是我们常说的「双亲委派」。</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_02.png" alt="占位"></p>
+<blockquote>
+<h4 id="加载过程"><a href="#加载过程" class="headerlink" title="加载过程"></a>加载过程</h4></blockquote>
+<p>AppClassLoader 在加载一个未知的类名时，它并不是立即去搜寻 Classpath，它会首先将这个类名称交给 ExtensionClassLoader 来加载，如果 ExtensionClassLoader 可以加载，那么 AppClassLoader 就不用麻烦了。否则它就会搜索 Classpath 。<br>而 ExtensionClassLoader 在加载一个未知的类名时，它也并不是立即搜寻 ext 路径，它会首先将类名称交给 BootstrapClassLoader 来加载，如果 BootstrapClassLoader 可以加载，那么 ExtensionClassLoader 也就不用麻烦了。否则它就会搜索 ext 路径下的 jar 包。</p>
+<p>这三个 ClassLoader 之间形成了级联的父子关系，每个 ClassLoader 都很懒，尽量把工作交给父亲做，父亲干不了了自己才会干。每个 ClassLoader 对象内部都会有一个 parent 属性指向它的父加载器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class ClassLoader &#123;</span><br><span class="line">  ...</span><br><span class="line">  private final ClassLoader parent;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>值得注意的是图中的 ExtensionClassLoader 的 parent 指针画了虚线，这是因为它的 parent 的值是 null，当 parent 字段是 null 时就表示它的父加载器是「根加载器」。如果某个 Class 对象的 classLoader 属性值是 null，那么就表示这个类也是「根加载器」加载的。注意这里的 parent 不是 super 不是父类，只是 ClassLoader 内部的字段。</p>
+<h3 id="Class-forName"><a href="#Class-forName" class="headerlink" title="Class.forName"></a>Class.forName</h3><p>当我们在使用 jdbc 驱动时，经常会使用 Class.forName 方法来动态加载驱动类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);</span><br></pre></td></tr></table></figure>
+<p>其原理是 mysql 驱动的 Driver 类里有一个静态代码块，它会在 Driver 类被加载的时候执行。这个静态代码块会将 mysql 驱动实例注册到全局的 jdbc 驱动管理器里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class Driver &#123;</span><br><span class="line">  static &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">       java.sql.DriverManager.registerDriver(new Driver());</span><br><span class="line">    &#125; catch (SQLException E) &#123;</span><br><span class="line">       throw new RuntimeException(&quot;Can&apos;t register driver!&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>forName 方法同样也是使用调用者 Class 对象的 ClassLoader 来加载目标类。不过 forName 还提供了多参数版本，可以指定使用哪个 ClassLoader 来加载<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;?&gt; forName(String name, boolean initialize, ClassLoader cl)</span><br></pre></td></tr></table></figure></p>
+<p>通过这种形式的 forName 方法可以突破内置加载器的限制，通过使用自定类加载器允许我们自由加载其它任意来源的类库。根据 ClassLoader 的传递性，目标类库传递引用到的其它类库也将会使用自定义加载器加载。</p>
+<h3 id="自定义加载器"><a href="#自定义加载器" class="headerlink" title="自定义加载器"></a>自定义加载器</h3><p>ClassLoader 里面有三个重要的方法 loadClass()、findClass() 和 defineClass()。</p>
+<p>loadClass() 方法是加载目标类的入口，它首先会查找当前 ClassLoader 以及它的双亲里面是否已经加载了目标类，如果没有找到就会让双亲尝试加载，如果双亲都加载不了，就会调用 findClass() 让自定义加载器自己来加载目标类。ClassLoader 的 findClass() 方法是需要子类来覆盖的，不同的加载器将使用不同的逻辑来获取目标类的字节码。拿到这个字节码之后再调用 defineClass() 方法将字节码转换成 Class 对象。下面我使用伪代码表示一下基本过程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">class ClassLoader &#123;</span><br><span class="line"></span><br><span class="line">  // 加载入口，定义了双亲委派规则</span><br><span class="line">  Class loadClass(String name) &#123;</span><br><span class="line">    // 是否已经加载了</span><br><span class="line">    Class t = this.findFromLoaded(name);</span><br><span class="line">    if(t == null) &#123;</span><br><span class="line">      // 交给双亲</span><br><span class="line">      t = this.parent.loadClass(name)</span><br><span class="line">    &#125;</span><br><span class="line">    if(t == null) &#123;</span><br><span class="line">      // 双亲都不行，只能靠自己了</span><br><span class="line">      t = this.findClass(name);</span><br><span class="line">    &#125;</span><br><span class="line">    return t;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  // 交给子类自己去实现</span><br><span class="line">  Class findClass(String name) &#123;</span><br><span class="line">    throw ClassNotFoundException();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  // 组装Class对象</span><br><span class="line">  Class defineClass(byte[] code, String name) &#123;</span><br><span class="line">    return buildClassFromCode(code, name);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class CustomClassLoader extends ClassLoader &#123;</span><br><span class="line"></span><br><span class="line">  Class findClass(String name) &#123;</span><br><span class="line">    // 寻找字节码</span><br><span class="line">    byte[] code = findCodeFromSomewhere(name);</span><br><span class="line">    // 组装Class对象</span><br><span class="line">    return this.defineClass(code, name);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义类加载器不易破坏双亲委派规则，不要轻易覆盖 loadClass 方法。否则可能会导致自定义加载器无法加载内置的核心类库。在使用自定义加载器时，要明确好它的父加载器是谁，将父加载器通过子类的构造器传入。如果父类加载器是 null，那就表示父加载器是「根加载器」。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// ClassLoader 构造器</span><br><span class="line">protected ClassLoader(String name, ClassLoader parent);</span><br></pre></td></tr></table></figure>
+<p>双亲委派规则可能会变成三亲委派，四亲委派，取决于你使用的父加载器是谁，它会一直递归委派到根加载器.</p>
+<h3 id="Class-forName-vs-ClassLoader-loadClass"><a href="#Class-forName-vs-ClassLoader-loadClass" class="headerlink" title="Class.forName vs ClassLoader.loadClass"></a>Class.forName vs ClassLoader.loadClass</h3><p>这两个方法都可以用来加载目标类，它们之间有一个小小的区别，那就是 Class.forName() 方法可以获取原生类型的 Class，而 ClassLoader.loadClass() 则会报错。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;?&gt; x = Class.forName(&quot;[I&quot;);</span><br><span class="line">System.out.println(x);</span><br><span class="line"></span><br><span class="line">x = ClassLoader.getSystemClassLoader().loadClass(&quot;[I&quot;);</span><br><span class="line">System.out.println(x);</span><br><span class="line"></span><br><span class="line">---------------------</span><br><span class="line">class [I</span><br><span class="line"></span><br><span class="line">Exception in thread &quot;main&quot; java.lang.ClassNotFoundException: [I</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h3 id="钻石依赖"><a href="#钻石依赖" class="headerlink" title="钻石依赖"></a>钻石依赖</h3><p>项目管理上有一个著名的概念叫着「钻石依赖」，是指软件依赖导致同一个软件包的两个版本需要共存而不能冲突。</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_03.png" alt></p>
+<p>我们平时使用的 maven 是这样解决钻石依赖的，它会从多个冲突的版本中选择一个来使用，如果不同的版本之间兼容性很糟糕，那么程序将无法正常编译运行。Maven 这种形式叫「扁平化」依赖管理。</p>
+<p>使用 ClassLoader 可以解决钻石依赖问题。不同版本的软件包使用不同的 ClassLoader 来加载， <strong>位于不同 ClassLoader 中名称一样的类实际上是不同的类</strong>。 下面让我们使用 URLClassLoader 来尝试一个简单的例子，它默认的父加载器是 AppClassLoader</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">$ cat ~/source/jcl/v1/Dep.java</span><br><span class="line">public class Dep &#123;</span><br><span class="line">	public void print() &#123;</span><br><span class="line">		System.out.println(&quot;v1&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$ cat ~/source/jcl/v2/Dep.java</span><br><span class="line">public class Dep &#123;</span><br><span class="line"> public void print() &#123;</span><br><span class="line">  System.out.println(&quot;v1&quot;);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$ cat ~/source/jcl/Test.java</span><br><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) throws Exception &#123;</span><br><span class="line">		String v1dir = &quot;file:///Users/qianwp/source/jcl/v1/&quot;;</span><br><span class="line">		String v2dir = &quot;file:///Users/qianwp/source/jcl/v2/&quot;;</span><br><span class="line">		URLClassLoader v1 = new URLClassLoader(new URL[]&#123;new URL(v1dir)&#125;);</span><br><span class="line">		URLClassLoader v2 = new URLClassLoader(new URL[]&#123;new URL(v2dir)&#125;);</span><br><span class="line">		</span><br><span class="line">  Class&lt;?&gt; depv1Class = v1.loadClass(&quot;Dep&quot;);</span><br><span class="line">		Object depv1 = depv1Class.getConstructor().newInstance();</span><br><span class="line">		depv1Class.getMethod(&quot;print&quot;).invoke(depv1);</span><br><span class="line"></span><br><span class="line">		Class&lt;?&gt; depv2Class = v2.loadClass(&quot;Dep&quot;);</span><br><span class="line">		Object depv2 = depv2Class.getConstructor().newInstance();</span><br><span class="line">		depv2Class.getMethod(&quot;print&quot;).invoke(depv2);</span><br><span class="line">	 </span><br><span class="line">  System.out.println(depv1Class.equals(depv2Class));</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在运行之前，我们需要对依赖的类库进行编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~/source/jcl/v1</span><br><span class="line">$ javac Dep.java</span><br><span class="line">$ cd ~/source/jcl/v2</span><br><span class="line">$ javac Dep.java</span><br><span class="line">$ cd ~/source/jcl</span><br><span class="line">$ javac Test.java</span><br><span class="line">$ java Test</span><br><span class="line">v1</span><br><span class="line">v2</span><br><span class="line">false</span><br></pre></td></tr></table></figure>
+<p>在这个例子中如果两个 URLClassLoader 指向的路径是一样的，下面这个表达式还是 false，因为即使是同样的字节码用不同的 ClassLoader 加载出来的类都不能算同一个类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">depv1Class.equals(depv2Class)</span><br></pre></td></tr></table></figure>
+<p>我们还可以让两个不同版本的 Dep 类实现同一个接口，这样可以避免使用反射的方式来调用 Dep 类里面的方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;?&gt; depv1Class = v1.loadClass(&quot;Dep&quot;);</span><br><span class="line">IPrint depv1 = (IPrint)depv1Class.getConstructor().newInstance();</span><br><span class="line">depv1.print()</span><br></pre></td></tr></table></figure>
+<p>ClassLoader 固然可以解决依赖冲突问题，不过它也限制了不同软件包的操作界面必须使用反射或接口的方式进行动态调用。Maven 没有这种限制，它依赖于虚拟机的默认懒惰加载策略，运行过程中如果没有显示使用定制的 ClassLoader，那么从头到尾都是在使用 AppClassLoader，而不同版本的同名类必须使用不同的 ClassLoader 加载，所以 Maven 不能完美解决钻石依赖。<br>如果你想知道有没有开源的包管理工具可以解决钻石依赖的，我推荐你了解一下 sofa-ark，它是蚂蚁金服开源的轻量级类隔离框架。</p>
+<h3 id="分工与合作"><a href="#分工与合作" class="headerlink" title="分工与合作"></a>分工与合作</h3><p>这里我们重新理解一下 ClassLoader 的意义，它相当于类的命名空间，起到了类隔离的作用。位于同一个 ClassLoader 里面的类名是唯一的，不同的 ClassLoader 可以持有同名的类。ClassLoader 是类名称的容器，是类的沙箱。</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/zb_030_04.png" alt></p>
+<p>不同的 ClassLoader 之间也会有合作，它们之间的合作是通过 parent 属性和双亲委派机制来完成的。parent 具有更高的加载优先级。除此之外，parent 还表达了一种共享关系，当多个子 ClassLoader 共享同一个 parent 时，那么这个 parent 里面包含的类可以认为是所有子 ClassLoader 共享的。这也是为什么 BootstrapClassLoader 被所有的类加载器视为祖先加载器，JVM 核心类库自然应该被共享。</p>
+<h3 id="Thread-contextClassLoader"><a href="#Thread-contextClassLoader" class="headerlink" title="Thread.contextClassLoader"></a>Thread.contextClassLoader</h3><p>如果你稍微阅读过 Thread 的源代码，你会在它的实例字段中发现有一个字段非常特别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class Thread &#123;</span><br><span class="line">  ...</span><br><span class="line">  private ClassLoader contextClassLoader;</span><br><span class="line">  </span><br><span class="line">  public ClassLoader getContextClassLoader() &#123;</span><br><span class="line">    return contextClassLoader;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  public void setContextClassLoader(ClassLoader cl) &#123;</span><br><span class="line">    this.contextClassLoader = cl;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>contextClassLoader「线程上下文类加载器」，这究竟是什么东西？</p>
+<p>首先 contextClassLoader 是那种需要显示使用的类加载器，如果你没有显示使用它，也就永远不会在任何地方用到它。你可以使用下面这种方式来显示使用它</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Thread.currentThread().getContextClassLoader().loadClass(name);</span><br></pre></td></tr></table></figure>
+<p>这意味着如果你使用 forName(string name) 方法加载目标类，它不会自动使用 contextClassLoader。那些因为代码上的依赖关系而懒惰加载的类也不会自动使用 contextClassLoader来加载。</p>
+<p>其次线程的 contextClassLoader 默认是从父线程那里继承过来的，所谓父线程就是创建了当前线程的线程。程序启动时的 main 线程的 contextClassLoader 就是 AppClassLoader。这意味着如果没有人工去设置，那么所有的线程的 contextClassLoader 都是 AppClassLoader。</p>
+<p>那这个 contextClassLoader 究竟是做什么用的？我们要使用前面提到了类加载器分工与合作的原理来解释它的用途。</p>
+<p>它可以做到跨线程共享类，只要它们共享同一个 contextClassLoader。父子线程之间会自动传递 contextClassLoader，所以共享起来将是自动化的。</p>
+<p>如果不同的线程使用不同的 contextClassLoader，那么不同的线程使用的类就可以隔离开来。</p>
+<p>如果我们对业务进行划分，不同的业务使用不同的线程池，线程池内部共享同一个 contextClassLoader，线程池之间使用不同的 contextClassLoader，就可以很好的起到隔离保护的作用，避免类版本冲突。</p>
+<p>如果我们不去定制 contextClassLoader，那么所有的线程将会默认使用 AppClassLoader，所有的类都将会是共享的。</p>
+<p>线程的 contextClassLoader 使用场合比较罕见，如果上面的逻辑晦涩难懂也不必过于计较。</p>
+<p>JDK9 增加了模块功能之后对类加载器的结构设计做了一定程度的修改，不过类加载器的原理还是类似的，作为类的容器，它起到类隔离的作用，同时还需要依靠双亲委派机制来建立不同的类加载器之间的合作关系。</p>
+<h3 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a>原文链接</h3><ul>
+<li><a href="https://juejin.im/post/5c04892351882516e70dcc9b" target="_blank" rel="noopener">老大难的 Java ClassLoader 再不理解就老了</a></li>
+</ul>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>-<a href="https://github.com/hcsp/implement-a-classloader" target="_blank" rel="noopener">q实现一个自定义的ClassLoader</a></p>
+<p>-<a href="https://github.com/hcsp/implement-a-classloader/pull/8" target="_blank" rel="noopener">a</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/10/28/ZB-030-04ClassLoader详解/" data-title="ZB-030-04ClassLoader详解 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/10/28/ZB-030-05反射详解/" title="ZB-030-05反射详解">
+  <strong>上一篇：</strong><br/>
+  <span>
+  ZB-030-05反射详解</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/10/28/ZB-030-03反射/"  title="ZB-030-03反射">
+ <strong>下一篇：</strong><br/> 
+ <span>ZB-030-03反射
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ClassLoader-做什么的？"><span class="toc-number">1.</span> <span class="toc-text">ClassLoader 做什么的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#延迟加载"><span class="toc-number">2.</span> <span class="toc-text">延迟加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#各司其职"><span class="toc-number">3.</span> <span class="toc-text">各司其职</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JVM-中内置了三个重要的-ClassLoader，分别是"><span class="toc-number">3.1.</span> <span class="toc-text">JVM 中内置了三个重要的 ClassLoader，分别是</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#BootstrapClassLoader"><span class="toc-number">3.1.1.</span> <span class="toc-text">BootstrapClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ExtensionClassLoader"><span class="toc-number">3.1.2.</span> <span class="toc-text">ExtensionClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AppClassLoader"><span class="toc-number">3.1.3.</span> <span class="toc-text">AppClassLoader</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#URLClassLoader"><span class="toc-number">3.1.4.</span> <span class="toc-text">URLClassLoader</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ClassLoader-传递性"><span class="toc-number">4.</span> <span class="toc-text">ClassLoader 传递性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#双亲委派"><span class="toc-number">5.</span> <span class="toc-text">双亲委派</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#加载过程"><span class="toc-number">5.1.</span> <span class="toc-text">加载过程</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class-forName"><span class="toc-number">6.</span> <span class="toc-text">Class.forName</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自定义加载器"><span class="toc-number">7.</span> <span class="toc-text">自定义加载器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Class-forName-vs-ClassLoader-loadClass"><span class="toc-number">8.</span> <span class="toc-text">Class.forName vs ClassLoader.loadClass</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#钻石依赖"><span class="toc-number">9.</span> <span class="toc-text">钻石依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分工与合作"><span class="toc-number">10.</span> <span class="toc-text">分工与合作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread-contextClassLoader"><span class="toc-number">11.</span> <span class="toc-text">Thread.contextClassLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#原文链接"><span class="toc-number">12.</span> <span class="toc-text">原文链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">13.</span> <span class="toc-text">练习</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
