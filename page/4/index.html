@@ -534,6 +534,142 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2019/12/19/Node-JS专精02this变态面试题/" title="Node-JS专精02this变态面试题" itemprop="url">Node-JS专精02this变态面试题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-12-19T15:05:45.000Z" itemprop="datePublished"> Published 2019-12-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="回顾基础知识，JS如何声明函数"><a href="#回顾基础知识，JS如何声明函数" class="headerlink" title="回顾基础知识，JS如何声明函数"></a>回顾基础知识，JS如何声明函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const f1 = new Function(&apos;x&apos;,&apos;y&apos;,&apos;return x + y&apos;)</span><br><span class="line"></span><br><span class="line">function f2(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f3 = function(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f4 = (x, y)=&gt; x + y</span><br></pre></td></tr></table></figure>
+<p>其中，<code>f1,f2,f3</code> 是ES6之前的语法，<strong>支持 <code>this,arguments,new</code></strong><br>而 <code>f4</code> 是 ES6语法，<strong>不支持 <code>this,arguments,new</code></strong></p>
+<blockquote>
+<p>你可以去 浏览器控制台里试试</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const f2 = ()=&gt;console.log(this)</span><br><span class="line">f2() // window</span><br><span class="line"></span><br><span class="line">f2.call(&#123;name:&apos;hjx&apos;&#125;)  // 还是 window</span><br></pre></td></tr></table></figure>
+<h4 id="箭头函数不支持this"><a href="#箭头函数不支持this" class="headerlink" title="箭头函数不支持this"></a>箭头函数不支持this</h4><blockquote>
+<p>箭头函数如何处理 a ,就如何处理 this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const a = 233</span><br><span class="line">const f2 = ()=&gt;console.log(a)</span><br><span class="line">f2() //</span><br><span class="line"></span><br><span class="line">console.log(this) </span><br><span class="line">const f2 = ()=&gt;console.log(this)</span><br></pre></td></tr></table></figure>
+<p>箭头函数把 this 当作外部的变量，仅此而已，但是非箭头函数的 this 有很多<strong>特殊处理</strong></p>
+<p>箭头函数不支持this 指的就是<strong>尖头函数对 this 和其他变量一视同仁，不会特殊对待</strong></p>
+<h4 id="非箭头函数的this"><a href="#非箭头函数的this" class="headerlink" title="非箭头函数的this"></a>非箭头函数的this</h4><blockquote>
+<p>网传死记方法</p>
+</blockquote>
+<ul>
+<li>this是上下文</li>
+<li>全局环境执行时候,this是全局对象</li>
+<li>调用对象方法时，this是该对象</li>
+<li>函数里调用函数时，this是全局对象</li>
+<li>箭头函数的this，不看调用，看定义(静态作用域)</li>
+<li>还有人说箭头函数里的 this 指向外面的this</li>
+<li>用new调用函数时，this是新增对象</li>
+<li>可以用<code>call/apply/bind</code>指定this</li>
+</ul>
+<blockquote>
+<p>记忆力好可以这样记</p>
+</blockquote>
+<ul>
+<li>我记不住</li>
+</ul>
+<h4 id="那么this是参数还是环境？"><a href="#那么this是参数还是环境？" class="headerlink" title="那么this是参数还是环境？"></a>那么this是参数还是环境？</h4><ul>
+<li>答案：this是参数，只有箭头函数 this是环境</li>
+</ul>
+<h4 id="如何确定this"><a href="#如何确定this" class="headerlink" title="如何确定this"></a>如何确定this</h4><blockquote>
+<p>显式this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn.call(asThis,1,2)</span><br><span class="line">fn.bind(asThis,1,2)()</span><br><span class="line">obj.method.call(obj,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>隐式this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+<p><strong>为什么你很难确定this,因为你总是让js帮你选this</strong></p>
+<p><strong>所以你应该自己指定this</strong></p>
+<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// this 是参数， 答 button 是错的</span><br></pre></td></tr></table></figure>
+<p>答案是：<strong>不知道,要看怎么调用</strong></p>
+<p>因为你没看到call,没指定this,所以没法确定</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当你手点的时候 是 button</span><br><span class="line"></span><br><span class="line">// 如果js调用呢?</span><br><span class="line">button.click()</span><br><span class="line"></span><br><span class="line">// 而如果这样，就不是button</span><br><span class="line">var fn = button.onclick</span><br><span class="line">fn() // 打印的是 window</span><br><span class="line">fn.call(&#123;name:&apos;hjx&apos;&#125;) // &#123;name:&apos;hjx&apos;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>标准答案</p>
+</blockquote>
+<p>这个this的值无法确定，我们要看this是如何调用的，如果是用户点击按钮的时候浏览器调用的，那么浏览器一定会把button作为this传递进来，<br>如果是通过其他方式调用的，那么就要看它是如何调用的如以下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var fn = button.onclick</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+<p>由于fn没指定this所以相当于 fn.call(undefined) 那么浏览器就会把这个this变成全局对象 window</p>
+<blockquote>
+<p>再来一个题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const vm = new Vue(&#123;</span><br><span class="line">    data:&#123;</span><br><span class="line">        msg:&apos;hi&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods:&#123;</span><br><span class="line">        sayHi()&#123;</span><br><span class="line">            console.log(this.msg) // this是什么</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案依然是 不知道</span><br><span class="line">如果你是在 vue正常情况下调用 这个this 就是 vm</span><br><span class="line">但如果你是把 vm.sayHi放在其他地方调用就要看你调用的时候怎么传递参数</span><br><span class="line">根据传参的形式不同，我才能确定this是什么</span><br><span class="line">所以this是一个参数，只有在调用的时候唯一的确定</span><br></pre></td></tr></table></figure>
+<h4 id="真实面试题"><a href="#真实面试题" class="headerlink" title="真实面试题"></a>真实面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1) // 输出什么，有陷阱</span><br></pre></td></tr></table></figure>
+<p>你可以拷贝代码到浏览器里试一下</p>
+<blockquote>
+<p>分析以下，先把 <code>fn()</code>改写</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        // fn()</span><br><span class="line">        fn.call(undefined) // 所以此时 this 实际是 window</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj.method(fn,1) </span><br><span class="line">//所以打印的是 window.length</span><br><span class="line">// 然而 let length 是不是 window 的 length?</span><br><span class="line">// 答案是 没关系</span><br><span class="line">// window.length 是什么？</span><br><span class="line"></span><br><span class="line">window.length 默认指的是 当前页面有多少个窗口或者说多少个 iframe</span><br><span class="line">// 你说这题是不是非常坑</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>再来分析<code>arguments[0]()</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 改写 arguments[0]()</span><br><span class="line">// 实际就变成了这样 arguments.0.call(arguments)</span><br><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">        // arguments.0.call(arguments)</span><br><span class="line">        // 所以此时 this是 arguments</span><br><span class="line">        // arguments.length 是什么？</span><br><span class="line">        // 是形参的长度还是，实参的长度</span><br><span class="line">        // 答案是 arguments.length 是 实参的长度</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1)</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>首先碰到这些this问题，一定要改写，你不改写就是坑自己</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>this 是 call 的第一个参数</p>
+</li>
+<li>new 重新设计了 this/箭头函数不接受 this <ul>
+<li><a href="https://zhuanlan.zhihu.com/p/23987456" target="_blank" rel="noopener">参考链接</a></li>
+</ul>
+</li>
+<li>函数的返回值由参数和环境确定</li>
+<li>this是参数，arguments也是参数</li>
+<li>全局变量和自由变量是环境</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2019/12/19/Node-JS专精01函数与闭包/" title="Node-JS专精01函数与闭包" itemprop="url">Node-JS专精01函数与闭包</a>
   </h1>
   <p class="article-author">By
@@ -676,142 +812,6 @@
 <li>如果一门语言不支持对象，你可以用闭包代理</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// person 有 name age 属性</span><br><span class="line"></span><br><span class="line">function createPerson(age,name)&#123;</span><br><span class="line">    return function(key)&#123;</span><br><span class="line">        if(key === &apos;name&apos;) return name;</span><br><span class="line">        if(key === &apos;age&apos;) return age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var person = createPerson(18,&apos;hjx&apos;);</span><br><span class="line">person(&apos;name&apos;) // &apos;hjx&apos;</span><br><span class="line">person(&apos;age&apos;) // 18</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/12/19/Node-JS专精02this变态面试题/" title="Node-JS专精02this变态面试题" itemprop="url">Node-JS专精02this变态面试题</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-12-19T15:05:45.000Z" itemprop="datePublished"> Published 2019-12-19</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="回顾基础知识，JS如何声明函数"><a href="#回顾基础知识，JS如何声明函数" class="headerlink" title="回顾基础知识，JS如何声明函数"></a>回顾基础知识，JS如何声明函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const f1 = new Function(&apos;x&apos;,&apos;y&apos;,&apos;return x + y&apos;)</span><br><span class="line"></span><br><span class="line">function f2(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f3 = function(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f4 = (x, y)=&gt; x + y</span><br></pre></td></tr></table></figure>
-<p>其中，<code>f1,f2,f3</code> 是ES6之前的语法，<strong>支持 <code>this,arguments,new</code></strong><br>而 <code>f4</code> 是 ES6语法，<strong>不支持 <code>this,arguments,new</code></strong></p>
-<blockquote>
-<p>你可以去 浏览器控制台里试试</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const f2 = ()=&gt;console.log(this)</span><br><span class="line">f2() // window</span><br><span class="line"></span><br><span class="line">f2.call(&#123;name:&apos;hjx&apos;&#125;)  // 还是 window</span><br></pre></td></tr></table></figure>
-<h4 id="箭头函数不支持this"><a href="#箭头函数不支持this" class="headerlink" title="箭头函数不支持this"></a>箭头函数不支持this</h4><blockquote>
-<p>箭头函数如何处理 a ,就如何处理 this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const a = 233</span><br><span class="line">const f2 = ()=&gt;console.log(a)</span><br><span class="line">f2() //</span><br><span class="line"></span><br><span class="line">console.log(this) </span><br><span class="line">const f2 = ()=&gt;console.log(this)</span><br></pre></td></tr></table></figure>
-<p>箭头函数把 this 当作外部的变量，仅此而已，但是非箭头函数的 this 有很多<strong>特殊处理</strong></p>
-<p>箭头函数不支持this 指的就是<strong>尖头函数对 this 和其他变量一视同仁，不会特殊对待</strong></p>
-<h4 id="非箭头函数的this"><a href="#非箭头函数的this" class="headerlink" title="非箭头函数的this"></a>非箭头函数的this</h4><blockquote>
-<p>网传死记方法</p>
-</blockquote>
-<ul>
-<li>this是上下文</li>
-<li>全局环境执行时候,this是全局对象</li>
-<li>调用对象方法时，this是该对象</li>
-<li>函数里调用函数时，this是全局对象</li>
-<li>箭头函数的this，不看调用，看定义(静态作用域)</li>
-<li>还有人说箭头函数里的 this 指向外面的this</li>
-<li>用new调用函数时，this是新增对象</li>
-<li>可以用<code>call/apply/bind</code>指定this</li>
-</ul>
-<blockquote>
-<p>记忆力好可以这样记</p>
-</blockquote>
-<ul>
-<li>我记不住</li>
-</ul>
-<h4 id="那么this是参数还是环境？"><a href="#那么this是参数还是环境？" class="headerlink" title="那么this是参数还是环境？"></a>那么this是参数还是环境？</h4><ul>
-<li>答案：this是参数，只有箭头函数 this是环境</li>
-</ul>
-<h4 id="如何确定this"><a href="#如何确定this" class="headerlink" title="如何确定this"></a>如何确定this</h4><blockquote>
-<p>显式this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn.call(asThis,1,2)</span><br><span class="line">fn.bind(asThis,1,2)()</span><br><span class="line">obj.method.call(obj,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>隐式this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-<p><strong>为什么你很难确定this,因为你总是让js帮你选this</strong></p>
-<p><strong>所以你应该自己指定this</strong></p>
-<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// this 是参数， 答 button 是错的</span><br></pre></td></tr></table></figure>
-<p>答案是：<strong>不知道,要看怎么调用</strong></p>
-<p>因为你没看到call,没指定this,所以没法确定</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当你手点的时候 是 button</span><br><span class="line"></span><br><span class="line">// 如果js调用呢?</span><br><span class="line">button.click()</span><br><span class="line"></span><br><span class="line">// 而如果这样，就不是button</span><br><span class="line">var fn = button.onclick</span><br><span class="line">fn() // 打印的是 window</span><br><span class="line">fn.call(&#123;name:&apos;hjx&apos;&#125;) // &#123;name:&apos;hjx&apos;&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>标准答案</p>
-</blockquote>
-<p>这个this的值无法确定，我们要看this是如何调用的，如果是用户点击按钮的时候浏览器调用的，那么浏览器一定会把button作为this传递进来，<br>如果是通过其他方式调用的，那么就要看它是如何调用的如以下代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var fn = button.onclick</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
-<p>由于fn没指定this所以相当于 fn.call(undefined) 那么浏览器就会把这个this变成全局对象 window</p>
-<blockquote>
-<p>再来一个题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const vm = new Vue(&#123;</span><br><span class="line">    data:&#123;</span><br><span class="line">        msg:&apos;hi&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods:&#123;</span><br><span class="line">        sayHi()&#123;</span><br><span class="line">            console.log(this.msg) // this是什么</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案依然是 不知道</span><br><span class="line">如果你是在 vue正常情况下调用 这个this 就是 vm</span><br><span class="line">但如果你是把 vm.sayHi放在其他地方调用就要看你调用的时候怎么传递参数</span><br><span class="line">根据传参的形式不同，我才能确定this是什么</span><br><span class="line">所以this是一个参数，只有在调用的时候唯一的确定</span><br></pre></td></tr></table></figure>
-<h4 id="真实面试题"><a href="#真实面试题" class="headerlink" title="真实面试题"></a>真实面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1) // 输出什么，有陷阱</span><br></pre></td></tr></table></figure>
-<p>你可以拷贝代码到浏览器里试一下</p>
-<blockquote>
-<p>分析以下，先把 <code>fn()</code>改写</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        // fn()</span><br><span class="line">        fn.call(undefined) // 所以此时 this 实际是 window</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj.method(fn,1) </span><br><span class="line">//所以打印的是 window.length</span><br><span class="line">// 然而 let length 是不是 window 的 length?</span><br><span class="line">// 答案是 没关系</span><br><span class="line">// window.length 是什么？</span><br><span class="line"></span><br><span class="line">window.length 默认指的是 当前页面有多少个窗口或者说多少个 iframe</span><br><span class="line">// 你说这题是不是非常坑</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>再来分析<code>arguments[0]()</code></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 改写 arguments[0]()</span><br><span class="line">// 实际就变成了这样 arguments.0.call(arguments)</span><br><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">        // arguments.0.call(arguments)</span><br><span class="line">        // 所以此时 this是 arguments</span><br><span class="line">        // arguments.length 是什么？</span><br><span class="line">        // 是形参的长度还是，实参的长度</span><br><span class="line">        // 答案是 arguments.length 是 实参的长度</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1)</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li><p>首先碰到这些this问题，一定要改写，你不改写就是坑自己</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>this 是 call 的第一个参数</p>
-</li>
-<li>new 重新设计了 this/箭头函数不接受 this <ul>
-<li><a href="https://zhuanlan.zhihu.com/p/23987456" target="_blank" rel="noopener">参考链接</a></li>
-</ul>
-</li>
-<li>函数的返回值由参数和环境确定</li>
-<li>this是参数，arguments也是参数</li>
-<li>全局变量和自由变量是环境</li>
-</ul>
 
         
         
