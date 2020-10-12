@@ -1,0 +1,599 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>CSS-003-堆叠上下文 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="堆叠上下文堆叠顺序盒模型一个盒子中主要的属性就5个：  width height padding border margin  一个 div 背景色到底在哪个层级？12345678div&amp;#123;    width:200px;    height:200px;    border:10px solid red;    padding:15px;    margin:15px;    backg">
+<meta name="keywords" content="CSS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSS-003-堆叠上下文">
+<meta property="og:url" content="http://yoursite.com/2020/10/11/CSS-003-堆叠上下文/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="堆叠上下文堆叠顺序盒模型一个盒子中主要的属性就5个：  width height padding border margin  一个 div 背景色到底在哪个层级？12345678div&amp;#123;    width:200px;    height:200px;    border:10px solid red;    padding:15px;    margin:15px;    backg">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://static.xiedaimala.com/FrbdiFEq7r5xDideYoKtAFaPbnvD">
+<meta property="og:updated_time" content="2020-10-11T08:03:37.074Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CSS-003-堆叠上下文">
+<meta name="twitter:description" content="堆叠上下文堆叠顺序盒模型一个盒子中主要的属性就5个：  width height padding border margin  一个 div 背景色到底在哪个层级？12345678div&amp;#123;    width:200px;    height:200px;    border:10px solid red;    padding:15px;    margin:15px;    backg">
+<meta name="twitter:image" content="https://static.xiedaimala.com/FrbdiFEq7r5xDideYoKtAFaPbnvD">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/10/11/CSS-003-堆叠上下文/" title="CSS-003-堆叠上下文" itemprop="url">CSS-003-堆叠上下文</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-10-11T07:19:02.000Z" itemprop="datePublished"> Published 2020-10-11</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#堆叠上下文"><span class="toc-number">1.</span> <span class="toc-text">堆叠上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#堆叠顺序"><span class="toc-number">1.1.</span> <span class="toc-text">堆叠顺序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#盒模型"><span class="toc-number">1.1.1.</span> <span class="toc-text">盒模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一个-div-背景色到底在哪个层级？"><span class="toc-number">1.1.2.</span> <span class="toc-text">一个 div 背景色到底在哪个层级？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#div上有文字内容-谁先谁后？"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">div上有文字内容 谁先谁后？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#情况复杂了"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">情况复杂了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如果有浮动元素呢？"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">如果有浮动元素呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#定位元素呢？"><span class="toc-number">1.1.2.4.</span> <span class="toc-text">定位元素呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#z-index"><span class="toc-number">1.1.2.5.</span> <span class="toc-text">z-index</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#堆叠顺序-1"><span class="toc-number">1.1.3.</span> <span class="toc-text">堆叠顺序</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="堆叠上下文"><a href="#堆叠上下文" class="headerlink" title="堆叠上下文"></a>堆叠上下文</h1><h2 id="堆叠顺序"><a href="#堆叠顺序" class="headerlink" title="堆叠顺序"></a>堆叠顺序</h2><h3 id="盒模型"><a href="#盒模型" class="headerlink" title="盒模型"></a>盒模型</h3><p>一个盒子中主要的属性就5个：</p>
+<ul>
+<li>width</li>
+<li>height</li>
+<li>padding</li>
+<li>border</li>
+<li>margin</li>
+</ul>
+<h3 id="一个-div-背景色到底在哪个层级？"><a href="#一个-div-背景色到底在哪个层级？" class="headerlink" title="一个 div 背景色到底在哪个层级？"></a>一个 div 背景色到底在哪个层级？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    width:200px;</span><br><span class="line">    height:200px;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    padding:15px;</span><br><span class="line">    margin:15px;</span><br><span class="line">    background:black;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>给 border 设置半透明，你发现 black 在后面</li>
+</ul>
+<blockquote>
+<p>结论</p>
+</blockquote>
+<p><strong>背景色在border的后面</strong></p>
+<h4 id="div上有文字内容-谁先谁后？"><a href="#div上有文字内容-谁先谁后？" class="headerlink" title="div上有文字内容 谁先谁后？"></a>div上有文字内容 谁先谁后？</h4><p>答案是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">背景色 &gt;  border &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
+<h4 id="情况复杂了"><a href="#情况复杂了" class="headerlink" title="情况复杂了"></a>情况复杂了</h4><ul>
+<li>parent 里的 child 有文字</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      margin-top:-15px;</span><br><span class="line">      color:black;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;BBB&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>结论</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- parent的文字 会盖住 child 的背景色</span><br><span class="line">- child的文字 会盖住 parent的 文字，因为它是后出现的</span><br><span class="line"></span><br><span class="line">background &gt; border &gt; child的 div/块级元素 &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
+<h4 id="如果有浮动元素呢？"><a href="#如果有浮动元素呢？" class="headerlink" title="如果有浮动元素呢？"></a>如果有浮动元素呢？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">        text-indent:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      color:black;</span><br><span class="line">      height: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">    .float&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      background:blue;</span><br><span class="line">      height: 30px;</span><br><span class="line">      width: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;float&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>浮动元素 盖住了 child 说明，浮动元素天生比块级元素要高</li>
+<li>parent的文字 盖在 浮动元素上面</li>
+</ul>
+<p><strong>如果浮动元素里面有文字咋办？</strong></p>
+<ul>
+<li>答案是 浮动元素 是 parent 的孩子节点， parent的文字 显示层级天生就比 浮动元素高</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- parent的文字 会盖住 child 的背景色</span><br><span class="line">- child的文字 会盖住 parent的 文字，因为它是后出现的</span><br><span class="line">- 浮动元素 会盖住 child</span><br><span class="line">- parent的文字 会盖住 浮动元素</span><br><span class="line"></span><br><span class="line">background &gt; border &gt; child的 div/块级元素 &gt; 浮动元素 &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
+<h4 id="定位元素呢？"><a href="#定位元素呢？" class="headerlink" title="定位元素呢？"></a>定位元素呢？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">        text-indent:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      color:black;</span><br><span class="line">      height: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">    .float&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      background:blue;</span><br><span class="line">      height: 30px;</span><br><span class="line">      width: 30px;</span><br><span class="line">      margin-top:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .relative&#123;</span><br><span class="line">      position:relative;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 50px;</span><br><span class="line">      background:orange;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;relative&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;float&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>定位元素会在 float 之前</li>
+</ul>
+<h4 id="z-index"><a href="#z-index" class="headerlink" title="z-index"></a>z-index</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">parent 内 同级别元素直接加 z-index 不会影响 堆叠顺序</span><br><span class="line"></span><br><span class="line">只有 position不为 static 默认值的元素 z-index才会生效</span><br></pre></td></tr></table></figure>
+<h3 id="堆叠顺序-1"><a href="#堆叠顺序-1" class="headerlink" title="堆叠顺序"></a>堆叠顺序</h3><p><img src="https://static.xiedaimala.com/FrbdiFEq7r5xDideYoKtAFaPbnvD" alt></p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context</a></li>
+</ul>
+<p>可以理解为堆叠作用域。跟 BFC 一样，我们只知道一些属性会触发堆叠上下文，但并不知道堆叠上下文是什么。</p>
+<ul>
+<li>根元素 (HTML),</li>
+<li>z-index 值不为 “auto”的 绝对/相对定位 <strong>（只记住这个就行了，其他凭感觉）</strong></li>
+<li>一个 z-index 值不为 “auto”的 flex 项目 (flex item)，即：父元素 display: flex|inline-flex，</li>
+<li>opacity 属性值小于 1 的元素（参考 the specification for opacity），</li>
+<li>transform 属性值不为 “none”的元素，</li>
+<li>mix-blend-mode 属性值不为 “normal”的元素，</li>
+<li>filter值不为“none”的元素，</li>
+<li>perspective值不为“none”的元素，</li>
+<li>isolation 属性被设置为 “isolate”的元素，</li>
+<li>position: fixed</li>
+<li>在 will-change 中指定了任意 CSS 属性，即便你没有直接指定这些属性的值（参考 这篇文章）</li>
+<li>-webkit-overflow-scrolling 属性被设置 “touch”的元素</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/CSS/">CSS</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/10/11/CSS-003-堆叠上下文/" data-title="CSS-003-堆叠上下文 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/10/11/CSS-005-移动端响应式/" title="CSS-005-移动端响应式">
+  <strong>上一篇：</strong><br/>
+  <span>
+  CSS-005-移动端响应式</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/10/11/CSS-002-宽度与高度/"  title="CSS-002-宽度与高度">
+ <strong>下一篇：</strong><br/> 
+ <span>CSS-002-宽度与高度
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#堆叠上下文"><span class="toc-number">1.</span> <span class="toc-text">堆叠上下文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#堆叠顺序"><span class="toc-number">1.1.</span> <span class="toc-text">堆叠顺序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#盒模型"><span class="toc-number">1.1.1.</span> <span class="toc-text">盒模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一个-div-背景色到底在哪个层级？"><span class="toc-number">1.1.2.</span> <span class="toc-text">一个 div 背景色到底在哪个层级？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#div上有文字内容-谁先谁后？"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">div上有文字内容 谁先谁后？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#情况复杂了"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">情况复杂了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#如果有浮动元素呢？"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">如果有浮动元素呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#定位元素呢？"><span class="toc-number">1.1.2.4.</span> <span class="toc-text">定位元素呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#z-index"><span class="toc-number">1.1.2.5.</span> <span class="toc-text">z-index</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#堆叠顺序-1"><span class="toc-number">1.1.3.</span> <span class="toc-text">堆叠顺序</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CSS/" title="CSS">CSS<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
