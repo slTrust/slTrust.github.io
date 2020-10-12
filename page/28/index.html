@@ -79,6 +79,556 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/11/13/Py006-02-04forms局部和全局钩子使用/" title="Py006-02-04forms局部和全局钩子使用" itemprop="url">Py006-02-04forms局部和全局钩子使用</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-12T17:33:35.000Z" itemprop="datePublished"> Published 2018-11-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="钩子函数"><a href="#钩子函数" class="headerlink" title="钩子函数"></a>钩子函数</h3><p>定义你特殊的校验规则</p>
+<h3 id="局部钩子和全局钩子"><a href="#局部钩子和全局钩子" class="headerlink" title="局部钩子和全局钩子"></a>局部钩子和全局钩子</h3><ul>
+<li>clean_字段  校验单个字段</li>
+<li>clean()全局钩子函数  如校验多个字段的时候 如两次密码是否一致</li>
+<li>需要抛出指定异常ValidationError</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"># forms组件</span><br><span class="line">from django.forms import widgets</span><br><span class="line"></span><br><span class="line">wid_01=widgets.TextInput(attrs=&#123;&quot;class&quot;:&quot;form-control&quot;&#125;)</span><br><span class="line">wid_02=widgets.PasswordInput(attrs=&#123;&quot;class&quot;:&quot;form-control&quot;&#125;)</span><br><span class="line"></span><br><span class="line">from django.core.exceptions import ValidationError</span><br><span class="line">class UserForm(forms.Form):</span><br><span class="line">    name=forms.CharField(max_length=32,</span><br><span class="line">                         widget=wid_01</span><br><span class="line">                         )</span><br><span class="line">    pwd=forms.CharField(max_length=32,widget=wid_02)</span><br><span class="line">    r_pwd=forms.CharField(max_length=32,widget=wid_02)</span><br><span class="line">    email=forms.EmailField(widget=wid_01)</span><br><span class="line">    tel=forms.CharField(max_length=32,widget=wid_01)</span><br><span class="line"></span><br><span class="line">    # 局部钩子</span><br><span class="line">    def clean_name(self):</span><br><span class="line">        val=self.cleaned_data.get(&quot;name&quot;)</span><br><span class="line">        if not val.isdigit():</span><br><span class="line">            return val</span><br><span class="line">        else:</span><br><span class="line">            raise ValidationError(&quot;用户名不能是纯数字!&quot;)</span><br><span class="line"></span><br><span class="line">    # 全局钩子</span><br><span class="line"></span><br><span class="line">    def clean(self):</span><br><span class="line">        pwd=self.cleaned_data.get(&quot;pwd&quot;)</span><br><span class="line">        r_pwd=self.cleaned_data.get(&quot;r_pwd&quot;)</span><br><span class="line">        </span><br><span class="line">        if pwd==r_pwd:</span><br><span class="line">            return self.cleaned_data</span><br><span class="line">        else:</span><br><span class="line">            raise ValidationError(&apos;两次密码不一致!&apos;)</span><br><span class="line"></span><br><span class="line">def register(request):</span><br><span class="line"></span><br><span class="line">    if request.method==&quot;POST&quot;:</span><br><span class="line">        form=UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)       # 所有干净的字段以及对应的值</span><br><span class="line">        else:</span><br><span class="line">            # 全局</span><br><span class="line">            clean_error=form.errors.get(&quot;__all__&quot;)</span><br><span class="line"></span><br><span class="line">        return render(request,&quot;register.html&quot;,locals())</span><br><span class="line">    form=UserForm()</span><br><span class="line">    return render(request,&quot;register.html&quot;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>reg.html</p>
+</blockquote>
+<ul>
+<li>全局钩子的错误信息获取</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;errors.0&#125;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>思考 如果第一次密码输入123 第二次密码输入12345会提示几个错误？</p>
+</blockquote>
+<p>两个，具体请参考源码</p>
+<blockquote>
+<p>如何处理第一次密码校验失败(长度不够) 就不校验 两次密码一致</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def clean(self):</span><br><span class="line">        pwd=self.cleaned_data.get(&quot;pwd&quot;)</span><br><span class="line">        r_pwd=self.cleaned_data.get(&quot;r_pwd&quot;)</span><br><span class="line"></span><br><span class="line">        if pwd and r_pwd:</span><br><span class="line">            if pwd==r_pwd:</span><br><span class="line">                return self.cleaned_data</span><br><span class="line">            else:</span><br><span class="line">                raise ValidationError(&apos;两次密码不一致!&apos;)</span><br><span class="line">        else:</span><br><span class="line">            return self.cleaned_data</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/12/Py006-02-03forms表单验证/" title="Py006-02-03forms表单验证" itemprop="url">Py006-02-03forms表单验证</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-12T15:28:13.000Z" itemprop="datePublished"> Published 2018-11-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="forms组件"><a href="#forms组件" class="headerlink" title="forms组件"></a>forms组件</h3><p>校验字段</p>
+<blockquote>
+<h4 id="针对一个实例：注册用户讲解。"><a href="#针对一个实例：注册用户讲解。" class="headerlink" title="针对一个实例：注册用户讲解。"></a>针对一个实例：注册用户讲解。</h4></blockquote>
+<ul>
+<li>前置准备</li>
+</ul>
+<p>创建项目，创建一个orm表，一个注册页面</p>
+<p>模型：models.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class UserInfo(models.Model):</span><br><span class="line">    name=models.CharField(max_length=32)</span><br><span class="line">    pwd=models.CharField(max_length=32)</span><br><span class="line">    email=models.EmailField()</span><br><span class="line">    tel=models.CharField(max_length=32)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"># 别忘了settings.py里 注册 应用如 app01</span><br><span class="line"># 数据库迁徙</span><br><span class="line">python3 manage.py  makemigrations</span><br><span class="line">python3 manage.py  migrate</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<p>注册路由配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from app01 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;reg/&apos;,views.reg) # 注册页</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>reg.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;user&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;name&quot; id=&quot;name&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;pwd&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;password&quot; name=&quot;pwd&quot; id=&quot;pwd&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;r_pwd&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;password&quot; name=&quot;r_pwd&quot; id=&quot;r_pwd&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">     &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;email&quot;&gt;邮箱&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;email&quot; id=&quot;email&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;tel&quot;&gt;手机号&lt;/label&gt;</span><br><span class="line">        &lt;p&gt;&lt;input type=&quot;text&quot; name=&quot;tel&quot; id=&quot;tel&quot;&gt;&lt;/p&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line"></span><br><span class="line">        print(request.POST)</span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>至此，准备工作完毕，</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 依次填写表单1，2，3，4,5。</span><br><span class="line"># 打印如下信息</span><br><span class="line">&lt;QueryDict: &#123;&apos;csrfmiddlewaretoken&apos;: [&apos;dTj3JNHHoZKrLZEXAJsoty9UxZ8vCJ3zqZH3gvIor4Lp1bKp8GFfmYS1Q4A58fji&apos;], &apos;name&apos;: [&apos;1&apos;], &apos;pwd&apos;: [&apos;2&apos;], &apos;r_pwd&apos;: [&apos;3&apos;], &apos;email&apos;: [&apos;4&apos;],&apos;tel&apos;:[&apos;5&apos;]&#125;&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="forms简单使用"><a href="#forms简单使用" class="headerlink" title="forms简单使用"></a>forms简单使用</h4><ul>
+<li>引入forms</li>
+<li>定义一个校验类如UserForm继承forms.Form</li>
+<li>自定义校验规则name = forms.CharField(min_length=4)</li>
+<li>根据校验字段生成UserForm初始化对象</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 引入forms</span><br><span class="line">from django import forms</span><br><span class="line"></span><br><span class="line"># 自定义表单校验</span><br><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        </span><br><span class="line">        form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123&apos;&#125;)</span><br><span class="line">        # 所有值校验字段通过返回 true 10个字段其中一个失败返回false</span><br><span class="line">        print(form.is_valid()) # 返回布尔值 返回False email没有通过校验</span><br><span class="line"></span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;&#125;)</span><br><span class="line">form.is_valid() # True</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="错写校验字段会如何？"><a href="#错写校验字段会如何？" class="headerlink" title="错写校验字段会如何？"></a>错写校验字段会如何？</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;names&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;&#125;)</span><br><span class="line"># 定义的UserForm里 为name 你传递names 显然不匹配</span><br><span class="line">form.is_valid() # False</span><br><span class="line"></span><br><span class="line"># 校验字段必须和定义里的字段相同</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="多出校验字段会咋样？"><a href="#多出校验字段会咋样？" class="headerlink" title="多出校验字段会咋样？"></a>多出校验字段会咋样？</h4></blockquote>
+<p>多了无所谓，只要定义的字段全匹配就ok</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:22&#125;)</span><br><span class="line"># 定义的UserForm里 为name,email 你多传递的key会被忽略</span><br><span class="line">form.is_valid() # True</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="form-cleaned-data"><a href="#form-cleaned-data" class="headerlink" title="form.cleaned_data"></a>form.cleaned_data</h4></blockquote>
+<p>这里是校验合法字段的字典</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 部分校验通过</span><br><span class="line">form = UserForm(&#123;&quot;names&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.cleaned_data)</span><br><span class="line"># &#123;&apos;email&apos;: &apos;123@qq.com&apos;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># -------------------</span><br><span class="line"># 全部校验通过</span><br><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abcd&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.cleaned_data)</span><br><span class="line"># &#123;&apos;name&apos;: &apos;abcd&apos;, &apos;email&apos;: &apos;123@qq.com&apos;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="form-errors"><a href="#form-errors" class="headerlink" title="form.errors"></a>form.errors</h4></blockquote>
+<p>校验失败字段对应的错误信息 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">form = UserForm(&#123;&quot;name&quot;:&apos;abc&apos;,&apos;email&apos;:&apos;123@qq.com&apos;,&apos;age&apos;:111&#125;)</span><br><span class="line">print(form.errors)</span><br><span class="line"># &lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;name&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;Ensure this value has at least 4 characters (it has 3).&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<p>别看返回的是个ul实际是个字典类型</p>
+<h4 id="重写我们的UserForm对应实际的表单"><a href="#重写我们的UserForm对应实际的表单" class="headerlink" title="重写我们的UserForm对应实际的表单"></a>重写我们的UserForm对应实际的表单</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line">    tel = forms.CharField()</span><br></pre></td></tr></table></figure>
+<p>重写views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        # 表单会携带csrf_token字段 但是未在UserForm里定义所以会忽略</span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict 字典</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList 列表</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息 </span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;)</span><br><span class="line"></span><br><span class="line"># reg页面表单什么都不填写直接提交</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&#123;&#125;</span><br><span class="line">&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;name&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;pwd&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;r_pwd&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;email&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;li&gt;tel&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</span><br><span class="line">&lt;ul class=&quot;errorlist&quot;&gt;&lt;li&gt;This field is required.&lt;/li&gt;&lt;/ul&gt;</span><br><span class="line">This field is required.</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染标签方式一"><a href="#forms渲染标签方式一" class="headerlink" title="forms渲染标签方式一"></a>forms渲染标签方式一</h3><p>修改views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line"></span><br><span class="line">from django import forms</span><br><span class="line"></span><br><span class="line"># 自定义表单校验</span><br><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField() # 邮箱校验</span><br><span class="line">    tel = forms.CharField()</span><br><span class="line"></span><br><span class="line">def reg(request):</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line"></span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息</span><br><span class="line">        return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line">    # get请求的时候</span><br><span class="line">    form = UserForm() </span><br><span class="line">    </span><br><span class="line">    return render(request,&apos;reg.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不传递参数初始化表单校验对象form = UserForm() 传递到模版里就以定义的字段可以生成表单标签</p>
+</blockquote>
+<p>reg.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.name &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.pwd &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.r_pwd &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 邮箱&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.email &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 手机&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.tel &#125;&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn btn-default pull-right&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染方式二"><a href="#forms渲染方式二" class="headerlink" title="forms渲染方式二"></a>forms渲染方式二</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;% for field in form %&#125;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;label for=&quot;&quot;&gt;&#123;&#123; field.label &#125;&#125;&lt;/label&gt;</span><br><span class="line">            &#123;&#123; field &#125;&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line"></span><br><span class="line"># 这样渲染的label名是首字母大写的字段</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我就要显示中文</p>
+</blockquote>
+<p>设置label值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4,label=&apos;用户名&apos;) # 最少四个字符</span><br><span class="line">    pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    r_pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField(label=&apos;邮箱&apos;) # 邮箱校验</span><br><span class="line">    tel = forms.CharField(label=&apos;电话&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染方式三"><a href="#forms渲染方式三" class="headerlink" title="forms渲染方式三"></a>forms渲染方式三</h3><blockquote>
+<p>不建议使用,因为dom结构是定义死的。不够灵活</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;&#123; form.as_p &#125;&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms渲染错误信息"><a href="#forms渲染错误信息" class="headerlink" title="forms渲染错误信息"></a>forms渲染错误信息</h3><blockquote>
+<p>在校验失败的地方 返回 HttpResponse(request,’reg.html’,locals())</p>
+</blockquote>
+<p>为啥？</p>
+<ul>
+<li>你已经填写了表单，不管校验成功还是失败</li>
+<li>此时已经提交，页面会重刷，但是UserForm对象里有你传递的值，所以通过UserForm对象渲染标签的时候同时会把传递的值渲染到里面</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">def reg(request):</span><br><span class="line">    </span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        form = UserForm(request.POST)</span><br><span class="line">        if form.is_valid():</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">        else:</span><br><span class="line">            print(form.cleaned_data)</span><br><span class="line">            print(form.errors) # ErrorDict</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)) # ErrorList</span><br><span class="line">            print(form.errors.get(&apos;name&apos;)[0]) # 具体的错误信息</span><br><span class="line">            </span><br><span class="line">        return render(request,&apos;reg.html&apos;,locals())</span><br><span class="line"></span><br><span class="line">    form = UserForm()</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;reg.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>错误信息form.字段.errors.0</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;用户名&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.name &#125;&#125; &lt;span&gt;&#123;&#123; form.name.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.pwd &#125;&#125; &lt;span&gt;&#123;&#123; form.pwd.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt;确认密码&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.r_pwd &#125;&#125; &lt;span&gt;&#123;&#123; form.r_pwd.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 邮箱&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.email &#125;&#125; &lt;span&gt;&#123;&#123; form.email.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">     &lt;div&gt;</span><br><span class="line">        &lt;label for=&quot;&quot;&gt; 手机&lt;/label&gt;</span><br><span class="line">        &#123;&#123; form.tel &#125;&#125; &lt;span&gt;&#123;&#123; form.tel.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot; novalidate&gt;</span><br><span class="line">    &#123;% csrf_token %&#125;</span><br><span class="line"></span><br><span class="line">    &#123;% for field in form %&#125;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &lt;label for=&quot;&quot;&gt;&#123;&#123; field.label &#125;&#125;&lt;/label&gt;</span><br><span class="line">            &#123;&#123; field &#125;&#125; &lt;span class=&quot;pull-right&quot; style=&quot;color: red&quot;&gt;&#123;&#123; field.errors.0 &#125;&#125;&lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &lt;input type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="forms参数配置"><a href="#forms参数配置" class="headerlink" title="forms参数配置"></a>forms参数配置</h3><ul>
+<li>错误信息定义为自己想要的</li>
+<li>渲染不同类型的表单select/password</li>
+</ul>
+<blockquote>
+<p>渲染其他类型标签要引入widgets</p>
+</blockquote>
+<blockquote>
+<p>定义错误信息要设置error_messages={“选项”:”错误信息”}   required代表必填</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class UserForm(forms.Form):</span><br><span class="line">    # 定义校验字段的规则</span><br><span class="line">    name = forms.CharField(min_length=4,label=&apos;用户名&apos;,error_messages=&#123;&quot;required&quot;:&apos;该字段不能为空&apos;&#125;,</span><br><span class="line">                        widgets = widgets.TextInput(attrs=&#123;&quot;class&quot;:&apos;form-control&apos;&#125;))</span><br><span class="line">    pwd = forms.CharField(min_length=4,label=&apos;密码&apos;,</span><br><span class="line">                          widgets=widgets.PasswordInput())</span><br><span class="line">    r_pwd = forms.CharField(min_length=4,label=&apos;密码&apos;)  # 最少四个字符</span><br><span class="line">    email = forms.EmailField(label=&apos;邮箱&apos;,error_messages=&#123;&quot;required&quot;:&apos;该字段不能为空&apos;,&quot;invalid&quot;:&quot;格式错误&quot;&#125;) # 邮箱校验</span><br><span class="line">    tel = forms.CharField(label=&apos;电话&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">widgets = widgets.TextInput(attrs=&#123;&quot;class&quot;:&apos;form-control&apos;&#125;))</span><br><span class="line">给标签设置属性</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/05/Py006-02-02分页器Paginator/" title="Py006-02-02分页器Paginator" itemprop="url">Py006-02-02分页器Paginator</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-05T14:21:05.000Z" itemprop="datePublished"> Published 2018-11-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="前置准备"><a href="#前置准备" class="headerlink" title="前置准备"></a>前置准备</h3><p>新建django项目应用app01</p>
+<p>models.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models</span><br><span class="line"></span><br><span class="line"># Create your models here.</span><br><span class="line">class Book(models.Model):</span><br><span class="line">    title = models.CharField(max_length=32)</span><br><span class="line">    price = models.DecimalField(decimal_places=2,max_digits=8)</span><br></pre></td></tr></table></figure>
+<p>urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from app01 import views</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(&apos;index/&apos;,views.index)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>数据库迁徙</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python3 manage.py makemigrations</span><br><span class="line">python3 manage.py migrate</span><br></pre></td></tr></table></figure>
+<p>views.py</p>
+<blockquote>
+<p>批量录入数据</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 录入初识数据100条</span><br><span class="line">def index(request):</span><br><span class="line"></span><br><span class="line">    # 缺陷  循环一次插入一条</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    for i in range(100):</span><br><span class="line">        Book.objects.create(title=&quot;book%s&quot;%i,price=i*i)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 改善批量插入</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    book_list = []</span><br><span class="line">    for i in range(100):</span><br><span class="line">        book = Book(title=&quot;book%s&quot; % i, price=i * i)</span><br><span class="line">        book_list.append(book)</span><br><span class="line"></span><br><span class="line">    Book.objects.bulk_create(book_list) # 批量插入</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<p>index.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;ul&gt;</span><br><span class="line">    &#123;% for book in book_list %&#125;</span><br><span class="line">        &lt;li&gt;&#123;&#123; book.title &#125;&#125;:&#123;&#123; book.price &#125;&#125;&lt;/li&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<p>如上我们有了100条数据</p>
+<h3 id="分页器-Paginator"><a href="#分页器-Paginator" class="headerlink" title="分页器 Paginator"></a>分页器 Paginator</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># 引入分页器</span><br><span class="line">from django.core.paginator import Paginator</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line">book_list = Book.objects.all()</span><br><span class="line">    # 分页器 Paginator(列表,分页条数)</span><br><span class="line">    paginator = Paginator(book_list,10)</span><br><span class="line"></span><br><span class="line">    # 总数据条数</span><br><span class="line">    print(&quot;count:&quot;,paginator.count)</span><br><span class="line">    # 总页数</span><br><span class="line">    print(&quot;num_pages:&quot;, paginator.num_pages)</span><br><span class="line">    # 页码对应的列表</span><br><span class="line">    print(&quot;page_range:&quot;, paginator.page_range)</span><br><span class="line">    # 第x页数据</span><br><span class="line">    page3 = paginator.page(3)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    或者迭代取第x页数据</span><br><span class="line">    for i in page3</span><br><span class="line">        print(i)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    print(&quot;第三页数据&quot;,page3.object_list)</span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">访问 http://127.0.0.1:8000/index/</span><br><span class="line">count: 100</span><br><span class="line">num_pages: 10</span><br><span class="line">page_range: range(1, 11)</span><br><span class="line">第三页数据 &lt;QuerySet [&lt;Book: Book object (21)&gt;, &lt;Book: Book object (22)&gt;, &lt;Book: Book object (23)&gt;, &lt;Book: Book object (24)&gt;, &lt;Book: Book object (25)&gt;, &lt;Book: Book object (26)&gt;, &lt;Book: Book object (27)&gt;, &lt;Book: Book object (28)&gt;, &lt;Book: Book object (29)&gt;, &lt;Book: Book object (30)&gt;]&gt;</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<p>&gt; 通过url的get参数模拟动态页码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render</span><br><span class="line">from app01.models import Book</span><br><span class="line"></span><br><span class="line"># 引入分页组件,和边界值异常类型处理边界值</span><br><span class="line">from django.core.paginator import Paginator,EmptyPage</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line"></span><br><span class="line">    #分页组件 初始化一定数量的数据</span><br><span class="line"></span><br><span class="line">    # 缺陷  循环一次插入一条</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    for i in range(100):</span><br><span class="line">        Book.objects.create(title=&quot;book%s&quot;%i,price=i*i)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 改善批量插入</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    book_list = []</span><br><span class="line">    for i in range(100):</span><br><span class="line">        book = Book(title=&quot;book%s&quot; % i, price=i * i)</span><br><span class="line">        book_list.append(book)</span><br><span class="line"></span><br><span class="line">    Book.objects.bulk_create(book_list) # 批量插入</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    book_list = Book.objects.all()</span><br><span class="line">    # 分页器 Paginator(列表,分页条数)</span><br><span class="line">    paginator = Paginator(book_list,10)</span><br><span class="line"></span><br><span class="line">    # 总数据条数</span><br><span class="line">    # print(&quot;count:&quot;,paginator.count)</span><br><span class="line">    # 总页数</span><br><span class="line">    # print(&quot;num_pages:&quot;, paginator.num_pages)</span><br><span class="line">    # 页码对应的列表</span><br><span class="line">    # print(&quot;page_range:&quot;, paginator.page_range)</span><br><span class="line">    # 第x页数据</span><br><span class="line">    # page3 = paginator.page(3)</span><br><span class="line">    # print(&quot;第三页数据&quot;,page3.object_list)</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line">        current_page = int(request.GET.get(&apos;page&apos;, 1))</span><br><span class="line">        current_page_data = paginator.page(current_page)</span><br><span class="line">        # 处理边界值  &lt;1,&gt;10</span><br><span class="line">    except EmptyPage as e:</span><br><span class="line">        current_page_data = paginator.page(1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<p>index.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;ul&gt;</span><br><span class="line">    &#123;% for book in current_page_data %&#125;</span><br><span class="line">        &lt;li&gt;&#123;&#123; book.title &#125;&#125;:&#123;&#123; book.price &#125;&#125;&lt;/li&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<p>访问</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8000/index/</span><br><span class="line">http://127.0.0.1:8000/index/?page=1</span><br><span class="line">http://127.0.0.1:8000/index/?page=2</span><br><span class="line">http://127.0.0.1:8000/index/?page=10</span><br><span class="line">http://127.0.0.1:8000/index/?page=2000</span><br><span class="line">http://127.0.0.1:8000/index/?page=-1</span><br></pre></td></tr></table></figure>
+<h4 id="引入bootstrap分页组件"><a href="#引入bootstrap分页组件" class="headerlink" title="引入bootstrap分页组件"></a>引入bootstrap分页组件</h4><ul>
+<li>paginator.page_range 分页列表</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;ul&gt;</span><br><span class="line">    &#123;% for book in current_page_data %&#125;</span><br><span class="line">        &lt;li&gt;&#123;&#123; book.title &#125;&#125;:&#123;&#123; book.price &#125;&#125;&lt;/li&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line"></span><br><span class="line">&lt;nav aria-label=&quot;Page navigation&quot;&gt;</span><br><span class="line">  &lt;ul class=&quot;pagination&quot;&gt;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;#&quot; aria-label=&quot;Previous&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;上一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% for index in  paginator.page_range %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;&#123;&#123; index &#125;&#125;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;#&quot; aria-label=&quot;Next&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;下一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">  &lt;/ul&gt;</span><br><span class="line">&lt;/nav&gt;</span><br></pre></td></tr></table></figure>
+<p>点击页码a标签跳转url设置当前页码数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for index in  paginator.page_range %&#125;</span><br><span class="line">    &#123;% if current_page == index %&#125;</span><br><span class="line">    &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;?page=&#123;&#123; index &#125;&#125;&quot;&gt;&#123;&#123; index &#125;&#125;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% else %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; index &#125;&#125;&quot;&gt;&#123;&#123; index &#125;&#125;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>上一页下一页处理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page|add:-1 &#125;&#125;&quot; aria-label=&quot;Previous&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;上一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line"></span><br><span class="line">&lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page|add:1&quot; aria-label=&quot;Next&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;下一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通过分页器的上一页下一页api接口处理</p>
+</blockquote>
+<ul>
+<li>current_page_data.previous_page_number</li>
+<li>current_page_data.next_page_number</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page_data.previous_page_number &#125;&#125;&quot; aria-label=&quot;Previous&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;上一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    </span><br><span class="line">&lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page_data.next_page_number &#125;&#125;&quot; aria-label=&quot;Next&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;下一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line"># 仍然有bug 在第2~9是好的  1和10是坏的</span><br></pre></td></tr></table></figure>
+<p>&gt; 边界值处理</p>
+<ul>
+<li>current_page_data.has_previous</li>
+<li>current_page_data.has_next</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if current_page_data.has_previous %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page_data.previous_page_number &#125;&#125;&quot; aria-label=&quot;Previous&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;上一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">&#123;% else %&#125;</span><br><span class="line">    &lt;li class=&quot;disabled&quot;&gt;&lt;a href=&quot;#&quot; aria-label=&quot;Previous&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;上一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">&#123;% endif  %&#125;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&#123;% if current_page_data.has_next %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; current_page_data.next_page_number &#125;&#125;&quot; aria-label=&quot;Next&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;下一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">&#123;% else %&#125;</span><br><span class="line">    &lt;li class=&quot;disabled&quot;&gt;&lt;a href=&quot;#&quot; aria-label=&quot;Next&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;下一页&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">&#123;% endif  %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="页码过多时的处理"><a href="#页码过多时的处理" class="headerlink" title="页码过多时的处理"></a>页码过多时的处理</h4><ul>
+<li>左5右5</li>
+</ul>
+<p>总不能分页100页全显示出来吧！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"># 特殊处理</span><br><span class="line">from django.shortcuts import render</span><br><span class="line">from app01.models import Book</span><br><span class="line"></span><br><span class="line"># 引入分页组件</span><br><span class="line">from django.core.paginator import Paginator,EmptyPage</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line"></span><br><span class="line">    book_list = Book.objects.all()</span><br><span class="line">    # 分页器 Paginator(列表,分页条数)</span><br><span class="line">    paginator = Paginator(book_list,2)</span><br><span class="line"></span><br><span class="line">    # 总数据条数</span><br><span class="line">    print(&quot;count:&quot;,paginator.count)</span><br><span class="line">    # 总页数</span><br><span class="line">    print(&quot;num_pages:&quot;, paginator.num_pages)</span><br><span class="line">    # 页码对应的列表</span><br><span class="line">    print(&quot;page_range:&quot;, paginator.page_range)</span><br><span class="line">    # 第x页数据</span><br><span class="line">    # page3 = paginator.page(3)</span><br><span class="line">    # print(&quot;第三页数据&quot;,page3.object_list)</span><br><span class="line"></span><br><span class="line">    # 左五右五</span><br><span class="line">    current_page = int(request.GET.get(&apos;page&apos;, 1))</span><br><span class="line"></span><br><span class="line">    if paginator.num_pages &gt; 11:</span><br><span class="line"></span><br><span class="line">        if current_page - 5 &lt; 1:</span><br><span class="line">            page_range = range(1, 12)</span><br><span class="line">        elif current_page + 5 &gt; paginator.num_pages:</span><br><span class="line">            page_range = range(paginator.num_pages - 10, paginator.num_pages + 1)</span><br><span class="line"></span><br><span class="line">        else:</span><br><span class="line">            page_range = range(current_page - 5, current_page + 6)</span><br><span class="line">    else:</span><br><span class="line">        page_range = paginator.page_range</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line"></span><br><span class="line">        current_page_data = paginator.page(current_page)</span><br><span class="line"></span><br><span class="line">    except EmptyPage as e:</span><br><span class="line">        current_page_data = paginator.page(1)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;index.html&apos;,locals())</span><br></pre></td></tr></table></figure>
+<p>index.html里的页码循环部分替换页码列表page_range</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for index in  page_range %&#125;</span><br><span class="line">    &#123;% if current_page == index %&#125;</span><br><span class="line">    &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;?page=&#123;&#123; index &#125;&#125;&quot;&gt;&#123;&#123; index &#125;&#125;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% else %&#125;</span><br><span class="line">    &lt;li&gt;&lt;a href=&quot;?page=&#123;&#123; index &#125;&#125;&quot;&gt;&#123;&#123; index &#125;&#125;&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/05/Py006-02-01ajax/" title="Py006-02-01ajax" itemprop="url">Py006-02-01ajax</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-05T13:30:43.000Z" itemprop="datePublished"> Published 2018-11-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="什么是ajax"><a href="#什么是ajax" class="headerlink" title="什么是ajax"></a>什么是ajax</h3><p>AJAX（Asynchronous Javascript And XML）翻译成中文就是“异步Javascript和XML”。使用Javascript语言与服务器进行异步交互，传输的数据为XML。但现在广泛使用的是JSON格式.</p>
+<ul>
+<li>同步交互：客户端form表单提交，需等待服务器响应结果,页面是停滞的。</li>
+<li>异步交互：客户端发出一个ajax请求后，无需等待服务器响应结束，就可以发出第二个请求。</li>
+</ul>
+<blockquote>
+<p>AJAX除了异步的特点外，还有一个就是：浏览器页面局部刷新；（这一特点给用户的感受是在不知不觉中完成请求和响应过程）</p>
+</blockquote>
+<p>前端的起源就是ajax的出现，ajax之前的程序员们绞尽脑汁想出jsonp的形式，来提升用户体验(也就是局部更新,但jsonp只支持get请求)。</p>
+<h4 id="AJAX优点"><a href="#AJAX优点" class="headerlink" title="AJAX优点"></a>AJAX优点</h4><ul>
+<li>AJAX使用XMLHttpRequest对象向服务器发送异步请求；</li>
+<li>AJAX请求无须刷新整个页面；</li>
+</ul>
+<h4 id="ajax的技术实例"><a href="#ajax的技术实例" class="headerlink" title="ajax的技术实例"></a>ajax的技术实例</h4><ul>
+<li>注册账号时，账号是否注册的检查提升</li>
+<li>软件搜索栏里信息热词(用jsonp也是可以的如百度)</li>
+</ul>
+<h3 id="ajax实战"><a href="#ajax实战" class="headerlink" title="ajax实战"></a>ajax实战</h3><p>请自行创建django实例,同时注释掉settings里的csrf限制</p>
+<p>urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from app01 import views</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(r&apos;index/&apos;,views.index)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render,HttpResponse</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line">    print(request.method)</span><br><span class="line">    if request.method==&apos;POST&apos;:</span><br><span class="line">        print(request.POST)</span><br><span class="line">        aa = request.POST.get(&apos;aa&apos;)</span><br><span class="line">        bb = request.POST.get(&apos;bb&apos;)</span><br><span class="line">        return HttpResponse(&apos;&#123;&quot;status&quot;:0,&quot;msg&quot;:&quot;hahaha&quot;&#125;&apos;)</span><br><span class="line">    else:</span><br><span class="line">        return render(request,&apos;index.html&apos;)</span><br></pre></td></tr></table></figure>
+<p>index.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;script src=&quot;http://ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div&gt;</span><br><span class="line">    &lt;form action=&quot;&quot;&gt;</span><br><span class="line">        &lt;span&gt;aa:&lt;/span&gt;&lt;input type=&quot;text&quot; name=&quot;aa&quot; value=&quot;aa&quot; id=&quot;aa&quot;&gt; &lt;br&gt;</span><br><span class="line">        &lt;span&gt;bb:&lt;/span&gt;&lt;input type=&quot;text&quot; name=&quot;bb&quot; value=&quot;bb&quot; id=&quot;bb&quot;&gt; &lt;br&gt;</span><br><span class="line">        &lt;input type=&quot;submit&quot; value=&quot;提交&quot;&gt;</span><br><span class="line">    &lt;/form&gt;</span><br><span class="line">    &lt;button id=&quot;btn1&quot;&gt;ajax1&lt;/button&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    $(function()&#123;</span><br><span class="line">        $(&apos;#btn1&apos;).on(&apos;click&apos;,function()&#123;</span><br><span class="line">            $.ajax(&#123;</span><br><span class="line">                url:&apos;&apos;,</span><br><span class="line">                type:&apos;post&apos;,</span><br><span class="line">                data:&#123;</span><br><span class="line">                    aa:$(&apos;#aa&apos;).val(),</span><br><span class="line">                    bb:$(&apos;#bb&apos;).val(),</span><br><span class="line">                &#125;,</span><br><span class="line">                success:function(res)&#123;</span><br><span class="line">                    console.log(res)</span><br><span class="line">                &#125;,</span><br><span class="line">                error:function(err)&#123;</span><br><span class="line">                    console.log(err)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><h4 id="一、请求头ContentType"><a href="#一、请求头ContentType" class="headerlink" title="一、请求头ContentType"></a>一、请求头ContentType</h4><p>ContentType指的是请求体的编码类型，常见的类型共有3种：</p>
+<ol>
+<li>application/x-www-form-urlencoded<br>这应该是最常见的 POST 提交数据的方式了。浏览器的原生</li>
+</ol>
+<p>表单，如果不设置 enctype 属性，那么最终就会以 application/x-www-form-urlencoded 方式提交数据。请求类似于下面这样（无关的请求头在本文中都省略掉了）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">POST http://www.example.com HTTP/1.1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded;charset=utf-8</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">使用chrome开发模式打开Network标签</span><br><span class="line">点击view source!!!</span><br><span class="line">点击view source!!!</span><br><span class="line">点击view source!!!</span><br><span class="line">格式如下</span><br><span class="line">user=aa&amp;age=18</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li>multipart/form-data</li>
+</ol>
+<p>这又是一个常见的 POST 数据提交的方式。我们使用表单上传文件时，必须让</p>
+<p>表单的 enctype 等于 multipart/form-data。直接来看一个请求示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST http://www.example.com HTTP/1.1</span><br><span class="line">Content-Type:multipart/form-data; boundary=----WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line">Content-Disposition: form-data; name=&quot;user&quot;</span><br><span class="line"></span><br><span class="line">yuan</span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA</span><br><span class="line">Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;chrome.png&quot;</span><br><span class="line">Content-Type: image/png</span><br><span class="line"></span><br><span class="line">PNG ... content of chrome.png ...</span><br><span class="line">------WebKitFormBoundaryrGKCBY7qhFd3TrwA--</span><br></pre></td></tr></table></figure>
+<p>这个例子稍微复杂点。首先生成了一个 boundary 用于分割不同的字段，为了避免与正文内容重复，boundary 很长很复杂。然后 Content-Type 里指明了数据是以 multipart/form-data 来编码，本次请求的 boundary 是什么内容。消息主体里按照字段个数又分为多个结构类似的部分，每部分都是以 –boundary 开始，紧接着是内容描述信息，然后是回车，最后是字段具体内容（文本或二进制）。如果传输的是文件，还要包含文件名和文件类型信息。消息主体最后以 –boundary– 标示结束。关于 multipart/form-data 的详细定义，请前往 rfc1867 查看。</p>
+<p>这种方式一般用来上传文件，各大服务端语言对它也有着良好的支持。</p>
+<p>上面提到的这两种 POST 数据的方式，都是浏览器原生支持的，而且现阶段标准中原生</p>
+<p>表单也只支持这两种方式（通过 元素的 enctype 属性指定，默认为 application/x-www-form-urlencoded。其实 enctype 还支持 text/plain，不过用得非常少）。</p>
+<p>随着越来越多的 Web 站点，尤其是 WebApp，全部使用 Ajax 进行数据交互之后，我们完全可以定义新的数据提交方式，给开发带来更多便利。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">该类型的文件服务端获取在</span><br><span class="line">request.FILES.get(&apos;文件字段&apos;)</span><br><span class="line">非文件字段依然在 </span><br><span class="line">request.POST里</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>application/json(仅ajax支持)</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">    url:&apos;&apos;,</span><br><span class="line">    type:&apos;post&apos;,</span><br><span class="line">    contentType:&apos;application/json&apos;,</span><br><span class="line">    data:&#123;</span><br><span class="line">        a:1,</span><br><span class="line">        b:2</span><br><span class="line">    &#125;,</span><br><span class="line">    success:function()&#123;&#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">contentType:&apos;application/json&apos;</span><br><span class="line">实际是把data数据序列号传递给服务器</span><br><span class="line">JSON.stringify(&#123;a:1,b:2&#125;)</span><br><span class="line">请求体如下：</span><br><span class="line">&#123;&quot;a&quot;:1,&quot;b&quot;:2&#125;</span><br><span class="line">此时服务端的request.POST是个字典&#123;&quot;a&quot;:1,&quot;b&quot;:2&#125;</span><br><span class="line"></span><br><span class="line">如果不设置contentType默认是 urlencode</span><br><span class="line">数据给服务器的格式如下</span><br><span class="line">a=1&amp;b=2</span><br><span class="line">此时服务端的request.POST是个空字典</span><br><span class="line">requets.body 里内容是&#123;&quot;a&quot;:1,&quot;b&quot;:2&#125;字符串  需要你自己进行反序列化</span><br></pre></td></tr></table></figure>
+<p>application/json 这个 Content-Type 作为响应头大家肯定不陌生。实际上，现在越来越多的人把它作为请求头，用来告诉服务端消息主体是序列化后的 JSON 字符串。由于 JSON 规范的流行，除了低版本 IE 之外的各大浏览器都原生支持 JSON.stringify，服务端语言也都有处理 JSON 的函数，使用 JSON 不会遇上什么麻烦。</p>
+<p>JSON 格式支持比键值对复杂得多的结构化数据，这一点也很有用。记得我几年前做一个项目时，需要提交的数据层次非常深，我就是把数据 JSON 序列化之后来提交的。不过当时我是把 JSON 字符串作为 val，仍然放在键值对里，以 x-www-form-urlencoded 方式提交。</p>
+<h4 id="基于form表单的文件上传"><a href="#基于form表单的文件上传" class="headerlink" title="基于form表单的文件上传"></a>基于form表单的文件上传</h4><p>模板部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;</span><br><span class="line">      用户名 &lt;input type=&quot;text&quot; name=&quot;user&quot;&gt;</span><br><span class="line">      头像 &lt;input type=&quot;file&quot; name=&quot;avatar&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>视图部分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    print(request.body)   # 原始的请求体数据</span><br><span class="line">    print(request.GET)    # GET请求数据</span><br><span class="line">    print(request.POST)   # POST请求数据</span><br><span class="line">    print(request.FILES)  # 上传的文件数据</span><br><span class="line">    return render(request,&quot;index.html&quot;)</span><br></pre></td></tr></table></figure>
+<h4 id="基于Ajax的文件上传"><a href="#基于Ajax的文件上传" class="headerlink" title="基于Ajax的文件上传"></a>基于Ajax的文件上传</h4><p>模板</p>
+<blockquote>
+<p>如果上传文件的内容需要设置两个参数和使用一个FormData对象提交</p>
+</blockquote>
+<ul>
+<li>processData: false    // 不处理数据</li>
+<li>contentType: false    // 不设置内容类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;form&gt;</span><br><span class="line">      用户名 &lt;input type=&quot;text&quot; id=&quot;user&quot;&gt;</span><br><span class="line">      头像 &lt;input type=&quot;file&quot; id=&quot;avatar&quot;&gt;</span><br><span class="line">     &lt;input type=&quot;button&quot; id=&quot;ajax-submit&quot; value=&quot;ajax-submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line"></span><br><span class="line">    $(&quot;#ajax-submit&quot;).click(function()&#123;</span><br><span class="line">        var formdata=new FormData();</span><br><span class="line">        formdata.append(&quot;user&quot;,$(&quot;#user&quot;).val());</span><br><span class="line">        formdata.append(&quot;avatar_img&quot;,$(&quot;#avatar&quot;)[0].files[0]);</span><br><span class="line">        $.ajax(&#123;</span><br><span class="line"></span><br><span class="line">            url:&quot;&quot;,</span><br><span class="line">            type:&quot;post&quot;,</span><br><span class="line">            data:formdata,</span><br><span class="line">            processData: false ,    // 不处理数据</span><br><span class="line">            contentType: false,    // 不设置内容类型</span><br><span class="line"></span><br><span class="line">            success:function(data)&#123;</span><br><span class="line">                console.log(data)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>视图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    if request.is_ajax():</span><br><span class="line">        print(request.body)   # 原始的请求体数据</span><br><span class="line">        print(request.GET)    # GET请求数据</span><br><span class="line">        print(request.POST)   # POST请求数据</span><br><span class="line">        print(request.FILES)  # 上传的文件数据</span><br><span class="line">        file_obj=request.FILES.get(&quot;avatar&quot;) # 获取指定上传文件内容</span><br><span class="line">        return HttpResponse(&quot;ok&quot;)</span><br><span class="line">    return render(request,&quot;index.html&quot;)</span><br></pre></td></tr></table></figure>
+<p>检查浏览器的请求头：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryaWl9k5ZMiTAzx3FT</span><br></pre></td></tr></table></figure>
+<h3 id="ajax-参数"><a href="#ajax-参数" class="headerlink" title="$.ajax()参数"></a>$.ajax()参数</h3><p>$.ajax()方法是jQuery最底层的Ajax实现。它的结构为：$.ajax(options)</p>
+<p>该方法只有一个参数，但是这个对象里包含了$.ajax()方法所需要的请求设置以及回调函数等信息，参数以key/value的形式存在，所有的参数都是可选的。常用参数如下：</p>
+<blockquote>
+<p>1.url</p>
+</blockquote>
+<p>要求为String类型的参数，（默认为当前地址）发送请求的页面。</p>
+<blockquote>
+<p>2.type</p>
+</blockquote>
+<p>要求为String类型的参数，请求方式（post或get）默认为get。注意其他http请求方法，例如put和delete也可以使用，但仅部分浏览器支持。</p>
+<blockquote>
+<p>3.timeout</p>
+</blockquote>
+<p>要求为Number类型的参数，设置请求超时时间（毫秒）。此设置将覆盖$.ajaxSetup()方法的全局设置。</p>
+<blockquote>
+<p>4.async</p>
+</blockquote>
+<p>要求为Boolean类型的参数，默认设置为true，所有请求均为异步请求。如果需要同步请求，请将此选项设置为false。注意，同步请求将锁住浏览器，用户其他操作必须等待请求完成才可以执行。</p>
+<blockquote>
+<p>5.cache</p>
+</blockquote>
+<p>要求为Boolean类型的参数，默认为true（当dataType为Script时，默认为false），设置false将不会从浏览器缓存中加载请求信息。</p>
+<blockquote>
+<p>6.data</p>
+</blockquote>
+<p>要求为Object或String类型的参数，发送到服务器的数据。如果不是字符串，将自动转换为字符串格式。get请求中将附加在URL后。防止这种自动转换，</p>
+<p>可以查看processData选项。对象必须为key/value格式，例如{foo1:”bar1”,foo2:”bar2”}转换为&amp;foo1=bar1&amp;foo2=bar2。如果是数组，JQuery将自动为不同值对应同一个名称。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;foo:[&quot;bar1&quot;,&quot;bar2&quot;]&#125;转换为&amp;foo=bar1&amp;foo=bar2。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>7.dataType</p>
+</blockquote>
+<p>要求为String类型的参数，预期服务器返回的数据类型。如果不指定，jQuery将自动根据HTTP包的mine信息返回responseXML或responseText，并作为回调函数参数传递。可用的类型如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">xml：返回XML文档，可用jQuery处理。</span><br><span class="line"> </span><br><span class="line">　　html：返回纯文本HTML信息；包含的script标签会在插入DOM时执行。</span><br><span class="line"> </span><br><span class="line">　　script：返回纯文本javascript代码。不会自动缓存结果，除非设置了cache参数。注意在远程请求时（不在同一个域下），所有post请求都将转为get请求。</span><br><span class="line"> </span><br><span class="line">　　json：返回JSON数据。</span><br><span class="line"> </span><br><span class="line">　　jsonp:JSON格式。使用JSONP形式调用函数时，例如myurl?callback=?，JQuery将自动替换后一个“?”为正确的函数名，以执行回调函数。</span><br><span class="line"> </span><br><span class="line">　　text：返回纯文本字符串。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>8.beforeSend</p>
+</blockquote>
+<p>要求为Function类型的参数，发送请求前可以修改XMLHttpRequest对象的函数，例如添加自定义HTTP头。在beforeSend中如果返回false可以取消本次ajax请求。XMLHttpRequest对象是唯一的参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function(XMLHttpRequest)&#123;</span><br><span class="line"> </span><br><span class="line">　　　　this;//调用本次ajax请求时传递的options参数</span><br><span class="line"> </span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>9.complete</p>
+</blockquote>
+<p>要求为Function类型的参数，请求完成后调用的回调函数（请求成功或失败均调用）。参数：XMLHttpRequest对象和一个描述成功请求类型的字符串。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function(XMLHttpRequest,textStatus)&#123;</span><br><span class="line"> </span><br><span class="line">　　　　this;    //调用本次ajax请求时传递的options参数</span><br><span class="line"> </span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>10.success</p>
+</blockquote>
+<p>要求为Function类型的参数，请求成功后调用的回调函数</p>
+<blockquote>
+<p>11.error</p>
+</blockquote>
+<p>要求为Function类型的参数，请求失败时被调用的函数。该函数有3个参数，即XMLHttpRequest对象、错误信息、捕获的错误对象（可选）。ajax事件函数如下：</p>
+<blockquote>
+<p>12.contentType</p>
+</blockquote>
+<p>要求为String类型的参数，当发送信息至服务器时。内容编码类型默认为”application/x-www-form-urlencoded”。该默认值适合大多数应用场合。</p>
+<blockquote>
+<p>13.dataFilter<br>要求为Function类型的参数，给Ajax返回的原始数据进行预处理的函数。提供data和type两个参数。data是Ajax返回的原始数据，type是调用jQuery.ajax时提供的dataTYpe参数。函数返回的值将由jQuery进一步处理。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function(data,type)&#123;</span><br><span class="line"> </span><br><span class="line">　　　　//返回处理后的数据</span><br><span class="line"> </span><br><span class="line">　　　　return data;</span><br><span class="line"> </span><br><span class="line">　　&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>14.global</p>
+</blockquote>
+<p>要求为Boolean类型的参数，默认为true。表示是否触发全局ajax事件。设置为false将不会触发全局ajax事件，ajaxStart和ajaxStop可用于控制各种ajax事件。</p>
+<blockquote>
+<p>15.ifModified</p>
+</blockquote>
+<p>要求为Boolean类型的参数，默认为false。仅在服务器数据改变时获取新数据。服务器数据改变判断的依据是Last-Modified头信息。默认值是false，即忽略头信息。</p>
+<blockquote>
+<p>16.jsonp</p>
+</blockquote>
+<p>要求为String类型的参数，在一个jsonp请求中重写回调函数的名字。该值用来替代在”callback=?”这种GET或POST请求中URL参数里的”callback”部分，例如{jsonp:’onJsonPLoad’}会导致将”onJsonPLoad=?”传给服务器。</p>
+<blockquote>
+<p>17.username</p>
+</blockquote>
+<p>要求为String类型的参数，用于响应HTTP访问认证请求的用户。</p>
+<blockquote>
+<p>18.password</p>
+</blockquote>
+<p>要求为String类型的参数，用于响应HTTP访问认证请求的密码。</p>
+<blockquote>
+<p>19.processData</p>
+</blockquote>
+<p>要求为Boolean类型的参数，默认为true。默认情况下，发送的数据将被转换为对象（从技术角度来讲而非字符串）以配合默认内容类型”application/x-www-form-urlencoded”。如果要发送DOM树信息或者其他不希望转换的信息，请设置为false。</p>
+<blockquote>
+<p>20.scriptCharset</p>
+</blockquote>
+<p>要求为String类型的参数，只有当请求时dataType为”jsonp”或者”script”，并且type是GET时才会用于强制修改字符集(charset)。通常在本地和远程的内容编码不同时使用。</p>
+<h4 id="AJAX请求如何设置csrf-token"><a href="#AJAX请求如何设置csrf-token" class="headerlink" title="AJAX请求如何设置csrf_token"></a>AJAX请求如何设置csrf_token</h4><blockquote>
+<h5 id="方式1"><a href="#方式1" class="headerlink" title="方式1"></a>方式1</h5></blockquote>
+<p>通过获取隐藏的input标签中的csrfmiddlewaretoken值，放置在data中发送。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">  url: &quot;/cookie_ajax/&quot;,</span><br><span class="line">  type: &quot;POST&quot;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    &quot;username&quot;: &quot;fuyong&quot;,</span><br><span class="line">    &quot;password&quot;: 123456,</span><br><span class="line">    &quot;csrfmiddlewaretoken&quot;: $(&quot;[name = &apos;csrfmiddlewaretoken&apos;]&quot;).val()  // 使用JQuery取出csrfmiddlewaretoken的值，拼接到data中</span><br><span class="line">  &#125;,</span><br><span class="line">  success: function (data) &#123;</span><br><span class="line">    console.log(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>　　</p>
+<blockquote>
+<h5 id="方式2"><a href="#方式2" class="headerlink" title="方式2"></a>方式2</h5></blockquote>
+<p>通过获取返回的cookie中的字符串 放置在请求头中发送。</p>
+<p>注意：需要引入一个jquery.cookie.js插件。（插件下载）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">  url: &quot;/cookie_ajax/&quot;,</span><br><span class="line">  type: &quot;POST&quot;,</span><br><span class="line">  headers: &#123;&quot;X-CSRFToken&quot;: $.cookie(&apos;csrftoken&apos;)&#125;,  // 从Cookie取csrf_token，并设置ajax请求头</span><br><span class="line">  data: &#123;&quot;username&quot;: &quot;fuyong&quot;, &quot;password&quot;: 123456&#125;,</span><br><span class="line">  success: function (data) &#123;</span><br><span class="line">    console.log(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>　</p>
+<p>或者用自己写一个getCookie方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function getCookie(name) &#123;</span><br><span class="line">    var cookieValue = null;</span><br><span class="line">    if (document.cookie &amp;&amp; document.cookie !== &apos;&apos;) &#123;</span><br><span class="line">        var cookies = document.cookie.split(&apos;;&apos;);</span><br><span class="line">        for (var i = 0; i &lt; cookies.length; i++) &#123;</span><br><span class="line">            var cookie = jQuery.trim(cookies[i]);</span><br><span class="line">            // Does this cookie string begin with the name we want?</span><br><span class="line">            if (cookie.substring(0, name.length + 1) === (name + &apos;=&apos;)) &#123;</span><br><span class="line">                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return cookieValue;</span><br><span class="line">&#125;</span><br><span class="line">var csrftoken = getCookie(&apos;csrftoken&apos;);</span><br></pre></td></tr></table></figure>
+<p>每一次都这么写太麻烦了，可以使用$.ajaxSetup()方法为ajax请求统一设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function csrfSafeMethod(method) &#123;</span><br><span class="line">  // these HTTP methods do not require CSRF protection</span><br><span class="line">  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">$.ajaxSetup(&#123;</span><br><span class="line">  beforeSend: function (xhr, settings) &#123;</span><br><span class="line">    if (!csrfSafeMethod(settings.type) &amp;&amp; !this.crossDomain) &#123;</span><br><span class="line">      xhr.setRequestHeader(&quot;X-CSRFToken&quot;, csrftoken);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>更多细节详见：<a href="https://docs.djangoproject.com/en/1.11/ref/csrf/" target="_blank" rel="noopener">Djagno官方文档中关于CSRF的内容</a></p>
+<h4 id="axios"><a href="#axios" class="headerlink" title="axios"></a>axios</h4><p>由于现在前后端分离所以新项目基本都是vue/react/angular</p>
+<p>所以几乎项目里使用的ajax库是—— axios</p>
+<p>axios具体配置请参考</p>
+<p><a href="https://www.npmjs.com/package/axios" target="_blank" rel="noopener">参考链接</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M06/">M06</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/11/05/Py006-01-22多表的图书管理系统/" title="Py006-01-22多表的图书管理系统" itemprop="url">Py006-01-22多表的图书管理系统</a>
   </h1>
   <p class="article-author">By
@@ -512,441 +1062,9 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/10/31/Py006-01-16关系型orm模型/" title="Py006-01-16关系型orm模型" itemprop="url">Py006-01-16关系型orm模型</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-10-31T13:48:24.000Z" itemprop="datePublished"> Published 2018-10-31</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<h4 id="实例：我们来假定下面这些概念，字段和关系"><a href="#实例：我们来假定下面这些概念，字段和关系" class="headerlink" title="实例：我们来假定下面这些概念，字段和关系"></a>实例：我们来假定下面这些概念，字段和关系</h4></blockquote>
-<ol>
-<li><p>作者模型：一个作者有姓名和年龄。</p>
-</li>
-<li><p>作者详细模型：把作者的详情放到详情表，包含生日，手机号，家庭住址等信息。作者详情模型和作者模型之间是一对一的关系（one-to-one）</p>
-</li>
-<li><p>出版商模型：出版商有名称，所在城市以及email。</p>
-</li>
-<li><p>书籍模型： 书籍有书名和出版日期</p>
-<ul>
-<li>一本书只应该有一个出版商出版，所以出版商和书籍是一对多关联关系(one-to-many)</li>
-</ul>
-</li>
-<li><p>书籍作者关系表</p>
-<ul>
-<li>一本书可能会有多个作者，一个作者也可以写多本书，所以作者和书籍的关系就是多对多的关联关系(many-to-many);<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"># 出版社表</span><br><span class="line">create table publish(</span><br><span class="line">    nid int primary key auto_increment,</span><br><span class="line">    name varchar(32),</span><br><span class="line">    city varchar(32),</span><br><span class="line">    email varchar(32)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"># 书籍表</span><br><span class="line">create table book(</span><br><span class="line">    nid int primary key auto_increment,</span><br><span class="line">    title varchar(32),</span><br><span class="line">    publishDate date,</span><br><span class="line">    price decimal(6,2),</span><br><span class="line">    publish_id int,</span><br><span class="line">    foreign key(publish_id) references publish(nid)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"># 作者详情表</span><br><span class="line">create table authorDetail(</span><br><span class="line">    nid int primary key auto_increment,</span><br><span class="line">    birthday date ,</span><br><span class="line">    telephone int,</span><br><span class="line">    addr varchar(32)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"># 作者表</span><br><span class="line">create table author(</span><br><span class="line">    nid int primary key auto_increment,</span><br><span class="line">    name varchar(32),</span><br><span class="line">    age int,</span><br><span class="line">    ad_id int unique,</span><br><span class="line">    foreign key(ad_id) references authorDetail(nid)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"># 书籍作者关系表</span><br><span class="line">create table book_authors(</span><br><span class="line">    nid int primary key auto_increment,</span><br><span class="line">    book_id int,</span><br><span class="line">    author_id int,</span><br><span class="line">    foreign key(book_id) references book(nid),</span><br><span class="line">    foreign key(author_id) references author(nid)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-<h3 id="orm模型"><a href="#orm模型" class="headerlink" title="orm模型"></a>orm模型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models</span><br><span class="line"></span><br><span class="line"># 作者表</span><br><span class="line">class Author(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    name=models.CharField( max_length=32)</span><br><span class="line">    age=models.IntegerField()</span><br><span class="line">    # 一对一  OneToOneField相当于指定 外间关联时设置  unique</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    ad_id int unique,</span><br><span class="line">    foreign key(ad_id) references authorDetail(nid)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    authordetail=models.OneToOneField(to=&quot;AuthorDetail&quot;,to_field=&quot;nid&quot;,on_delete=models.CASCADE)</span><br><span class="line"></span><br><span class="line"># 作者详情表</span><br><span class="line">class AuthorDetail(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    birthday=models.DateField()</span><br><span class="line">    telephone=models.BigIntegerField()</span><br><span class="line">    addr=models.CharField( max_length=64)</span><br><span class="line"></span><br><span class="line"># 出版社表</span><br><span class="line">class Publish(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    name=models.CharField( max_length=32)</span><br><span class="line">    city=models.CharField( max_length=32)</span><br><span class="line">    email=models.EmailField()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">Book  ----   Publish 一对多</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">class Book(models.Model):</span><br><span class="line">    nid = models.AutoField(primary_key=True)</span><br><span class="line">    title = models.CharField( max_length=32)</span><br><span class="line">    publishDate=models.DateField()</span><br><span class="line">    price=models.DecimalField(max_digits=5,decimal_places=2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 一对多关系  一本书对应多个出版社</span><br><span class="line">    publish=models.ForeignKey(to=&quot;Publish&quot;,to_field=&quot;nid&quot;,on_delete=models.CASCADE,)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">        publish_id int,</span><br><span class="line">        foreign key(publish_id) references publish(nid)</span><br><span class="line"></span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    #多对多</span><br><span class="line">    authors =models.ManyToManyField(to=&quot;Author&quot;)</span><br><span class="line"></span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 书籍作者关系表</span><br><span class="line">    create table book_authors(</span><br><span class="line">        nid int primary key auto_increment,</span><br><span class="line">        book_id int,</span><br><span class="line">        author_id int,</span><br><span class="line">        foreign key(book_id) references book(nid),</span><br><span class="line">        foreign key(author_id) references author(nid)</span><br><span class="line">    );</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line"># 多对多关系时 不需要这个模型类   django会依据 authors =models.ManyToManyField(to=&quot;Author&quot;)帮我们生成这张表</span><br><span class="line"># class Book2Author(models.Model):</span><br><span class="line">#</span><br><span class="line">#     nid = models.AutoField(primary_key=True)</span><br><span class="line">#     book=models.ForeignKey(to=&quot;Book&quot;)</span><br><span class="line">#     author=models.ForeignKey(to=&quot;Author&quot;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>生成表如下：</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1601.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1602.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1603.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1604.png" alt><br><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_1605.png" alt></p>
-<blockquote>
-<p>注意事项：</p>
-</blockquote>
-<ul>
-<li>表的名称myapp_modelName，是根据 模型中的元数据自动生成的，也可以覆写为别的名称　　</li>
-<li>id 字段是自动添加的</li>
-<li>对于外键字段，Django 会在字段名上添加”_id” 来创建数据库中的列名</li>
-<li>这个例子中的CREATE TABLE SQL 语句使用PostgreSQL 语法格式，要注意的是Django 会根据settings 中指定的数据库类型来使用相应的SQL 语句。</li>
-<li>定义好模型之后，你需要告诉Django_使用_这些模型。你要做的就是修改配置文件中的INSTALL_APPSZ中设置，在其中添加models.py所在应用的名称。</li>
-<li>外键字段 ForeignKey 有一个 null=True 的设置(它允许外键接受空值 NULL)，你可以赋给它空值 None 。</li>
-<li>请务必设置on_delete=models.CASCADE(及联删除)否则会在django2报错on_delete。</li>
-<li>注意为什么authordetail=models.OneToOneField(to=”AuthorDetail”…)中AuthorDetail加引号<br>  如果AuthorDetail声明在Author前 可以不加但是如果定义在Author后就只能加引号来解决</li>
-</ul>
-<h3 id="添加表记录"><a href="#添加表记录" class="headerlink" title="添加表记录"></a>添加表记录</h3><p>操作前先简单的录入一些数据：</p>
-<p>publish表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-----+-----------------+--------+---------------+</span><br><span class="line">| nid | name            | city   | email         |</span><br><span class="line">+-----+-----------------+--------+---------------+</span><br><span class="line">|   1 | 苹果出版社      | 北京   | 10000@qq.com  |</span><br><span class="line">|   2 | 橘子出版社      | 天津   | 20000@126.com |</span><br><span class="line">+-----+-----------------+--------+---------------+</span><br></pre></td></tr></table></figure>
-<p>author表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-----+------+-----+-----------------+</span><br><span class="line">| nid | name | age | authordetail_id |</span><br><span class="line">+-----+------+-----+-----------------+</span><br><span class="line">|   1 | alex |  33 |               1 |</span><br><span class="line">|   2 | hjx  |  18 |               2 |</span><br><span class="line">+-----+------+-----+-----------------+</span><br></pre></td></tr></table></figure>
-<p>authordetail表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-----+------------+-----------+--------+</span><br><span class="line">| nid | birthday   | telephone | addr   |</span><br><span class="line">+-----+------------+-----------+--------+</span><br><span class="line">|   1 | 1983-01-01 |       110 | 北京   |</span><br><span class="line">|   2 | 2000-10-15 |       119 | 天津   |</span><br><span class="line">+-----+------------+-----------+--------+</span><br></pre></td></tr></table></figure>
-<p>python代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render</span><br><span class="line"></span><br><span class="line"># Create your views here.</span><br><span class="line"></span><br><span class="line">from app01.models import Book,Publish,Author,AuthorDetail</span><br><span class="line"></span><br><span class="line">def index(request):</span><br><span class="line">    # 出版社记录</span><br><span class="line">    Publish.objects.create(name=&apos;苹果出版社&apos;,city=&apos;北京&apos;,email=&apos;10000@qq.com&apos;)</span><br><span class="line">    Publish.objects.create(name=&apos;橘子出版社&apos;, city=&apos;天津&apos;, email=&apos;20000@126.com&apos;)</span><br><span class="line"></span><br><span class="line">    # 作者详情记录</span><br><span class="line">    AuthorDetail.objects.create(birthday=&apos;1983-01-01&apos;,telephone=110,addr=&apos;北京&apos;)</span><br><span class="line">    AuthorDetail.objects.create(birthday=&apos;2000-10-15&apos;, telephone=119, addr=&apos;天津&apos;)</span><br><span class="line">    # 作者记录</span><br><span class="line">    Author.objects.create(name=&apos;alex&apos;,age=33,authordetail_id=1)</span><br><span class="line">    Author.objects.create(name=&apos;hjx&apos;, age=18, authordetail_id=2)</span><br><span class="line"></span><br><span class="line">    return render(request,&apos;index.html&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">方式1:</span><br><span class="line">   publish_obj=Publish.objects.get(nid=1)</span><br><span class="line">   book_obj=Book.objects.create(title=&quot;金瓶梅&quot;,publishDate=&quot;2012-12-12&quot;,price=100,publish=publish_obj)</span><br><span class="line">  </span><br><span class="line">方式2:</span><br><span class="line">   book_obj=Book.objects.create(title=&quot;金瓶梅&quot;,publishDate=&quot;2012-12-12&quot;,price=100,publish_id=1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--------------------</span><br><span class="line">查询金瓶梅对应出版社的邮箱</span><br><span class="line">book_obj = Book.objects.filter(title=&apos;金瓶梅&apos;).first()</span><br><span class="line">email = book_obj.publish.email</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h5 id="核心：book-obj-publish与book-obj-publish-id是什么？"><a href="#核心：book-obj-publish与book-obj-publish-id是什么？" class="headerlink" title="核心：book_obj.publish与book_obj.publish_id是什么？"></a>核心：book_obj.publish与book_obj.publish_id是什么？</h5></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+-----+-----------+-------------+--------+------------+</span><br><span class="line">| nid | title     | publishDate | price  | publish_id |</span><br><span class="line">+-----+-----------+-------------+--------+------------+</span><br><span class="line">|   1 | 金瓶梅    | 2012-12-12  | 100.00 |          1 |</span><br><span class="line">+-----+-----------+-------------+--------+------------+</span><br></pre></td></tr></table></figure>
-<h4 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 当前生成的书籍对象</span><br><span class="line">book_obj = Book.objects.create(title=&quot;追风筝的人&quot;, price=200, publishDate=&quot;2012-11-12&quot;, publish_id=1)</span><br><span class="line"># 为书籍绑定的做作者对象</span><br><span class="line">hjx = Author.objects.filter(name=&quot;hjx&quot;).first()  # 在Author表中主键为2的纪录</span><br><span class="line">alex = Author.objects.filter(name=&quot;alex&quot;).first()  # 在Author表中主键为1的纪录</span><br><span class="line"></span><br><span class="line"># 绑定多对多关系,即向关系表book_authors中添加纪录</span><br><span class="line">book_obj.authors.add(hjx, alex)  # 将某些特定的 model 对象添加到被关联对象集合中。   </span><br><span class="line">=======    book_obj.authors.add(*[])</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">还可以这样  1,2代表作者的主键</span><br><span class="line">book_obj.authors.add(1, 2)</span><br><span class="line">还可以写出解包的形式</span><br><span class="line">book_obj.authors.add(*[1,2])</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">book表</span><br><span class="line">+-----+-----------------+-------------+--------+------------+</span><br><span class="line">| nid | title           | publishDate | price  | publish_id |</span><br><span class="line">+-----+-----------------+-------------+--------+------------+</span><br><span class="line">|   1 | 金瓶梅          | 2012-12-12  | 100.00 |          1 |</span><br><span class="line">|   2 | 追风筝的人      | 2012-11-12  | 200.00 |          1 |</span><br><span class="line">+-----+-----------------+-------------+--------+------------+</span><br><span class="line"></span><br><span class="line">book_authors表</span><br><span class="line">+----+---------+-----------+</span><br><span class="line">| id | book_id | author_id |</span><br><span class="line">+----+---------+-----------+</span><br><span class="line">|  1 |       2 |         1 |</span><br><span class="line">|  2 |       2 |         2 |</span><br><span class="line">+----+---------+-----------+</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="核心-book-obj-authors-all-是什么？"><a href="#核心-book-obj-authors-all-是什么？" class="headerlink" title="核心:book_obj.authors.all()是什么？"></a>核心:book_obj.authors.all()是什么？</h4></blockquote>
-<p>多对多关系其它常用API：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">book_obj.authors.remove()      # 将某个特定的对象从被关联对象集合中去除。    ======   book_obj.authors.remove(*[])</span><br><span class="line">book_obj.authors.clear()       #清空被关联对象集合</span><br><span class="line">book_obj.authors.set()         #先清空再设置　</span><br><span class="line">book_obj.authors.all()         #获取所有与这本书关联的作者对象的集合 queryset</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">----------------操作实例</span><br><span class="line"># 解除多多关系</span><br><span class="line">book=Book.objects.filter(nid=2).first()</span><br><span class="line">book.authors.remove(1) # 解除 主键为1的出版社</span><br><span class="line">book.authors.remove(1,2) # 解除 主键为1，2的出版社</span><br><span class="line">book.authors.remove(*[1,2]) # 解除 主键为1，2的出版社</span><br><span class="line">book.authors.clear() # 解除所有关系</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 获取id为2d的书的所有关联作者集合</span><br><span class="line">book.authors.all() # [obj1,obj2,...] queryset </span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<p><a href="http://www.cnblogs.com/yuanchenqi/articles/8978167.html" target="_blank" rel="noopener">more</a></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M06/">M06</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/10/27/Py006-01-15单表操作之CRUD/" title="Py006-01-15单表操作之CRUD" itemprop="url">Py006-01-15单表操作之CRUD</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-10-27T07:58:00.000Z" itemprop="datePublished"> Published 2018-10-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="单表操作之查询"><a href="#单表操作之查询" class="headerlink" title="单表操作之查询"></a>单表操作之查询</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;1&gt; all():                  查询所有结果</span><br><span class="line">  </span><br><span class="line">&lt;2&gt; filter(**kwargs):       它包含了与所给筛选条件相匹配的对象</span><br><span class="line">  </span><br><span class="line">&lt;3&gt; get(**kwargs):          返回与所给筛选条件相匹配的对象，返回结果有且只有一个，</span><br><span class="line">                            如果符合筛选条件的对象超过一个或者没有都会抛出错误。</span><br><span class="line">  </span><br><span class="line">&lt;4&gt; exclude(**kwargs):      它包含了与所给筛选条件不匹配的对象</span><br><span class="line"> </span><br><span class="line">&lt;5&gt; order_by(*field):       对查询结果排序</span><br><span class="line">  </span><br><span class="line">&lt;6&gt; reverse():              对查询结果反向排序</span><br><span class="line">  </span><br><span class="line">&lt;8&gt; count():                返回数据库中匹配查询(QuerySet)的对象数量。</span><br><span class="line">  </span><br><span class="line">&lt;9&gt; first():                返回第一条记录</span><br><span class="line">  </span><br><span class="line">&lt;10&gt; last():                返回最后一条记录</span><br><span class="line">  </span><br><span class="line">&lt;11&gt; exists():              如果QuerySet包含数据，就返回True，否则返回False</span><br><span class="line"> </span><br><span class="line">&lt;12&gt; values(*field):        返回一个ValueQuerySet——一个特殊的QuerySet，运行后得到的并不是一系列</span><br><span class="line">                            model的实例化对象，而是一个可迭代的字典序列</span><br><span class="line">&lt;13&gt; values_list(*field):   它与values()非常相似，它返回的是一个元组序列，values返回的是一个字典序列</span><br><span class="line"> </span><br><span class="line">&lt;14&gt; distinct():            从返回结果中剔除重复纪录</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="自行拷贝上一节代码的结构"><a href="#自行拷贝上一节代码的结构" class="headerlink" title="自行拷贝上一节代码的结构"></a>自行拷贝上一节代码的结构</h4></blockquote>
-<ul>
-<li>all() 查询所有记录</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    # 添加表记录</span><br><span class="line"></span><br><span class="line">    # 方式一</span><br><span class="line">    # book_obj = Book(id=1,title=&apos;python红宝书&apos;,price=100,pub_date=&apos;2012-12-12&apos;,publish=&apos;人民出版社&apos;)</span><br><span class="line">    # book_obj.save()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 方式二</span><br><span class="line">    # book_obj2 = Book.objects.create(title=&apos;php&apos;,price=100,pub_date=&apos;2012-12-12&apos;,publish=&apos;人民出版社&apos;)</span><br><span class="line">    # print(book_obj2.title)</span><br><span class="line">    # print(book_obj2.publish)</span><br><span class="line">    # return HttpResponse(&apos;hello&apos;)</span><br><span class="line"></span><br><span class="line">    # 查询表记录</span><br><span class="line"></span><br><span class="line">    book_list = Book.objects.all()</span><br><span class="line">    print(book_list)</span><br><span class="line"></span><br><span class="line">    return HttpResponse(&apos;ok&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># ---------------------------------------------------------</span><br><span class="line"># 访问localhost:8000/index/</span><br><span class="line"># pycharm里打印了这个</span><br><span class="line"># &lt;QuerySet [&lt;Book: Book object (1)&gt;, &lt;Book: Book object (2)&gt;]&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>为什么打印的是个对象呢？</p>
-</blockquote>
-<p>因为我们没有定义str方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">在模型models.py里添加 str方法</span><br><span class="line">def __str__(self):</span><br><span class="line">    return self.title</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 访问localhost:8000/index/</span><br><span class="line"># pycharm里打印了这个</span><br><span class="line"># &lt;QuerySet [&lt;Book: python红宝书&gt;, &lt;Book: php&gt;]&gt;</span><br><span class="line">----------------------------------------------------</span><br><span class="line"># QuerySet是啥？</span><br><span class="line">类似一个列表放着一个个对象,也就是一行数据</span><br><span class="line">[obj1,obj2,obj3]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>使用for循环来处理queryset</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    ...</span><br><span class="line">    # 查询表记录</span><br><span class="line"></span><br><span class="line">    book_list = Book.objects.all()</span><br><span class="line">    print(book_list)</span><br><span class="line"></span><br><span class="line">    for item in book_list:</span><br><span class="line">        print(item.title,item.price,item.publish)</span><br><span class="line"></span><br><span class="line">    return HttpResponse(&apos;ok&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>取数据里第一个first，最后一个last</li>
-</ul>
-<p>调用者queryset对象 返回值model对象</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">book = Book.objects.all().first()</span><br><span class="line">book2 = Book.objects.all()[0]</span><br><span class="line"></span><br><span class="line">book3 = Book.objects.all().last()</span><br></pre></td></tr></table></figure>
-<ul>
-<li>过滤filter() 返回值：queryset对象</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">book_list = Book.objects.filter(price=100) # [obj1,obj2]</span><br><span class="line"></span><br><span class="line">book = Book.objects.filter(price=100).first() # 取第一条记录</span><br><span class="line"></span><br><span class="line"># -----------------支持多个条件</span><br><span class="line">Book.objects.filter(price=100,title=&apos;php&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>get() 只有——有且一个的情况下才有意义 返回值： model对象</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">book = Book.objects.get(price=100) # 两本书都一个价 报错</span><br><span class="line"></span><br><span class="line">book2 = Book.objects.get(price=300) # 没有300元的书 报错</span><br><span class="line"></span><br><span class="line">book3 = Book.objects.get(title=&apos;python红宝书&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>exclude() 跟filter 相反，排除条件的结果，返回值 queryset</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">book1 = Book.objects.filter(title=&apos;php&apos;) # title=&apos;php&apos; 的书</span><br><span class="line"></span><br><span class="line">book1 = Book.objects.exclude(title=&apos;php&apos;) # title!=&apos;php&apos; 的书</span><br></pre></td></tr></table></figure>
-<ul>
-<li>order_by() 排序 调用者：queryset 返回值：queryset</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">res = Book.objects.all().order_by(&quot;id&quot;) # 生序</span><br><span class="line">res = Book.objects.all().order_by(&quot;-id&quot;) # 降序</span><br><span class="line"></span><br><span class="line"># 按多列规则排序  如价格相同时 按书名排序</span><br><span class="line">res = Book.objects.all().order_by(&quot;price&quot;,&apos;title&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>count() 计数  调用者：queryset 返回值：int类型</li>
-</ul>
-<p>注意：count之后不能调用别的了因为返回值不是queryset了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res = Book.objects.all().count()</span><br></pre></td></tr></table></figure>
-<ul>
-<li>exist() 这张表里有没有记录</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">第一种方式  </span><br><span class="line">res = Book.objects.all()</span><br><span class="line">if res:</span><br><span class="line">    print(&apos;有记录&apos;)</span><br><span class="line">假如表里10万条记录，是不是很浪费</span><br><span class="line"></span><br><span class="line">第二种</span><br><span class="line">res = Book.objects.all().exist()</span><br><span class="line">if res:</span><br><span class="line">    print(&apos;有记录&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="重要方法"><a href="#重要方法" class="headerlink" title="重要方法"></a>重要方法</h4><ul>
-<li><h4 id="values-调用者：queryset-返回值：queryset"><a href="#values-调用者：queryset-返回值：queryset" class="headerlink" title="values() 调用者：queryset 返回值：queryset"></a>values() 调用者：queryset 返回值：queryset</h4></li>
-</ul>
-<blockquote>
-<p>需求想查询所有书籍的名称</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 很麻烦要自己for循环处理</span><br><span class="line">res = Book.objects.all()</span><br><span class="line">for i in res:</span><br><span class="line">    print(i.title)</span><br></pre></td></tr></table></figure>
-<p>解决方案——values() 单独取某个字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">res = Book.objects.all().values(&quot;price&quot;)</span><br><span class="line"></span><br><span class="line"># &lt;QuerySet [&#123;&apos;price&apos;: Decimal(&apos;100.00&apos;)&#125;, &#123;&apos;price&apos;: Decimal(&apos;100.00&apos;)&#125;]&gt;</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">原理</span><br><span class="line">temp = []</span><br><span class="line">for i in Book.objects.all():</span><br><span class="line">    temp.append(&#123;</span><br><span class="line">        &quot;price&quot;:obj.price</span><br><span class="line">    &#125;)</span><br><span class="line">return temp</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="其实也可以这样使用"><a href="#其实也可以这样使用" class="headerlink" title="其实也可以这样使用"></a>其实也可以这样使用</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.values(&quot;price&quot;)</span><br><span class="line"></span><br><span class="line">实际上是这个：Book.objects.all().values(&quot;price&quot;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>也可以获取多个字段 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.all().values(&quot;price&quot;,&quot;title&quot;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li><h4 id="values-list-调用者：queryset-返回值：queryset"><a href="#values-list-调用者：queryset-返回值：queryset" class="headerlink" title="values_list() 调用者：queryset 返回值：queryset"></a>values_list() 调用者：queryset 返回值：queryset</h4></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">跟 values调用方式一样</span><br><span class="line">不同的是它们的返回内容</span><br><span class="line"></span><br><span class="line">res = Book.objects.all().values_list(&quot;price&quot;)</span><br><span class="line"># values_list 返回的内容是元祖形式</span><br><span class="line"># &lt;QuerySet [(Decimal(&apos;100.00&apos;),), (Decimal(&apos;100.00&apos;))]&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">res = Book.objects.all().values(&quot;price&quot;)</span><br><span class="line"># values 返回的内容是字典形式</span><br><span class="line"># &lt;QuerySet [&#123;&apos;price&apos;: Decimal(&apos;100.00&apos;)&#125;, &#123;&apos;price&apos;: Decimal(&apos;100.00&apos;)&#125;]&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><h4 id="distinct-去重"><a href="#distinct-去重" class="headerlink" title="distinct() 去重"></a>distinct() 去重</h4></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">table aa</span><br><span class="line">----------------------</span><br><span class="line">id      name        age</span><br><span class="line">1       alex        12</span><br><span class="line">2       alex        34</span><br><span class="line"></span><br><span class="line">select distinct name from aa</span><br><span class="line">-----</span><br><span class="line">name</span><br><span class="line">alex</span><br><span class="line"></span><br><span class="line">select distinct id from aa</span><br><span class="line">----- 没有任何意义因为id肯定不重复</span><br><span class="line">id</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line"></span><br><span class="line">----------------------------</span><br><span class="line">res = Book.objects.all().distinct() # 没有一样 queryset里是一个个的对象</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>正确姿势 针对字段来使用 values()</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res = Book.objects.all().values(&quot;price&quot;).distinct()</span><br></pre></td></tr></table></figure>
-<h3 id="基于双下划线的模糊查询"><a href="#基于双下划线的模糊查询" class="headerlink" title="基于双下划线的模糊查询"></a>基于双下划线的模糊查询</h3><blockquote>
-<p>注意filter里这样是错的</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(price&gt;100)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>双下划线方法</p>
-</blockquote>
-<ul>
-<li>大于小于</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(price__gt=100) # 价格大于100</span><br><span class="line">Book.objects.filter(price__lt=100) # 价格小于100</span><br><span class="line">Book.objects.filter(price__gt=100,price__lt=200) # 价格大于100小于200</span><br></pre></td></tr></table></figure>
-<ul>
-<li>以什么开头</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(title__startswith=&quot;py&quot;) # 以py开头</span><br></pre></td></tr></table></figure>
-<ul>
-<li>包含指定内容</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(title__contains=&quot;python&quot;) # 包含字符 python 不忽略大小写</span><br><span class="line">Book.objects.filter(title__icontains=&quot;python&quot;) # 忽略大小写</span><br></pre></td></tr></table></figure>
-<ul>
-<li>指定匹配几个值</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(price__in=[100,200,300])</span><br></pre></td></tr></table></figure>
-<ul>
-<li>范围</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 范围在 100-200</span><br><span class="line">Book.objects.filter(price__range=[100,200])</span><br></pre></td></tr></table></figure>
-<ul>
-<li>找日期范围   </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 发版日期在2012年的</span><br><span class="line">Book.objects.filter(pub_date__year=2012)</span><br><span class="line"></span><br><span class="line"># 发版日期在2012年6月的</span><br><span class="line">Book.objects.filter(pub_date__year=2012,pub_date__year=6)</span><br></pre></td></tr></table></figure>
-<h3 id="删除操作"><a href="#删除操作" class="headerlink" title="删除操作"></a>删除操作</h3><ul>
-<li>delete() 调用者：queryset/model 返回值：元祖</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># queryset调用删除</span><br><span class="line">res = Book.objects.filter(price=100).delete()</span><br><span class="line"></span><br><span class="line">print(res) # (2,&#123;&apos;app001.Book&apos;:2&#125;)</span><br><span class="line"></span><br><span class="line"># model调用删除</span><br><span class="line">Book.objects.filter(price=100).first().delete()</span><br></pre></td></tr></table></figure>
-<h3 id="修改操作"><a href="#修改操作" class="headerlink" title="修改操作"></a>修改操作</h3><ul>
-<li>update()  调用者：queryset</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Book.objects.filter(title=&apos;php&apos;).update(title=&apos;php2&apos;)</span><br></pre></td></tr></table></figure>
-<h3 id="实战练习"><a href="#实战练习" class="headerlink" title="实战练习"></a>实战练习</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">1 查询xx出版社出版过的价格大于200的书籍</span><br><span class="line"></span><br><span class="line">Book.objects.filter(publish=&apos;xx出版社&apos;,price__gt=200)</span><br><span class="line"></span><br><span class="line">2 查询2017年8月出版的所有以py开头的书籍名称</span><br><span class="line"></span><br><span class="line">Book.objects.filter(title__startswith=&apos;py&apos;,pub_date__year=2017,pub_date__month=8)</span><br><span class="line"> </span><br><span class="line">3 查询价格为50,100或者150的所有书籍名称及其出版社名称</span><br><span class="line"> </span><br><span class="line">Book.objects.filter(price__in=[50,100,150]).values(&apos;title&apos;,&apos;publist&apos;)</span><br><span class="line"></span><br><span class="line">4 查询价格在100到200之间的所有书籍名称及其价格</span><br><span class="line"> </span><br><span class="line">Book.objects.filter(price__range=[100,200]).values(&apos;title&apos;,&apos;price&apos;)</span><br><span class="line"></span><br><span class="line">5 查询所有xx出版社出版的书籍的价格（从高到低排序，去重）</span><br><span class="line"></span><br><span class="line">Book.objects.filter(publish=&apos;xx出版社&apos;).values(&apos;price&apos;).distinct().order_by(&apos;-price&apos;)</span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M06/">M06</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/10/27/Py006-01-14单表操作添加记录/" title="Py006-01-14单表操作添加记录" itemprop="url">Py006-01-14单表操作添加记录</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-10-27T06:17:14.000Z" itemprop="datePublished"> Published 2018-10-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="单表操作之添加记录"><a href="#单表操作之添加记录" class="headerlink" title="单表操作之添加记录"></a>单表操作之添加记录</h3><blockquote>
-<h3 id="本功能依赖上一节内容的项目结构"><a href="#本功能依赖上一节内容的项目结构" class="headerlink" title="本功能依赖上一节内容的项目结构"></a>本功能依赖上一节内容的项目结构</h3></blockquote>
-<ul>
-<li>1 models.py文件</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Book(models.Model):</span><br><span class="line">    id = models.AutoField(primary_key=True)</span><br><span class="line">    title = models.CharField(max_length=32)</span><br><span class="line">    pub_date = models.DateField()</span><br><span class="line">    price = models.DecimalField(max_digits=8, decimal_places=2)</span><br><span class="line">    publish = models.CharField(max_length=32)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>2 settings里添加mysql数据库配置,同时不要忘记在设置里注册app001</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    ...</span><br><span class="line">    &apos;app001&apos;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">DATABASES = &#123;</span><br><span class="line">    &apos;default&apos;: &#123;</span><br><span class="line">        &apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</span><br><span class="line">        &apos;NAME&apos;:&apos;orm&apos;,</span><br><span class="line">        &apos;USER&apos;:&apos;root&apos;,</span><br><span class="line">        &apos;PASSWORD&apos;:&apos;xxxx&apos;,</span><br><span class="line">        &apos;HOST&apos;:&apos;127.0.0.1&apos;,</span><br><span class="line">        &apos;PORT&apos;:3306</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>3修改路由配置一个index视图函数</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    # 添加表记录</span><br><span class="line">    # 方式一</span><br><span class="line">    # book_obj = Book(id=1,title=&apos;python红宝书&apos;,price=100,pub_date=&apos;2012-12-12&apos;,publish=&apos;人民出版社&apos;)</span><br><span class="line">    # book_obj.save()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    # 方式二</span><br><span class="line">    book_obj2 = Book.objects.create(title=&apos;php&apos;,price=100,pub_date=&apos;2012-12-12&apos;,publish=&apos;人民出版社&apos;)</span><br><span class="line">    print(book_obj2.title)</span><br><span class="line">    print(book_obj2.publish)</span><br><span class="line">    return HttpResponse(book_obj2)</span><br></pre></td></tr></table></figure>
-<p>访问localhost:8000/index/</p>
-<ul>
-<li>第一种方式怎么刷新都只有一条记录(因为id定死了)</li>
-<li>第二种方式每次刷新都会新增一条记录</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M06/">M06</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/10/27/Py006-01-13单表操作生成模型/" title="Py006-01-13单表操作生成模型" itemprop="url">Py006-01-13单表操作生成模型</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-10-27T02:44:21.000Z" itemprop="datePublished"> Published 2018-10-27</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h3><h4 id="1-创建模型"><a href="#1-创建模型" class="headerlink" title="1.创建模型"></a>1.创建模型</h4><p>创建名为app001的应用</p>
-<p>修改app001/models.py</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models</span><br><span class="line"></span><br><span class="line">class Book(models.Model):</span><br><span class="line">     id=models.AutoField(primary_key=True)</span><br><span class="line">     title=models.CharField(max_length=32)</span><br><span class="line">     pub_date=models.DateField()</span><br><span class="line">     price=models.DecimalField(max_digits=8,decimal_places=2) # 999999.99</span><br><span class="line">     publish=models.CharField(max_length=32) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 你想要自增长主键models.AutoField(primary_key=True)</span><br><span class="line"></span><br><span class="line"># 你想要字符类型models.CharField(max_length=32)</span><br><span class="line"></span><br><span class="line"># 你想要日期类型models.DateField()</span><br><span class="line"></span><br><span class="line"># 你想要Decimal类型models.DecimalField(max_digits=8,decimal_places=2) # 999999.99</span><br></pre></td></tr></table></figure>
-<h4 id="2-更多字段和参数"><a href="#2-更多字段和参数" class="headerlink" title="2.更多字段和参数"></a>2.更多字段和参数</h4><p>每个字段有一些特有的参数，例如，CharField需要max_length参数来指定VARCHAR数据库字段的大小。还有一些适用于所有字段的通用参数。 这些参数在文档中有详细定义，这里我们只简单介绍一些最常用的：</p>
-<blockquote>
-<p>更多字段：(初次学习不要看这些更多内容，只有详细的业务场景才方便理解使用)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line">&apos;&apos;&apos;</span><br><span class="line"> </span><br><span class="line">&lt;1&gt; CharField</span><br><span class="line">        字符串字段, 用于较短的字符串.</span><br><span class="line">        CharField 要求必须有一个参数 maxlength, 用于从数据库层和Django校验层限制该字段所允许的最大字符数.</span><br><span class="line"> </span><br><span class="line">&lt;2&gt; IntegerField</span><br><span class="line">       #用于保存一个整数.</span><br><span class="line"> </span><br><span class="line">&lt;3&gt; FloatField</span><br><span class="line">        一个浮点数. 必须 提供两个参数:</span><br><span class="line">         </span><br><span class="line">        参数    描述</span><br><span class="line">        max_digits    总位数(不包括小数点和符号)</span><br><span class="line">        decimal_places    小数位数</span><br><span class="line">                举例来说, 要保存最大值为 999 (小数点后保存2位),你要这样定义字段:</span><br><span class="line">                 </span><br><span class="line">                models.FloatField(..., max_digits=5, decimal_places=2)</span><br><span class="line">                要保存最大值一百万(小数点后保存10位)的话,你要这样定义:</span><br><span class="line">                 </span><br><span class="line">                models.FloatField(..., max_digits=19, decimal_places=10)</span><br><span class="line">                admin 用一个文本框(&lt;input type=&quot;text&quot;&gt;)表示该字段保存的数据.</span><br><span class="line"> </span><br><span class="line">&lt;4&gt; AutoField</span><br><span class="line">        一个 IntegerField, 添加记录时它会自动增长. 你通常不需要直接使用这个字段;</span><br><span class="line">        自定义一个主键：my_id=models.AutoField(primary_key=True)</span><br><span class="line">        如果你不指定主键的话,系统会自动添加一个主键字段到你的 model.</span><br><span class="line"> </span><br><span class="line">&lt;5&gt; BooleanField</span><br><span class="line">        A true/false field. admin 用 checkbox 来表示此类字段.</span><br><span class="line"> </span><br><span class="line">&lt;6&gt; TextField</span><br><span class="line">        一个容量很大的文本字段.</span><br><span class="line">        admin 用一个 &lt;textarea&gt; (文本区域)表示该字段数据.(一个多行编辑框).</span><br><span class="line"> </span><br><span class="line">&lt;7&gt; EmailField</span><br><span class="line">        一个带有检查Email合法性的 CharField,不接受 maxlength 参数.</span><br><span class="line"> </span><br><span class="line">&lt;8&gt; DateField</span><br><span class="line">        一个日期字段. 共有下列额外的可选参数:</span><br><span class="line">        Argument    描述</span><br><span class="line">        auto_now    当对象被保存时,自动将该字段的值设置为当前时间.通常用于表示 &quot;last-modified&quot; 时间戳.</span><br><span class="line">        auto_now_add    当对象首次被创建时,自动将该字段的值设置为当前时间.通常用于表示对象创建时间.</span><br><span class="line">        （仅仅在admin中有意义...)</span><br><span class="line"> </span><br><span class="line">&lt;9&gt; DateTimeField</span><br><span class="line">         一个日期时间字段. 类似 DateField 支持同样的附加选项.</span><br><span class="line"> </span><br><span class="line">&lt;10&gt; ImageField</span><br><span class="line">        类似 FileField, 不过要校验上传对象是否是一个合法图片.#它有两个可选参数:height_field和width_field,</span><br><span class="line">        如果提供这两个参数,则图片将按提供的高度和宽度规格保存.    </span><br><span class="line">&lt;11&gt; FileField</span><br><span class="line">     一个文件上传字段.</span><br><span class="line">     要求一个必须有的参数: upload_to, 一个用于保存上载文件的本地文件系统路径. 这个路径必须包含 strftime #formatting,</span><br><span class="line">     该格式将被上载文件的 date/time</span><br><span class="line">     替换(so that uploaded files don&apos;t fill up the given directory).</span><br><span class="line">     admin 用一个&lt;input type=&quot;file&quot;&gt;部件表示该字段保存的数据(一个文件上传部件) .</span><br><span class="line"> </span><br><span class="line">     注意：在一个 model 中使用 FileField 或 ImageField 需要以下步骤:</span><br><span class="line">            （1）在你的 settings 文件中, 定义一个完整路径给 MEDIA_ROOT 以便让 Django在此处保存上传文件.</span><br><span class="line">            (出于性能考虑,这些文件并不保存到数据库.) 定义MEDIA_URL 作为该目录的公共 URL. 要确保该目录对</span><br><span class="line">             WEB服务器用户帐号是可写的.</span><br><span class="line">            （2） 在你的 model 中添加 FileField 或 ImageField, 并确保定义了 upload_to 选项,以告诉 Django</span><br><span class="line">             使用 MEDIA_ROOT 的哪个子目录保存上传文件.你的数据库中要保存的只是文件的路径(相对于 MEDIA_ROOT).</span><br><span class="line">             出于习惯你一定很想使用 Django 提供的 get_&lt;#fieldname&gt;_url 函数.举例来说,如果你的 ImageField</span><br><span class="line">             叫作 mug_shot, 你就可以在模板中以 &#123;&#123; object.#get_mug_shot_url &#125;&#125; 这样的方式得到图像的绝对路径.</span><br><span class="line"> </span><br><span class="line">&lt;12&gt; URLField</span><br><span class="line">      用于保存 URL. 若 verify_exists 参数为 True (默认), 给定的 URL 会预先检查是否存在( 即URL是否被有效装入且</span><br><span class="line">      没有返回404响应).</span><br><span class="line">      admin 用一个 &lt;input type=&quot;text&quot;&gt; 文本框表示该字段保存的数据(一个单行编辑框)</span><br><span class="line"> </span><br><span class="line">&lt;13&gt; NullBooleanField</span><br><span class="line">       类似 BooleanField, 不过允许 NULL 作为其中一个选项. 推荐使用这个字段而不要用 BooleanField 加 null=True 选项</span><br><span class="line">       admin 用一个选择框 &lt;select&gt; (三个可选择的值: &quot;Unknown&quot;, &quot;Yes&quot; 和 &quot;No&quot; ) 来表示这种字段数据.</span><br><span class="line"> </span><br><span class="line">&lt;14&gt; SlugField</span><br><span class="line">       &quot;Slug&quot; 是一个报纸术语. slug 是某个东西的小小标记(短签), 只包含字母,数字,下划线和连字符.#它们通常用于URLs</span><br><span class="line">       若你使用 Django 开发版本,你可以指定 maxlength. 若 maxlength 未指定, Django 会使用默认长度: 50.  #在</span><br><span class="line">       以前的 Django 版本,没有任何办法改变50 这个长度.</span><br><span class="line">       这暗示了 db_index=True.</span><br><span class="line">       它接受一个额外的参数: prepopulate_from, which is a list of fields from which to auto-#populate</span><br><span class="line">       the slug, via JavaScript,in the object&apos;s admin form: models.SlugField</span><br><span class="line">       (prepopulate_from=(&quot;pre_name&quot;, &quot;name&quot;))prepopulate_from 不接受 DateTimeFields.</span><br><span class="line"> </span><br><span class="line">&lt;13&gt; XMLField</span><br><span class="line">        一个校验值是否为合法XML的 TextField,必须提供参数: schema_path, 它是一个用来校验文本的 RelaxNG schema #的文件系统路径.</span><br><span class="line"> </span><br><span class="line">&lt;14&gt; FilePathField</span><br><span class="line">        可选项目为某个特定目录下的文件名. 支持三个特殊的参数, 其中第一个是必须提供的.</span><br><span class="line">        参数    描述</span><br><span class="line">        path    必需参数. 一个目录的绝对文件系统路径. FilePathField 据此得到可选项目.</span><br><span class="line">        Example: &quot;/home/images&quot;.</span><br><span class="line">        match    可选参数. 一个正则表达式, 作为一个字符串, FilePathField 将使用它过滤文件名. </span><br><span class="line">        注意这个正则表达式只会应用到 base filename 而不是</span><br><span class="line">        路径全名. Example: &quot;foo.*\.txt^&quot;, 将匹配文件 foo23.txt 却不匹配 bar.txt 或 foo23.gif.</span><br><span class="line">        recursive可选参数.要么 True 要么 False. 默认值是 False. 是否包括 path 下面的全部子目录.</span><br><span class="line">        这三个参数可以同时使用.</span><br><span class="line">        match 仅应用于 base filename, 而不是路径全名. 那么,这个例子:</span><br><span class="line">        FilePathField(path=&quot;/home/images&quot;, match=&quot;foo.*&quot;, recursive=True)</span><br><span class="line">        ...会匹配 /home/images/foo.gif 而不匹配 /home/images/foo/bar.gif</span><br><span class="line"> </span><br><span class="line">&lt;15&gt; IPAddressField</span><br><span class="line">        一个字符串形式的 IP 地址, (i.e. &quot;24.124.1.30&quot;).</span><br><span class="line">&lt;16&gt; CommaSeparatedIntegerField</span><br><span class="line">        用于存放逗号分隔的整数值. 类似 CharField, 必须要有maxlength参数.</span><br><span class="line"> </span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>更多参数：</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">1)null</span><br><span class="line"> </span><br><span class="line">如果为True，Django 将用NULL 来在数据库中存储空值。 默认值是 False.</span><br><span class="line"> </span><br><span class="line">(1)blank</span><br><span class="line"> </span><br><span class="line">如果为True，该字段允许不填。默认为False。</span><br><span class="line">要注意，这与 null 不同。null纯粹是数据库范畴的，而 blank 是数据验证范畴的。</span><br><span class="line">如果一个字段的blank=True，表单的验证将允许该字段是空值。如果字段的blank=False，该字段就是必填的。</span><br><span class="line"> </span><br><span class="line">(2)default</span><br><span class="line"> </span><br><span class="line">字段的默认值。可以是一个值或者可调用对象。如果可调用 ，每有新对象被创建它都会被调用。</span><br><span class="line"> </span><br><span class="line">(3)primary_key</span><br><span class="line"> </span><br><span class="line">如果为True，那么这个字段就是模型的主键。如果你没有指定任何一个字段的primary_key=True，</span><br><span class="line">Django 就会自动添加一个IntegerField字段做为主键，所以除非你想覆盖默认的主键行为，</span><br><span class="line">否则没必要设置任何一个字段的primary_key=True。</span><br><span class="line"> </span><br><span class="line">(4)unique</span><br><span class="line"> </span><br><span class="line">如果该值设置为 True, 这个数据字段的值在整张表中必须是唯一的</span><br><span class="line"> </span><br><span class="line">(5)choices</span><br><span class="line">由二元组组成的一个可迭代对象（例如，列表或元组），用来给字段提供选择项。 如果设置了choices ，默认的表单将是一个选择框而不是标准的文本框，&lt;br&gt;而且这个选择框的选项就是choices 中的选项。</span><br></pre></td></tr></table></figure>
-<h4 id="3settings配置"><a href="#3settings配置" class="headerlink" title="3settings配置"></a>3settings配置</h4><p>若想将模型转为mysql数据库中的表，需要在settings中配置：（默认是sqlite）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">    &apos;default&apos;: &#123;</span><br><span class="line">        &apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</span><br><span class="line">        &apos;NAME&apos;:&apos;orm&apos;,     　　 　  # 要连接的数据库，连接前需要创建好</span><br><span class="line">        &apos;USER&apos;:&apos;root&apos;,　　　　　　  # 连接数据库的用户名</span><br><span class="line">        &apos;PASSWORD&apos;:&apos;&apos;,　　　　　　  # 连接数据库的密码</span><br><span class="line">        &apos;HOST&apos;:&apos;127.0.0.1&apos;,       # 连接主机，默认本级</span><br><span class="line">        &apos;PORT&apos;:3306    　　　     #  端口 默认3306</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>注意1：NAME即数据库的名字，在mysql连接前该数据库必须已经创建，而上面的sqlite数据库下的db.sqlite3则是项目自动创建 USER和PASSWORD分别是数据库的用户名和密码。设置完后，再启动我们的Django项目前，我们需要激活我们的mysql。然后，启动项目，会报错：no module named MySQLdb 。这是因为django默认你导入的驱动是MySQLdb，可是MySQLdb 对于py3有很大问题，所以我们需要的驱动是PyMySQL 所以，我们只需要找到项目名文件下的<strong>init</strong>,在里面写入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import pymysql</span><br><span class="line">pymysql.install_as_MySQLdb()</span><br></pre></td></tr></table></figure>
-<p>最后通过两条数据库迁移命令即可在指定的数据库中创建表 ：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 初始化orm</span><br><span class="line">python manage.py makemigrations</span><br><span class="line"># 创建具体的表</span><br><span class="line">python manage.py migrate</span><br></pre></td></tr></table></figure>
-<p>注意2:确保配置文件中的INSTALLED_APPS中写入我们创建的app名称</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    &apos;django.contrib.admin&apos;,</span><br><span class="line">    &apos;django.contrib.auth&apos;,</span><br><span class="line">    &apos;django.contrib.contenttypes&apos;,</span><br><span class="line">    &apos;django.contrib.sessions&apos;,</span><br><span class="line">    &apos;django.contrib.messages&apos;,</span><br><span class="line">    &apos;django.contrib.staticfiles&apos;,</span><br><span class="line">    &quot;app001&quot; # 你的应用名</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<p>注意3:如果报错如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">django.core.exceptions.ImproperlyConfigured: mysqlclient 1.3.3 or newer is required; you have 0.7.11.None</span><br><span class="line">MySQLclient目前只支持到python3.4，因此如果使用的更高版本的python，需要修改如下：</span><br></pre></td></tr></table></figure>
-<p>通过查找路径C:\Programs\Python\Python36-32\Lib\site-packages\Django-2.0-py3.6.egg\django\db\backends\mysql<br>这个路径里的文件把</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if version &lt; (1, 3, 3):</span><br><span class="line">     raise ImproperlyConfigured(&quot;mysqlclient 1.3.3 or newer is required; you have %s&quot; % Database.__version__)</span><br><span class="line">注释掉 就OK了。</span><br></pre></td></tr></table></figure>
-<p>注意4: 如果想打印orm转换过程中的sql，需要在settings中进行如下配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">LOGGING = &#123;</span><br><span class="line">    &apos;version&apos;: 1,</span><br><span class="line">    &apos;disable_existing_loggers&apos;: False,</span><br><span class="line">    &apos;handlers&apos;: &#123;</span><br><span class="line">        &apos;console&apos;:&#123;</span><br><span class="line">            &apos;level&apos;:&apos;DEBUG&apos;,</span><br><span class="line">            &apos;class&apos;:&apos;logging.StreamHandler&apos;,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &apos;loggers&apos;: &#123;</span><br><span class="line">        &apos;django.db.backends&apos;: &#123;</span><br><span class="line">            &apos;handlers&apos;: [&apos;console&apos;],</span><br><span class="line">            &apos;propagate&apos;: True,</span><br><span class="line">            &apos;level&apos;:&apos;DEBUG&apos;,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M06/">M06</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/27/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="page-number" href="/page/27/">27</a><span class="page-number current">28</span><a class="page-number" href="/page/29/">29</a><a class="page-number" href="/page/30/">30</a><span class="space">&hellip;</span><a class="page-number" href="/page/50/">50</a><a class="extend next" rel="next" href="/page/29/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/27/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="page-number" href="/page/27/">27</a><span class="page-number current">28</span><a class="page-number" href="/page/29/">29</a><a class="page-number" href="/page/30/">30</a><span class="space">&hellip;</span><a class="page-number" href="/page/51/">51</a><a class="extend next" rel="next" href="/page/29/">Next<span></span></a>
   </nav>
 
 </div>

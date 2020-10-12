@@ -79,6 +79,488 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2020/03/04/Node-JS专精11-04async-await问题/" title="Node-JS专精11_04async_await问题" itemprop="url">Node-JS专精11_04async_await问题</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T09:53:22.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="问题整理"><a href="#问题整理" class="headerlink" title="问题整理"></a>问题整理</h3><blockquote>
+<h4 id="async-await-是-promise-的语法糖如何用-promise-实现-async-await"><a href="#async-await-是-promise-的语法糖如何用-promise-实现-async-await" class="headerlink" title="async / await 是 promise 的语法糖如何用 promise 实现 async/await"></a>async / await 是 promise 的语法糖如何用 promise 实现 async/await</h4></blockquote>
+<ul>
+<li>答：有的语法糖好改写，有的语法糖不好改写。这个语法糖就不好改写，因为这是语言层面的改动，而不是API层面的。可以举例说明</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// API层面语法糖</span><br><span class="line">如 promise 的 catch 改写成  promise.then(null,fn)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// await 改写</span><br><span class="line">async function fn()&#123;</span><br><span class="line">    const res = await ajax();</span><br><span class="line">    console.log(res)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function fn2()&#123;</span><br><span class="line">    ajax().then((res)=&gt;&#123;</span><br><span class="line">        console.log(res)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="有些-await-需要等待上一个-await-的结果，有些不用，如何让不用同步的-await-异步执行"><a href="#有些-await-需要等待上一个-await-的结果，有些不用，如何让不用同步的-await-异步执行" class="headerlink" title="有些 await 需要等待上一个 await 的结果，有些不用，如何让不用同步的 await 异步执行"></a>有些 await 需要等待上一个 await 的结果，有些不用，如何让不用同步的 await 异步执行</h4></blockquote>
+<ul>
+<li>答：其实非常简单</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">async function fn()&#123;</span><br><span class="line">    await getUser()</span><br><span class="line">    await getProducts();</span><br><span class="line">    // 你想要 getOthers 不等前两个同步结果，非常简单 把它放到 前面就行了</span><br><span class="line">    getOthers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 处理方式</span><br><span class="line">async function fn2()&#123;</span><br><span class="line">    getOthers();</span><br><span class="line">    await getUser()</span><br><span class="line">    await getProducts();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调"><a href="#如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调" class="headerlink" title="如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调"></a>如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调</h4></blockquote>
+<ul>
+<li>答：不太清楚你的场景，不过 Vue2 已经做到了这一点，用 Object.defineProperty ,也可以用Proxy方案</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ajax = function()&#123;</span><br><span class="line">    return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">        resolve(&#123;</span><br><span class="line">            data:&#123;name:&apos;a&apos;&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var data =&#123;</span><br><span class="line">  name:&apos;sss&apos;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var vm = &#123;&#125;</span><br><span class="line"></span><br><span class="line">Object.defineProperty(vm,&apos;name&apos;,&#123;</span><br><span class="line">  set(newValue)&#123;</span><br><span class="line">    data.name = newValue</span><br><span class="line">  &#125;,</span><br><span class="line">  get()&#123;</span><br><span class="line">      return data.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">ajax().then(res=&gt;&#123;</span><br><span class="line">   console.log(res.data);</span><br><span class="line">   vm.name = res.data.name</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="代码题"><a href="#代码题" class="headerlink" title="代码题"></a>代码题</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">let a = 0;</span><br><span class="line">let test = async()=&gt;&#123;</span><br><span class="line">    a = a + await 10;</span><br><span class="line">    console.log(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(); </span><br><span class="line">console.log(++a);</span><br><span class="line"></span><br><span class="line">// test 是个异步的 所以不会执行 先去打印</span><br></pre></td></tr></table></figure>
+<ul>
+<li>答：倒数第二行有坑</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">答案是 </span><br><span class="line">1</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">为什么？是10 你一定认为是 11</span><br><span class="line"></span><br><span class="line">// 改写下代码继续运行 打印 test时 a + </span><br><span class="line">let a = 0;</span><br><span class="line">let test = async()=&gt;&#123;</span><br><span class="line">    a = (console.log(&apos;a:&apos;+ a),a) + await 10;</span><br><span class="line">    console.log(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(); </span><br><span class="line">console.log(++a);</span><br><span class="line"></span><br><span class="line">// 原因就是 我们一直认为 await 的右边会立刻执行 await 是等一会执行的</span><br><span class="line">但是如果他用 加号的时候 就不能这样算 因为你不是 `a + await 10` 而是先确定 a的值</span><br></pre></td></tr></table></figure>
+<h4 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h4><ul>
+<li><a href="https://juejin.im/post/5cd8e7e251882568b664f459" target="_blank" rel="noopener">async/await 之于 Promise，正如 do 之于 monad（译文）</a></li>
+<li>结论就是 Promise 是JS里非常重要的概念，所以我们更应该理解 Promise 而不是 await async</li>
+</ul>
+<blockquote>
+<p>只有在一行代码的情况下</p>
+</blockquote>
+<ul>
+<li>用 await 最好的</li>
+<li>如果情况变复杂了，还是要 Promise</li>
+<li>并行的情况，也要用 Promise.all</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/04/Node-JS专精11-03async-await/" title="Node-JS专精11_03async_await" itemprop="url">Node-JS专精11_03async_await</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T06:15:12.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="async-await"><a href="#async-await" class="headerlink" title="async / await"></a>async / await</h3><blockquote>
+<p>常用用法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">const fn = async () =&gt; &#123;</span><br><span class="line">    // makePromise 返回 promise的函数</span><br><span class="line">    const temp = await makePromise()</span><br><span class="line">    return temp + 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这个 makePromise 如果成功了就会返回一个值</span><br><span class="line">// 如果失败了，就会报错，你就必须用 try / catch 才能拿到那个值，但是也不一定后面会说</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>优点</p>
+</blockquote>
+<ul>
+<li>完全没有缩进，就像是写同步代码</li>
+</ul>
+<h4 id="封装一个-async-函数"><a href="#封装一个-async-函数" class="headerlink" title="封装一个 async 函数"></a>封装一个 async 函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">async function 摇骰子()&#123;</span><br><span class="line">  return Math.floor(Math.random()*6)+1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果需要 reject , 直接 throw Error(&apos;xxx&apos;)</span><br><span class="line"></span><br><span class="line">// 使用</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">  const result = await 摇骰子();</span><br><span class="line">  console.log(result)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果需要处理错误，可以 try catch</span><br><span class="line"></span><br><span class="line">fn(); // 直接打印摇骰子结果</span><br></pre></td></tr></table></figure>
+<p><strong>但是如果想要 3秒后得到摇骰子的结果 就就没法直接写，必须有一个 Promise</strong></p>
+<blockquote>
+<p>实现3秒后摇骰子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子3秒后()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">      setTimeout(()=&gt;&#123;</span><br><span class="line">          resolve(Math.floor(Math.random()*6)+1)</span><br><span class="line">      &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn2()&#123;</span><br><span class="line">  const result = await 摇骰子3秒后();</span><br><span class="line">  console.log(result)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn2()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="抛出错误-解惑错误"><a href="#抛出错误-解惑错误" class="headerlink" title="抛出错误 / 解惑错误"></a>抛出错误 / 解惑错误</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">async function 摇骰子()&#123;</span><br><span class="line">    throw new Error(&apos;骰子坏了&apos;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await 摇骰子()</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
+<h4 id="为什么需要-async"><a href="#为什么需要-async" class="headerlink" title="为什么需要 async"></a>为什么需要 async</h4><ul>
+<li>await 所在的函数不就是 async 函数吗？ 但是为什么还是要加上 async声明</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    throw new Error(&apos;骰子坏了&apos;)</span><br><span class="line">&#125;</span><br><span class="line">// 删掉 async</span><br><span class="line">function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await 摇骰子()</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>原因是在 await出现之前，有些人自己写了 await</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 旧代码，自己实现的 await</span><br><span class="line">function fn()&#123;</span><br><span class="line">    var res = await(摇骰子())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为什么加了 async</p>
+</blockquote>
+<ul>
+<li>由于那些自己实现 await 的人来说 ，如果 await 不配合 async 直接发布它的代码就不能用，<strong>不兼容</strong></li>
+<li>如何兼容呢？ 于是JS设计者想到的是 在外面包一层 来加以区别</li>
+<li>最终原因只有一个：<strong>兼容旧代码里，普通函数里的 await(xxx)</strong> 所以在所有出现 await 的地方外面加了一个 async</li>
+</ul>
+<h4 id="await的错误处理"><a href="#await的错误处理" class="headerlink" title="await的错误处理"></a>await的错误处理</h4><blockquote>
+<p>常见方式</p>
+</blockquote>
+<ul>
+<li>一个字：丑</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await axios.get(&apos;/xxx&apos;)</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="正确姿势"><a href="#正确姿势" class="headerlink" title="正确姿势"></a>正确姿势</h4></blockquote>
+<ul>
+<li>then 和 await 结合使用，在 then 里处理异步错误， await只接受成功的结果</li>
+<li>能处理90%的情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const result = await axios.get(&apos;/xxx&apos;).then(null,errorHandler)</span><br><span class="line">console.log(result)</span><br><span class="line">// 错误处理放在 then里面</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>细节</p>
+</blockquote>
+<ul>
+<li>可以把 4xx/5xx等常见错误用拦截器全局处理</li>
+<li>await只关心成功，失败全部交给 errorHandler</li>
+<li>errorHandler 也可以放在拦截器里</li>
+</ul>
+<p><strong>示例代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ajax = function()&#123;</span><br><span class="line">    return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">        /*</span><br><span class="line">        // 成功处理</span><br><span class="line">        resolve(&#123;</span><br><span class="line">            data:&#123;name:&apos;a&apos;&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        */</span><br><span class="line">        reject(&#123;</span><br><span class="line">            response:&#123;status:403&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var error = (e)=&gt;&#123;</span><br><span class="line">    console.log(e)</span><br><span class="line">    console.log(&apos;提示用户没有权限&apos;)</span><br><span class="line">    throw e</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">    const response = await ajax().then(null,error)</span><br><span class="line">    console.log(response) </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+<h4 id="await-的传染性"><a href="#await-的传染性" class="headerlink" title="await 的传染性"></a>await 的传染性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">console.log(1)</span><br><span class="line">await console.log(2)</span><br><span class="line">console.log(3)</span><br><span class="line"></span><br><span class="line">导致 3 要等一会才被打印，因为有 await, 导致它下面的代码变成异步任务</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分析</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">console.log(3) 变成异步任务了</span><br><span class="line">Promise 同样具有传染性 (同步变异步)</span><br><span class="line">谁没有传染性 ： 回调</span><br></pre></td></tr></table></figure>
+<h4 id="await-应用场景"><a href="#await-应用场景" class="headerlink" title="await 应用场景"></a>await 应用场景</h4><blockquote>
+<p>多次处理一个结果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const s1 = await makePromise();</span><br><span class="line">const s2 = handlerR1(r1)</span><br><span class="line">const s3 = handlerR2(r2)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>串行</p>
+</blockquote>
+<ul>
+<li><p>天生串行</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">async function fn()&#123;</span><br><span class="line">    await ajax1();</span><br><span class="line">    await ajax2();</span><br><span class="line">    await ajax3();</span><br><span class="line">    await ajax4();</span><br><span class="line">    await ajax5();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>循环的时候有 bug </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 实际上它是并行的</span><br><span class="line">async function fn()&#123;</span><br><span class="line">    var array = [ajax1, ajax2, ajax3]</span><br><span class="line">    for(let i=0;i&lt;array.length;i++)&#123;</span><br><span class="line">        await array[i]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">跟你直接这样 不一样</span><br><span class="line">await ajax1();</span><br><span class="line">await ajax2();</span><br><span class="line">await ajax3();</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 用 await 循环</span><br><span class="line">搜索关键字 for-await-of</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>并行</p>
+</blockquote>
+<ul>
+<li>await Promise.all() 就是并行了</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/04/Node-JS专精11-02Promise使用场景/" title="Node-JS专精11_02Promise使用场景" itemprop="url">Node-JS专精11_02Promise使用场景</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T03:23:03.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="Promise使用场景"><a href="#Promise使用场景" class="headerlink" title="Promise使用场景"></a>Promise使用场景</h3><h4 id="多次处理一个结果"><a href="#多次处理一个结果" class="headerlink" title="多次处理一个结果"></a>多次处理一个结果</h4><ul>
+<li><code>摇骰子.then(v =&gt; v1).then(v1 =&gt; v2)</code><ul>
+<li>1 2 3 返回小 / 4 5 6 返回大</li>
+</ul>
+</li>
+<li>在BOSS直聘上投递阿里简历流程： <ul>
+<li>必须先有网</li>
+<li>有网才能使用 BOSS直聘app或 pc</li>
+<li>登录</li>
+<li>从众多公司里搜索 阿里的 岗位</li>
+<li>投递简历</li>
+</ul>
+</li>
+</ul>
+<h4 id="串行"><a href="#串行" class="headerlink" title="串行"></a>串行</h4><blockquote>
+<p>一道网传面试题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">页面有两个按A和B,以及一个输入框，</span><br><span class="line">A按钮点击后发送一个请求，返回一个字符串A</span><br><span class="line">B按钮点击后也发送一个请求，返回一个字符串B</span><br><span class="line">返回后会把返回的字符串赋值给输入框，但是 A 和 B发送的请求时间点不同，</span><br><span class="line">点击按钮的顺序也不一定，B要比A先返回，而最终效果要求是 输入框字符的顺序是 AB</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这道题实际就是日常你做的如下需求</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">你打开了  百度搜索，先输入 vue,(此时已经发送了 请求a ) ,然后输入 react (此时已经发送了 请求b)</span><br><span class="line"></span><br><span class="line">好巧不巧的是  请求a 10秒返回结果  请求b 1秒返回结果</span><br><span class="line">此时 你如果按照正常的展示逻辑</span><br><span class="line"></span><br><span class="line">你肯定先展示 react的结果 ， 然后在展示 vue的结果</span><br><span class="line">此时用户觉得你神经病 ， 我明明搜的 react 你给我展示 vue的结果</span><br><span class="line"></span><br><span class="line">此时你就要保证就算 react的结果先回来，我也要等到 vue的结果展示了之后在展示</span><br></pre></td></tr></table></figure>
+<p>正确处理的姿势：只要有一个结果返回了 就把之前的请求取消掉 ajax.cancel</p>
+<blockquote>
+<p>生活中的高铁进站例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a 和 b 两个人，分别去高铁app上买了去 北京的票 如C2212</span><br><span class="line">b 比 a先买到票，但是检票的时候，a站在 b前面。</span><br><span class="line">所以 无论如何，b都要在 a之后进入车厢</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>代码实例</p>
+</blockquote>
+<ul>
+<li>点击 a 按钮后立刻点击 b按钮</li>
+<li>3秒后 输入框显示 “bbb”  </li>
+<li>5秒后显示 “aaa”</li>
+</ul>
+<p><strong>我们想要的结果是，不管那个结果回来，都最后显示”bbb”</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;  </span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>生活中的点餐取餐例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">餐厅有两个窗口 点餐 / 取餐</span><br><span class="line">a 和 b 两个人 先后进入餐厅的点餐队列进行点餐 a 在 b 之前点餐了</span><br><span class="line">a 点餐制作耗时 15分钟</span><br><span class="line">b 点餐制作耗时 10分钟</span><br><span class="line"></span><br><span class="line">a 和 b 点餐完成后， 又依次站在 取餐队列里 a在 b之前</span><br><span class="line">10分钟后 b的餐好了，</span><br><span class="line">但是 a 在 b之前， b 无法取餐</span><br><span class="line">15分钟 a 的餐好了</span><br><span class="line">a 取餐成功</span><br><span class="line">于是轮到 b ， b取餐成功</span><br></pre></td></tr></table></figure>
+<p>代码示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var 取餐队伍 = [];</span><br><span class="line">var 吧台 = [];</span><br><span class="line">var 问 = ()=&gt;&#123;</span><br><span class="line">  var lastN = 吧台[吧台.length -1][0];</span><br><span class="line">  var lastS = 吧台[吧台.length -1][1];</span><br><span class="line">  if(取餐队伍[0][0] === lastN)&#123;</span><br><span class="line">    取餐队伍[0][1](lastS);</span><br><span class="line">    取餐队伍.shift();</span><br><span class="line">    吧台.pop();</span><br><span class="line">    问();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="并行"><a href="#并行" class="headerlink" title="并行"></a>并行</h4><ul>
+<li>Promise.all([task1,task2]) 不好用(可以自己写一个，参考上一篇文章)</li>
+<li>Promise.allSettled 又太新</li>
+</ul>
+<h3 id="Promise的错误处理"><a href="#Promise的错误处理" class="headerlink" title="Promise的错误处理"></a>Promise的错误处理</h3><blockquote>
+<p>其实挺好用的</p>
+</blockquote>
+<ul>
+<li>promise.then(s1,f1) 即可</li>
+<li>如果我想全局处理(以 axios 为例 参考它的拦截器)<ul>
+<li><a href="https://juejin.im/post/5a9cddb46fb9a028bc2d3c2f" target="_blank" rel="noopener">axios 作弊表</a> 拦截器章节<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(function (response) &#123;</span><br><span class="line">    // Do something with response data</span><br><span class="line">    return response;</span><br><span class="line">&#125;, function (error) &#123;</span><br><span class="line">    // Do something with response error</span><br><span class="line">    return Promise.reject(error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>语法糖</p>
+</blockquote>
+<ul>
+<li><code>promise.then(s1).catch(f1)</code></li>
+</ul>
+<blockquote>
+<p>错误处理之后</p>
+</blockquote>
+<ul>
+<li>如果你没有继续抛错，那么错误不再出现</li>
+<li>如果你继续抛出错误， 那么后续回调就继续处理错误</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// </span><br><span class="line">Promise.resolve(`&#123;&apos;name&apos;:&apos;frank&apos;&#125;`)</span><br><span class="line">    .then( s =&gt; JSON.parse(s)) // parse 失败 json 的 key必须是双引号</span><br><span class="line">    .then( null, (reason) =&gt; console.log(&quot;err:&quot; + reason)) // 继续 promise 里处理</span><br></pre></td></tr></table></figure>
+<h4 id="但是有人对-Promise-不满意"><a href="#但是有人对-Promise-不满意" class="headerlink" title="但是有人对 Promise 不满意"></a>但是有人对 Promise 不满意</h4><ul>
+<li><a href="https://blog.fundebug.com/2017/04/04/nodejs-async-await/" target="_blank" rel="noopener">Async/Await替代Promise的6个理由</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/04/Node-JS专精11-01Promise精讲/" title="Node-JS专精11_01Promise精讲" itemprop="url">Node-JS专精11_01Promise精讲</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-04T01:33:52.000Z" itemprop="datePublished"> Published 2020-03-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h1><blockquote>
+<p>先看代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        setTimeout(() =&gt; &#123;</span><br><span class="line">            const result = Math.floor(Math.random()*6+1)</span><br><span class="line">            resolve(result)</span><br><span class="line">        &#125;, 3000);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇骰子() // 此时返回的是一个 promise</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;) // 3秒后返回摇骰子的结果</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="这是一个异步任务，那么问题来了-异步任务什么时候执行？"><a href="#这是一个异步任务，那么问题来了-异步任务什么时候执行？" class="headerlink" title="这是一个异步任务，那么问题来了 异步任务什么时候执行？"></a>这是一个异步任务，那么问题来了 异步任务什么时候执行？</h3></blockquote>
+<ul>
+<li>改写了一下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        const result = Math.floor(Math.random()*6+1)</span><br><span class="line">        resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)  // 会立刻返回 摇骰子的结果，但是它是什么时候开始呢？</span><br></pre></td></tr></table></figure>
+<h3 id="面试中的-微任务-宏任务"><a href="#面试中的-微任务-宏任务" class="headerlink" title="面试中的 微任务/宏任务"></a>面试中的 微任务/宏任务</h3><p>看这样一段代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;btn1&quot;&gt;btn1&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;btn2&quot;&gt;btn2&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">// Promise</span><br><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn1.onclick=()=&gt;&#123;</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  console.log(&quot;end&quot;);</span><br><span class="line">  // 执行结果：很明显 我们知道  摇骰子 是异步任务 所以会晚于 同步代码 console.log</span><br><span class="line">  /*</span><br><span class="line">  &quot;end&quot;</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn2.onclick=()=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;),0&#125;)</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;),0&#125;)</span><br><span class="line">  // 执行结果</span><br><span class="line">  // 如果我们还有其他的异步任务 比如 setTimeout 那么谁会优先呢？</span><br><span class="line">  // 答案是 先打出骰子的点数</span><br><span class="line">  /*</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  &quot;timeout1&quot;</span><br><span class="line">  &quot;timeout2&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="微任务-宏任务这些前端名词的前因后果"><a href="#微任务-宏任务这些前端名词的前因后果" class="headerlink" title="微任务/宏任务这些前端名词的前因后果"></a>微任务/宏任务这些前端名词的前因后果</h4><ul>
+<li>本来是没有 Promise的 在 ES6之前，ES6之后才有了 Promise这种异步</li>
+<li>以前的JS非常单纯只有两个东西<ul>
+<li>当前任务 执行的代码(同步代码) </li>
+<li>延时任务 setTimeout / setInterval</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<h4 id="ES6以前"><a href="#ES6以前" class="headerlink" title="ES6以前"></a>ES6以前</h4></blockquote>
+<ul>
+<li>当前代码 如<code>console.log(1)</code></li>
+<li>异步队列 setTimeout </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">console.log(1)</span><br><span class="line">console.log(2)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 1&quot;)&#125;,0)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 2&quot;)&#125;,0)</span><br><span class="line">console.log(3)</span><br><span class="line">console.log(4)</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">timeout 1</span><br><span class="line">timeout 2</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">两次 setTimeout 不会立刻执行，而是放入异步队列里</span><br><span class="line">当前代码执行完了 就去看异步队列了</span><br></pre></td></tr></table></figure>
+<p><strong>所以以前的js非常好理解，就是我有个当前要执行的任务，和有个等待执行的任务</strong></p>
+<blockquote>
+<h4 id="ES6之后"><a href="#ES6之后" class="headerlink" title="ES6之后"></a>ES6之后</h4></blockquote>
+<p>前端觉得回调太蛋疼了，于是加了个 Promise</p>
+<ul>
+<li>宏任务 – 异步队列1（原来的异步队列 setTimeout）</li>
+<li>微任务 – 异步队列2 (Promise 使用)</li>
+<li>同步代码 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">// 伪代码</span><br><span class="line">ajax.then(s1)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout&quot;)&#125;,0)</span><br><span class="line">console.log(1);</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">依然  console.log 放入同步任务</span><br><span class="line">setTimeout 放入异步任务</span><br><span class="line"></span><br><span class="line">此时 ，如果不引入其他东西 ajax.then(s1) 就显得特别智障</span><br><span class="line">    假设只有一个异步任务 那么实际就是 把 s1 加入异步队列1 ， 然后把第二行的 setTimeout 加入异步队列1 s1之后</span><br><span class="line"></span><br><span class="line">    于是你惊讶的发现，那我要 then 干什么，有病吧？ 直接 setTimeout(s1,0) 不就完了</span><br><span class="line"></span><br><span class="line">所以他们就想了一个 让我们的 then 更有用的办法 ，在加一个 异步队列2</span><br><span class="line"></span><br><span class="line">于是乎上面的代码</span><br><span class="line">s1 放入 异步队列2</span><br><span class="line">setTimeout 放入 异步队列1</span><br><span class="line"></span><br><span class="line">当 同步代码执行完</span><br><span class="line">先去读取 异步队列2 里的任务 去执行</span><br><span class="line">等 异步队列2 里的任务执行完了， 再去读取 异步队列1 里的任务 去执行</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<p><strong>于是分别给 异步队列1 / 异步队列2 取了个名字叫做 宏任务 / 微任务</strong></p>
+<p><strong>如果队列里有任务，先把 微任务 做完，再去做 宏任务</strong></p>
+<h3 id="Promise-其他API"><a href="#Promise-其他API" class="headerlink" title="Promise 其他API"></a>Promise 其他API</h3><blockquote>
+<p>继续以摇骰子为例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line">// 随机的</span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>Promise.resolve(result) 制造一个成功(或失败)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 制造成功</span><br><span class="line">// 你想造假一直 摇6</span><br><span class="line"></span><br><span class="line">function 摇6的骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      resolve(6)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇6的骰子2()&#123;</span><br><span class="line">  return  Promise.resolve(6)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇6的骰子</span><br><span class="line">// 摇6的骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 摇6的骰子2().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 制造失败</span><br><span class="line">function 摇骰子返回失败()&#123;</span><br><span class="line">  return  Promise.resolve(</span><br><span class="line">              new Promise((resolve,reject)=&gt;reject())</span><br><span class="line">          )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子返回失败().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.reject(reason) 制造一个失败</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇坏的骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        reject(&apos;坏了&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇坏的骰子2()&#123;</span><br><span class="line">    return Promise.reject(&apos;坏了&apos;)</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">摇坏的骰子().then(null,(reason)=&gt;console.log(reason))</span><br><span class="line">摇坏的骰子2().then(null,(reason)=&gt;console.log(reason))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.all(数组) 等待全部成功，或有一个失败</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 所有人都成功了，才叫成功 返回所有成功的结果</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 打印 [1,2,3]</span><br><span class="line"></span><br><span class="line">// 某个失败 返回失败</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了3&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.resolve(1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了2&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了1&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>所以 Promise.all 非常没用,因为有一个失败就返回了不等所有的结果</li>
+<li>请使用 <code>Promise.allSettled</code></li>
+</ul>
+</li>
+<li><p>Promise.race(数组) 等待第一个状态改变</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同时发很多请求，只要又一个成功了，就成功，或者一个失败了就失败</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Promise.allSettled(数组) 等待全部状态改变,目前处于 Stage-4(板上钉钉的实现)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">Promise.allSettled([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// resolve 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 2&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.resolve(1),Promise.reject(&apos;错了2&apos;),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line"></span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了1&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了3&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>由于<code>Promise.allSettled</code>很多浏览器不支持，我们依旧无法使用</p>
+</blockquote>
+<p>所以用 Promise.all 实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">// 假设还是三个 promise 任务  第一个和第二个会失败</span><br><span class="line">task1 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第一扇门关了&quot;)</span><br><span class="line">  &#125;,3000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task2 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第二扇门关了&quot;)</span><br><span class="line">  &#125;,4000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task3 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    resolve(&quot;第三扇门开了&quot;)</span><br><span class="line">  &#125;,5000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 如果这样</span><br><span class="line">// 发现第一个失败就 结束了</span><br><span class="line">Promise.all([task1(),task2(),task3()])</span><br><span class="line">  .then(null,(reason)=&gt;console.log(reason))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 正确姿势 把每个任务都 then一下 因为 Promise.then 会返回新的 promise</span><br><span class="line">Promise.all([</span><br><span class="line">          task1().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task2().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task3().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;ok&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 优化代码 因为写的太重复了  </span><br><span class="line">setSuccessResult = (promise) =&gt; promise.then(</span><br><span class="line">                                        (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                                        (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;),</span><br><span class="line">                                        )</span><br><span class="line">Promise.all([</span><br><span class="line">          setSuccessResult(task1()),</span><br><span class="line">          setSuccessResult(task2()),</span><br><span class="line">          setSuccessResult(task3()),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))                                     </span><br><span class="line">// 打印结果</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第一扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第二扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;ok&quot;, value: &quot;第三扇门开了&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 还能再次简化</span><br><span class="line">setSuccessResultList = (promiseList) =&gt; promiseList.map(</span><br><span class="line">  promise =&gt; promise.then(</span><br><span class="line">                         (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                         (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;)</span><br><span class="line">                        )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Promise.all(setSuccessResultList([task1(),task2(),task3()]))</span><br><span class="line">  .then((result)=&gt;console.log(result))  </span><br><span class="line"></span><br><span class="line">// 再次简化 你不是不支持  Promise.allSettled 吗？</span><br><span class="line">Promise.allSettled2 = function(promiseList)&#123;</span><br><span class="line">  return Promise.all(setSuccessResultList(promiseList))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这其实就是 allSettled2 的实现</span><br><span class="line">Promise.allSettled2([task1(),task2(),task3()])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/" title="Node-JS专精10_02在浏览器支持nextTick" itemprop="url">Node-JS专精10_02在浏览器支持nextTick</a>
   </h1>
   <p class="article-author">By
@@ -688,504 +1170,9 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/01/14/ZB-046-04JVM运行时内存区域/" title="ZB-046-04JVM运行时内存区域" itemprop="url">ZB-046-04JVM运行时内存区域</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-01-14T13:32:45.000Z" itemprop="datePublished"> Published 2020-01-14</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="JVM运行时内存区域"><a href="#JVM运行时内存区域" class="headerlink" title="JVM运行时内存区域"></a>JVM运行时内存区域</h1><h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><ul>
-<li>被整个虚拟机所共享的Class信息等</li>
-<li>运行时常量池</li>
-<li>Java7之前：永久代(PermGen)</li>
-<li>Java8之后：元空间(Metaspace)</li>
-</ul>
-<blockquote>
-<p>我们知道每当你 <code>new Object()</code> 或者 <code>new Cat()</code>的时候，都会在堆内开辟空间，而在你分配空间之前</p>
-</blockquote>
-<ul>
-<li>你首先得知道 Object 长什么样子，也就是 Class，Class就是那个模子，那个说明书，它指明了这个对象如何被创建</li>
-<li>因此 Object.class 和 Cat.class 就是你创建 Object / Cat 对象时候参照的说明书</li>
-<li>这个说明书放在哪里呢？ 我们称之为 <strong>方法区</strong></li>
-</ul>
-<blockquote>
-<p>方法区中存的一般都是这些类型信息，被JVM所有人所共享，一般来说是只读的</p>
-</blockquote>
-<ul>
-<li>意外情况就是 运行时常量池</li>
-</ul>
-<blockquote>
-<p>看一个例子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String s1 = new String(&quot;abc&quot;);</span><br><span class="line">        String s2 = new String(&quot;abc&quot;);</span><br><span class="line">        String s3 = s1.intern();</span><br><span class="line">        String s4 = s2.intern();</span><br><span class="line"></span><br><span class="line">        System.out.println( s1 == s2); // false</span><br><span class="line">        System.out.println( s3 == s4); // true</span><br><span class="line">        System.out.println( s3.equals(s4)); // 进入 equals if 分支</span><br><span class="line">        System.out.println( s1.equals(s2)); // 进入 equals else 分支</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">s1 == s2 返回 false可以理解 因为它比较的是引用 ——-》 地址</span><br><span class="line">s3 == s4 为什么 true ？ 点击 intern() 进入发现 它是一个 native 方法 意思是它没有java代码的由 java虚拟机帮你实现</span><br><span class="line">intern() 意思是 在一个你看不到的地方 一个池子 Pool 存了很多字符串 ，如 &quot;abc&quot; ，保证你每次调用的时候返回的都是同一个字符串实例</span><br><span class="line">所以 intern() 你可以理解为 内联化，内部表示</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<p><code>intern()</code>的注释非常好</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">     * Returns a canonical representation for the string object.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * A pool of strings, initially empty, is maintained privately by the</span><br><span class="line">     * class &#123;@code String&#125;.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * When the intern method is invoked, if the pool already contains a</span><br><span class="line">     * string equal to this &#123;@code String&#125; object as determined by</span><br><span class="line">     * the &#123;@link #equals(Object)&#125; method, then the string from the pool is</span><br><span class="line">     * returned. Otherwise, this &#123;@code String&#125; object is added to the</span><br><span class="line">     * pool and a reference to this &#123;@code String&#125; object is returned.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * It follows that for any two strings &#123;@code s&#125; and &#123;@code t&#125;,</span><br><span class="line">     * &#123;@code s.intern() == t.intern()&#125; is &#123;@code true&#125;</span><br><span class="line">     * if and only if &#123;@code s.equals(t)&#125; is &#123;@code true&#125;.</span><br><span class="line">     * &lt;p&gt;</span><br><span class="line">     * All literal strings and string-valued constant expressions are</span><br><span class="line">     * interned. String literals are defined in section 3.10.5 of the</span><br><span class="line">     * &lt;cite&gt;The Java&amp;trade; Language Specification&lt;/cite&gt;.</span><br><span class="line">     *</span><br><span class="line">     * @return  a string that has the same contents as this string, but is</span><br><span class="line">     *          guaranteed to be from a pool of unique strings.</span><br><span class="line">     */</span><br><span class="line">    public native String intern();</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">*返回字符串对象的规范表示形式。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*一个字符串池，最初是空的，由</span><br><span class="line">*类&#123;@code字符串&#125;。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*如果池中已经包含了</span><br><span class="line">* string等于这个&#123;@code string&#125;对象</span><br><span class="line">* &#123;@link #equals(Object)&#125;方法，则池中的字符串为</span><br><span class="line">*返回。否则，将此&#123;@code字符串&#125;对象添加到</span><br><span class="line">*池和这个&#123;@code String&#125;对象的引用被返回。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*对于任意两个字符串&#123;@code s&#125;和&#123;@code t&#125;，</span><br><span class="line">* &#123;@code s.intern () = = t.intern()&#125;是&#123;@code真的&#125;</span><br><span class="line">*当且仅当&#123;@code s.equals(t)&#125;为&#123;@code true&#125;时。</span><br><span class="line">*&lt;p&gt;</span><br><span class="line">*所有字符串和字符串值常量表达式都是</span><br><span class="line">*实习。的第3.10.5节定义了字符串字面量</span><br><span class="line">* &lt;引用&gt; Java™语言规范&lt; /引用&gt;。</span><br><span class="line">*</span><br><span class="line">* @返回一个与该字符串内容相同的字符串，但是</span><br><span class="line">*保证来自唯一字符串池。</span><br><span class="line">* /</span><br><span class="line">public native String intern();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>为什么要 <code>intern()</code> 答案就在 <code>String.equals()</code>里</p>
-</blockquote>
-<p>equals 方法实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public boolean equals(Object anObject) &#123;</span><br><span class="line">    if (this == anObject) &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    if (anObject instanceof String) &#123;</span><br><span class="line">        String anotherString = (String)anObject;</span><br><span class="line">        int n = value.length;</span><br><span class="line">        if (n == anotherString.value.length) &#123;</span><br><span class="line">            char v1[] = value;</span><br><span class="line">            char v2[] = anotherString.value;</span><br><span class="line">            int i = 0;</span><br><span class="line">            while (n-- != 0) &#123;</span><br><span class="line">                if (v1[i] != v2[i])</span><br><span class="line">                    return false;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果你要比较两个字符串 它就会跑一个循环，比较每个字符。假如你这个字符串有 几百个几千个字符，意味着你运行 equals 就要比较那么多的次数，效率非常低</span><br><span class="line"></span><br><span class="line">假如碰巧这两个对象是同一个对象的话，它的地址是一样的话，只需要一次就可以完成</span><br><span class="line">所以Java的 Collection 体系非常依赖 equals </span><br><span class="line">如你把 String 声明的东西 当作 map的 key 。做成 Set / List 它们比较的时候都会使用 equals</span><br><span class="line">有这样字符串常量池的意义就在于，如果有个常量池，可以对于每个字符串都返回一摸一样对象的时候，用来比较它们相等性的时候就可以通过一个 指令 this == anObject 就完成，效率高很多</span><br></pre></td></tr></table></figure>
-<h4 id="子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？"><a href="#子类对象创建的时候同时创建父类对象吗？-是不是有n个Object对象在-jvm中？" class="headerlink" title="子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？"></a>子类对象创建的时候同时创建父类对象吗？ 是不是有n个Object对象在 jvm中？</h4><p>是也不是</p>
-<p>假如你有以下类,请分别创建 Base.java 和 Sub.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">public class Base&#123;</span><br><span class="line">    int i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Base对应字节码</span><br><span class="line">// class version 49.0 (49)</span><br><span class="line">// access flags 0x21</span><br><span class="line">public class Base &#123;</span><br><span class="line"></span><br><span class="line">  // compiled from: Base.java</span><br><span class="line"></span><br><span class="line">  // access flags 0x0</span><br><span class="line">  I i</span><br><span class="line"></span><br><span class="line">  // access flags 0x1</span><br><span class="line">  public &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 1 L0</span><br><span class="line">    ALOAD 0</span><br><span class="line">    INVOKESPECIAL java/lang/Object.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE this LBase; L0 L1 0</span><br><span class="line">    MAXSTACK = 1</span><br><span class="line">    MAXLOCALS = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">------------------分割线------------------------</span><br><span class="line">public class Sub extends Base&#123;</span><br><span class="line">    int j;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Sub对应字节码</span><br><span class="line">// class version 49.0 (49)</span><br><span class="line">// access flags 0x21</span><br><span class="line">public class Sub extends Base  &#123;</span><br><span class="line"></span><br><span class="line">  // compiled from: Sub.java</span><br><span class="line"></span><br><span class="line">  // access flags 0x0</span><br><span class="line">  I j</span><br><span class="line"></span><br><span class="line">  // access flags 0x1</span><br><span class="line">  public &lt;init&gt;()V</span><br><span class="line">   L0</span><br><span class="line">    LINENUMBER 1 L0</span><br><span class="line">    ALOAD 0</span><br><span class="line">    INVOKESPECIAL Base.&lt;init&gt; ()V</span><br><span class="line">    RETURN</span><br><span class="line">   L1</span><br><span class="line">    LOCALVARIABLE this LSub; L0 L1 0</span><br><span class="line">    MAXSTACK = 1</span><br><span class="line">    MAXLOCALS = 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>每当你 <code>new Sub()</code>的时候实际上它会先偷偷帮你调用父类的构造器 也就是偷偷帮你调用<code>new Base()</code>，而你去看 Base 发现它会偷偷调用 <code>new Object()</code></p>
-<ul>
-<li>这样对象就是一层一层的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">_____________________</span><br><span class="line">object|             |</span><br><span class="line">______|             |</span><br><span class="line">                    |  </span><br><span class="line">    Base 的数据 i    |</span><br><span class="line">--------------------|</span><br><span class="line">        Sub 的数据 j |</span><br><span class="line">--------------------|</span><br><span class="line"></span><br><span class="line">同时也解释了 为什么面向对象里你总是可以把一个 子类转换成 父类</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h4 id="基本数据类型的值是放在堆常量池还是栈的常量池？"><a href="#基本数据类型的值是放在堆常量池还是栈的常量池？" class="headerlink" title="基本数据类型的值是放在堆常量池还是栈的常量池？"></a>基本数据类型的值是放在堆常量池还是栈的常量池？</h4><ul>
-<li>基本数据类型不放常量池</li>
-<li><p>放在堆还是栈取决于你这个东西是什么东西</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int i = 0;</span><br><span class="line">        // 这个 i 放在 main 的栈帧里</span><br><span class="line"></span><br><span class="line">        Base base = new Base();</span><br><span class="line">        // 这个 base会在 堆上开辟一块内存</span><br><span class="line">        // base 里有个 i 初始化是 0</span><br><span class="line">        // base 指向这块空间  base = 一个地址(指向堆上开辟的base对象)</span><br><span class="line">    &#125;</span><br><span class="line">    static class Base&#123;</span><br><span class="line">        int i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果是局部变量放在 栈里</li>
-<li>如果是一个类的成员它就放在堆里面</li>
-</ul>
-</li>
-</ul>
-<h4 id="永久代-PermGen-：Java7之前"><a href="#永久代-PermGen-：Java7之前" class="headerlink" title="永久代(PermGen)：Java7之前"></a>永久代(PermGen)：Java7之前</h4><ul>
-<li>OutOfMemory  <ul>
-<li>有的时候看到的是 heap space</li>
-<li>有的时候是 perm gen （java8之后把它移出来了，移到元空间里了）</li>
-</ul>
-</li>
-</ul>
-<h4 id="元空间-Metaspace-Java8之后"><a href="#元空间-Metaspace-Java8之后" class="headerlink" title="元空间(Metaspace):Java8之后"></a>元空间(Metaspace):Java8之后</h4><ul>
-<li>元空间和Native是共享内存</li>
-</ul>
-<blockquote>
-<p>为什么 Java8之后把 <code>perm gen</code> 放在元空间里</p>
-</blockquote>
-<ul>
-<li>永久代在之前的过程中，是和堆放在一起的，会和堆抢内存。很容易碰到 OutOfMemory</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/12/26/Node-JS专精08手写bind02/" title="Node-JS专精08手写bind02" itemprop="url">Node-JS专精08手写bind02</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-12-26T14:40:16.000Z" itemprop="datePublished"> Published 2019-12-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="手写bind02"><a href="#手写bind02" class="headerlink" title="手写bind02"></a>手写bind02</h1><blockquote>
-<p>上次实现的代码</p>
-</blockquote>
-<ul>
-<li><a href="https://github.com/slTrust/source-bind" target="_blank" rel="noopener">代码分支:01手写bind基本实现</a></li>
-</ul>
-<blockquote>
-<p>但它有个问题</p>
-</blockquote>
-<ul>
-<li>不支持 new</li>
-</ul>
-<blockquote>
-<p>自带的<code>bind</code> 演示</p>
-</blockquote>
-<ul>
-<li>理解 <code>new fn()</code> 后的四个关键步骤</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">var fn = function(a)&#123;</span><br><span class="line">	this.a = a;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">new fn(&apos;x&apos;);  // 返回一个对象</span><br><span class="line">// 当你这样之后</span><br><span class="line">// 会有四个步骤</span><br><span class="line"></span><br><span class="line">// step01 产生临时对象 temp</span><br><span class="line">var temp = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">// step02 挂载 fn.prototype 到 temp对象的 prototype上</span><br><span class="line">temp.__proto__ = fn.prototype</span><br><span class="line"></span><br><span class="line">// step03 调用 call 绑定this 把生成的临时对象 temp作为 this</span><br><span class="line">fn.call(temp,&apos;x&apos;) </span><br><span class="line"></span><br><span class="line">// step04 new fn(&apos;a&apos;)后的返回值 this 返回 this 就是 temp</span><br><span class="line">return this;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">var fn2 = fn.bind(undefined,&apos;y&apos;)</span><br><span class="line">new fn2(); // 此时bind通过参数帮我们  绑定身上的 a = &apos;y&apos;</span><br></pre></td></tr></table></figure>
-<p><strong>这就是原版bind支持 new操作的</strong></p>
-<blockquote>
-<h4 id="我们先测试原版bind"><a href="#我们先测试原版bind" class="headerlink" title="我们先测试原版bind"></a>我们先测试原版bind</h4></blockquote>
-<ul>
-<li>测试后可以通过</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">function test5(message)&#123;</span><br><span class="line">    console.log(message)</span><br><span class="line">    Function.prototype.bind2 = bind;</span><br><span class="line">    const fn = function(p1, p2)&#123;</span><br><span class="line">        this.p1 = p1;</span><br><span class="line">        this.p2 = p2;</span><br><span class="line">    &#125;</span><br><span class="line">    const fn2 = fn.bind(undefined,&apos;x&apos;,&apos;y&apos;);</span><br><span class="line">    const object = new fn2();</span><br><span class="line">    console.log(object) //  此时 object = &#123;p1:&apos;x&apos;,p2:&apos;y&apos;&#125; </span><br><span class="line">    console.assert(object.p1 === &apos;x&apos;,&apos;p1&apos;);</span><br><span class="line">    console.assert(object.p2 === &apos;y&apos;,&apos;p2&apos;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这是可以通过的</span><br></pre></td></tr></table></figure>
-<ul>
-<li>测试我们的bind</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 测试不通过</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line">const fn = function(p1, p2)&#123;</span><br><span class="line">    this.p1 = p1;</span><br><span class="line">    this.p2 = p2;</span><br><span class="line">&#125;</span><br><span class="line">const fn2 = fn.bind2(undefined,&apos;x&apos;,&apos;y&apos;);</span><br><span class="line">const object = new fn2();</span><br><span class="line">console.log(object) //  此时 object = &#123;&#125; </span><br><span class="line">console.assert(object.p1 === &apos;x&apos;,&apos;p1&apos;);</span><br><span class="line">console.assert(object.p2 === &apos;y&apos;,&apos;p2&apos;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>分析原因</p>
-</blockquote>
-<ul>
-<li><code>new fn2()</code>的时候<ul>
-<li>产生临时对象 temp<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis)&#123;</span><br><span class="line">      var args = slice.call(arguments,1);</span><br><span class="line">      const fn = this</span><br><span class="line">      return function()&#123;</span><br><span class="line">          /*</span><br><span class="line">          // step01  </span><br><span class="line">              产生临时对象 temp</span><br><span class="line">          // step02 </span><br><span class="line">              temp.p1 = &apos;x&apos;; </span><br><span class="line">              temp.p2 = &apos;y&apos;</span><br><span class="line">          // step03 </span><br><span class="line">              return this</span><br><span class="line">              // 问题来了 ？ 此时你主动写了 return 就不会把 temp正常返回</span><br><span class="line">              // 返回的是什么？ 就是 global 对象</span><br><span class="line">              // 实际效果是 global.p1 = &apos;x&apos; ; global.p2= &apos;y&apos;;</span><br><span class="line">          */</span><br><span class="line"></span><br><span class="line">          var args2 = slice.call(arguments,0);</span><br><span class="line">          return fn.apply(asThis, args.concat(args2))</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // 所以我们最后不能使用 return fn.apply(asThis, args.concat(args2) 里的 asThis</span><br><span class="line">  而是使用 new 产生的临时对象 this</span><br><span class="line"></span><br><span class="line">  // 意思就是 可能是 asThis 可能是 temp临时对象 (this)</span><br><span class="line">  // 那什么时候用这个 this呢？</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<p><strong>如何知道一个函数调用的时候用没用 new</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var fn = function()&#123;console.log(this); console.log(this.__proto__ === fn.prototype);&#125;</span><br><span class="line"></span><br><span class="line">fn() </span><br><span class="line">// window</span><br><span class="line">// false</span><br><span class="line"></span><br><span class="line">fn.call(&#123;a:11&#125;) </span><br><span class="line">// &#123;a:11&#125;</span><br><span class="line">// false</span><br><span class="line"></span><br><span class="line">new fn();</span><br><span class="line">// fn&#123;&#125;</span><br><span class="line">// true</span><br></pre></td></tr></table></figure>
-<p><strong>所以答案非常明显我们只要这样判断 this就可以了</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function resultFn()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(</span><br><span class="line">            this.__proto__ === resultFn.prototype ? this : asThis,</span><br><span class="line">            args.concat(args2)</span><br><span class="line">            )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 而且测试也能通过</span><br></pre></td></tr></table></figure>
-<p><strong>其实此时代码是有bug的</strong></p>
-<ul>
-<li>继续添加测试用例</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function test6(message)&#123;</span><br><span class="line">    console.log(message)</span><br><span class="line">    Function.prototype.bind2 = bind;</span><br><span class="line">    const fn = function(p1, p2)&#123;</span><br><span class="line">        this.p1 = p1;</span><br><span class="line">        this.p2 = p2;</span><br><span class="line">    &#125;</span><br><span class="line">    fn.prototype.sayHi = function()&#123;&#125;;</span><br><span class="line">    const fn2 = fn.bind2(undefined,&apos;x&apos;,&apos;y&apos;);</span><br><span class="line">    const object = new fn2();</span><br><span class="line">    console.assert(object.p1 === &apos;x&apos;,&apos;p1&apos;);</span><br><span class="line">    console.assert(object.p2 === &apos;y&apos;,&apos;p2&apos;);</span><br><span class="line">    console.assert(typeof object.sayHi === &apos;function&apos;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 测试没有通过</span><br><span class="line">// 而用原版 bind 是可以通过的 </span><br><span class="line">// 证明我们代码有问题</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>重新指向它的 prototype</strong></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    function resultFn()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(</span><br><span class="line">            this.__proto__ === resultFn.prototype ? this : asThis,</span><br><span class="line">            args.concat(args2)</span><br><span class="line">            )</span><br><span class="line">    &#125;</span><br><span class="line">    resultFn.prototype = fn.prototype;</span><br><span class="line">    return resultFn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 此时测试可以通过</span><br><span class="line"></span><br><span class="line">// 但是代码还是有问题</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="解决代码的问题"><a href="#解决代码的问题" class="headerlink" title="解决代码的问题"></a>解决代码的问题</h4></blockquote>
-<ul>
-<li><p>bind传递的this 是 fn是 <code>new fn()</code> 就会误判断</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// 虽然没造成影响，但是有 误判的情况</span><br><span class="line">function test7(message)&#123;</span><br><span class="line">    console.log(message)</span><br><span class="line">    Function.prototype.bind2 = bind;</span><br><span class="line">    const fn = function(p1, p2)&#123;</span><br><span class="line">        this.p1 = p1;</span><br><span class="line">        this.p2 = p2;</span><br><span class="line">    &#125;</span><br><span class="line">    fn.prototype.sayHi = function()&#123;&#125;;</span><br><span class="line">    const object1 = new fn();</span><br><span class="line">    const fn2 = fn.bind2(object1,&apos;x&apos;,&apos;y&apos;);</span><br><span class="line">    const object = fn2();</span><br><span class="line">    console.assert(object === undefined, &apos;object为空&apos;);</span><br><span class="line">    console.assert(object1.p1 === &apos;x&apos;,&apos;p1&apos;);</span><br><span class="line">    console.assert(object1.p2 === &apos;y&apos;,&apos;p2&apos;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><code>this.__proto__ === resultFn.prototype</code> 中的 <code>this.__proto__</code> 是不能在生产代码里用的</p>
-<ul>
-<li><code>this instanceof resultFn</code></li>
-<li><code>resultFn.prototype.isPrototypeOf(this)</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    function resultFn()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(</span><br><span class="line">            resultFn.prototype.isPrototypeOf(this) ? this : asThis,</span><br><span class="line">            args.concat(args2)</span><br><span class="line">            )</span><br><span class="line">    &#125;</span><br><span class="line">    resultFn.prototype = fn.prototype;</span><br><span class="line">    return resultFn;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="手写bind完整版"><a href="#手写bind完整版" class="headerlink" title="手写bind完整版"></a>手写bind完整版</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    function resultFn()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(</span><br><span class="line">            resultFn.prototype.isPrototypeOf(this) ? this : asThis,</span><br><span class="line">            args.concat(args2)</span><br><span class="line">            )</span><br><span class="line">    &#125;</span><br><span class="line">    resultFn.prototype = fn.prototype;</span><br><span class="line">    return resultFn;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">// ES6版</span><br><span class="line">function _bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    function resultFn(...args2)&#123;</span><br><span class="line">        return fn.call(</span><br><span class="line">                resultFn.prototype.isPrototypeOf(this) ? this : asThis,</span><br><span class="line">                ...args, </span><br><span class="line">                ...args2</span><br><span class="line">                );</span><br><span class="line">    &#125;</span><br><span class="line">    resultFn.prototype = fn.prototype;</span><br><span class="line">    return resultFn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="MDN的bind实现是有缺陷的"><a href="#MDN的bind实现是有缺陷的" class="headerlink" title="MDN的bind实现是有缺陷的"></a>MDN的bind实现是有缺陷的</h4><ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="noopener">mdn bind(注意是英文版)</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">// Yes, it does work with `new funcA.bind(thisArg, args)`</span><br><span class="line">if (!Function.prototype.bind) (function()&#123;</span><br><span class="line">  var ArrayPrototypeSlice = Array.prototype.slice;</span><br><span class="line">  Function.prototype.bind = function(otherThis) &#123;</span><br><span class="line">    if (typeof this !== &apos;function&apos;) &#123;</span><br><span class="line">      // closest thing possible to the ECMAScript 5</span><br><span class="line">      // internal IsCallable function</span><br><span class="line">      throw new TypeError(&apos;Function.prototype.bind - what is trying to be bound is not callable&apos;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    var baseArgs= ArrayPrototypeSlice .call(arguments, 1),</span><br><span class="line">        baseArgsLength = baseArgs.length,</span><br><span class="line">        fToBind = this,</span><br><span class="line">        fNOP    = function() &#123;&#125;,</span><br><span class="line">        fBound  = function() &#123;</span><br><span class="line">          baseArgs.length = baseArgsLength; // reset to default base arguments</span><br><span class="line">          baseArgs.push.apply(baseArgs, arguments);</span><br><span class="line">          return fToBind.apply(</span><br><span class="line">                 fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs</span><br><span class="line">          );</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    if (this.prototype) &#123;</span><br><span class="line">      // Function.prototype doesn&apos;t have a prototype property</span><br><span class="line">      fNOP.prototype = this.prototype; </span><br><span class="line">    &#125;</span><br><span class="line">    fBound.prototype = new fNOP();</span><br><span class="line"></span><br><span class="line">    return fBound;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>它的代码和我们不同的地方在这</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (this.prototype) &#123;</span><br><span class="line">    fNOP.prototype = this.prototype; </span><br><span class="line">&#125;</span><br><span class="line">fBound.prototype = new fNOP();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>先不管它代码什么意思 我们先测试一下</p>
-</blockquote>
-<ul>
-<li>step01拷贝到浏览器控制台</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var ArrayPrototypeSlice = Array.prototype.slice;</span><br><span class="line">// 注意不能直接 Function.prototype.bind = xxx</span><br><span class="line">// 因为不能改写不了 要 Function.prototype.bind2 = xxx</span><br><span class="line">Function.prototype.bind2 = function(otherThis) &#123;</span><br><span class="line">    if (typeof this !== &apos;function&apos;) &#123;</span><br><span class="line">      // closest thing possible to the ECMAScript 5</span><br><span class="line">      // internal IsCallable function</span><br><span class="line">      throw new TypeError(&apos;Function.prototype.bind - what is trying to be bound is not callable&apos;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    var baseArgs= ArrayPrototypeSlice .call(arguments, 1),</span><br><span class="line">        baseArgsLength = baseArgs.length,</span><br><span class="line">        fToBind = this,</span><br><span class="line">        fNOP    = function() &#123;&#125;,</span><br><span class="line">        fBound  = function() &#123;</span><br><span class="line">          baseArgs.length = baseArgsLength; // reset to default base arguments</span><br><span class="line">          baseArgs.push.apply(baseArgs, arguments);</span><br><span class="line">          return fToBind.apply(</span><br><span class="line">                 fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs</span><br><span class="line">          );</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    if (this.prototype) &#123;</span><br><span class="line">      // Function.prototype doesn&apos;t have a prototype property</span><br><span class="line">      fNOP.prototype = this.prototype; </span><br><span class="line">    &#125;</span><br><span class="line">    fBound.prototype = new fNOP();</span><br><span class="line"></span><br><span class="line">    return fBound;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>step02继续拷贝代码</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">var fn = function(a)&#123;this.a = a;&#125;</span><br><span class="line">fn.prototype.sayHi = function()&#123;&#125;;</span><br><span class="line"></span><br><span class="line">// 此时来测试</span><br><span class="line">new fn(&apos;x&apos;) </span><br><span class="line">// 打印 fn&#123;a:&apos;x&apos;&#125;</span><br><span class="line">// 点开它只有一层 fn.__proto__</span><br><span class="line"></span><br><span class="line">// 继续测试bind</span><br><span class="line">fn2 = fn.bind(undefined,&apos;y&apos;);</span><br><span class="line">new fn2();</span><br><span class="line">// 打印 fn&#123;a:&apos;y&apos;&#125;</span><br><span class="line">// 点开它也只有一层 fn.__proto__</span><br><span class="line"></span><br><span class="line">// 测试 mdn 的 bind</span><br><span class="line">fn3 = fn.bind2(undefined,&apos;y&apos;)</span><br><span class="line">new fn3();</span><br><span class="line">// 打印 fn&#123;a:&apos;y&apos;&#125;</span><br><span class="line">// 点开它会多了一层 fn.__proto__.__proto__</span><br><span class="line">/*</span><br><span class="line">fn</span><br><span class="line"> -__proto__</span><br><span class="line">  -__proto__</span><br><span class="line">    -sayHi</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// MDN的代码问题 它的 prototype和原始的是不一样的</span><br><span class="line">const o1 = new fn(&apos;x&apos;)</span><br><span class="line">o1.__proto__ === fn.prototype // true</span><br><span class="line"></span><br><span class="line">const o2 = new fn2(&apos;y&apos;)</span><br><span class="line">o2.__proto__ === fn.prototype // true</span><br><span class="line"></span><br><span class="line">const o3 = new fn3(&apos;x&apos;)</span><br><span class="line">o3.__proto__ === fn.prototype // false</span><br><span class="line">o3.__proto__.__proto__ === fn.prototype // true</span><br></pre></td></tr></table></figure>
-<ul>
-<li>MDN bind支持 new操作的实现的<code>__proto__</code>会多了一层</li>
-<li>而且它的<code>prorotype</code>不是跟原始 bind的不一样</li>
-</ul>
-<blockquote>
-<h3 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h3></blockquote>
-<ul>
-<li><a href="https://github.com/slTrust/source-bind" target="_blank" rel="noopener">https://github.com/slTrust/source-bind</a></li>
-<li>启发</li>
-<li>先实现一个最容易的</li>
-<li>找到自己的问题(需要经验)</li>
-<li>不停迭代</li>
-<li>直到找不到问题(需要经验)</li>
-<li>留一个问题给面试官<ul>
-<li>先甩出简陋版 ES6版</li>
-<li>TA说给我改成ES5的/支持分阶段绑定参数/支持new的</li>
-<li>不要一开始就放大 不然一下提出一个高出你最终版的你没碰到的问题你就惨了</li>
-</ul>
-</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/12/26/Node-JS专精08手写bind01/" title="Node-JS专精08手写bind01" itemprop="url">Node-JS专精08手写bind01</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-12-26T14:39:38.000Z" itemprop="datePublished"> Published 2019-12-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="手写bind"><a href="#手写bind" class="headerlink" title="手写bind"></a>手写bind</h1><ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="noopener">MDN bind</a></li>
-</ul>
-<h3 id="确定API"><a href="#确定API" class="headerlink" title="确定API"></a>确定API</h3><ul>
-<li>bind 位于 Function.prototype 上</li>
-<li>需要做 polyfill</li>
-</ul>
-<blockquote>
-<p>什么是<strong>polyfill</strong>？</p>
-</blockquote>
-<ul>
-<li><a href="https://juejin.im/post/5a579bc7f265da3e38496ba1" target="_blank" rel="noopener">polyfill为何物</a></li>
-<li>聚填充(生活中)<ul>
-<li>抹平</li>
-<li>补全</li>
-<li>你的桌子一个腿短，于是底下垫了一个纸片</li>
-<li>你的墙面不够平整，有坑，于是用白浆填平它</li>
-</ul>
-</li>
-<li>对于前端<ul>
-<li>你的JS代码运行在坑人的IE6下</li>
-<li>我们知道方法一般挂在<code>Function.prototype</code>上 也就是<code>Function.prototype.bind</code>而在 IE6没有，此时你就需要 <strong>polyfill</strong> </li>
-</ul>
-</li>
-</ul>
-<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ul>
-<li><code>fn.bind(asThis)</code></li>
-<li><code>fn.bind(asThis, param1, param2)</code></li>
-<li><code>fn.bind(asThis)()</code></li>
-<li><code>fn.bind(asThis, param1, param2)()</code></li>
-<li><code>fn.bind(asThis)(param1)</code></li>
-<li><code>fn.bind(asThis, param1, param2)(p3, p4)</code></li>
-</ul>
-<blockquote>
-<p>bind API例子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function aa()&#123;</span><br><span class="line">    console.log(this);</span><br><span class="line">    console.log(arguments)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)</span><br><span class="line">// fn.bind(asThis)()</span><br><span class="line">var newFn = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis, param1, param2)</span><br><span class="line">// fn.bind(asThis, param1, param2)()</span><br><span class="line">var newFn2 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn2()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)(param1)</span><br><span class="line">var newFn3 = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn3(1)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis,p1,p2)(p3,p4)</span><br><span class="line">var newFn4 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn4(3,4)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2,3,4]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="001bind-asThis-实现"><a href="#001bind-asThis-实现" class="headerlink" title="001bind(asThis) 实现"></a>001<code>bind(asThis)</code> 实现</h3></blockquote>
-<ul>
-<li>新建项目目录 <code>bind_demo</code></li>
-<li>新建 <code>bind_demo/src/index.js</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>新建 <code>bind_demo/test/index.js</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="002bind-asThis-p1-p2-实现"><a href="#002bind-asThis-p1-p2-实现" class="headerlink" title="002bind(asThis,p1,p2) 实现"></a>002<code>bind(asThis,p1,p2)</code> 实现</h3></blockquote>
-<ul>
-<li>通过扩展运算符</li>
-</ul>
-<p><code>src/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis, ...args)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>test/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;, 123, 456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="003bind-asThis-p1-p2-实现"><a href="#003bind-asThis-p1-p2-实现" class="headerlink" title="003bind(asThis,p1)(p2) 实现"></a>003<code>bind(asThis,p1)(p2)</code> 实现</h3></blockquote>
-<ul>
-<li>step1通过<code>newFn = fn.bind({name:&#39;hjx&#39;},1)</code> 绑定this 传递参数</li>
-<li>step2<code>newFn(2)</code> 在此传递参数调用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>test/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123,456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const anotherFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123);</span><br><span class="line">console.assert(anotherFn2(456)[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(anotherFn2(456)[1] === 123);</span><br><span class="line">console.assert(anotherFn2(456)[2] === 456);</span><br></pre></td></tr></table></figure>
-<h3 id="MDN-bind的Polyfill实现"><a href="#MDN-bind的Polyfill实现" class="headerlink" title="MDN bind的Polyfill实现"></a>MDN bind的Polyfill实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">if (!Function.prototype.bind) (function()&#123;</span><br><span class="line">  var slice = Array.prototype.slice;</span><br><span class="line">  Function.prototype.bind = function() &#123;</span><br><span class="line">    var thatFunc = this, thatArg = arguments[0];</span><br><span class="line">    var args = slice.call(arguments, 1);</span><br><span class="line">    if (typeof thatFunc !== &apos;function&apos;) &#123;</span><br><span class="line">      // closest thing possible to the ECMAScript 5</span><br><span class="line">      // internal IsCallable function</span><br><span class="line">      throw new TypeError(&apos;Function.prototype.bind - &apos; +</span><br><span class="line">             &apos;what is trying to be bound is not callable&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">      var funcArgs = args.concat(slice.call(arguments))</span><br><span class="line">      return thatFunc.apply(thatArg, funcArgs);</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>改写我们的 bind </p>
-</blockquote>
-<ul>
-<li>为什么MDN 不用扩展运算符，因为它不能用和 bind 同时期的API</li>
-</ul>
-<p><code>src/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="ES5和ES6版-bind"><a href="#ES5和ES6版-bind" class="headerlink" title="ES5和ES6版 bind"></a>ES5和ES6版 bind</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ES6版</span><br><span class="line">function _bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><a href="https://github.com/slTrust/source-bind" target="_blank" rel="noopener">代码分支:01手写bind基本实现</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/12/26/Node-JS专精07手写深拷贝/" title="Node-JS专精07手写深拷贝" itemprop="url">Node-JS专精07手写深拷贝</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-12-26T14:38:50.000Z" itemprop="datePublished"> Published 2019-12-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="手写深拷贝"><a href="#手写深拷贝" class="headerlink" title="手写深拷贝"></a>手写深拷贝</h2><h3 id="如何答题？"><a href="#如何答题？" class="headerlink" title="如何答题？"></a>如何答题？</h3><blockquote>
-<p>步骤</p>
-</blockquote>
-<ul>
-<li>询问数据类型</li>
-<li>询问数据规模</li>
-<li>询问性能要求</li>
-<li>询问运行环境</li>
-<li>询问其他要求</li>
-<li>开始写</li>
-</ul>
-<h4 id="JSON数据格式有哪些"><a href="#JSON数据格式有哪些" class="headerlink" title="JSON数据格式有哪些"></a>JSON数据格式有哪些</h4><ul>
-<li><a href="https://sltrust.github.io/2017/12/05/N034_AJAX%E6%98%AF%E4%BB%80%E4%B9%88%E9%AC%BC/#JSON-%E6%98%AF%E4%B8%80%E9%97%A8%E8%AF%AD%E8%A8%80-%E6%8A%84%E8%A2%AD%E7%9A%84JS" target="_blank" rel="noopener">参考</a></li>
-</ul>
-<h4 id="JSON序列化和反序列化"><a href="#JSON序列化和反序列化" class="headerlink" title="JSON序列化和反序列化"></a>JSON序列化和反序列化</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  name:&apos;abc&apos;,</span><br><span class="line">  age:18,</span><br><span class="line">  birthDate:new Date(2018,1,1), // 会变成日期字符串</span><br><span class="line">  exp:/hi/ , // 会被忽略</span><br><span class="line">  body:&#123;</span><br><span class="line">    leg:4,</span><br><span class="line">    head:&apos;one&apos;,</span><br><span class="line">    eye:[&apos;left&apos;,&apos;right&apos;],</span><br><span class="line">    color:&apos;red&apos;</span><br><span class="line">  &#125;,</span><br><span class="line">  s:Symbol(&quot;a&quot;), // 会被忽略</span><br><span class="line">  gender:undefined, // 会被忽略</span><br><span class="line">  sayHi:function()&#123;console.log(&apos;hello&apos;)&#125; // 会被忽略</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 序列化</span><br><span class="line">var obj_str = JSON.stringify(obj)</span><br><span class="line"></span><br><span class="line">// 反序列化</span><br><span class="line">var obj2 = JSON.parse(obj_str)</span><br><span class="line">console.log(obj2)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="JSON序列化反序列化的缺点是什么"><a href="#JSON序列化反序列化的缺点是什么" class="headerlink" title="JSON序列化反序列化的缺点是什么"></a>JSON序列化反序列化的缺点是什么</h4></blockquote>
-<ul>
-<li>不支持函数(会被忽略)</li>
-<li>不支持 <code>undefined</code> 只支持<code>null</code></li>
-<li><p>不支持引用(循环引用)</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var a = &#123;name:&apos;abc&apos;,age:18&#125;</span><br><span class="line">a.self = a;</span><br><span class="line">JSON.stringify(a)</span><br><span class="line"></span><br><span class="line">报错</span><br><span class="line">Converting circular structure to JSON</span><br><span class="line">    --&gt; starting at object with constructor &apos;Object&apos;</span><br><span class="line">    --- property &apos;self&apos; closes the circle</span><br><span class="line">    at JSON.stringify (&lt;anonymous&gt;)</span><br><span class="line">    at &lt;anonymous&gt;:3:6</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>不支持 Date ,<code>JSON.stringify</code> 之后会是 Date的字符串形式</p>
-</li>
-<li>不支持正则表达式</li>
-<li>不支持 Symbol</li>
-</ul>
-<h3 id="递归深拷贝"><a href="#递归深拷贝" class="headerlink" title="递归深拷贝"></a>递归深拷贝</h3>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/50/">50</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/51/">51</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
   </nav>
 
 </div>
