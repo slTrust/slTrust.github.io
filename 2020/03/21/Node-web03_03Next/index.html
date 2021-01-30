@@ -1,0 +1,619 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-web03_03Next | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="Next深入2SSRSSG 存在问题 跟用户数据相关的时候，我们必须获取用户数据后，在渲染页面，这样就无法静态化   虽然也能把用户内容静态化，但是新浪微薄，几亿个用户，难道生产那么多html? 数据更新快，用户自己改身份信息 年龄，昵称等  咋办？ BSR 客户端渲染，下拉更新 SSR 服务端渲染，下拉更新 但是不能用 getStaticProps 因为这个是 SSG  它是 yarn buil">
+<meta name="keywords" content="NodeWeb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-web03_03Next">
+<meta property="og:url" content="http://yoursite.com/2020/03/21/Node-web03_03Next/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="Next深入2SSRSSG 存在问题 跟用户数据相关的时候，我们必须获取用户数据后，在渲染页面，这样就无法静态化   虽然也能把用户内容静态化，但是新浪微薄，几亿个用户，难道生产那么多html? 数据更新快，用户自己改身份信息 年龄，昵称等  咋办？ BSR 客户端渲染，下拉更新 SSR 服务端渲染，下拉更新 但是不能用 getStaticProps 因为这个是 SSG  它是 yarn buil">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-01-30T14:02:54.284Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-web03_03Next">
+<meta name="twitter:description" content="Next深入2SSRSSG 存在问题 跟用户数据相关的时候，我们必须获取用户数据后，在渲染页面，这样就无法静态化   虽然也能把用户内容静态化，但是新浪微薄，几亿个用户，难道生产那么多html? 数据更新快，用户自己改身份信息 年龄，昵称等  咋办？ BSR 客户端渲染，下拉更新 SSR 服务端渲染，下拉更新 但是不能用 getStaticProps 因为这个是 SSG  它是 yarn buil">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/21/Node-web03_03Next/" title="Node-web03_03Next" itemprop="url">Node-web03_03Next</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-21T07:56:44.000Z" itemprop="datePublished"> Published 2020-03-21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Next深入2"><span class="toc-number">1.</span> <span class="toc-text">Next深入2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSR"><span class="toc-number">1.0.1.</span> <span class="toc-text">SSR</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SSG-存在问题"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">SSG 存在问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#咋办？"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">咋办？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取用户浏览器信息"><span class="toc-number">1.0.2.</span> <span class="toc-text">获取用户浏览器信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getServerSideProps"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">getServerSideProps</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSR缺点"><span class="toc-number">1.0.3.</span> <span class="toc-text">SSR缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三种渲染方式如何选择"><span class="toc-number">1.0.4.</span> <span class="toc-text">三种渲染方式如何选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#升级SSG：文章详情"><span class="toc-number">1.0.5.</span> <span class="toc-text">升级SSG：文章详情</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pages-posts-id-tsx的作用"><span class="toc-number">1.0.5.1.</span> <span class="toc-text">pages/posts/[id].tsx的作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fallback的作用"><span class="toc-number">1.0.5.2.</span> <span class="toc-text">fallback的作用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#完整版代码"><span class="toc-number">1.0.6.</span> <span class="toc-text">完整版代码</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="Next深入2"><a href="#Next深入2" class="headerlink" title="Next深入2"></a>Next深入2</h1><h3 id="SSR"><a href="#SSR" class="headerlink" title="SSR"></a>SSR</h3><h4 id="SSG-存在问题"><a href="#SSG-存在问题" class="headerlink" title="SSG 存在问题"></a>SSG 存在问题</h4><blockquote>
+<p>跟用户数据相关的时候，我们必须获取用户数据后，在渲染页面，这样就无法静态化</p>
+</blockquote>
+<ul>
+<li>虽然也能把用户内容静态化，但是新浪微薄，几亿个用户，难道生产那么多html?</li>
+<li>数据更新快，用户自己改身份信息 年龄，昵称等</li>
+</ul>
+<h4 id="咋办？"><a href="#咋办？" class="headerlink" title="咋办？"></a>咋办？</h4><ul>
+<li>BSR 客户端渲染，下拉更新</li>
+<li>SSR 服务端渲染，下拉更新</li>
+<li>但是不能用 getStaticProps<ul>
+<li>因为这个是 SSG </li>
+<li>它是 yarn build 后</li>
+</ul>
+</li>
+<li>可用 <code>getServerSideProps(context:NextPageContext)</code></li>
+</ul>
+<h3 id="获取用户浏览器信息"><a href="#获取用户浏览器信息" class="headerlink" title="获取用户浏览器信息"></a>获取用户浏览器信息</h3><ul>
+<li><p>不同浏览器user-agent不同</p>
+</li>
+<li><p>定义 getServerSideProps 函数</p>
+</li>
+<li>pages/posts/index_ssr.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import &#123; GetServerSideProps, NextPage &#125; from &apos;next&apos;;</span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">type Props = &#123;</span><br><span class="line">  browser: string;</span><br><span class="line">&#125;</span><br><span class="line">const Index_SSR: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  return (</span><br><span class="line">    &lt;&gt;</span><br><span class="line">      &lt;div&gt;SSR服务端生成</span><br><span class="line">        你的浏览器是：&#123;props.browser&#125;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Index_SSR;</span><br><span class="line"></span><br><span class="line">export const getServerSideProps: GetServerSideProps = async (context) =&gt; &#123;</span><br><span class="line">  const ua = context.req.headers[&apos;user-agent&apos;];</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      browser: ua</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="getServerSideProps"><a href="#getServerSideProps" class="headerlink" title="getServerSideProps"></a>getServerSideProps</h4><ul>
+<li>运行时机<ul>
+<li>无论开发还是生产环境</li>
+<li>都是在请求后运行 getServerSideProps</li>
+</ul>
+</li>
+<li>回顾 getStaticProps<ul>
+<li>开发环境，每次请求后运行</li>
+<li>生产环境，build时运行一次</li>
+</ul>
+</li>
+<li>参数<ul>
+<li>context 类型为 NextPageContext</li>
+<li><code>context.req / context.res</code> 可以获取请求和响应</li>
+<li>一般只用 <code>context.req</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="SSR缺点"><a href="#SSR缺点" class="headerlink" title="SSR缺点"></a>SSR缺点</h3><ul>
+<li>无法获取客户端信息，如浏览器窗口大小</li>
+</ul>
+<h3 id="三种渲染方式如何选择"><a href="#三种渲染方式如何选择" class="headerlink" title="三种渲染方式如何选择"></a>三种渲染方式如何选择</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if(有动态内容吗？)&#123;</span><br><span class="line">  if(跟客户端相关？)&#123;</span><br><span class="line">    // 跟请求用户数据相关</span><br><span class="line">    return BSR || SSR</span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 跟用户数据无关</span><br><span class="line">    return SSG</span><br><span class="line">  &#125;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  return 直接html</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="升级SSG：文章详情"><a href="#升级SSG：文章详情" class="headerlink" title="升级SSG：文章详情"></a>升级SSG：文章详情</h3><ul>
+<li><p>step01 修改跳转链接 </p>
+<ul>
+<li>pages/posts/index_ssg.tsx<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Link href=&#123;`/posts/$&#123;p.id&#125;`&#125;&gt;&#123;p.id&#125;&lt;/Link&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>step02 新建 <code>pages/posts/[id].tsx</code></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">import &#123; getPost, getPostIds, Post &#125; from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">type Props = &#123;</span><br><span class="line">  post: Post</span><br><span class="line">&#125;</span><br><span class="line">const postShow: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  const &#123; post &#125; = props</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      文章详情</span><br><span class="line">      &lt;h1&gt;&#123;post.title&#125;&lt;/h1&gt;</span><br><span class="line">      &lt;article&gt;</span><br><span class="line">        &#123;post.content&#125;</span><br><span class="line">      &lt;/article&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default postShow;</span><br><span class="line"></span><br><span class="line">export const getStaticPaths = async () =&gt; &#123;</span><br><span class="line">  const idList = await getPostIds();</span><br><span class="line">  console.log(idList)</span><br><span class="line">  return &#123;</span><br><span class="line">    paths: idList.map(id =&gt; (&#123; params: &#123; id: id &#125; &#125;)),</span><br><span class="line">    fallback: false</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const getStaticProps = async (x: any) =&gt; &#123;</span><br><span class="line">  const id = x.params.id;</span><br><span class="line">  const post = await getPost(id);</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      post: JSON.parse(JSON.stringify(post))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="pages-posts-id-tsx的作用"><a href="#pages-posts-id-tsx的作用" class="headerlink" title="pages/posts/[id].tsx的作用"></a><code>pages/posts/[id].tsx</code>的作用</h4><ul>
+<li>声明路由 <code>/posts/:id</code></li>
+<li>同时是 <code>/posts/:id</code>的页面实现程序</li>
+</ul>
+<p>你需要实现三个东西</p>
+<ul>
+<li>PostsShow组件 从props里接受 post数据</li>
+<li>实现 getStaticProps,从第一个参数接受 <code>params.id</code></li>
+<li>实现 getStaticPaths,返回 id列表</li>
+</ul>
+<h4 id="fallback的作用"><a href="#fallback的作用" class="headerlink" title="fallback的作用"></a>fallback的作用</h4><p><strong>是否自动兜底</strong></p>
+<ul>
+<li>false 表示请求的 id 文章不存在 返回404页面</li>
+<li><p>true代表自动兜底， id找不到 依然尝试渲染页面</p>
+<ul>
+<li>id不在 getStaticPaths ，不代表不存在，比如大型项目无法将所有页面静态化(几亿用户，它静态化一部分如 常用的10%) 不在这里 你可以走 SSR</li>
+</ul>
+<h3 id="完整版代码"><a href="#完整版代码" class="headerlink" title="完整版代码"></a>完整版代码</h3><ul>
+<li><a href="https://github.com/slTrust/next-demo-2" target="_blank" rel="noopener">https://github.com/slTrust/next-demo-2</a></li>
+</ul>
+</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/NodeWeb/">NodeWeb</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2020/03/21/Node-web03_03Next/" data-title="Node-web03_03Next | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/10/11/CSS-001-CSS不正交/" title="CSS-001-CSS不正交">
+  <strong>上一篇：</strong><br/>
+  <span>
+  CSS-001-CSS不正交</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/03/21/Node-web03_02Next/"  title="Node-web03_02Next">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-web03_02Next
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Next深入2"><span class="toc-number">1.</span> <span class="toc-text">Next深入2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SSR"><span class="toc-number">1.0.1.</span> <span class="toc-text">SSR</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SSG-存在问题"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">SSG 存在问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#咋办？"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">咋办？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取用户浏览器信息"><span class="toc-number">1.0.2.</span> <span class="toc-text">获取用户浏览器信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getServerSideProps"><span class="toc-number">1.0.2.1.</span> <span class="toc-text">getServerSideProps</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSR缺点"><span class="toc-number">1.0.3.</span> <span class="toc-text">SSR缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三种渲染方式如何选择"><span class="toc-number">1.0.4.</span> <span class="toc-text">三种渲染方式如何选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#升级SSG：文章详情"><span class="toc-number">1.0.5.</span> <span class="toc-text">升级SSG：文章详情</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#pages-posts-id-tsx的作用"><span class="toc-number">1.0.5.1.</span> <span class="toc-text">pages/posts/[id].tsx的作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fallback的作用"><span class="toc-number">1.0.5.2.</span> <span class="toc-text">fallback的作用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#完整版代码"><span class="toc-number">1.0.6.</span> <span class="toc-text">完整版代码</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>36</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>24</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CSS/" title="CSS">CSS<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2021 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

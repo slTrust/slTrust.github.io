@@ -79,36 +79,24 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-02-03模拟ssh远程登录/" title="Py003-02-03模拟ssh远程登录" itemprop="url">Py003-02-03模拟ssh远程登录</a>
+      <a href="/2018/10/11/Py004-01-13互斥锁/" title="Py004-01-13互斥锁" itemprop="url">Py004-01-13互斥锁</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T08:47:55.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-11T13:14:26.000Z" itemprop="datePublished"> Published 2018-10-11</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="模拟ssh远程登录"><a href="#模拟ssh远程登录" class="headerlink" title="模拟ssh远程登录"></a>模拟ssh远程登录</h3><blockquote>
-<p>注意 window默认编码是gbk,linux默认是 utf-8</p>
-</blockquote>
-<p>服务端：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line">import subprocess</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8082)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">while True: # 链接循环</span><br><span class="line">    conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">    while True: # 通讯循环</span><br><span class="line">        try:</span><br><span class="line">            # 1 接受命令</span><br><span class="line">            cmd = conn.recv(1024)</span><br><span class="line">            # 针对客户端中断问题</span><br><span class="line">            if not cmd:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">            # 2 执行命令，拿到结果</span><br><span class="line">            obj = subprocess.Popen(cmd.decode(&apos;gbk&apos;),shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)</span><br><span class="line">            stdout = obj.stdout.read().decode(&apos;gbk&apos;)</span><br><span class="line">            stderr = obj.stderr.read().decode(&apos;gbk&apos;)</span><br><span class="line">            # 3 把命令结果返回给客户端</span><br><span class="line">            data = stdout+stderr</span><br><span class="line">            print(len(data))</span><br><span class="line">            conn.send(data.encode(&apos;gbk&apos;))</span><br><span class="line">        except ConnectionResetError: # 适用于windows</span><br><span class="line">            break</span><br><span class="line">    conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<p>客户端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8082)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    # 1 发命令</span><br><span class="line">    cmd = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    phone.send(cmd.encode(&apos;gbk&apos;))</span><br><span class="line">    # 2 拿到命令结果</span><br><span class="line">    data = phone.recv(1024) # 1024的坑</span><br><span class="line">    print(data.decode(&apos;gbk&apos;))</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<h4 id="1024的坑"><a href="#1024的坑" class="headerlink" title="1024的坑"></a>1024的坑</h4><p>如果命令的返回结果超过1024的话，就会有问题了。即——粘包</p>
-<p>我们知道结果保存在管道里，你内容超过1024的时候，多余的内容还在管道里</p>
-<blockquote>
-<p>所以当你输入 ipconfig 的时候假设结果为2024 那么还残留1000 在管道里，你再次输入其他命令如ls的时候会先把上次剩余的内容 返回。。。</p>
-</blockquote>
-<p>以上现象就是————————粘包</p>
-<h4 id="粘包的原理"><a href="#粘包的原理" class="headerlink" title="粘包的原理"></a>粘包的原理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. 不管是recv 和send都不是直接接受对方的数据，而是操作自己的操作系统内存---》不是一个send对应一个recv</span><br><span class="line">2.  recv:</span><br><span class="line">        wait data 耗时时间长</span><br><span class="line">        copy data</span><br><span class="line">    send:</span><br><span class="line">        copy data </span><br><span class="line">3.</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="粘包的触发条件"><a href="#粘包的触发条件" class="headerlink" title="粘包的触发条件"></a>粘包的触发条件</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line"></span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1024) # &apos;helloworld&apos;</span><br><span class="line">res2 = conn.recv(1024) # &apos;&apos;</span><br><span class="line">send间隔比较短,就会触发粘包，合并一次发送到服务端</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">time.sleep(5)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1024) # &apos;hello&apos;</span><br><span class="line">res2 = conn.recv(1024) # 5秒后 &apos;world&apos;</span><br><span class="line"></span><br><span class="line">send的间隔已经超过一次正常数据接受的时间。会分两次发送</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">time.sleep(5)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1) # &apos;h&apos;</span><br><span class="line">res2 = conn.recv(1024) # 5秒后 &apos;ellowworld&apos;</span><br><span class="line"></span><br><span class="line">服务端粘包：第一次内容过多，会在下次接受多余的</span><br></pre></td></tr></table></figure>
+        <h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>多线程下操作同一数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">from threading import Thread</span><br><span class="line"></span><br><span class="line">n = 100</span><br><span class="line"></span><br><span class="line">def task():</span><br><span class="line">    global n</span><br><span class="line">    temp = n</span><br><span class="line">    time.sleep(0.1)</span><br><span class="line">    n = temp-1</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    arr = []</span><br><span class="line">    for i in range(100):</span><br><span class="line">        t = Thread(target=task)</span><br><span class="line">        arr.append(t)</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    # 保证所有线程都执行完毕</span><br><span class="line">    for t in arr:</span><br><span class="line">        t.join()</span><br><span class="line"></span><br><span class="line">    print(&apos;主&apos;,n)</span><br><span class="line"></span><br><span class="line">执行结果：</span><br><span class="line">主 99</span><br></pre></td></tr></table></figure>
+<p>此时就不安全了，100个线程都操作了但是数据还是99</p>
+<h4 id="互斥锁的应用"><a href="#互斥锁的应用" class="headerlink" title="互斥锁的应用"></a>互斥锁的应用</h4><p>牺牲效率来保证数据的安全——将并行变成串行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">from threading import Thread,Lock</span><br><span class="line"></span><br><span class="line">n = 100</span><br><span class="line"></span><br><span class="line">def task(mutex):</span><br><span class="line">    global n</span><br><span class="line">    mutex.acquire()</span><br><span class="line">    temp = n</span><br><span class="line">    time.sleep(0.1)</span><br><span class="line">    n = temp-1</span><br><span class="line">    mutex.release()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    mutex=Lock()</span><br><span class="line">    arr = []</span><br><span class="line">    for i in range(100):</span><br><span class="line">        t = Thread(target=task,args=(mutex,))</span><br><span class="line">        arr.append(t)</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    # 保证所有线程都执行完毕</span><br><span class="line">    for t in arr:</span><br><span class="line">        t.join()</span><br><span class="line"></span><br><span class="line">    print(&apos;主&apos;,n)</span><br></pre></td></tr></table></figure>
 
         
         
@@ -122,7 +110,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -150,34 +138,30 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-02-02socket/" title="Py003-02-02socket" itemprop="url">Py003-02-02socket</a>
+      <a href="/2018/10/10/Py004-01-12守护线程/" title="Py004-01-12守护线程" itemprop="url">Py004-01-12守护线程</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T05:48:36.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-10T13:48:07.000Z" itemprop="datePublished"> Published 2018-10-10</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><h4 id="简单例子-拨打电话"><a href="#简单例子-拨打电话" class="headerlink" title="简单例子 拨打电话"></a>简单例子 拨打电话</h4><p>服务端.py</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line"># 1 买手机</span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"># 2 绑定手机卡</span><br><span class="line"></span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"># 3 开机</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line"># 4 等电话打入</span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line"># 5 收发消息</span><br><span class="line"># 单位bytes 现在表示最大接受1024字节的数据</span><br><span class="line">data = conn.recv(1024) # 1024代表接受数据的最大数</span><br><span class="line">print(&apos;客户端的数据&apos;,data)</span><br><span class="line">conn.send(data.upper())</span><br><span class="line"></span><br><span class="line"># 6 挂电话</span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line"># 7 关机</span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<p>客户端.py</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line"># 1 买手机</span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line"># 2 拨号</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line"># 3 发/收消息</span><br><span class="line">phone.send(&apos;hello&apos;.encode(&apos;utf-8&apos;))</span><br><span class="line">data = phone.recv(1024)</span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line"># 4 关闭</span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<h4 id="通讯循环"><a href="#通讯循环" class="headerlink" title="通讯循环"></a>通讯循环</h4><p>服务端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">while True: # 通讯循环</span><br><span class="line">    data = conn.recv(1024)</span><br><span class="line">    print(&apos;客户端的数据&apos;,data)</span><br><span class="line">    conn.send(data.upper())</span><br><span class="line"></span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<p>客户端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    msg = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    phone.send(msg.encode(&apos;utf-8&apos;))</span><br><span class="line">    data = phone.recv(1024)</span><br><span class="line">    print(data)</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<h4 id="重复启动服务端的bug"><a href="#重复启动服务端的bug" class="headerlink" title="重复启动服务端的bug"></a>重复启动服务端的bug</h4><p>因为端口重复占用，所以必须收到切换端口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"># 添加这一行代表重用端口</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br></pre></td></tr></table></figure>
-<h4 id="客户端直接敲回车发数据的bug"><a href="#客户端直接敲回车发数据的bug" class="headerlink" title="客户端直接敲回车发数据的bug"></a>客户端直接敲回车发数据的bug</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    msg = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    # bug解决</span><br><span class="line">    if not msg:continue</span><br><span class="line">    phone.send(msg.encode(&apos;utf-8&apos;))</span><br><span class="line">    data = phone.recv(1024)</span><br><span class="line">    print(data)</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<h4 id="客户端意外中断，服务器端在linux里会造成死循环的bug"><a href="#客户端意外中断，服务器端在linux里会造成死循环的bug" class="headerlink" title="客户端意外中断，服务器端在linux里会造成死循环的bug"></a>客户端意外中断，服务器端在linux里会造成死循环的bug</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">while True: # 通讯循环</span><br><span class="line">    try:</span><br><span class="line">        data = conn.recv(1024)</span><br><span class="line">        # 针对客户端中断问题</span><br><span class="line">        if not data:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">        print(&apos;客户端的数据&apos;,data)</span><br><span class="line">        conn.send(data.upper())</span><br><span class="line">    except ConnectionResetError: # 适用于windows</span><br><span class="line">        break</span><br><span class="line"></span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<h4 id="在不会并发的情况下——一个一个的服务用户"><a href="#在不会并发的情况下——一个一个的服务用户" class="headerlink" title="在不会并发的情况下——一个一个的服务用户"></a>在不会并发的情况下——一个一个的服务用户</h4><p>服务端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">while True: # 链接循环</span><br><span class="line">    conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">    while True: # 通讯循环</span><br><span class="line">        try:</span><br><span class="line">            data = conn.recv(1024)</span><br><span class="line">            # 针对客户端中断问题</span><br><span class="line">            if not data:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">            print(&apos;客户端的数据&apos;,data)</span><br><span class="line">            conn.send(data.upper())</span><br><span class="line">        except ConnectionResetError: # 适用于windows</span><br><span class="line">            break</span><br><span class="line">    conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
-<p>服务一个客户就要把对应客户端终止才能服务下一个客户</p>
+        <h3 id="守护线程"><a href="#守护线程" class="headerlink" title="守护线程"></a>守护线程</h3><p>无论是进程还是线程，都遵循：守护xxx会等待主xxx运行完毕后被销毁</p>
+<p>需要强调的是：运行完毕并非终止运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、对主进程来说，运行完毕指的是主进程代码运行完毕</span><br><span class="line"></span><br><span class="line">2、对主线程来说，运行完毕指的是主线程所在的进程内所有非守护线程统统运行完毕，主线程才算运行完毕</span><br></pre></td></tr></table></figure>
+<p>详细解释：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、主进程在其代码结束后就已经算运行完毕了（守护进程在此时就被回收）,然后主进程会一直等非守护的子进程都运行完毕后回收子进程的资源(否则会产生僵尸进程)，才会结束，</span><br><span class="line"></span><br><span class="line">2、主线程在其他非守护线程运行完毕后才算运行完毕（守护线程在此时就被回收）。因为主线程的结束意味着进程的结束，进程整体的资源都将被回收，而进程必须保证非守护线程都运行完毕后才能结束。</span><br></pre></td></tr></table></figure>
+<p>验证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import time</span><br><span class="line">def sayhi(name):</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    print(&apos;%s say hello&apos; %name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t=Thread(target=sayhi,args=(&apos;egon&apos;,))</span><br><span class="line">    t.setDaemon(True) #必须在t.start()之前设置</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line">    print(&apos;主线程&apos;)</span><br><span class="line">    print(t.is_alive())</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主线程</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>思考下述代码的执行结果有可能是哪些情况？为什么？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def foo():</span><br><span class="line">    print(123)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&quot;end123&quot;)</span><br><span class="line"></span><br><span class="line">def bar():</span><br><span class="line">    print(456)</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    print(&quot;end456&quot;)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t1=Thread(target=foo)</span><br><span class="line">    t2=Thread(target=bar)</span><br><span class="line"></span><br><span class="line">    t1.daemon=True</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    print(&quot;main-------&quot;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">123</span><br><span class="line">456</span><br><span class="line">main-------</span><br><span class="line">end123 (守护线程虽然要等主线程结束才陪葬 ，但是此守护线程已经执行结束——死了)</span><br><span class="line">end456 (主线程要等待其他非守护线程结束而结束)</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
 
         
         
@@ -191,7 +175,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -219,314 +203,295 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-02-01网络/" title="Py003-02-01网络" itemprop="url">Py003-02-01网络</a>
+      <a href="/2018/10/10/Py004-01-11线程其他属性和方法/" title="Py004-01-11线程其他属性和方法" itemprop="url">Py004-01-11线程其他属性和方法</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T05:02:29.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-10T13:47:23.000Z" itemprop="datePublished"> Published 2018-10-10</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="网络协议"><a href="#网络协议" class="headerlink" title="网络协议"></a>网络协议</h3><blockquote>
-<p>os七层：</p>
+        <h3 id="Thread对象的其他属性或方法"><a href="#Thread对象的其他属性或方法" class="headerlink" title="Thread对象的其他属性或方法"></a>Thread对象的其他属性或方法</h3><blockquote>
+<p>介绍</p>
 </blockquote>
-<ul>
-<li>应——应用层</li>
-<li>表——表示层</li>
-<li>会——会话层</li>
-<li>传——传输层</li>
-<li>网——网络层</li>
-<li>数——数据链路层</li>
-<li>物——物理层</li>
-</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Thread实例对象的方法</span><br><span class="line">  # isAlive(): 返回线程是否活动的。</span><br><span class="line">  # getName(): 返回线程名。</span><br><span class="line">  # setName(): 设置线程名。</span><br><span class="line"></span><br><span class="line">threading模块提供的一些方法：</span><br><span class="line">  # threading.currentThread(): 返回当前的线程变量。</span><br><span class="line">  # threading.enumerate(): 返回一个包含正在运行的线程的list。正在运行指线程启动后、结束前，不包括启动前和终止后的线程。</span><br><span class="line">  # threading.activeCount(): 返回正在运行的线程数量，与len(threading.enumerate())有相同的结果。</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>也叫五层协议</p>
+<p>验证</p>
 </blockquote>
-<p>把 应用层/表示层/会话层 统一表示为——应用层</p>
-<h4 id="五层协议详解"><a href="#五层协议详解" class="headerlink" title="五层协议详解"></a>五层协议详解</h4><blockquote>
-<p>数据报：有报头和报文   报头代表头信息 报文是实际的数据内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import threading</span><br><span class="line">from multiprocessing import Process</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    import time</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    print(threading.current_thread().getName())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    #在主进程下开启线程</span><br><span class="line">    t=Thread(target=work)</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line">    print(threading.current_thread().getName())</span><br><span class="line">    print(threading.current_thread()) #主线程</span><br><span class="line">    print(threading.enumerate()) #连同主线程在内有两个运行的线程</span><br><span class="line">    print(threading.active_count())</span><br><span class="line">    print(&apos;主线程/主进程&apos;)</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MainThread</span><br><span class="line">&lt;_MainThread(MainThread, started 140735268892672)&gt;</span><br><span class="line">[&lt;_MainThread(MainThread, started 140735268892672)&gt;, &lt;Thread(Thread-1, started 123145307557888)&gt;]</span><br><span class="line">主线程/主进程</span><br><span class="line">Thread-1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>主线程等待子线程结束</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import time</span><br><span class="line">def sayhi(name):</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    print(&apos;%s say hello&apos; %name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t=Thread(target=sayhi,args=(&apos;egon&apos;,))</span><br><span class="line">    t.start()</span><br><span class="line">    t.join()</span><br><span class="line">    print(&apos;主线程&apos;)</span><br><span class="line">    print(t.is_alive())</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">egon say hello</span><br><span class="line">主线程</span><br><span class="line">False</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M04/">M04</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/10/Py004-01-10线程和进程的区别/" title="Py004-01-10线程和进程的区别" itemprop="url">Py004-01-10线程和进程的区别</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-10T13:46:36.000Z" itemprop="datePublished"> Published 2018-10-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="线程和进程的区别"><a href="#线程和进程的区别" class="headerlink" title="线程和进程的区别"></a>线程和进程的区别</h3><h4 id="谁的开启速度快？"><a href="#谁的开启速度快？" class="headerlink" title="谁的开启速度快？"></a>谁的开启速度快？</h4><blockquote>
+<p>1、在主进程下开启线程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    print(&apos;hello&apos;)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t=Thread(target=work)</span><br><span class="line">    t.start()</span><br><span class="line">    print(&apos;主线程/主进程&apos;)</span><br></pre></td></tr></table></figure>
+<p>执行结果如下，几乎是t.start ()的同时就将线程开启了，然后先打印出了hello，证明线程的创建开销极小</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hello</span><br><span class="line">主线程/主进程</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>2、在主进程下开启子进程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    print(&apos;hello&apos;)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    #在主进程下开启子进程</span><br><span class="line">    p=Process(target=work)</span><br><span class="line">    p.start()</span><br><span class="line">    print(&apos;主线程/主进程&apos;)</span><br></pre></td></tr></table></figure>
+<p>执行结果如下，p.start ()将开启进程的信号发给操作系统后，操作系统要申请内存空间，让好拷贝父进程地址空间到子进程，开销远大于线程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主线程/主进程</span><br><span class="line">hello</span><br></pre></td></tr></table></figure>
+<h4 id="瞅一瞅pid？"><a href="#瞅一瞅pid？" class="headerlink" title="瞅一瞅pid？"></a>瞅一瞅pid？</h4><blockquote>
+<p>1、在主进程下开启多个线程,每个线程都跟主进程的pid一样</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    print(&apos;hello&apos;,os.getpid())</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t1=Thread(target=work)</span><br><span class="line">    t2=Thread(target=work)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    print(&apos;主线程/主进程pid&apos;,os.getpid())</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hello 7939</span><br><span class="line">hello 7939</span><br><span class="line">主线程/主进程 7939</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>2、开多个进程,每个进程都有不同的pid</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    print(&apos;hello&apos;,os.getpid())</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    p1=Process(target=work)</span><br><span class="line">    p2=Process(target=work)</span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    print(&apos;主线程/主进程&apos;,os.getpid())</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主线程/主进程 7951</span><br><span class="line">hello 7952</span><br><span class="line">hello 7953</span><br></pre></td></tr></table></figure>
+<h4 id="同一进程内的线程共享该进程的数据？"><a href="#同一进程内的线程共享该进程的数据？" class="headerlink" title="同一进程内的线程共享该进程的数据？"></a>同一进程内的线程共享该进程的数据？</h4><blockquote>
+<p>1、进程之间地址空间是隔离的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    global n</span><br><span class="line">    n=0</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    n=100</span><br><span class="line">    p=Process(target=work)</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br><span class="line">    print(&apos;主&apos;,n)</span><br></pre></td></tr></table></figure>
+<p>执行结果如下，毫无疑问子进程p已经将自己的全局的n改成了0,但改的仅仅是它自己的,查看父进程的n仍然为100</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">主 100</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>2、同一进程内开启的多个线程是共享该进程地址空间的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">def work():</span><br><span class="line">    global n</span><br><span class="line">    n=0</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    n=100</span><br><span class="line">    t=Thread(target=work)</span><br><span class="line">    t.start()</span><br><span class="line">    t.join()</span><br><span class="line">    print(&apos;主&apos;,n)</span><br></pre></td></tr></table></figure>
+<p>执行结果如下， 查看结果为0,因为同一进程内的线程之间共享进程内的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">主 0</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M04/">M04</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/10/Py004-01-09线程/" title="Py004-01-09线程" itemprop="url">Py004-01-09线程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-10T13:45:30.000Z" itemprop="datePublished"> Published 2018-10-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="threading模块介绍"><a href="#threading模块介绍" class="headerlink" title="threading模块介绍"></a>threading模块介绍</h3><p>multiprocess模块的完全模仿了threading模块的接口，二者在使用层面，有很大的相似性，因而不再详细介绍</p>
+<p>方式一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    time.sleep(2)</span><br><span class="line">    print(&apos;%s say hi&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    for i in range(10):</span><br><span class="line">        t = Thread(target=task, args=(&apos;aa%s&apos;%i,))</span><br><span class="line">        t.start()</span><br><span class="line">    print(&apos;主&apos;)</span><br></pre></td></tr></table></figure>
+<p>方式二</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from threading import Thread</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">class Sayhi(Thread):</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.name=name</span><br><span class="line">    def run(self):</span><br><span class="line">        time.sleep(2)</span><br><span class="line">        print(&apos;%s say hello&apos; % self.name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    t = Sayhi(&apos;egon&apos;)</span><br><span class="line">    t.start()</span><br><span class="line">    print(&apos;主线程&apos;)</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/M04/">M04</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/10/Py004-01-08生产者消费者模型/" title="Py004-01-08生产者消费者模型" itemprop="url">Py004-01-08生产者消费者模型</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-10T13:44:00.000Z" itemprop="datePublished"> Published 2018-10-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="生产者消费者模型介绍"><a href="#生产者消费者模型介绍" class="headerlink" title="生产者消费者模型介绍"></a>生产者消费者模型介绍</h3><blockquote>
+<p>为什么要使用生产者消费者模型</p>
+</blockquote>
+<p>生产者指的是生产数据的任务，消费者指的是处理数据的任务，在并发编程中，如果生产者处理速度很快，而消费者处理速度很慢，那么生产者就必须等待消费者处理完，才能继续生产数据。同样的道理，如果消费者的处理能力大于生产者，那么消费者就必须等待生产者。为了解决这个问题于是引入了生产者和消费者模式。</p>
+<blockquote>
+<p>什么是生产者和消费者模式</p>
+</blockquote>
+<p>生产者消费者模式是通过一个容器来解决生产者和消费者的强耦合问题。生产者和消费者彼此之间不直接通讯，而通过阻塞队列来进行通讯，所以生产者生产完数据之后不用等待消费者处理，直接扔给阻塞队列，消费者不找生产者要数据，而是直接从阻塞队列里取，阻塞队列就相当于一个缓冲区，平衡了生产者和消费者的处理能力。</p>
+<p>这个阻塞队列就是用来给生产者和消费者解耦的</p>
+<h3 id="生产者消费者模型实现"><a href="#生产者消费者模型实现" class="headerlink" title="生产者消费者模型实现"></a>生产者消费者模型实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,Queue</span><br><span class="line">import time,random,os</span><br><span class="line">def consumer(q,name):</span><br><span class="line">    while True:</span><br><span class="line">        res=q.get()</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        print(&apos;\033[43m%s 吃 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">def producer(q,name,food):</span><br><span class="line">    for i in range(3):</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        res=&apos;%s%s&apos; %(food,i)</span><br><span class="line">        q.put(res)</span><br><span class="line">        print(&apos;\033[45m%s 生产了 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    q=Queue()</span><br><span class="line">    #生产者们:即厨师们</span><br><span class="line">    p1=Process(target=producer,args=(q,&apos;egon&apos;,&apos;包子&apos;))</span><br><span class="line"></span><br><span class="line">    #消费者们:即吃货们</span><br><span class="line">    c1=Process(target=consumer,args=(q,&apos;alex&apos;))</span><br><span class="line"></span><br><span class="line">    #开始</span><br><span class="line">    p1.start()</span><br><span class="line">    c1.start()</span><br><span class="line">    print(&apos;主&apos;)</span><br></pre></td></tr></table></figure>
+<p>执行结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">主</span><br><span class="line">egon 生产了 包子0</span><br><span class="line">egon 生产了 包子1</span><br><span class="line">alex 吃 包子0</span><br><span class="line">alex 吃 包子1</span><br><span class="line">egon 生产了 包子2</span><br><span class="line">alex 吃 包子2</span><br></pre></td></tr></table></figure>
+<p>此时的问题是主进程永远不会结束，原因是：生产者p在生产完后就结束了，但是消费者c在取空了q之后，则一直处于死循环中且卡在q.get()这一步。</p>
+<p>解决方式无非是让生产者在生产完毕后，往队列中再发一个结束信号，这样消费者在接收到结束信号后就可以break出死循环</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,Queue</span><br><span class="line">import time,random,os</span><br><span class="line">def consumer(q,name):</span><br><span class="line">    while True:</span><br><span class="line">        res=q.get()</span><br><span class="line">        if res is None:break</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        print(&apos;\033[43m%s 吃 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">def producer(q,name,food):</span><br><span class="line">    for i in range(3):</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        res=&apos;%s%s&apos; %(food,i)</span><br><span class="line">        q.put(res)</span><br><span class="line">        print(&apos;\033[45m%s 生产了 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    q=Queue()</span><br><span class="line">    #生产者们:即厨师们</span><br><span class="line">    p1=Process(target=producer,args=(q,&apos;egon&apos;,&apos;包子&apos;))</span><br><span class="line"></span><br><span class="line">    #消费者们:即吃货们</span><br><span class="line">    c1=Process(target=consumer,args=(q,&apos;alex&apos;))</span><br><span class="line"></span><br><span class="line">    #开始</span><br><span class="line">    p1.start()</span><br><span class="line">    c1.start()</span><br><span class="line"></span><br><span class="line">    p1.join()</span><br><span class="line">    q.put(None)</span><br><span class="line">    print(&apos;主&apos;)</span><br></pre></td></tr></table></figure>
+<p>但上述解决方式，在有多个生产者和多个消费者时，我们则需要用一个很low的方式去解决,有几个消费者就需要发送几次结束信号：相当low,例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,Queue</span><br><span class="line">import time,random,os</span><br><span class="line">def consumer(q,name):</span><br><span class="line">    while True:</span><br><span class="line">        res=q.get()</span><br><span class="line">        if res is None:break</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        print(&apos;\033[43m%s 吃 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">def producer(q,name,food):</span><br><span class="line">    for i in range(3):</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        res=&apos;%s%s&apos; %(food,i)</span><br><span class="line">        q.put(res)</span><br><span class="line">        print(&apos;\033[45m%s 生产了 %s\033[0m&apos; %(name,res))</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    q=Queue()</span><br><span class="line">    #生产者们:即厨师们</span><br><span class="line">    p1=Process(target=producer,args=(q,&apos;egon1&apos;,&apos;包子&apos;))</span><br><span class="line">    p2=Process(target=producer,args=(q,&apos;egon2&apos;,&apos;骨头&apos;))</span><br><span class="line">    p3=Process(target=producer,args=(q,&apos;egon3&apos;,&apos;泔水&apos;))</span><br><span class="line"></span><br><span class="line">    #消费者们:即吃货们</span><br><span class="line">    c1=Process(target=consumer,args=(q,&apos;alex1&apos;))</span><br><span class="line">    c2=Process(target=consumer,args=(q,&apos;alex2&apos;))</span><br><span class="line"></span><br><span class="line">    #开始</span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    p3.start()</span><br><span class="line">    c1.start()</span><br><span class="line">    c2.start()</span><br><span class="line"></span><br><span class="line">    p1.join()</span><br><span class="line">    p2.join()</span><br><span class="line">    p3.join()</span><br><span class="line">    q.put(None)</span><br><span class="line">    q.put(None)</span><br><span class="line">    q.put(None)</span><br><span class="line">    print(&apos;主&apos;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其实我们的思路无非是发送结束信号而已，有另外一种队列提供了这种机制</p>
 </blockquote>
 <ul>
-<li>物理层</li>
+<li>JoinableQueue([maxsize])</li>
 </ul>
-<p>物理设备，负责发电信号——形如01010101的二进制内容通过网线</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">这就像是一个Queue对象，但队列允许项目的使用者通知生成者项目已经被成功处理。通知进程是使用共享的信号和条件变量来实现的。</span><br></pre></td></tr></table></figure>
+<p>参数介绍</p>
 <ul>
-<li>数据链路层</li>
+<li>maxsize是队列中允许最大项数，省略则无大小限制。</li>
 </ul>
-<p>以太网协议：一组数据帧称为一个数据报，基于mac地址以广播的形式(只能在局域网里)</p>
+<p>方法介绍</p>
+<p>JoinableQueue的实例p除了与Queue对象相同的方法之外还具：</p>
 <ul>
-<li>网络层</li>
+<li><p>q.task_done()：使用者使用此方法发出信号，表示q.get()的返回项目已经被处理。如果调用此方法的次数大于从队列中删除项目的数量，将引发ValueError异常</p>
+</li>
+<li><p>q.join():生产者调用此方法进行阻塞，直到队列中所有的项目均被处理。阻塞将持续到队列中的每个项目均调用q.task_done（）方法为止</p>
+</li>
 </ul>
-<p>以太网通过mac只能表示同一局域网的一台机子</p>
-<p>而ip地址可以标识一个子网的地址</p>
-<p>IP协议：也是数据报的形式：形如 ip头+data</p>
-<p>最后ip+mac就可以标识全世界独一无二的一台机器</p>
-<ul>
-<li>传输层</li>
-</ul>
-<p>tcp/udp</p>
-<ul>
-<li>应用层</li>
-</ul>
-<p>各种软件自己的协议  http/ftp</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">客户端:                                                     服务端：</span><br><span class="line">应用层   http头 + data                                      应用层   http头 + data </span><br><span class="line">↓封包                                                       ↑解包</span><br><span class="line">传输层   tcp头 + (http头 + data)                            传输层   tcp头 + (http头 + data)</span><br><span class="line">↓封包                                                       ↑解包 </span><br><span class="line">网络层   ip头 + (tcp头 + (http头 + data))                    网络层   ip头 + (tcp头 + (http头 + data))</span><br><span class="line">↓封包                                                       ↑解包 </span><br><span class="line">数据链路层 以太网头 + (ip头 + (tcp头 + (http头 + data)))      数据链路层 以太网头 + (ip头 + (tcp头 + (http头 + data)))</span><br><span class="line">↓                                                           ↑</span><br><span class="line">物理层                                                      物理层 </span><br><span class="line">↓                                                           ↑</span><br><span class="line">    →→→→→→→→→→→→→→→→→→→→→→→→网络→→→→→→→→→→→→→→→→→→→→→→→→</span><br></pre></td></tr></table></figure>
-<h4 id="tcp三次握手"><a href="#tcp三次握手" class="headerlink" title="tcp三次握手"></a>tcp三次握手</h4><ol>
-<li>客户端：我能连接你吗？</li>
-<li>服务端：我准备好了，你连接吧！</li>
-<li>客户端：好！我连接你了</li>
+<h4 id="基于JoinableQueue实现生产者消费者模型"><a href="#基于JoinableQueue实现生产者消费者模型" class="headerlink" title="基于JoinableQueue实现生产者消费者模型"></a>基于JoinableQueue实现生产者消费者模型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,JoinableQueue</span><br><span class="line">import time,random,os</span><br><span class="line">def consumer(q,name):</span><br><span class="line">    while True:</span><br><span class="line">        res=q.get()</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        print(&apos;\033[43m%s 吃 %s\033[0m&apos; %(name,res))</span><br><span class="line">        q.task_done() #发送信号给q.join()，说明已经从队列中取走一个数据并处理完毕了</span><br><span class="line"></span><br><span class="line">def producer(q,name,food):</span><br><span class="line">    for i in range(3):</span><br><span class="line">        time.sleep(random.randint(1,3))</span><br><span class="line">        res=&apos;%s%s&apos; %(food,i)</span><br><span class="line">        q.put(res)</span><br><span class="line">        print(&apos;\033[45m%s 生产了 %s\033[0m&apos; %(name,res))</span><br><span class="line">    q.join() #等到消费者把自己放入队列中的所有的数据都取走之后，生产者才结束</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    q=JoinableQueue() #使用JoinableQueue()</span><br><span class="line"></span><br><span class="line">    #生产者们:即厨师们</span><br><span class="line">    p1=Process(target=producer,args=(q,&apos;egon1&apos;,&apos;包子&apos;))</span><br><span class="line">    p2=Process(target=producer,args=(q,&apos;egon2&apos;,&apos;骨头&apos;))</span><br><span class="line">    p3=Process(target=producer,args=(q,&apos;egon3&apos;,&apos;泔水&apos;))</span><br><span class="line"></span><br><span class="line">    #消费者们:即吃货们</span><br><span class="line">    c1=Process(target=consumer,args=(q,&apos;alex1&apos;))</span><br><span class="line">    c2=Process(target=consumer,args=(q,&apos;alex2&apos;))</span><br><span class="line">    c1.daemon=True</span><br><span class="line">    c2.daemon=True</span><br><span class="line"></span><br><span class="line">    #开始</span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    p3.start()</span><br><span class="line">    c1.start()</span><br><span class="line">    c2.start()</span><br><span class="line"></span><br><span class="line">    p1.join()</span><br><span class="line">    p2.join()</span><br><span class="line">    p3.join()</span><br><span class="line">    #1、主进程等生产者p1、p2、p3结束</span><br><span class="line">    #2、而p1、p2、p3是在消费者把所有数据都取干净之后才会结束</span><br><span class="line">    #3、所以一旦p1、p2、p3结束了，证明消费者也没必要存在了，应该随着主进程一块死掉，因而需要将生产者们设置成守护进程</span><br><span class="line">    print(&apos;主&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="生产者消费者模型总结"><a href="#生产者消费者模型总结" class="headerlink" title="生产者消费者模型总结"></a>生产者消费者模型总结</h3><ol>
+<li>程序中有两类角色</li>
 </ol>
-<h4 id="tcp协议-udp协议"><a href="#tcp协议-udp协议" class="headerlink" title="tcp协议/udp协议"></a>tcp协议/udp协议</h4><p>tcp协议</p>
 <ul>
-<li>可靠的：面向连接，双向通道</li>
-<li>传输速度慢</li>
+<li>一类负责生产数据（生产者）</li>
+<li>一类负责处理数据（消费者）</li>
 </ul>
-<p>生活的实例：你往水里扔石头看见了浪花</p>
-<p>udp协议</p>
-<ul>
-<li>不可靠：不面向连接</li>
-<li>直接发送数据是否收到数据未知，数据可能丢</li>
-<li>传输速度快</li>
-</ul>
-<p>生活的实例：你往草里扔石头没啥反应</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M03/">M03</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/09/09/Py003-01-15异常操作方式/" title="Py003-01-15异常操作方式" itemprop="url">Py003-01-15异常操作方式</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-09-09T03:19:02.000Z" itemprop="datePublished"> Published 2018-09-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="异常的处理"><a href="#异常的处理" class="headerlink" title="异常的处理"></a>异常的处理</h3><h4 id="多分支"><a href="#多分支" class="headerlink" title="多分支"></a>多分支</h4><blockquote>
-<p>被监测的代码块抛出的异常有多种可能性，并且我们需要针对每一种异常类型都定制专门的处理逻辑</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="万能异常：Exception"><a href="#万能异常：Exception" class="headerlink" title="万能异常：Exception"></a>万能异常：Exception</h4><ul>
-<li>被监测的代码块抛出的异常有多种可能性，</li>
-<li>并且我们针对所有的异常类型都只用一种处理逻辑就可以了，那就使用Exception</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;异常发生啦：&apos;,e)</span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;统一的处理方法&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="其他结构"><a href="#其他结构" class="headerlink" title="其他结构"></a>其他结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;统一的处理方法&apos;)</span><br><span class="line"></span><br><span class="line">else:</span><br><span class="line">    print(&apos;在被检测的代码块没有发生异常时执行&apos;)</span><br><span class="line"></span><br><span class="line">finally:</span><br><span class="line">    print(&apos;不管被检测的代码块有无发生异常都会执行&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br><span class="line"></span><br><span class="line"># 回收资源</span><br><span class="line"></span><br><span class="line">try:</span><br><span class="line">    f=open(&apos;a.txt&apos;,&apos;r&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line"></span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">finally:</span><br><span class="line">    f.close()</span><br></pre></td></tr></table></figure>
-<h4 id="主动触发异常：raise-异常类型-值"><a href="#主动触发异常：raise-异常类型-值" class="headerlink" title="主动触发异常：raise  异常类型(值)"></a>主动触发异常：raise  异常类型(值)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age):</span><br><span class="line">        if not isinstance(name,str):</span><br><span class="line">            raise TypeError(&apos;名字必须传入str类型&apos;)</span><br><span class="line">        if not isinstance(age,int):</span><br><span class="line">            raise TypeError(&apos;年龄必须传入int类型&apos;)</span><br><span class="line">        self.name=name</span><br><span class="line">        self.age=age</span><br><span class="line"></span><br><span class="line">p=People(&apos;egon&apos;,18)</span><br></pre></td></tr></table></figure>
-<h4 id="自定义异常类型"><a href="#自定义异常类型" class="headerlink" title="自定义异常类型"></a>自定义异常类型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class MyException(BaseException):</span><br><span class="line">    def __init__(self,msg):</span><br><span class="line">        super(MyException,self).__init__()</span><br><span class="line">        self.msg=msg</span><br><span class="line"></span><br><span class="line">    def __str__(self):</span><br><span class="line">        return &apos;&lt;%s&gt;&apos; %self.msg</span><br><span class="line"></span><br><span class="line">raise MyException(&apos;我自己的异常类型&apos;) #print(obj)</span><br></pre></td></tr></table></figure>
-<h4 id="断言assert"><a href="#断言assert" class="headerlink" title="断言assert"></a>断言assert</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">info=&#123;&#125;</span><br><span class="line">info[&apos;name&apos;]=&apos;hjx&apos;</span><br><span class="line"># info[&apos;age&apos;]=18</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># if &apos;name&apos; not in info:</span><br><span class="line">#     raise KeyError(&apos;必须有name这个key&apos;)</span><br><span class="line">#</span><br><span class="line"># if &apos;age&apos; not in info:</span><br><span class="line">#     raise KeyError(&apos;必须有age这个key&apos;)</span><br><span class="line"></span><br><span class="line">assert (&apos;name&apos; in info) and (&apos;age&apos; in info)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if info[&apos;name&apos;] == &apos;hjx&apos; and info[&apos;age&apos;] &gt; 10:</span><br><span class="line">    print(&apos;welcome&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="万能异常-铁定不出错"><a href="#万能异常-铁定不出错" class="headerlink" title="万能异常(铁定不出错)"></a>万能异常(铁定不出错)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">except Exception:</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M03/">M03</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/09/09/Py003-01-14异常处理/" title="Py003-01-14异常处理" itemprop="url">Py003-01-14异常处理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-09-09T03:18:02.000Z" itemprop="datePublished"> Published 2018-09-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="什么是异常"><a href="#什么是异常" class="headerlink" title="什么是异常"></a>什么是异常</h3><blockquote>
-<p>异常是错误发生的信号，一旦程序出错，并且程序没有处理这个错误，那个就会抛出异常，并且程序的运行随之终止</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">print(&apos;1&apos;)</span><br><span class="line">print(&apos;2&apos;)</span><br><span class="line">print(&apos;3&apos;)</span><br><span class="line">int(&apos;aaaa&apos;)</span><br><span class="line">print(&apos;4&apos;)</span><br><span class="line">print(&apos;5&apos;)</span><br><span class="line">print(&apos;6&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="错误分为两种："><a href="#错误分为两种：" class="headerlink" title="错误分为两种："></a>错误分为两种：</h4><ul>
-<li>语法错误:在程序执行前就要立刻改正过来</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(&apos;xxxx&apos;</span><br><span class="line">if 1 &gt; 2</span><br></pre></td></tr></table></figure>
-<ul>
-<li>逻辑错误</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#ValueError</span><br><span class="line"># int(&apos;aaa&apos;)</span><br><span class="line"></span><br><span class="line">#NameError</span><br><span class="line"># name</span><br><span class="line"></span><br><span class="line">#IndexError</span><br><span class="line"># l=[1,2,3]</span><br><span class="line"># l[1000]</span><br><span class="line"></span><br><span class="line">#KeyError</span><br><span class="line"># d=&#123;&#125;</span><br><span class="line"># d[&apos;name&apos;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#AttributeError</span><br><span class="line"># class Foo:</span><br><span class="line">#     pass</span><br><span class="line">#</span><br><span class="line"># Foo.xxx</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#ZeroDivisionError:</span><br><span class="line"># 1/0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#TypeError:int类型不可迭代</span><br><span class="line"># for i in 3:</span><br><span class="line">#     pass</span><br><span class="line"></span><br><span class="line"># import time</span><br><span class="line"># time.sleep(1000)</span><br></pre></td></tr></table></figure>
-<h4 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h4><blockquote>
-<h5 id="强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常"><a href="#强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常" class="headerlink" title="强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常"></a>强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常</h5></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">AGE=10</span><br><span class="line">age=input(&apos;&gt;&gt;: &apos;).strip()</span><br><span class="line"></span><br><span class="line">if age.isdigit():</span><br><span class="line">    age=int(age)</span><br><span class="line">    if age &gt; AGE:</span><br><span class="line">        print(&apos;太大了&apos;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h5 id="强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except"><a href="#强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except" class="headerlink" title="强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except"></a>强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except</h5></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    f=open(&apos;a.txt&apos;,&apos;r&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line"></span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line"></span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line"></span><br><span class="line">    f.close()</span><br><span class="line">except StopIteration:</span><br><span class="line">    print(&apos;出错啦&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;1&apos;)</span><br><span class="line">print(&apos;====&gt;2&apos;)</span><br><span class="line">print(&apos;====&gt;3&apos;)</span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/M03/">M03</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/09/09/Py003-01-13元类/" title="Py003-01-13元类" itemprop="url">Py003-01-13元类</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-09-09T03:17:02.000Z" itemprop="datePublished"> Published 2018-09-09</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<h3 id="选学内容-基本用不到"><a href="#选学内容-基本用不到" class="headerlink" title="选学内容(基本用不到)"></a>选学内容(基本用不到)</h3></blockquote>
-<h3 id="元类介绍"><a href="#元类介绍" class="headerlink" title="元类介绍"></a>元类介绍</h3><blockquote>
-<p>储备知识 exec</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">参数1 ：字符串形式的命令</span><br><span class="line">参数2 ：全局作用域(字典形式)如果不指定默认是globals()</span><br><span class="line">参数3 ：局部作用域(字典形式)如果不指定默认是locals()</span><br><span class="line"></span><br><span class="line">g = &#123;</span><br><span class="line">    &quot;x&quot;:1,</span><br><span class="line">    &quot;y&quot;:2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">l = &#123;&#125;</span><br><span class="line"></span><br><span class="line">exec(&apos;&apos;&apos;</span><br><span class="line">global x,m</span><br><span class="line">x = 10</span><br><span class="line">m = 100</span><br><span class="line"></span><br><span class="line">z = 3</span><br><span class="line">&apos;&apos;&apos;,g,l)</span><br><span class="line"></span><br><span class="line">print(g) # 全局作用域  x的值修改为 10  新增 m = 100</span><br><span class="line">print(l) # 局部作用域里  l 新增了 z:3</span><br></pre></td></tr></table></figure>
-<h4 id="一切皆对象，对象可以怎么用？"><a href="#一切皆对象，对象可以怎么用？" class="headerlink" title="一切皆对象，对象可以怎么用？"></a>一切皆对象，对象可以怎么用？</h4><ol>
-<li>都可以被引用，x=obj</li>
-<li>都可以当作函数的参数传入</li>
-<li>都可以当作函数的返回值</li>
-<li>都可以当作容器类的元素，l=[func,time,obj,1]</li>
+<ol start="2">
+<li>引入生产者消费者模型为了解决的问题是</li>
 </ol>
-<blockquote>
-<p>类也是对象</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Foo():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">obj = Foo()</span><br><span class="line">print(type(obj))</span><br><span class="line">print(type(Foo)) </span><br><span class="line"></span><br><span class="line"># &lt;class &apos;__main__.Foo&apos;&gt;</span><br><span class="line"># &lt;class &apos;type&apos;&gt;</span><br><span class="line"></span><br><span class="line">class Bar():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">print(type(Bar)) #  &lt;class &apos;type&apos;&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="产生类的类称之为元类，默认所有用class定义的类，它们的元类是type"><a href="#产生类的类称之为元类，默认所有用class定义的类，它们的元类是type" class="headerlink" title="产生类的类称之为元类，默认所有用class定义的类，它们的元类是type"></a>产生类的类称之为元类，默认所有用class定义的类，它们的元类是type</h3></blockquote>
-<h4 id="定义类的两种方式"><a href="#定义类的两种方式" class="headerlink" title="定义类的两种方式"></a>定义类的两种方式</h4><ul>
-<li>class关键字</li>
-<li>type元类产生</li>
+<ul>
+<li>平衡生产者与消费者之间的速度差</li>
+<li>程序解开耦合</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># class方式</span><br><span class="line">class Chinese: #Chinese=type(...)</span><br><span class="line">    country=&apos;China&apos;</span><br><span class="line"></span><br><span class="line">    def __init__(self,namem,age):</span><br><span class="line">        self.name=namem</span><br><span class="line">        self.age=age</span><br><span class="line"></span><br><span class="line">    def talk(self):</span><br><span class="line">        print(&apos;%s is talking&apos; %self.name)</span><br><span class="line"></span><br><span class="line"># type方式</span><br><span class="line"># 定义类的三要素:类名，类的基类们，类的名称空间</span><br><span class="line">class_name=&apos;Chinese&apos;</span><br><span class="line">class_bases=(object,)</span><br><span class="line"></span><br><span class="line">class_body=&quot;&quot;&quot;</span><br><span class="line">country=&apos;China&apos;</span><br><span class="line"></span><br><span class="line">def __init__(self,namem,age):</span><br><span class="line">    self.name=namem</span><br><span class="line">    self.age=age</span><br><span class="line"></span><br><span class="line">def talk(self):</span><br><span class="line">    print(&apos;%s is talking&apos; %self.name)</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">class_dic=&#123;&#125;</span><br><span class="line">exec(class_body,globals(),class_dic)</span><br><span class="line"></span><br><span class="line"># 定义类的三要素:类名，类的基类们，类的名称空间</span><br><span class="line">Chinese1=type(class_name,class_bases,class_dic)</span><br></pre></td></tr></table></figure>
-<h4 id="自定义元类控制类的创建"><a href="#自定义元类控制类的创建" class="headerlink" title="自定义元类控制类的创建"></a>自定义元类控制类的创建</h4><ul>
-<li>类名必须大写</li>
-<li>必须有文档注释</li>
+<ol start="3">
+<li>如何实现生产者消费者模型</li>
+</ol>
+<ul>
+<li>生产者<--->队列<--->消费者</---></---></li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">class Mymeta(type):</span><br><span class="line">    def __init__(self,class_name,class_bases,class_dic):</span><br><span class="line">        if not class_name.istitle():</span><br><span class="line">            raise TypeError(&apos;类名的首字母必须大写&apos;)</span><br><span class="line"></span><br><span class="line">        if &apos;__doc__&apos; not in class_dic or not class_dic[&apos;__doc__&apos;].strip():</span><br><span class="line">            raise TypeError(&apos;必须有注释，且注释不能为空&apos;)</span><br><span class="line"></span><br><span class="line">        super(Mymeta,self).__init__(class_name,class_bases,class_dic)</span><br><span class="line"></span><br><span class="line">class Chinese(object,metaclass=Mymeta):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    中文人的类</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    country=&apos;China&apos;</span><br><span class="line"></span><br><span class="line">    def __init__(self,namem,age):</span><br><span class="line">        self.name=namem</span><br><span class="line">        self.age=age</span><br><span class="line"></span><br><span class="line">    def talk(self):</span><br><span class="line">        print(&apos;%s is talking&apos; %self.name)</span><br></pre></td></tr></table></figure>
-<h4 id="自定义元类控制类的实例化行为"><a href="#自定义元类控制类的实例化行为" class="headerlink" title="自定义元类控制类的实例化行为"></a>自定义元类控制类的实例化行为</h4><p>知识储备call方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Foo():</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">obj = Foo()</span><br><span class="line"># 请问obj能当作函数调用吗？</span><br><span class="line">obj(1,2,3) # 报错</span><br><span class="line"># --------------------------------------</span><br><span class="line"># 需要提供call方法</span><br><span class="line"># 再看</span><br><span class="line"></span><br><span class="line">class Foo2():</span><br><span class="line">    def __call__(self,*args,**kwargs):</span><br><span class="line">        print(&apos;===&gt;&apos;)</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">obj2= Foo2()</span><br><span class="line">obj2(1,2,3) # 不报错</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>切入正题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">class Mymeta(type):</span><br><span class="line">    def __init__(self,class_name,class_bases,class_dic):</span><br><span class="line">        if not class_name.istitle():</span><br><span class="line">            raise TypeError(&apos;类名的首字母必须大写&apos;)</span><br><span class="line"></span><br><span class="line">        if &apos;__doc__&apos; not in class_dic or not class_dic[&apos;__doc__&apos;].strip():</span><br><span class="line">            raise TypeError(&apos;必须有注释，且注释不能为空&apos;)</span><br><span class="line"></span><br><span class="line">        super(Mymeta,self).__init__(class_name,class_bases,class_dic)</span><br><span class="line"></span><br><span class="line">    def __call__(self, *args, **kwargs): #obj=Chinese(&apos;hjx&apos;,age=18)</span><br><span class="line">        # print(self) #self=Chinese</span><br><span class="line">        # print(args) #args=(&apos;hjx&apos;,)</span><br><span class="line">        # print(kwargs) #kwargs=&#123;&apos;age&apos;: 18&#125;</span><br><span class="line"></span><br><span class="line">        #第一件事：先造一个空对象obj</span><br><span class="line">        obj=object.__new__(self)</span><br><span class="line">        #第二件事：初始化obj</span><br><span class="line">        self.__init__(obj,*args,**kwargs)</span><br><span class="line">        #第三件事：返回obj</span><br><span class="line">        return obj</span><br><span class="line"></span><br><span class="line">class Chinese(object,metaclass=Mymeta):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    中文人的类</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    country=&apos;China&apos;</span><br><span class="line"></span><br><span class="line">    def __init__(self,namem,age):</span><br><span class="line">        self.name=namem</span><br><span class="line">        self.age=age</span><br><span class="line"></span><br><span class="line">    def talk(self):</span><br><span class="line">        print(&apos;%s is talking&apos; %self.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj=Chinese(&apos;egon&apos;,age=18) #Chinese.__call__(Chinese,&apos;hjx&apos;,18)</span><br><span class="line"></span><br><span class="line">print(obj.__dict__)</span><br></pre></td></tr></table></figure>
-<h4 id="元类控制类的实例化行为"><a href="#元类控制类的实例化行为" class="headerlink" title="元类控制类的实例化行为"></a>元类控制类的实例化行为</h4><p>单例模式</p>
-<blockquote>
-<h4 id="实现方式一："><a href="#实现方式一：" class="headerlink" title="实现方式一："></a>实现方式一：</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">class MySQL:</span><br><span class="line">    __instance=None #__instance=obj1</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.host=&apos;127.0.0.1&apos;</span><br><span class="line">        self.port=3306</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def singleton(cls):</span><br><span class="line">        if not cls.__instance:</span><br><span class="line">            obj=cls()</span><br><span class="line">            cls.__instance=obj</span><br><span class="line">        return cls.__instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    def conn(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">    def execute(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># obj1=MySQL()</span><br><span class="line"># obj2=MySQL()</span><br><span class="line"># obj3=MySQL()</span><br><span class="line">#</span><br><span class="line"># print(obj1)</span><br><span class="line"># print(obj2)</span><br><span class="line"># print(obj3)</span><br><span class="line"></span><br><span class="line">obj1=MySQL.singleton()</span><br><span class="line">obj2=MySQL.singleton()</span><br><span class="line">obj3=MySQL.singleton()</span><br><span class="line"></span><br><span class="line">print(obj1 is obj3)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="实现方式二：元类的方式"><a href="#实现方式二：元类的方式" class="headerlink" title="实现方式二：元类的方式"></a>实现方式二：元类的方式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">class Mymeta(type):</span><br><span class="line">    def __init__(self,class_name,class_bases,class_dic):</span><br><span class="line">        if not class_name.istitle():</span><br><span class="line">            raise TypeError(&apos;类名的首字母必须大写&apos;)</span><br><span class="line"></span><br><span class="line">        if &apos;__doc__&apos; not in class_dic or not class_dic[&apos;__doc__&apos;].strip():</span><br><span class="line">            raise TypeError(&apos;必须有注释，且注释不能为空&apos;)</span><br><span class="line"></span><br><span class="line">        super(Mymeta,self).__init__(class_name,class_bases,class_dic)</span><br><span class="line">        self.__instance=None</span><br><span class="line"></span><br><span class="line">    def __call__(self, *args, **kwargs): #obj=Chinese(&apos;egon&apos;,age=18)</span><br><span class="line">        if not self.__instance:</span><br><span class="line">            obj=object.__new__(self)</span><br><span class="line">            self.__init__(obj)</span><br><span class="line">            self.__instance=obj</span><br><span class="line"></span><br><span class="line">        return self.__instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Mysql(object,metaclass=Mymeta):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    mysql xxx</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.host=&apos;127.0.0.1&apos;</span><br><span class="line">        self.port=3306</span><br><span class="line"></span><br><span class="line">    def conn(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">    def execute(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj1=Mysql()</span><br><span class="line">obj2=Mysql()</span><br><span class="line">obj3=Mysql()</span><br><span class="line"></span><br><span class="line">print(obj1 is obj2 is obj3)</span><br></pre></td></tr></table></figure></blockquote>
 
         
         
@@ -540,7 +505,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -568,34 +533,36 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-01-12内置方法/" title="Py003-01-12内置方法" itemprop="url">Py003-01-12内置方法</a>
+      <a href="/2018/10/09/Py004-01-07队列/" title="Py004-01-07队列" itemprop="url">Py004-01-07队列</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T03:17:01.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-09T14:38:26.000Z" itemprop="datePublished"> Published 2018-10-09</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="内置方法"><a href="#内置方法" class="headerlink" title="内置方法"></a>内置方法</h3><ul>
-<li>isinstance(对象,类名) 谁是谁的实例</li>
-<li>issubclass(sub,super) 这个类是不是另一个类的子类</li>
+        <h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>进程彼此之间互相隔离，要实现进程间通信（IPC），multiprocessing模块支持两种形式：队列和管道，这两种方式都是使用消息传递的</p>
+<ul>
+<li>队列操作的是内存空间</li>
 </ul>
-<h4 id="item系列"><a href="#item系列" class="headerlink" title="item系列"></a>item系列</h4><p>将类定制成像字典一样的操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">class Foo:</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.name = name</span><br><span class="line"></span><br><span class="line">    def __getitem__(self, item):</span><br><span class="line">        print(&apos;get item&apos;)</span><br><span class="line">        self.__dict__</span><br><span class="line">        print(item)</span><br><span class="line">        return self.__dict__.get(item)</span><br><span class="line"></span><br><span class="line">    def __setitem__(self, key,value):</span><br><span class="line">        print(&apos;set item&apos;)</span><br><span class="line">        print(key,value)</span><br><span class="line">        self.__dict__[key] = value</span><br><span class="line"></span><br><span class="line">    def __delitem__(self, key):</span><br><span class="line">        print(&apos;del item&apos;)</span><br><span class="line">        print(key)</span><br><span class="line">        del self.__dict__[key]</span><br><span class="line"></span><br><span class="line">obj = Foo(&apos;hjx&apos;)</span><br><span class="line">print(obj.__dict__)</span><br><span class="line"># 属性名</span><br><span class="line">print(obj[&apos;name&apos;]) # obj.name</span><br><span class="line">print(obj[&apos;namexxx&apos;] ) # 不会报错</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj[&apos;sex&apos;] = &apos;man&apos;</span><br><span class="line">print(obj[&apos;sex&apos;])</span><br><span class="line"></span><br><span class="line">del obj[&apos;name&apos;]</span><br><span class="line">print(obj.__dict__)</span><br></pre></td></tr></table></figure>
-<h4 id="双下str双下"><a href="#双下str双下" class="headerlink" title="双下str双下"></a>双下str双下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line"></span><br><span class="line">    def __str__(self):</span><br><span class="line">        return &apos;&lt;name:%s,age:%s&gt;&apos;%(self.name,self.age)</span><br><span class="line"></span><br><span class="line">p = People(&apos;hjx&apos;,18)</span><br><span class="line"></span><br><span class="line">print(p) # &lt;name:hjx,age:18&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="双下del双下"><a href="#双下del双下" class="headerlink" title="双下del双下"></a>双下del双下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f = open(&apos;aa.py&apos;,mode=&apos;w+&apos;)</span><br><span class="line">f.read()</span><br><span class="line">f.close() # 回收操作系统资源</span><br><span class="line"></span><br><span class="line"># 此时f还存在不存在——存在</span><br><span class="line">print(f) # &lt;_io.TextIOWrapper name=&apos;aa.py&apos; mode=&apos;w+&apos; encoding=&apos;cp936&apos;&gt;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>再看</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">class Open:</span><br><span class="line">    def __init__(self,fileName):</span><br><span class="line">        print(&apos;open file...&apos;)</span><br><span class="line">        self.fileName = fileName</span><br><span class="line"></span><br><span class="line">    def __del__(self):</span><br><span class="line">        print(&apos;del_____&apos;)</span><br><span class="line"></span><br><span class="line">f2 = Open(&apos;aa.txt&apos;)</span><br><span class="line"># del f2</span><br><span class="line">print(&apos;-----main------&apos;)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">open file...</span><br><span class="line">-----main------</span><br><span class="line">del_____</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">---------------------</span><br><span class="line">f3 = Open(&apos;aa.txt&apos;)</span><br><span class="line">del f3</span><br><span class="line">print(&apos;-----main------&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">open file...</span><br><span class="line">del_____</span><br><span class="line">-----main------</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h3 id="队列就是管道加锁实现"><a href="#队列就是管道加锁实现" class="headerlink" title="队列就是管道加锁实现"></a>队列就是管道加锁实现</h3></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Queue([maxsize]):创建共享的进程队列，Queue是多进程安全的队列，可以使用Queue实现多进程之间的数据传递。</span><br></pre></td></tr></table></figure>
+<h4 id="参数介绍："><a href="#参数介绍：" class="headerlink" title="参数介绍："></a>参数介绍：</h4><p>maxsize是队列中允许最大项数，省略则无大小限制。</p>
 <blockquote>
-<p>执行结果：你不调用 del程序会在执行结束后自动帮你调用  ，如果你手动调用了，就不帮你调用了</p>
+<p>但需要明确：</p>
 </blockquote>
+<ul>
+<li>队列内存放的是消息而非大数据</li>
+<li>队列占用的是内存空间，因而maxsize即便是无大小限制也受限于内存大小</li>
+</ul>
+<h4 id="主要方法介绍："><a href="#主要方法介绍：" class="headerlink" title="主要方法介绍："></a>主要方法介绍：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">q.put方法用以插入数据到队列中。</span><br><span class="line">q.get方法可以从队列读取并且删除一个元素。</span><br></pre></td></tr></table></figure>
+<h4 id="队列的使用"><a href="#队列的使用" class="headerlink" title="队列的使用"></a>队列的使用</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,Queue</span><br><span class="line"></span><br><span class="line">q=Queue(3) # 指定队列最大数量为3 就是能放三个数据进去</span><br><span class="line"></span><br><span class="line">#put ,get ,put_nowait,get_nowait,full,empty</span><br><span class="line">q.put(1)</span><br><span class="line">q.put(2)</span><br><span class="line">q.put(3)</span><br><span class="line">print(q.full()) #满了  (队列是否满了)</span><br><span class="line"># q.put(4) #再放就阻塞住了</span><br><span class="line"></span><br><span class="line">print(q.get())</span><br><span class="line">print(q.get())</span><br><span class="line">print(q.get())</span><br><span class="line">print(q.empty()) #空了</span><br><span class="line"># print(q.get()) #再取就阻塞住了 队列已经没数据了</span><br></pre></td></tr></table></figure>
 
         
         
@@ -609,7 +576,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -637,20 +604,39 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-01-11反射/" title="Py003-01-11反射" itemprop="url">Py003-01-11反射</a>
+      <a href="/2018/10/09/Py004-01-06互斥锁/" title="Py004-01-06互斥锁" itemprop="url">Py004-01-06互斥锁</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T02:27:37.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-09T13:41:08.000Z" itemprop="datePublished"> Published 2018-10-09</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line"></span><br><span class="line">    def talk(self):</span><br><span class="line">        print(&apos;%s is talking &apos;%self.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj = People(&apos;hjx&apos;,18)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 判断是否含有属性和方法</span><br><span class="line">print(hasattr(obj,&apos;name&apos;))</span><br><span class="line">print(hasattr(obj,&apos;talk&apos;))</span><br><span class="line"></span><br><span class="line"># 拿到对象的属性或方法</span><br><span class="line"># print(getattr(obj,&apos;namexxxx&apos;)) 报错因为 没有该属性</span><br><span class="line"># 兜底写法</span><br><span class="line">print(getattr(obj,&apos;namexxxx&apos;,None))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 修改对象的属性</span><br><span class="line">setattr(obj,&apos;sex&apos;,&apos;man&apos;)</span><br><span class="line">print(obj.sex)</span><br><span class="line"></span><br><span class="line"># 删除对象的属性</span><br><span class="line">delattr(obj,&apos;age&apos;)</span><br><span class="line">print(obj.__dict__)</span><br><span class="line"></span><br><span class="line"># 类的属性也是可以获取的</span><br><span class="line">print(getattr(People,&apos;city&apos;))</span><br></pre></td></tr></table></figure>
+        <h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>多个进程直接虽然数据不共享，但是它们共享同一套文件系统(或者同一个打印终端)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s 1&apos;%name)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&apos;%s 2&apos;%name)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&apos;%s 3&apos; % name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    for i in range(3):</span><br><span class="line">        p = Process(target=task, args=(&apos;子进程%s&apos;%i,))</span><br><span class="line">        p.start()</span><br><span class="line"></span><br><span class="line">    print(&apos;主进程。。。。&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">主进程。。。。</span><br><span class="line">子进程0 1</span><br><span class="line">子进程1 1</span><br><span class="line">子进程2 1</span><br><span class="line">子进程0 2</span><br><span class="line">子进程1 2</span><br><span class="line">子进程2 2</span><br><span class="line">子进程0 3</span><br><span class="line">子进程1 3</span><br><span class="line">子进程2 3</span><br><span class="line">此时数据发生错乱，三个进程都占据打印终端的输出，这样数据容易出现问题</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="互斥锁-来把锁"><a href="#互斥锁-来把锁" class="headerlink" title="互斥锁(来把锁)"></a>互斥锁(来把锁)</h4><ul>
+<li>从multiprocessing引入Lock</li>
+<li>初始化锁 mutex = Lock()</li>
+<li>给子进程的触发函数传入锁对象mutex</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process,Lock</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def task(name,mutex):</span><br><span class="line">    mutex.acquire()</span><br><span class="line">    print(&apos;%s 1&apos;%name)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&apos;%s 2&apos;%name)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&apos;%s 3&apos; % name)</span><br><span class="line">    mutex.release()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    for i in range(3):</span><br><span class="line">        mutex=Lock()</span><br><span class="line">        p = Process(target=task, args=(&apos;子进程%s&apos;%i,mutex))</span><br><span class="line">        p.start()</span><br><span class="line"></span><br><span class="line">    print(&apos;主进程。。。。&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">主进程。。。。</span><br><span class="line">子进程0 1</span><br><span class="line">子进程1 1</span><br><span class="line">子进程2 1</span><br><span class="line">子进程0 2</span><br><span class="line">子进程1 2</span><br><span class="line">子进程2 2</span><br><span class="line">子进程0 3</span><br><span class="line">子进程1 3</span><br><span class="line">子进程2 3</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="模拟抢票"><a href="#模拟抢票" class="headerlink" title="模拟抢票"></a>模拟抢票</h4><p>多个进程共享同一文件，我们可以把文件当数据库，用多个进程模拟多个人执行抢票任务</p>
+<blockquote>
+<h4 id="新建文件db-txt的内容为：-“count”-1"><a href="#新建文件db-txt的内容为：-“count”-1" class="headerlink" title="新建文件db.txt的内容为：{“count”:1}"></a>新建文件db.txt的内容为：{“count”:1}</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import  Process</span><br><span class="line">import json</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def search(name):</span><br><span class="line">    time.sleep(1) # 模拟网络延迟</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line">    print(&apos;&lt;%s&gt;查看剩余票数[%s]&apos;%(name,dic[&apos;count&apos;]))</span><br><span class="line"></span><br><span class="line">def get(name):</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;, encoding=&apos;utf-8&apos;))</span><br><span class="line">    if dic[&apos;count&apos;]&gt;0:</span><br><span class="line">        dic[&apos;count&apos;]-=1</span><br><span class="line">        time.sleep(3)</span><br><span class="line">        json.dump(dic,open(&apos;db.txt&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line">        print(&apos;&lt;%s 购票成功&gt;&apos;%name)</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    search(name)</span><br><span class="line">    get(name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    for i in range(10):</span><br><span class="line">        p = Process(target=task,args=(&apos;路人%s&apos;%i,))</span><br><span class="line">        p.start()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&lt;路人0&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人2&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人1&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人3&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人4&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人5&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人6&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人7&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人8&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人9&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人0 购票成功&gt;</span><br><span class="line">&lt;路人2 购票成功&gt;</span><br><span class="line">&lt;路人1 购票成功&gt;</span><br><span class="line">&lt;路人3 购票成功&gt;</span><br><span class="line">&lt;路人4 购票成功&gt;</span><br><span class="line">&lt;路人5 购票成功&gt;</span><br><span class="line">&lt;路人6 购票成功&gt;</span><br><span class="line">&lt;路人7 购票成功&gt;</span><br><span class="line">&lt;路人8 购票成功&gt;</span><br><span class="line">&lt;路人9 购票成功&gt;</span><br><span class="line"></span><br><span class="line">并发的执行查看同一个文件，于是都看到了剩余1张票，最后都购票成功于是 打起来了。。。。</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import  Process,Lock</span><br><span class="line">import json</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def search(name):</span><br><span class="line">    time.sleep(1) # 模拟网络延迟</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line">    print(&apos;&lt;%s&gt;查看剩余票数[%s]&apos;%(name,dic[&apos;count&apos;]))</span><br><span class="line"></span><br><span class="line">def get(name):</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;, encoding=&apos;utf-8&apos;))</span><br><span class="line">    if dic[&apos;count&apos;]&gt;0:</span><br><span class="line">        dic[&apos;count&apos;]-=1</span><br><span class="line">        time.sleep(3)</span><br><span class="line">        json.dump(dic,open(&apos;db.txt&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line"></span><br><span class="line">        print(&apos;&lt;%s 购票成功&gt;&apos;%name)</span><br><span class="line">def task(name,mutex):</span><br><span class="line">    mutex.acquire()</span><br><span class="line">    search(name)</span><br><span class="line">    get(name)</span><br><span class="line">    mutex.release()</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    mutex = Lock()</span><br><span class="line">    for i in range(10):</span><br><span class="line">        p = Process(target=task,args=(&apos;路人%s&apos;%i,mutex))</span><br><span class="line">        p.start()</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&lt;路人0&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人0 购票成功&gt;</span><br><span class="line">&lt;路人2&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人1&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人3&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人4&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人5&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人6&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人7&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人8&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人9&gt;查看剩余票数[0]</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="上述有一个问题必须等第一个人购票了其他人才能查票"><a href="#上述有一个问题必须等第一个人购票了其他人才能查票" class="headerlink" title="上述有一个问题必须等第一个人购票了其他人才能查票"></a>上述有一个问题必须等第一个人购票了其他人才能查票</h4></blockquote>
+<p>做如下修改</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def task(name,mutex):</span><br><span class="line"></span><br><span class="line">    search(name)</span><br><span class="line"></span><br><span class="line">    mutex.acquire()</span><br><span class="line">    get(name)</span><br><span class="line">    mutex.release()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&lt;路人0&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人1&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人2&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人3&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人4&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人5&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人6&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人7&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人8&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人9&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人0 购票成功&gt;</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="互斥锁和join的区别"><a href="#互斥锁和join的区别" class="headerlink" title="互斥锁和join的区别"></a>互斥锁和join的区别</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import  Process,Lock</span><br><span class="line">import json</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">def search(name):</span><br><span class="line">    time.sleep(1) # 模拟网络延迟</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line">    print(&apos;&lt;%s&gt;查看剩余票数[%s]&apos;%(name,dic[&apos;count&apos;]))</span><br><span class="line"></span><br><span class="line">def get(name):</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    dic = json.load(open(&apos;db.txt&apos;, encoding=&apos;utf-8&apos;))</span><br><span class="line">    if dic[&apos;count&apos;]&gt;0:</span><br><span class="line">        dic[&apos;count&apos;]-=1</span><br><span class="line">        time.sleep(3)</span><br><span class="line">        json.dump(dic,open(&apos;db.txt&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;))</span><br><span class="line">        print(&apos;&lt;%s 购票成功&gt;&apos;%name)</span><br><span class="line">    else:</span><br><span class="line">        print(&apos;&lt;%s 购票失败&gt;&apos; % name)</span><br><span class="line">def task(name):</span><br><span class="line">    search(name)</span><br><span class="line">    get(name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    for i in range(10):</span><br><span class="line">        p = Process(target=task,args=(&apos;路人%s&apos;%i,))</span><br><span class="line">        p.start()</span><br><span class="line">        p.join()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">去掉锁后改用join虽然保证了串行，影响了整个的查询效率变慢了</span><br><span class="line">&lt;路人0&gt;查看剩余票数[1]</span><br><span class="line">&lt;路人0 购票成功&gt;</span><br><span class="line">&lt;路人1&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人1 购票失败&gt;</span><br><span class="line">&lt;路人2&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人2 购票失败&gt;</span><br><span class="line">&lt;路人3&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人3 购票失败&gt;</span><br><span class="line">&lt;路人4&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人4 购票失败&gt;</span><br><span class="line">&lt;路人5&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人5 购票失败&gt;</span><br><span class="line">&lt;路人6&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人6 购票失败&gt;</span><br><span class="line">&lt;路人7&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人7 购票失败&gt;</span><br><span class="line">&lt;路人8&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人8 购票失败&gt;</span><br><span class="line">&lt;路人9&gt;查看剩余票数[0]</span><br><span class="line">&lt;路人9 购票失败&gt;</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
 
         
         
@@ -664,7 +650,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -692,42 +678,31 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-01-10绑定方法与非绑定方法/" title="Py003-01-10绑定方法与非绑定方法" itemprop="url">Py003-01-10绑定方法与非绑定方法</a>
+      <a href="/2018/10/09/Py004-01-05守护进程/" title="Py004-01-05守护进程" itemprop="url">Py004-01-05守护进程</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T01:58:52.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-09T13:32:51.000Z" itemprop="datePublished"> Published 2018-10-09</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="绑定方法与非绑定方法"><a href="#绑定方法与非绑定方法" class="headerlink" title="绑定方法与非绑定方法"></a>绑定方法与非绑定方法</h3><blockquote>
-<p>在类内部定义的方法，分为两类</p>
-</blockquote>
+        <h3 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h3><p>主进程创建子进程，然后将该进程设置成守护自己的进程，守护进程就好比崇祯皇帝身边的老太监，崇祯皇帝已死老太监就跟着殉葬了。</p>
+<p>关于守护进程需要强调两点：</p>
 <ol>
-<li><p>绑定方法:绑定给谁，就应该由谁来调用，谁来调用就会把调用者当作第一个参数自动传入</p>
-<ul>
-<li><p>绑定到对象的方法：在类内定义的没有被任何装饰器修饰的</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Foo:</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.name = name</span><br><span class="line">    def tell(self):</span><br><span class="line">        print(&apos;名字是：%s&apos;%self.name)</span><br><span class="line"></span><br><span class="line">f = Foo(&apos;hjx&apos;)</span><br><span class="line">print(Foo.tell)  # &lt;function Foo.tell at 0x0000027D2DE7AEA0&gt;</span><br><span class="line">Foo.tell(f) # 类可以调用tell方法，需要传递实例对象</span><br><span class="line"></span><br><span class="line">print(f.tell) # &lt;bound method Foo.tell of &lt;__main__.Foo object at 0x00000197433C95C0&gt;&gt;</span><br></pre></td></tr></table></figure>
+<li><p>守护进程会在主进程代码执行结束后就终止</p>
 </li>
-<li><p>绑定到类的方法:在类内定义的同时被装饰器classmethod修饰的方法</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Foo:</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.name = name</span><br><span class="line">  </span><br><span class="line">    @classmethod</span><br><span class="line">    def func(cls):</span><br><span class="line">        print(cls)</span><br><span class="line">f = Foo(&apos;hjx&apos;)</span><br><span class="line">       </span><br><span class="line">print(Foo.func) # &lt;bound method Foo.func of &lt;class &apos;__main__.Foo&apos;&gt;&gt;</span><br><span class="line">Foo.func() # &lt;class &apos;__main__.Foo&apos;&gt;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>非绑定方法：没有自动传值那么一说</p>
-<ul>
-<li><p>非绑定方法：不与类和对象绑定</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class Foo:</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.name = name</span><br><span class="line">    </span><br><span class="line">    @staticmethod</span><br><span class="line">    def sum(x,y):</span><br><span class="line">        return x+y</span><br><span class="line"></span><br><span class="line">f = Foo(&apos;hjx&apos;)</span><br><span class="line"></span><br><span class="line">print(f.sum)</span><br><span class="line">print(Foo.sum)</span><br><span class="line">f.sum(1,2)</span><br><span class="line">Foo.sum(2,5)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&lt;function Foo.sum at 0x000002240B6A2378&gt;</span><br><span class="line">&lt;function Foo.sum at 0x000002240B6A2378&gt;</span><br><span class="line">3</span><br><span class="line">7</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+<li><p>守护进程内无法再开启子进程,否则抛出异常：AssertionError: daemonic processes are not allowed to have children</p>
 </li>
 </ol>
-<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import hashlib</span><br><span class="line">import time</span><br><span class="line">settings = &#123;</span><br><span class="line">    &quot;name&quot;:&quot;hjx2&quot;,</span><br><span class="line">    &quot;age&quot;:28,</span><br><span class="line">    &quot;sex&quot;:&apos;man&apos;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age,sex):</span><br><span class="line">        self.id = self.create_id()</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.sex = sex</span><br><span class="line"></span><br><span class="line">    def tellInfo(self): # 绑定到对象的方法</span><br><span class="line">        print(&apos;name is %s,age: %s,sex :%s&apos;%(self.name,self.age,self.sex))</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def from_conf(cls):</span><br><span class="line">        obj = cls(</span><br><span class="line">            settings[&quot;name&quot;],</span><br><span class="line">            settings[&quot;age&quot;],</span><br><span class="line">            settings[&quot;sex&quot;]</span><br><span class="line">        )</span><br><span class="line">        return obj</span><br><span class="line"></span><br><span class="line">    @staticmethod</span><br><span class="line">    def create_id():</span><br><span class="line">        m = hashlib.md5(str(time.time()).encode(&apos;utf-8&apos;))</span><br><span class="line">        return m.hexdigest()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = People(&apos;hjx&apos;,18,&apos;man&apos;)</span><br><span class="line"></span><br><span class="line"># 绑定给对象，就应该由对象调用，自动将对象本身当第一个参数传入</span><br><span class="line">p.tellInfo()</span><br><span class="line"></span><br><span class="line"># 绑定给类，就应该由类来调用，自动将类本身当作第一个参数传入</span><br><span class="line">p2 = People.from_conf()</span><br><span class="line">p2.tellInfo()</span><br><span class="line"></span><br><span class="line"># 非绑定方法，不与类和对象绑定，谁都可以调用，没有自动传值一说</span><br><span class="line">p3 = People.from_conf()</span><br><span class="line">print(p3.id)</span><br></pre></td></tr></table></figure>
+<p>如果我们有两个任务需要并发执行，那么开一个主进程和一个子进程分别去执行就ok了，如果子进程的任务在主进程任务结束后就没有存在的必要了，那么该子进程应该在开启前就被设置成守护进程。主进程代码运行结束，守护进程随即终止</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time</span><br><span class="line">import random</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is piaoing&apos; %name)</span><br><span class="line">    time.sleep(random.randrange(1,3))</span><br><span class="line">    print(&apos;%s is piao end&apos; %name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    p=Process(target=task,args=(&apos;egon&apos;,))</span><br><span class="line">    p.daemon=True #一定要在p.start()前设置,设置p为守护进程,禁止p创建子进程,并且父进程代码执行结束,p即终止运行</span><br><span class="line">    p.start()</span><br><span class="line">    print(&apos;主&apos;) #只要终端打印出这一行内容，那么守护进程p也就跟着结束掉了</span><br></pre></td></tr></table></figure>
+<p>守护进程要在start前设置daemon=True 否则报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">#守护进程一定是等到主进程结束然后终止运行</span><br><span class="line">from multiprocessing import Process</span><br><span class="line"></span><br><span class="line">import time</span><br><span class="line">def foo():</span><br><span class="line">    print(123)</span><br><span class="line">    time.sleep(1)</span><br><span class="line">    print(&quot;end123&quot;)</span><br><span class="line"></span><br><span class="line">def bar():</span><br><span class="line">    print(456)</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    print(&quot;end456&quot;)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    p1=Process(target=foo)</span><br><span class="line">    p2=Process(target=bar)</span><br><span class="line"></span><br><span class="line">    p1.daemon=True</span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    print(&quot;main-------&quot;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">永远看不到  end123</span><br><span class="line">因为执行到  main------之后 主进程就结束了</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
 
         
         
@@ -741,7 +716,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -769,30 +744,52 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/09/09/Py003-01-09proterty/" title="Py003-01-09proterty" itemprop="url">Py003-01-09proterty</a>
+      <a href="/2018/10/08/Py004-01-04Process其他属性和方法/" title="Py004-01-04Process其他属性和方法" itemprop="url">Py004-01-04Process其他属性和方法</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
 		
   <p class="article-time">
-    <time datetime="2018-09-09T01:37:21.000Z" itemprop="datePublished"> Published 2018-09-09</time>
+    <time datetime="2018-10-08T13:38:44.000Z" itemprop="datePublished"> Published 2018-10-08</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <h3 id="property的使用"><a href="#property的使用" class="headerlink" title="property的使用"></a>property的使用</h3><p>房屋面积的需求</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Room:</span><br><span class="line">    def __init__(self,long_val,width_val):</span><br><span class="line">        self.long_val = long_val</span><br><span class="line">        self.width_val = width_val</span><br><span class="line">    # 房屋的面积</span><br><span class="line">    def Area(self):</span><br><span class="line">        return self.long_val * self.width_val</span><br><span class="line"></span><br><span class="line">r = Room(100,100)</span><br><span class="line"></span><br><span class="line"># 我想要房屋的面积数据,但是要通过方法一样调用  不能像 r.long_val一样去获取</span><br><span class="line">print(r.Area())</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="property的使用-1"><a href="#property的使用-1" class="headerlink" title="property的使用"></a>property的使用</h4></blockquote>
-<ul>
-<li>使使用者感知不到他在调用方法，它以为是在调用属性</li>
+        <h3 id="Process其他属性和方法"><a href="#Process其他属性和方法" class="headerlink" title="Process其他属性和方法"></a>Process其他属性和方法</h3><h4 id="需求一-父进程等待子进程结束在运行"><a href="#需求一-父进程等待子进程结束在运行" class="headerlink" title="需求一(父进程等待子进程结束在运行)"></a>需求一(父进程等待子进程结束在运行)</h4><ul>
+<li>join</li>
 </ul>
-<p>添加property装饰器后，像访问属性一样访问数据——本质依然是触发方法Area的执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class Room:</span><br><span class="line">    def __init__(self,long_val,width_val):</span><br><span class="line">        self.long_val = long_val</span><br><span class="line">        self.width_val = width_val</span><br><span class="line">    @property</span><br><span class="line">    def Area(self):</span><br><span class="line">        return self.long_val * self.width_val</span><br><span class="line"></span><br><span class="line">r = Room(100,100)</span><br><span class="line">print(r.Area)</span><br><span class="line"></span><br><span class="line"># Area能像属性一样赋值吗？</span><br><span class="line"># r.Area = 2000 报错 AttributeError: can&apos;t set attribute</span><br></pre></td></tr></table></figure>
-<h4 id="propety的补充-了解就行"><a href="#propety的补充-了解就行" class="headerlink" title="propety的补充(了解就行)"></a>propety的补充(了解就行)</h4><p>突然你就想像数据一样，给Area赋值呢？ 可以</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.__name = name</span><br><span class="line">    @property</span><br><span class="line">    def name(self):</span><br><span class="line">        return self.__name</span><br><span class="line">    @name.setter</span><br><span class="line">    def name(self,val):</span><br><span class="line">        if not isinstance(val,str):</span><br><span class="line">            print(&apos;名字必须是字符串&apos;)</span><br><span class="line">            return</span><br><span class="line">        self.__name = val</span><br><span class="line"></span><br><span class="line">    @name.deleter</span><br><span class="line">    def name(self):</span><br><span class="line">        print(&apos;delete 失败&apos;)</span><br><span class="line"></span><br><span class="line">p = People(&apos;hjx&apos;)</span><br><span class="line">print(p.name)</span><br><span class="line">p.name = &apos;李四&apos;</span><br><span class="line">print(p.name)</span><br><span class="line"></span><br><span class="line">del p.name</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    print(&apos;%s is done&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p = Process(target=task,args=(&apos;子进程&apos;,))</span><br><span class="line"></span><br><span class="line">    p.start()</span><br><span class="line"></span><br><span class="line">    p.join()</span><br><span class="line">    print(&apos;主进程。。。。1&apos;,os.getpid(),os.getppid())</span><br><span class="line">    print(p.pid) # 主进程进行完后，子进程pid并不会回收，但是如果主进程结束的时候所有的子进程就会结束</span><br></pre></td></tr></table></figure>
+<h4 id="不要以代码先后看执行结果"><a href="#不要以代码先后看执行结果" class="headerlink" title="不要以代码先后看执行结果"></a>不要以代码先后看执行结果</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p1 = Process(target=task,args=(&apos;子进程1&apos;,))</span><br><span class="line">    p2 = Process(target=task,args=(&apos;子进程2&apos;,))</span><br><span class="line">    p3 = Process(target=task,args=(&apos;子进程3&apos;,))</span><br><span class="line"></span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    p3.start()</span><br><span class="line"></span><br><span class="line">    print(&apos;主进程开始了&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">代码执行结果：</span><br><span class="line">p1.start()只是给操作系统发信号不一定会先执行</span><br><span class="line">p2.start()只是给操作系统发信号不一定会先执行</span><br><span class="line">p3.start()只是给操作系统发信号不一定会先执行</span><br><span class="line">多执行几次就会看大顺序是不确定的</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>偏要顺序执行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p1 = Process(target=task,args=(&apos;子进程1&apos;,))</span><br><span class="line">    p2 = Process(target=task,args=(&apos;子进程2&apos;,))</span><br><span class="line">    p3 = Process(target=task,args=(&apos;子进程3&apos;,))</span><br><span class="line"></span><br><span class="line">    p1.start()</span><br><span class="line">    p2.start()</span><br><span class="line">    p3.start()</span><br><span class="line"></span><br><span class="line">    p1.join()</span><br><span class="line">    p2.join()</span><br><span class="line">    p3.join()</span><br><span class="line">    </span><br><span class="line">    print(&apos;主进程开始了&apos;)</span><br></pre></td></tr></table></figure>
+<p>你已经踩坑了<br>你已经踩坑了<br>你已经踩坑了</p>
+<blockquote>
+<p>　假设p1运行1个小时，p2运行半个小时,p3运行10分钟，请问主进程等待多长时间？</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">p1.join() # 让主进程等待，并不会让兄弟进程(其他子进程)等待</span><br><span class="line"></span><br><span class="line">所以最后主进程会等待1小时</span><br></pre></td></tr></table></figure>
+<h4 id="真正意义的串行执行"><a href="#真正意义的串行执行" class="headerlink" title="真正意义的串行执行"></a>真正意义的串行执行</h4><p>这样修改就行了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">p1.start()</span><br><span class="line">p1.join()</span><br><span class="line">p2.start()</span><br><span class="line">p2.join()</span><br><span class="line">p3.start()</span><br><span class="line">p3.join()</span><br></pre></td></tr></table></figure>
+<p>巧用for循环</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">arr_p = [p1,p2,p3]</span><br><span class="line">for p in arr_p:</span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br></pre></td></tr></table></figure>
+<h4 id="查看子进程是否活着"><a href="#查看子进程是否活着" class="headerlink" title="查看子进程是否活着"></a>查看子进程是否活着</h4><ul>
+<li>is_alive()</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line">    time.sleep(3)</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p = Process(target=task,args=(&apos;子进程&apos;,))</span><br><span class="line"></span><br><span class="line">    p.start()</span><br><span class="line">    print(p.is_alive())</span><br><span class="line">    print(&apos;主进程&apos;)</span><br><span class="line">    print(p.pid)</span><br><span class="line">    print(p.is_alive())</span><br></pre></td></tr></table></figure>
+<h4 id="杀死进程"><a href="#杀死进程" class="headerlink" title="杀死进程"></a>杀死进程</h4><ul>
+<li>terminate()</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task(name):</span><br><span class="line">    print(&apos;%s is running&apos;%name)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p = Process(target=task,args=(&apos;子进程&apos;,))</span><br><span class="line"></span><br><span class="line">    p.start()</span><br><span class="line">    </span><br><span class="line">    p.terminate() # 只是给操作系统发信号让子进程终止，但不会立即执行 ，所以之后查看子进程is_alive还是True</span><br><span class="line">    print(p.is_alive())</span><br><span class="line">    </span><br><span class="line">    print(&apos;主进程&apos;)</span><br></pre></td></tr></table></figure>
+<p>怎样真的死掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">p.start()</span><br><span class="line">    </span><br><span class="line">p.terminate() # 只是给操作系统发信号让子进程终止，但不会立即执行</span><br><span class="line">time.sleep(3) #</span><br><span class="line">print(p.is_alive())</span><br></pre></td></tr></table></figure>
+<h4 id="给子进程起名字"><a href="#给子进程起名字" class="headerlink" title="给子进程起名字"></a>给子进程起名字</h4><ul>
+<li>name</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 不指定name参数就有一个默认的</span><br><span class="line">p = Process(target=task,name=&apos;sub-Process&apos;)</span><br><span class="line">p.start()</span><br><span class="line">print(p.name)</span><br></pre></td></tr></table></figure>
+<h4 id="父子进程是隔离的"><a href="#父子进程是隔离的" class="headerlink" title="父子进程是隔离的"></a>父子进程是隔离的</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import Process</span><br><span class="line">import time,os</span><br><span class="line"></span><br><span class="line">def task():</span><br><span class="line">    global n</span><br><span class="line">    n = 0</span><br><span class="line">    print(&apos;子进程内%s&apos;%n)</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    # args传递的参数必须是元组的形式</span><br><span class="line">    p = Process(target=task)</span><br><span class="line"></span><br><span class="line">    p.start()</span><br><span class="line">    p.join()</span><br><span class="line">    print(&apos;主进程&apos;,n)</span><br></pre></td></tr></table></figure>
         
         
         <p class="article-more-link">
@@ -805,7 +802,7 @@
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/M03/">M03</a>
+  <span></span> <a href="/tags/M04/">M04</a>
   </div>
 
 </div>
@@ -829,7 +826,7 @@
 
 
   <nav id="page-nav" class="clearfix">
-    <a class="extend prev" rel="prev" href="/page/32/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="page-number" href="/page/32/">32</a><span class="page-number current">33</span><a class="page-number" href="/page/34/">34</a><a class="page-number" href="/page/35/">35</a><span class="space">&hellip;</span><a class="page-number" href="/page/51/">51</a><a class="extend next" rel="next" href="/page/34/">Next<span></span></a>
+    <a class="extend prev" rel="prev" href="/page/32/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/31/">31</a><a class="page-number" href="/page/32/">32</a><span class="page-number current">33</span><a class="page-number" href="/page/34/">34</a><a class="page-number" href="/page/35/">35</a><span class="space">&hellip;</span><a class="page-number" href="/page/52/">52</a><a class="extend next" rel="next" href="/page/34/">Next<span></span></a>
   </nav>
 
 </div>
@@ -862,7 +859,7 @@
 			
 		
 			
-				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>36</sup></a></li>
 			
 		
 			
@@ -886,6 +883,10 @@
 			
 		
 			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>24</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
 			
 		
@@ -899,10 +900,6 @@
 		
 			
 				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
 			
 		
 			
@@ -999,7 +996,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2021 
 		
 		<a href="/about" target="_blank" title="Stevin">Stevin</a>
 		

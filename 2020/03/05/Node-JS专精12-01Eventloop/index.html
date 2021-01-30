@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Almost">
 <meta property="og:description" content="参考链接 Event Loop、计时器、nextTick  Eventloop 之前的前置内容 操作系统相关  12345678网页上有个输入框，当你按下键盘的 “J” 之后发生了什么实际 “J” 下面有一个非常复杂的电路当你按下 之后，会触发一个电流这个电流会触发一个你按键的信息 如 101然后把这个 信息 101 传递给 操作系统操作系统知道这个 按键信息之后，它就会通知给你的浏览器浏览器得到">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-09-08T12:50:20.269Z">
+<meta property="og:updated_time" content="2021-01-30T04:32:05.812Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Node-JS专精12_01Eventloop">
 <meta name="twitter:description" content="参考链接 Event Loop、计时器、nextTick  Eventloop 之前的前置内容 操作系统相关  12345678网页上有个输入框，当你按下键盘的 “J” 之后发生了什么实际 “J” 下面有一个非常复杂的电路当你按下 之后，会触发一个电流这个电流会触发一个你按键的信息 如 101然后把这个 信息 101 传递给 操作系统操作系统知道这个 按键信息之后，它就会通知给你的浏览器浏览器得到">
@@ -171,7 +171,7 @@
 <blockquote>
 <p>我们只需要清楚 times / poll / check 就够了</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1 times</span><br><span class="line">2 poll</span><br><span class="line">3 check </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">times =&gt; poll 会停留一段事件</span><br><span class="line">poll =&gt; check</span><br><span class="line">check =&gt; times</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们执行 setTimeout(fn,2000) 时， 会把 fn 放入 timse 的一个 数组里 (队列)同时记录 要在 2秒后执行 fn ,于是 js 就去做自己的事去了</span><br><span class="line"></span><br><span class="line">setTimeout(fn,2000) 之后就会进入 poll 阶段 等待的过程中 他会去看时间， </span><br><span class="line">刚才 js 说要在 2秒后执行 fn , 比如此时等了 500毫秒，发现不需要执行， 继续等 1000毫秒再去看， 继续等， 等到 2秒的时候 发现时间到了， </span><br><span class="line">赶紧进入 timse 阶段执行 fn， 虽然 poll之后要经过 check 阶段 ，但稍后再说</span><br><span class="line">执行完 fn 之后 又回到 poll 阶段 继续等。 一般来说有最长等待时间 假设3秒 后就会进入 check 然后进入 times 然后继续进入 poll</span><br><span class="line">所以 大部分时间都是在 poll 阶段 用来等</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1 times</span><br><span class="line">2 poll</span><br><span class="line">3 check </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">times =&gt; poll 会停留一段事件</span><br><span class="line">poll =&gt; check</span><br><span class="line">check =&gt; times</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们执行 setTimeout(fn,2000) 时， 会把 fn 放入 times 的一个 数组里 (队列)同时记录 要在 2秒后执行 fn ,于是 js 就去做自己的事去了</span><br><span class="line"></span><br><span class="line">setTimeout(fn,2000) 之后就会进入 poll 阶段 等待的过程中 他会去看时间， </span><br><span class="line">刚才 js 说要在 2秒后执行 fn , 比如此时等了 500毫秒，发现不需要执行， 继续等 1000毫秒再去看， 继续等， 等到 2秒的时候 发现时间到了， </span><br><span class="line">赶紧进入 times 阶段执行 fn， 虽然 poll之后要经过 check 阶段 ，但稍后再说</span><br><span class="line">执行完 fn 之后 又回到 poll 阶段 继续等。 一般来说有最长等待时间 假设3秒 后就会进入 check 然后进入 times 然后继续进入 poll</span><br><span class="line">所以 大部分时间都是在 poll 阶段 用来等</span><br></pre></td></tr></table></figure>
 <blockquote>
 <h4 id="check-阶段是什么？"><a href="#check-阶段是什么？" class="headerlink" title="check 阶段是什么？"></a>check 阶段是什么？</h4></blockquote>
 <ul>
@@ -348,7 +348,7 @@
 			
 		
 			
-				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>34</sup></a></li>
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>36</sup></a></li>
 			
 		
 			
@@ -372,6 +372,10 @@
 			
 		
 			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>24</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
 			
 		
@@ -385,10 +389,6 @@
 		
 			
 				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>16</sup></a></li>
 			
 		
 			
@@ -485,7 +485,7 @@
 		
 
 		<p class="copyright">
-		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2021 
 		
 		<a href="/about" target="_blank" title="Stevin">Stevin</a>
 		

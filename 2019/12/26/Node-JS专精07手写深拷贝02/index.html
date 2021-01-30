@@ -1,0 +1,711 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Node-JS专精07手写深拷贝02 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="思路 递归   看节点的类型 7种(number bool string undefined null symbol 和 object) array function regexp date 是 object的子类型   如果是简单数据类型就直接拷贝 如果是 object 就情况讨论   Object   普通 object 的 for in ? for in 有bug   数组 array -">
+<meta name="keywords" content="Node后端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node-JS专精07手写深拷贝02">
+<meta property="og:url" content="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝02/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="思路 递归   看节点的类型 7种(number bool string undefined null symbol 和 object) array function regexp date 是 object的子类型   如果是简单数据类型就直接拷贝 如果是 object 就情况讨论   Object   普通 object 的 for in ? for in 有bug   数组 array -">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-01-28T06:52:48.222Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Node-JS专精07手写深拷贝02">
+<meta name="twitter:description" content="思路 递归   看节点的类型 7种(number bool string undefined null symbol 和 object) array function regexp date 是 object的子类型   如果是简单数据类型就直接拷贝 如果是 object 就情况讨论   Object   普通 object 的 for in ? for in 有bug   数组 array -">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/12/26/Node-JS专精07手写深拷贝02/" title="Node-JS专精07手写深拷贝02" itemprop="url">Node-JS专精07手写深拷贝02</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-12-26T15:38:50.000Z" itemprop="datePublished"> Published 2019-12-26</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#思路"><span class="toc-number">1.</span> <span class="toc-text">思路</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开始干"><span class="toc-number">1.1.</span> <span class="toc-text">开始干</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#鸡贼的完成基本数据类型深拷贝"><span class="toc-number">1.1.1.</span> <span class="toc-text">鸡贼的完成基本数据类型深拷贝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制简单对象"><span class="toc-number">1.1.2.</span> <span class="toc-text">复制简单对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制函数"><span class="toc-number">1.1.3.</span> <span class="toc-text">复制函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#环检测"><span class="toc-number">1.1.4.</span> <span class="toc-text">环检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如果这个对象不是环，就是特别深呢？"><span class="toc-number">1.1.5.</span> <span class="toc-text">如果这个对象不是环，就是特别深呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#如何解决递归爆栈问题"><span class="toc-number">1.1.5.1.</span> <span class="toc-text">如何解决递归爆栈问题?</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制正则表达式和Date"><span class="toc-number">1.1.6.</span> <span class="toc-text">复制正则表达式和Date</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#是否拷贝原型属性？"><span class="toc-number">1.1.7.</span> <span class="toc-text">是否拷贝原型属性？</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h1><blockquote>
+<p>递归</p>
+</blockquote>
+<ul>
+<li>看节点的类型 7种(<code>number bool string undefined null symbol 和 object</code>)<ul>
+<li><code>array function regexp date 是 object的子类型</code></li>
+</ul>
+</li>
+<li>如果是简单数据类型就直接拷贝</li>
+<li>如果是 object 就情况讨论</li>
+</ul>
+<blockquote>
+<p>Object</p>
+</blockquote>
+<ul>
+<li>普通 object 的 <code>for in</code> ?<ul>
+<li><code>for in 有bug</code></li>
+</ul>
+</li>
+<li>数组 array - Array初始化<ul>
+<li>它里面可能还是对象</li>
+</ul>
+</li>
+<li>函数 function - 怎么拷贝？ 闭包？</li>
+<li>日期 Date - 怎么拷贝？</li>
+</ul>
+<h2 id="开始干"><a href="#开始干" class="headerlink" title="开始干"></a>开始干</h2><ul>
+<li><p>创建目录 </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">根目录</span><br><span class="line">deep-clone</span><br><span class="line"></span><br><span class="line">src/index.js</span><br><span class="line">test/index.js</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>引入 chai 和 sinon</p>
+<ul>
+<li>参考<a href="https://github.com/FrankFang/promise-1" target="_blank" rel="noopener">代码</a>引入库<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">npm init -y </span><br><span class="line"></span><br><span class="line">加入如下内容</span><br><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;test&quot;: &quot;mocha test/**/*.js&quot;</span><br><span class="line">&#125;,</span><br><span class="line">&quot;devDependencies&quot;: &#123;</span><br><span class="line">    &quot;chai&quot;: &quot;^4.2.0&quot;,</span><br><span class="line">    &quot;mocha&quot;: &quot;^6.2.0&quot;,</span><br><span class="line">    &quot;sinon&quot;: &quot;^7.4.1&quot;,</span><br><span class="line">    &quot;sinon-chai&quot;: &quot;^3.3.0&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">yarn install </span><br><span class="line"></span><br><span class="line">运行 yarn test</span><br><span class="line">如果显示 0 passing (1ms) 代表环境搭建成功</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>开始驱动测试开发</p>
+<ul>
+<li><p>src/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">function deepClone()&#123;&#125;</span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意！ 由于是js </p>
+<ul>
+<li>引入模块：js是不支持 import的 所以只能用 require </li>
+<li>导出模块：js是不支持 <code>export default</code> 所以只能用 <code>module.exports = xxx</code></li>
+</ul>
+</li>
+<li>test/index.js<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 注意！！！</span><br><span class="line">// js是不支持 import的 所以只能用 require</span><br><span class="line">const chai = require(&quot;chai&quot;);</span><br><span class="line">const sinon = require(&quot;sinon&quot;);</span><br><span class="line">const sinonChai = require(&quot;sinon-chai&quot;);</span><br><span class="line">chai.use(sinonChai);</span><br><span class="line">const assert = chai.assert;</span><br><span class="line">const deepClone = require(&quot;../src/index&quot;);</span><br><span class="line"></span><br><span class="line">describe(&apos;deepClone&apos;,()=&gt;&#123;</span><br><span class="line">    it(&quot;是一个函数&quot;,()=&gt;&#123;</span><br><span class="line">        assert.isFunction(deepClone)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>测试失败 =》 改代码 =》 测试成功 =》 加测试 =》 测试失败</p>
+</li>
+<li>这就是永动机</li>
+</ul>
+<h3 id="鸡贼的完成基本数据类型深拷贝"><a href="#鸡贼的完成基本数据类型深拷贝" class="headerlink" title="鸡贼的完成基本数据类型深拷贝"></a>鸡贼的完成基本数据类型深拷贝</h3><p>src/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function deepClone(source)&#123;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<p>test/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">const chai = require(&quot;chai&quot;);</span><br><span class="line">const sinon = require(&quot;sinon&quot;);</span><br><span class="line">const sinonChai = require(&quot;sinon-chai&quot;);</span><br><span class="line">chai.use(sinonChai);</span><br><span class="line">const assert = chai.assert;</span><br><span class="line">const deepClone = require(&quot;../src/index&quot;);</span><br><span class="line"></span><br><span class="line">describe(&apos;deepClone&apos;,()=&gt;&#123;</span><br><span class="line">    it(&quot;是一个函数&quot;,()=&gt;&#123;</span><br><span class="line">        assert.isFunction(deepClone)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    it(&quot;能够复制基本类型&quot;,()=&gt;&#123;</span><br><span class="line">        const n = 123;</span><br><span class="line">        const n2 = deepClone(n);</span><br><span class="line">        assert(n === n2);</span><br><span class="line"></span><br><span class="line">        const s = &quot;123456&quot;;</span><br><span class="line">        const s2 = deepClone(s);</span><br><span class="line">        assert(s === s2);</span><br><span class="line"></span><br><span class="line">        const b = true;</span><br><span class="line">        const b2 = deepClone(b);</span><br><span class="line">        assert(b === b2);</span><br><span class="line"></span><br><span class="line">        const u = undefined;</span><br><span class="line">        const u2 = deepClone(u);</span><br><span class="line">        assert(u === u2);</span><br><span class="line"></span><br><span class="line">        const empty = null;</span><br><span class="line">        const empty2 = deepClone(empty);</span><br><span class="line">        assert(empty === empty2);</span><br><span class="line"></span><br><span class="line">        const sym = Symbol();</span><br><span class="line">        const sym2 = deepClone(sym);</span><br><span class="line">        assert(sym === sym2);</span><br><span class="line">        </span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Symbol的疑问？ 为什么会相等</p>
+</blockquote>
+<ul>
+<li>不是说不会有两个相同的 Symbol吗？它到底是引用呢？还是没有引用啊？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">var a = Symbol()</span><br><span class="line">var b = a;</span><br><span class="line"></span><br><span class="line">// 此时 a 和 b 是同一个 Symbol吗？ 是不是不确定啊</span><br><span class="line"></span><br><span class="line">// 但是如果这样</span><br><span class="line">var a2 = 1;</span><br><span class="line">var b2 = a2;</span><br><span class="line">// a2 和 b2 是同一个 1吗 在内存里？ 你会回答 不是</span><br><span class="line"></span><br><span class="line">// 同样的问题回到 Symbol</span><br><span class="line"></span><br><span class="line">// a === b 吗？ 答案是 true</span><br><span class="line">// 所以 symbol 可能是个 不可变的引用类型。 此时你已经陷入知识盲区了，就不要在深入了</span><br></pre></td></tr></table></figure>
+<h3 id="复制简单对象"><a href="#复制简单对象" class="headerlink" title="复制简单对象"></a>复制简单对象</h3><p>test/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">describe(&quot;对象&quot;,()=&gt;&#123;</span><br><span class="line">    it(&quot;能够复制普通对象&quot;,()=&gt;&#123;</span><br><span class="line">        const a = &#123;name: &quot;方方&quot;, chlid: &#123;name: &quot;小方方&quot;&#125;&#125;;</span><br><span class="line">        const a2 = deepClone(a);</span><br><span class="line">        assert(a !== a2);</span><br><span class="line">        assert(a.name === a2.name);</span><br><span class="line">        assert(a.chai !== a2.chlid);</span><br><span class="line">        assert(a.chlid.name === a2.chlid.name);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通常你会这样想</p>
+</blockquote>
+<ul>
+<li><code>for in的坑</code> 你怎么知道 key是 source的属性 还是它原型上的属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        const dist = new Object();</span><br><span class="line">        for(let key in source)&#123;</span><br><span class="line">            dist[key] = deepClone(source[key]);</span><br><span class="line">        &#125;</span><br><span class="line">        return dist;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>试试数组</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">it(&quot;能够复制数组对象&quot;,()=&gt;&#123;</span><br><span class="line">    const a = [[11,12],[21,22],[31,32]]</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert(a[0] !== a2[0]);</span><br><span class="line">    assert(a[1] !== a2[1]);</span><br><span class="line">    assert(a[2] !== a2[2]);</span><br><span class="line">    assert.deepEqual(a,a2);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// yarn test报错</span><br><span class="line">AssertionError: expected [ [ 11, 12 ], [ 21, 22 ], [ 31, 32 ] ] to deeply equal &#123; Object (0, 1, ...) &#125;</span><br><span class="line">// 你可以把代码拷到浏览器试一下， a2 实际是一个 包含 0,1,2 key的伪数组</span><br><span class="line"></span><br><span class="line">// 要分支处理判断 Object的子类型</span><br></pre></td></tr></table></figure>
+<p><strong>修改src/index.js</strong></p>
+<ul>
+<li>注意此时不要优化代码</li>
+<li>注意此时不要优化代码</li>
+<li>注意此时不要优化代码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        if(source instanceof Array)&#123;</span><br><span class="line">            const dist = new Array();</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            const dist = new Object();</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<h3 id="复制函数"><a href="#复制函数" class="headerlink" title="复制函数"></a>复制函数</h3><p>test/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">it(&quot;能够复制函数&quot;,()=&gt;&#123;</span><br><span class="line">    const a = function(x,y)&#123;</span><br><span class="line">        return x + y;</span><br><span class="line">    &#125;</span><br><span class="line">    a.xxx = &#123; yyy: &#123; zzz: 1 &#125; &#125;</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert(a.xxx.yyy.zzz === a2.xxx.yyy.zzz);</span><br><span class="line">    assert(a.xxx.yyy !== a2.xxx.yyy);</span><br><span class="line">    assert(a.xxx !== a2.xxx);</span><br><span class="line">    assert(a(1,2) === a2(1,2));</span><br><span class="line"></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>网上的一个思路 eval</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 浏览器控制台里</span><br><span class="line">function x(a,b)&#123;return a+b;&#125;</span><br><span class="line">// 直接f 显示是个函数 </span><br><span class="line">// 你要这样</span><br><span class="line">console.dir(x);</span><br><span class="line">// 你会发现他的 __proto__ 里有个 toString</span><br><span class="line">x.toString() // &quot;function x(a,b)&#123;return a+b;&#125;&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 假设 source是一个函数 而且是具名函数</span><br><span class="line">eval(source.toString())</span><br><span class="line">// 但是 eval 是一个很难控制的东西</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们的思路是 call / apply</p>
+</blockquote>
+<ul>
+<li>唯一的缺陷就是比原来的函数多嵌套了一层</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        if(source instanceof Array)&#123;</span><br><span class="line">            const dist = new Array();</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125; else if(source instanceof Function)&#123;</span><br><span class="line">            const dist = function()&#123;</span><br><span class="line">                return source.apply(this,arguments);</span><br><span class="line">            &#125;</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            const dist = new Object();</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<h3 id="环检测"><a href="#环检测" class="headerlink" title="环检测"></a>环检测</h3><ul>
+<li>我们完成的递归都是对象有结尾的，而如果对象是个环状的就有问题了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a = &#123;name:&quot;方方&quot;&#125;</span><br><span class="line">a.self = a</span><br><span class="line"></span><br><span class="line">// 此时 a 就是一个环状结构</span><br><span class="line">a.self.self.self.self ..... .self = a  // true</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>思路</p>
+</blockquote>
+<ul>
+<li><p>优化代码</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        let dist;</span><br><span class="line">        if(source instanceof Array)&#123;</span><br><span class="line">            dist = new Array();</span><br><span class="line">        &#125; else if(source instanceof Function)&#123;</span><br><span class="line">            dist = function()&#123;</span><br><span class="line">                return source.apply(this,arguments);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            dist = new Object();</span><br><span class="line">        &#125;</span><br><span class="line">        for(let key in source)&#123;</span><br><span class="line">            dist[key] = deepClone(source[key]);</span><br><span class="line">        &#125;</span><br><span class="line">        return dist;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>你要把出现过的 节点 和 克隆后的节点 都保存起来</p>
+</li>
+</ul>
+<p>src/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">let cache = [];</span><br><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        let cacheDist = findCache(source)</span><br><span class="line">        if(cacheDist)&#123;</span><br><span class="line">            console.log(&quot;有缓存&quot;)</span><br><span class="line">            return cacheDist;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            console.log(&quot;没缓存&quot;)</span><br><span class="line">            let dist;</span><br><span class="line">            if(source instanceof Array)&#123;</span><br><span class="line">                dist = new Array();</span><br><span class="line">            &#125; else if(source instanceof Function)&#123;</span><br><span class="line">                dist = function()&#123;</span><br><span class="line">                    return source.apply(this,arguments);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                dist = new Object();</span><br><span class="line">            &#125;</span><br><span class="line">            // 数据源 和 副本 都存入缓存 ，注意一定要 在 dist创建成功之后就把它 存入，防止重复的生成</span><br><span class="line">            cache.push([source,dist])</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function findCache(source)&#123;</span><br><span class="line">    for(let i=0;i&lt;cache.length;i++)&#123;</span><br><span class="line">        if(cache[i][0] === source)&#123;</span><br><span class="line">            return cache[i][1];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return undefined</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<h3 id="如果这个对象不是环，就是特别深呢？"><a href="#如果这个对象不是环，就是特别深呢？" class="headerlink" title="如果这个对象不是环，就是特别深呢？"></a>如果这个对象不是环，就是特别深呢？</h3><ul>
+<li>由于你用的是递归它会使用调用栈，所以在一定层数后它会爆栈</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a.x.x.x.x.x.x.x.x.x.x  大概2w层呢？</span><br></pre></td></tr></table></figure>
+<p>test/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">xit(&quot;不会爆栈&quot;,()=&gt;&#123;</span><br><span class="line">    const a = &#123;child:null&#125;;</span><br><span class="line">    let b = a</span><br><span class="line">    for(let i=0;i&lt;20000;i++)&#123;</span><br><span class="line">        b.child = &#123;</span><br><span class="line">            child:null</span><br><span class="line">        &#125;</span><br><span class="line">        b = b.child</span><br><span class="line">    &#125;</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert(a.child !== a2.child);</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line">// 测试通不过</span><br><span class="line">// 而层数改成 5000 又没问题了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如何解决递归爆栈问题"><a href="#如何解决递归爆栈问题" class="headerlink" title="如何解决递归爆栈问题?"></a>如何解决递归爆栈问题?</h4></blockquote>
+<ul>
+<li>就是把递归变成循环<ul>
+<li>每进入一个对象，不要去复制他，先把它放到数组里，然后把它的子元素放在数组后面</li>
+<li>就是把竖着的拍平</li>
+</ul>
+</li>
+<li>本次不实现这个功能！！！<ul>
+<li>面试一般不会考到这一步，因为要把上面所有的思路改掉</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>如果面试问到</p>
+</blockquote>
+<ul>
+<li>可能会遇到爆栈</li>
+<li>解决办法是对它的结构进行一个改造，用循环的方式把它放在数组里</li>
+</ul>
+<h3 id="复制正则表达式和Date"><a href="#复制正则表达式和Date" class="headerlink" title="复制正则表达式和Date"></a>复制正则表达式和Date</h3><ul>
+<li>首先要去看文档，起码要知道 正则有那些属性<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank" rel="noopener">文档</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>测试用例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"> it(&quot;可以复制正则表达式&quot;,()=&gt;&#123;</span><br><span class="line">    const a = new RegExp(&quot;/hi\d+/&quot;,&quot;gi&quot;);</span><br><span class="line">    a.xxx = &#123; yyy: &#123; zzz: 1 &#125; &#125;</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a.source === a2.source);</span><br><span class="line">    assert(a.flags === a2.flags);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert(a.xxx.yyy.zzz === a2.xxx.yyy.zzz);</span><br><span class="line">    assert(a.xxx.yyy !== a2.xxx.yyy);</span><br><span class="line">    assert(a.xxx !== a2.xxx);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">it(&quot;可以复制日期&quot;,()=&gt;&#123;</span><br><span class="line">    const a = new Date();</span><br><span class="line">    a.xxx = &#123; yyy: &#123; zzz: 1 &#125; &#125;</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a.source === a2.source);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert(a.getTime() === a2.getTime());</span><br><span class="line">    assert(a.xxx.yyy.zzz === a2.xxx.yyy.zzz);</span><br><span class="line">    assert(a.xxx.yyy !== a2.xxx.yyy);</span><br><span class="line">    assert(a.xxx !== a2.xxx);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>src/index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">let cache = [];</span><br><span class="line">function deepClone(source)&#123;</span><br><span class="line">    if(source instanceof Object)&#123;</span><br><span class="line">        let cacheDist = findCache(source)</span><br><span class="line">        if(cacheDist)&#123;</span><br><span class="line">            // console.log(&quot;有缓存&quot;)</span><br><span class="line">            return cacheDist;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            // console.log(&quot;没缓存&quot;)</span><br><span class="line">            let dist;</span><br><span class="line">            if(source instanceof Array)&#123;</span><br><span class="line">                dist = new Array();</span><br><span class="line">            &#125; else if(source instanceof Function)&#123;</span><br><span class="line">                dist = function()&#123;</span><br><span class="line">                    return source.apply(this,arguments);</span><br><span class="line">                &#125;</span><br><span class="line">            </span><br><span class="line">            &#125; else if(source instanceof RegExp)&#123;</span><br><span class="line">                dist = new RegExp(source.source,source.flags);</span><br><span class="line">            &#125; else if(source instanceof Date)&#123;</span><br><span class="line">                dist = new Date(source);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                dist = new Object();</span><br><span class="line">            &#125;</span><br><span class="line">            // 数据源 和 副本 都存入缓存 ，注意一定要 在 dist创建成功之后就把它 存入，防止重复的生成</span><br><span class="line">            cache.push([source,dist])</span><br><span class="line">            for(let key in source)&#123;</span><br><span class="line">                dist[key] = deepClone(source[key]);</span><br><span class="line">            &#125;</span><br><span class="line">            return dist;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return source;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function findCache(source)&#123;</span><br><span class="line">    for(let i=0;i&lt;cache.length;i++)&#123;</span><br><span class="line">        if(cache[i][0] === source)&#123;</span><br><span class="line">            return cache[i][1];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return undefined</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = deepClone;</span><br></pre></td></tr></table></figure>
+<h3 id="是否拷贝原型属性？"><a href="#是否拷贝原型属性？" class="headerlink" title="是否拷贝原型属性？"></a>是否拷贝原型属性？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a = &#123;name:&apos;hi&apos;&#125;</span><br><span class="line"></span><br><span class="line">var a2 = Object.create(&#123;say:function()&#123;&#125;&#125;)</span><br><span class="line">// a2的原型上有个 say函数，如果深拷贝需要复制这个 say吗？</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一般来说不拷贝，因为如果拷贝这个对象内存占用就太大了<ul>
+<li>因为一旦你拷贝这一层，那它的原型链的所有原型都要拷贝，这个原型上的每个函数也有原型那岂不是都要拷贝</li>
+<li>所以你开了一个头，那整个 JS对象身上的东西都要拷贝，这样占用的内存就太大了</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>测试代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">it(&quot;自动跳过原型属性&quot;,()=&gt;&#123;</span><br><span class="line">    const a = Object.create(&#123;name:&quot;a&quot;&#125;)</span><br><span class="line">    a.xxx = &#123; yyy: &#123; zzz: 1 &#125; &#125;</span><br><span class="line">    const a2 = deepClone(a);</span><br><span class="line">    assert(a !== a2);</span><br><span class="line">    assert.isFalse(&quot;name&quot; in a2);</span><br><span class="line">    assert(a.xxx.yyy.zzz === a2.xxx.yyy.zzz);</span><br><span class="line">    assert(a.xxx.yyy !== a2.xxx.yyy);</span><br><span class="line">    assert(a.xxx !== a2.xxx);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 测试没有通过，因为你用的是 for in</span><br><span class="line">// 需要加一个判断</span><br><span class="line">// if(source.hasOwnProperty(key))&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>尽量少用<code>for in 复制属性</code></strong></p>
+<blockquote>
+<p>代码仓库</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/slTrust/deepClone" target="_blank" rel="noopener">https://github.com/slTrust/deepClone</a></li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝02/" data-title="Node-JS专精07手写深拷贝02 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/12/26/Node-JS专精07手写深拷贝03/" title="Node-JS专精07手写深拷贝03">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Node-JS专精07手写深拷贝03</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/12/26/Node-JS专精08手写bind02/"  title="Node-JS专精08手写bind02">
+ <strong>下一篇：</strong><br/> 
+ <span>Node-JS专精08手写bind02
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#思路"><span class="toc-number">1.</span> <span class="toc-text">思路</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开始干"><span class="toc-number">1.1.</span> <span class="toc-text">开始干</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#鸡贼的完成基本数据类型深拷贝"><span class="toc-number">1.1.1.</span> <span class="toc-text">鸡贼的完成基本数据类型深拷贝</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制简单对象"><span class="toc-number">1.1.2.</span> <span class="toc-text">复制简单对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制函数"><span class="toc-number">1.1.3.</span> <span class="toc-text">复制函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#环检测"><span class="toc-number">1.1.4.</span> <span class="toc-text">环检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如果这个对象不是环，就是特别深呢？"><span class="toc-number">1.1.5.</span> <span class="toc-text">如果这个对象不是环，就是特别深呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#如何解决递归爆栈问题"><span class="toc-number">1.1.5.1.</span> <span class="toc-text">如何解决递归爆栈问题?</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#复制正则表达式和Date"><span class="toc-number">1.1.6.</span> <span class="toc-text">复制正则表达式和Date</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#是否拷贝原型属性？"><span class="toc-number">1.1.7.</span> <span class="toc-text">是否拷贝原型属性？</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>36</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>24</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CSS/" title="CSS">CSS<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2021 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
