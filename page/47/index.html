@@ -79,6 +79,579 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2018/05/10/MONGODB_003_练习2/" title="mongoDb练习二" itemprop="url">mongoDb练习二</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-05-10T13:36:47.000Z" itemprop="datePublished"> Published 2018-05-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="练习2"><a href="#练习2" class="headerlink" title="练习2"></a>练习2</h3><ol>
+<li>向 numbers 集合中插入20000条数据</li>
+</ol>
+<p>笨方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.insert(&#123;num:1&#125;)</span><br><span class="line">db.numbers.insert(&#123;num:2&#125;)</span><br><span class="line">db.numbers.insert(&#123;num:3&#125;)</span><br><span class="line">db.numbers.insert(&#123;num:4&#125;)</span><br><span class="line">...</span><br><span class="line">db.numbers.insert(&#123;num:20000&#125;)</span><br></pre></td></tr></table></figure>
+<p>稍微快一点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for(var i=1;i&lt;=20000,i++)&#123;</span><br><span class="line">    db.numbers.insert(&#123;num:i&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>快一点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var arr =[];</span><br><span class="line">for(var i=1;i&lt;=20000,i++)&#123;</span><br><span class="line">    arr.push(&#123;num:i&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">db.numbers.insert(arr)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>查询numbers 中 num 为500的文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find(&#123;num:500&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>查询 num 大于500的文档</li>
+</ol>
+<blockquote>
+<p>$lt 小于  $gt大于  $eq等于  $ne 不等于</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find(&#123;num:&#123;$gt:500&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>查询 num 大于等于500的文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find(&#123;num:&#123;$gte:500&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>查询num 大于40 小于50的文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find(&#123;num:&#123;$gt:40,$lt:50&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>查看 numbers集合中 前10条数据</li>
+</ol>
+<blockquote>
+<h4 id="limit-设置数据的上限"><a href="#limit-设置数据的上限" class="headerlink" title="limit()设置数据的上限"></a>limit()设置数据的上限</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">不靠谱的方式</span><br><span class="line">db.numbers.find(&#123;num:&#123;$lte:10&#125;&#125;)</span><br><span class="line"></span><br><span class="line">靠谱的方式</span><br><span class="line">设置显示数据的上限</span><br><span class="line">db.numbers.find().limit(10)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="开发中绝对不该执行不带条件的查询"><a href="#开发中绝对不该执行不带条件的查询" class="headerlink" title="开发中绝对不该执行不带条件的查询"></a>开发中绝对不该执行不带条件的查询</h3></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find()</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>查询numbers  11条到20条的数据</li>
+</ol>
+<blockquote>
+<p>分页skip()</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1-10</span><br><span class="line">11-20</span><br><span class="line">21-30 </span><br><span class="line">...</span><br><span class="line">skip()用于跳过指定的条数</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find().skip(10).limit(10)</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>查询numbers  21条到30条的数据</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.numbers.find().skip(20).limit(10)</span><br></pre></td></tr></table></figure>
+<h3 id="分页公式"><a href="#分页公式" class="headerlink" title="分页公式"></a>分页公式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">skip((pageNo-1)*pageSize).limit(pageSize)</span><br></pre></td></tr></table></figure>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mongodb会自动调整 skip和limit的位置</span><br><span class="line">skip() 和 limit()的顺序谁先谁后无所谓</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/05/10/MONGODB_002_练习1/" title="mongoDb练习一" itemprop="url">mongoDb练习一</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-05-10T13:01:23.000Z" itemprop="datePublished"> Published 2018-05-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="练习1"><a href="#练习1" class="headerlink" title="练习1"></a>练习1</h3><ol>
+<li>进入my_test数据库</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use my_test</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>向 my_test中 user集合插入一个文档</li>
+</ol>
+<p>集合习惯会在其后加s  所以 user在操作时是 db.users</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.insert(&#123;username:&quot;猪八戒&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>查询user集合中的文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.find()</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>向user集合中插入一个文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.insert(&#123;username:&quot;孙悟空&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>统计user集合中文档document的数量</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.find().count()</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>查询user集合中 username为孙悟空的值</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.find(&#123;username:&quot;孙悟空&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>向user集合中 username=”孙悟空”的文档添加一个 address= 花果山</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.users.update(&#123;username:&quot;孙悟空&quot;&#125;,&#123;</span><br><span class="line">    &#123;</span><br><span class="line">        $set:&#123;</span><br><span class="line">            &#123;address:&quot;花果山&quot;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>使用{username:”唐僧”}替换  username为 猪八戒 的文档</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.replaceOne(&#123;username:&quot;猪八戒&quot;&#125;,&#123;username:&quot;唐僧&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li>删除 username 为 孙悟空 的 address属性</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.update(&#123;username:&quot;孙悟空&quot;&#125;,&#123;$unset:&#123;address:&quot;&quot;&#125;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="10">
+<li>向 username 为 孙悟空 的文档中 添加一个 hobby:{cities:[“北京”,”上海”,”深圳”],movies:[“三国”,”英雄”]}</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">db.users.update(&#123;username:&quot;孙悟空&quot;&#125;,&#123;</span><br><span class="line">    $set:&#123;</span><br><span class="line">        hobby:&#123;</span><br><span class="line">            cities:[&quot;北京&quot;,&quot;上海&quot;,&quot;深圳&quot;],</span><br><span class="line">            movies:[&quot;三国&quot;,&quot;英雄&quot;]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>mongodb 中的属性值也可以是一个文档，当一个文档的一个属性值是文档时，我们称之为「内嵌文档」</p>
+</blockquote>
+<ol start="11">
+<li>向 username 为 唐僧 的文档中 添加一个 hobby:{movies:[“大话西游”,”天下第一”]}</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.users.update(&#123;username:&quot;孙悟空&quot;&#125;,&#123;</span><br><span class="line">    $set:&#123;</span><br><span class="line">        hobby:&#123;</span><br><span class="line">           movies:[&quot;大话西游&quot;,&quot;天下第一&quot;]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="12">
+<li>查询喜欢 电影 movies = 英雄 的文档</li>
+</ol>
+<ul>
+<li>mongodb支持直接通过内嵌文档的属性进行查询，使用「.」进行操作 形如 hobby.movies的形式</li>
+<li>通过内嵌文档查询 必须使用引号包起来 形如 “hobby.movies”</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.find(&#123;&quot;hobby.movies&quot;:&quot;英雄&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="13">
+<li>向 唐僧 的文档中,电影 movies 中添加 “寒战”</li>
+</ol>
+<ul>
+<li>注意此时不要用 $set 修改操作符</li>
+<li>使用 $push 用于向数组中添加一个新的元素(可重复添加)</li>
+<li>$addToSet 向数组中添加一个元素 (如果添加元素已经存在就不会再去添加了，不可重复添加)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">db.users.update(&#123;username:&quot;唐僧&quot;&#125;,&#123;</span><br><span class="line">    $push:&#123;</span><br><span class="line">        &quot;hobby.movies&quot;:&quot;寒战&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">db.users.update(&#123;username:&quot;唐僧&quot;&#125;,&#123;</span><br><span class="line">    $addToSet:&#123;</span><br><span class="line">        &quot;hobby.movies&quot;:&quot;寒战&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="14">
+<li>删除 喜欢 北京 的用户</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.remove(&#123;&quot;hobby.cities&quot;:&quot;北京&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<ol start="15">
+<li>删除 users集合</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db.users.remove(&#123;&#125;) </span><br><span class="line">db.users.drop()</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/05/10/MONGODB_001_入门1/" title="mongoDb入门一" itemprop="url">mongoDb入门一</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-05-10T11:33:12.000Z" itemprop="datePublished"> Published 2018-05-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="mongodb入门"><a href="#mongodb入门" class="headerlink" title="mongodb入门"></a>mongodb入门</h3><blockquote>
+<p>windows用户推荐下载3.4 （3.6会卡在一个进度不动）</p>
+</blockquote>
+<p><a href="https://www.mongodb.com/" target="_blank" rel="noopener">官网</a></p>
+<p>解压后一路next 然后在对应目录建立目录 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data/db</span><br><span class="line"># 命令行中输入如下即可启动 mongodb</span><br><span class="line">mongod --dbpath &quot;f:/mongodb/data&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="执行mongo命令"><a href="#执行mongo命令" class="headerlink" title="执行mongo命令"></a>执行mongo命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 进入mongo命令行环境  path请自行添加</span><br><span class="line">mongo </span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">&gt; 如果安装不了  你可以使用官方提供的在线版(mongodb官网 doc中 /MongoDB CRUD Opeartions/Insert Document)</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 常用命令</span><br></pre></td></tr></table></figure>
+<p>show dbs 查看所有库<br>use test 使用test数据库 如果test不存在则创建<br>db.p   操作collections  p就是mysql表的概念  有就使用没有则创建<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### CRUD</span><br><span class="line"></span><br><span class="line">#### 增</span><br><span class="line"></span><br><span class="line">&gt; 增加的时候会默认生成 _id 确认数据的唯一标识</span><br></pre></td></tr></table></figure></p>
+<p>use test<br>db.p.insert({name:”aa”})<br>db.p.insert({name:”aa”},{name:”bb”})<br>db.p.insertOne({name:”aa”})<br>db.p.insertMany({name:”aa”},{name:”bb”})</p>
+<p>#如果你想不要生成的 _id 就可以传递该自动进行覆盖<br>db.p.insertOne({_id:”hello”,name:”aa”})<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 查</span><br></pre></td></tr></table></figure></p>
+<h1 id="查所有"><a href="#查所有" class="headerlink" title="查所有"></a>查所有</h1><p>db.p.find()   / db.p.find({})</p>
+<h1 id="按字段查"><a href="#按字段查" class="headerlink" title="按字段查"></a>按字段查</h1><p>db.p.find({name:”aa”})</p>
+<h1 id="多个字段-name为aa-age为-18"><a href="#多个字段-name为aa-age为-18" class="headerlink" title="多个字段  name为aa age为 18"></a>多个字段  name为aa age为 18</h1><p>db.p.find({name:”aa”,age:18})</p>
+<h1 id="find返回的是数组"><a href="#find返回的是数组" class="headerlink" title="find返回的是数组"></a>find返回的是数组</h1><h1 id="findOne-返回匹配的第一个文档"><a href="#findOne-返回匹配的第一个文档" class="headerlink" title="findOne() 返回匹配的第一个文档"></a>findOne() 返回匹配的第一个文档</h1><p>db.p.findOne({age:18}).name</p>
+<h1 id="find返回的个数"><a href="#find返回的个数" class="headerlink" title="find返回的个数"></a>find返回的个数</h1><p>db.p.find().count()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 修改</span><br></pre></td></tr></table></figure></p>
+<p>假如数据为{_id:Object(“3124912ui9012i8fsdafdsf”) ,name:”唐僧”,age:40,gender:”man”}<br>db.p.update({name:”唐僧”},{age:999})<br>数据更新为 {_id:Object(“3124912ui9012i8fsdafdsf”),age:999}<br>update默认 会覆盖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">修改操作符避免覆盖 $set</span><br></pre></td></tr></table></figure></p>
+<p>db.p.update({_id:Object(“3124912ui9012i8fsdafdsf”)},<br>            {<br>                $set:{<br>                    name:”沙和尚”<br>                }<br>            }<br>)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">删除文档的指定属性$unset</span><br></pre></td></tr></table></figure></p>
+<p>db.p.update({_id:Object(“3124912ui9012i8fsdafdsf”)},<br>            {<br>                $unset:{<br>                    gender:”这个值写不写没关系因为是删除的”<br>                }<br>            }<br>)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">update默认只会改第一个匹配的数据</span><br></pre></td></tr></table></figure></p>
+<p>db.p.updateOne({name:”八戒”},<br>    {<br>        $set:{<br>            address:”天宫”<br>        }<br>    }<br>)</p>
+<p>db.p.updateMany({name:”八戒”},<br>    {<br>        $set:{<br>            address:”天宫”<br>        }<br>    }<br>)</p>
+<h1 id="我就要用-update更新多条数据"><a href="#我就要用-update更新多条数据" class="headerlink" title="我就要用 update更新多条数据"></a>我就要用 update更新多条数据</h1><p>db.p.update({name:”八戒”},<br>    {<br>        $set:{<br>            address:”天宫”<br>        }<br>    },<br>    {<br>        multi:true  //修改多条<br>    }<br>)</p>
+<p>#替换一个文档<br>db.p.replaceOne({name:”八戒”}, { address:”天宫” })<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 删除</span><br></pre></td></tr></table></figure></p>
+<p>db.p.remove()  不传递参数报错<br>db.p.remove({})  全删了，性能比较查  一个一个删<br>db.p.remove({name:”aa”})   //默认删除多个<br>db.p.remove({name:”aa”},true)  //删除一个<br>db.p.deleteOne({name:”aa”})<br>db.p.deleteMany({name:”aa”})<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">删除相关操作</span><br></pre></td></tr></table></figure></p>
+<p>db.p.remove({})  全删了，集合还在，性能比较差  一个一个删<br>db.p.drop()  清空集合，性能好 集合没了<br>db.dropDatabase() 删库<br><code>`</code></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mongodb/">mongodb</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/05/04/LANG_001/" title="node ten Modules(初始)" itemprop="url">node ten Modules(初始)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-05-04T06:42:35.000Z" itemprop="datePublished"> Published 2018-05-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="给迷茫的你学习Node-js最好的方法"><a href="#给迷茫的你学习Node-js最好的方法" class="headerlink" title="给迷茫的你学习Node.js最好的方法"></a>给迷茫的你学习Node.js最好的方法</h3><p><a href="http://cnodejs.org/topic/59c75a3dd7cbefc511964688" target="_blank" rel="noopener">原文连接</a></p>
+<h3 id="每天10个-npm-模块"><a href="#每天10个-npm-模块" class="headerlink" title="每天10个 npm 模块"></a>每天10个 npm 模块</h3><p><a href="https://github.com/parro-it/awesome-micro-npm-packages" target="_blank" rel="noopener">仓库地址</a></p>
+<h3 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h3><h4 id="is-sorted"><a href="#is-sorted" class="headerlink" title="is-sorted"></a>is-sorted</h4><blockquote>
+<p>A small module to check if an Array is sorted.</p>
+</blockquote>
+<p>核心代码   index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function defaultComparator (a, b) &#123;</span><br><span class="line">  return a - b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = function checksort (array, comparator) &#123;</span><br><span class="line">  comparator = comparator || defaultComparator</span><br><span class="line"></span><br><span class="line">  for (var i = 1, length = array.length; i &lt; length; ++i) &#123;</span><br><span class="line">    if (comparator(array[i - 1], array[i]) &gt; 0) return false</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>test.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var sorted = require(&apos;./index&apos;)</span><br><span class="line"></span><br><span class="line">console.log(sorted([1, 2, 3]))</span><br><span class="line">// =&gt; true</span><br><span class="line"></span><br><span class="line">console.log(sorted([3, 1, 2]))</span><br><span class="line">// =&gt; false</span><br><span class="line"></span><br><span class="line">// supports custom comparators</span><br><span class="line">console.log(sorted([3, 2, 1], function (a, b) &#123; return b - a &#125;))</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/node每日精进/">node每日精进</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/04/27/NODE_002_02Express/" title="express三连(一)" itemprop="url">express三连(一)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-04-27T13:43:42.000Z" itemprop="datePublished"> Published 2018-04-27</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="Router用法"><a href="#Router用法" class="headerlink" title="Router用法"></a>Router用法</h3><p>simpleRouter.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">const router = require(&apos;express&apos;).Router();</span><br><span class="line"></span><br><span class="line">router.get(&apos;/&apos;,(req,res)=&gt;&#123;</span><br><span class="line">    res.json(&#123;code:0,msg:&apos;welcome to simple root router&apos;&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">router.get(&apos;/simple_demo&apos;,(req,res,next)=&gt;&#123;</span><br><span class="line">    res.end(`your simple_demo  here`)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">module.exports = router;</span><br></pre></td></tr></table></figure>
+<p>anotherRouter.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const router = require(&apos;express&apos;).Router();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">router.route(&apos;/&apos;)</span><br><span class="line">    .get((req,res)=&gt;&#123;</span><br><span class="line">        res.json(&#123;code:0,msg:&apos;welcome to another root router  get method&apos;&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">    .post((req,res)=&gt;&#123;</span><br><span class="line">        res.json(&#123;code:0,msg:&apos;welcome to another root router post method&apos;&#125;)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">router.get(&apos;/another_demo&apos;,(req,res,next)=&gt;&#123;</span><br><span class="line">    res.end(`your another_demo  here`)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">module.exports = router;</span><br></pre></td></tr></table></figure>
+<p>server001.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line">var app = express();</span><br><span class="line">const bodyParser = require(&apos;body-parser&apos;);</span><br><span class="line"></span><br><span class="line">const simpleRouter = require(&apos;./simpleRouter&apos;)</span><br><span class="line">const anotherRouter = require(&apos;./anotherRouter&apos;)</span><br><span class="line"></span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended:false&#125;))</span><br><span class="line"></span><br><span class="line">app.use(&apos;/simple/&apos;,simpleRouter);</span><br><span class="line">app.use(&apos;/another/&apos;,anotherRouter);</span><br><span class="line"></span><br><span class="line">app.use((err,req,res,next)=&gt;&#123;</span><br><span class="line">    res.status(401)</span><br><span class="line">    res.json(&#123;code:-1,msg:err.message&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="使用express生成器-类似vue-cli脚手架的工具"><a href="#使用express生成器-类似vue-cli脚手架的工具" class="headerlink" title="使用express生成器(类似vue-cli脚手架的工具)"></a>使用express生成器(类似vue-cli脚手架的工具)</h3><p>安装express模板生成器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install express-generator -g</span><br></pre></td></tr></table></figure>
+<p>创建目录(你的项目目录)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir one_punch</span><br></pre></td></tr></table></figure>
+<p>生成模板</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># --view==ejs 代表设置支持ejs语法的模板文件</span><br><span class="line">express --view=ejs one_punch</span><br></pre></td></tr></table></figure>
+<p>切换项目目录，安装依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd one_punch</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<p>启动项目</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm start</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>默认监听3000端口</p>
+</blockquote>
+<p>打开浏览器你会看到生成的express页面</p>
+<ul>
+<li>localhost:3000 </li>
+<li>localhost:3000/users</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/express/">express</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/04/26/NODE_002_01Express/" title="express三连(一)" itemprop="url">express三连(一)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2018-04-26T15:08:17.000Z" itemprop="datePublished"> Published 2018-04-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="express"><a href="#express" class="headerlink" title="express"></a>express</h3><blockquote>
+<p>基于 Node.js 平台，快速、开放、极简的 web 开发框架。</p>
+</blockquote>
+<p><a href="http://www.expressjs.com.cn/" target="_blank" rel="noopener">express</a></p>
+<h3 id="express-helloworld"><a href="#express-helloworld" class="headerlink" title="express helloworld"></a>express helloworld</h3><ol>
+<li>初始化项目(请确保你安装了node)</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir demo</span><br><span class="line">cd demo</span><br><span class="line"># 初始化 package.json 一路回车</span><br><span class="line">npm init   </span><br><span class="line"># 安装express 我的是4.16.3版本</span><br><span class="line">npm install express --save</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>创建server.js</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">  res.send(&apos;hello world&apos;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li><p>开启服务器  node server.js</p>
+</li>
+<li><p>浏览器访问 localhost:8001</p>
+</li>
+</ol>
+<h3 id="参数信息"><a href="#参数信息" class="headerlink" title="参数信息"></a>参数信息</h3><blockquote>
+<p>请求url为 <a href="http://localhost:8001/?name=22" target="_blank" rel="noopener">http://localhost:8001/?name=22</a> </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">  //获取请求方式</span><br><span class="line">  console.log(req.method)</span><br><span class="line">  //请求参数为 k/v形式</span><br><span class="line">  console.log(JSON.stringify(req.query));</span><br><span class="line">  //根据url取参数 </span><br><span class="line">  console.log(req.query.name);</span><br><span class="line">  //返回数据</span><br><span class="line">  return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>restful风格的匹配参数</p>
+</blockquote>
+<p>restful风格 <a href="http://localhost:8001/aa/18/man" target="_blank" rel="noopener">http://localhost:8001/aa/18/man</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">app.get(&apos;/:name/:age/:gender&apos;, function(req, res)&#123;</span><br><span class="line">  console.log(req.params.name);</span><br><span class="line">  console.log(req.params.age);</span><br><span class="line">  console.log(req.params.gender);</span><br><span class="line">  return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="获取请求头和设置响应头"><a href="#获取请求头和设置响应头" class="headerlink" title="获取请求头和设置响应头"></a>获取请求头和设置响应头</h3><ul>
+<li>request.get()</li>
+<li>response.set()</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 获取请求头 和设置响应头</span><br><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">  console.log(req.get(&apos;Accept&apos;));</span><br><span class="line">  res.set(&apos;token&apos;,&apos;fdsalkjljjfadslkjfds&apos;)</span><br><span class="line">  return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="设置json格式的响应类型"><a href="#设置json格式的响应类型" class="headerlink" title="设置json格式的响应类型"></a>设置json格式的响应类型</h3><ul>
+<li>res.json({code:0})</li>
+<li>麻烦的方式 先设置Content-Type 在去调对象序列化字符串</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 响应json格式</span><br><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">   return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 响应json格式</span><br><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">    res.set(&apos;Content-Type&apos;,&apos;application/json;charset=utf-8&apos;)</span><br><span class="line">    return res.send(JSON.stringify(&#123;code:0&#125;))</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="设置状态码"><a href="#设置状态码" class="headerlink" title="设置状态码"></a>设置状态码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.status(404)</span><br></pre></td></tr></table></figure>
+<h3 id="get-amp-amp-post"><a href="#get-amp-amp-post" class="headerlink" title="get &amp;&amp; post"></a>get &amp;&amp; post</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">app.get(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">   return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.post(&apos;/&apos;, function(req, res)&#123;</span><br><span class="line">   return res.json(&#123;code:0&#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="app-use"><a href="#app-use" class="headerlink" title="app.use()"></a>app.use()</h3><blockquote>
+<p>可以直接包含 get、post 等的匹配就不用同一路径分开写了 app.get(‘/user’,[args…]) app.post(‘/user’,[args..])</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line"></span><br><span class="line">app.use(&apos;/&apos;,(req,res,next)=&gt;&#123;</span><br><span class="line">    res.json(&#123;msg:&quot;use&quot;&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><blockquote>
+<p>类似promise里的 .then().then().then() 的加工处理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">// const Router = express.Router();</span><br><span class="line"></span><br><span class="line">app.use(&apos;/&apos;,mod1,mod2)</span><br><span class="line"></span><br><span class="line">function mod1(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod1 厂房&apos;)</span><br><span class="line">    return next();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function mod2(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod2 厂房&apos;)</span><br><span class="line">    res.json(&#123;msg:&apos;数据返回结束&apos;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>use使用中间件的方式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app.use(&apos;/&apos;,mod1,mod2)</span><br><span class="line">app.use(&apos;/&apos;,[mod1,mod2])</span><br><span class="line">app.use(&apos;/&apos;,[mod1],mod2)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>处理过程中通过req携带参数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">app.use(&apos;/&apos;,mod1,mod2)</span><br><span class="line"></span><br><span class="line">function mod1(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod1 厂房&apos;)</span><br><span class="line">    req.user = &#123;name:&quot;fsafsdfas&quot;&#125;;</span><br><span class="line">    return next();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function mod2(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod2 厂房&apos;)</span><br><span class="line">    console.log(JSON.stringify(req.user))</span><br><span class="line">    res.json(&#123;msg:&apos;数据返回结束&apos;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="next-控制流程"><a href="#next-控制流程" class="headerlink" title="next() 控制流程"></a>next() 控制流程</h4><ul>
+<li>不传递参数就会进入下一个中间件</li>
+<li>传递Error对象 就会走进错误的处理分支</li>
+<li>传递字符串 也会进入错误的处理分支 但是获取不到错误信息</li>
+<li>传递字符串除非你是’route’ 否则都会进入错误分支</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">next()</span><br><span class="line">next(new Error(&apos;fdsfdsa&apos;))</span><br><span class="line">next(&apos;fdsafsa&apos;)</span><br><span class="line">next(&apos;route&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="中间件的兜底处理"><a href="#中间件的兜底处理" class="headerlink" title="中间件的兜底处理"></a>中间件的兜底处理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">app.use(&apos;/&apos;,mod1,mod2)</span><br><span class="line"></span><br><span class="line">function mod1(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod1 厂房&apos;)</span><br><span class="line">    return next(new Error(&apos;少了一个零件，请求召回&apos;));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function mod2(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod2 厂房&apos;)</span><br><span class="line">    res.json(&#123;msg:&apos;数据返回结束&apos;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//兜底处理</span><br><span class="line">app.use((err,req,res,next)=&gt;&#123;</span><br><span class="line">    res.status(401)</span><br><span class="line">    res.json(&#123;code:-1,msg:err.message&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="处理请求体-body-parser"><a href="#处理请求体-body-parser" class="headerlink" title="处理请求体 body-parser"></a>处理请求体 body-parser</h3><blockquote>
+<p>安装 body-parser</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install body-parser --save</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">const bodyParser = require(&apos;body-parser&apos;);</span><br><span class="line"></span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended:false&#125;))</span><br><span class="line"></span><br><span class="line">app.use(&apos;/&apos;,mod1,mod2)</span><br><span class="line"></span><br><span class="line">function mod1(req,res,next)&#123;</span><br><span class="line">    //打印解析后的请求体</span><br><span class="line">    console.log(req.body)</span><br><span class="line">    console.log(&apos;进入 mod1 厂房&apos;)</span><br><span class="line">    return next()</span><br><span class="line">    // return next(new Error(&apos;少了一个零件，请求召回&apos;));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function mod2(req,res,next)&#123;</span><br><span class="line">    console.log(&apos;进入 mod2 厂房&apos;)</span><br><span class="line">    res.json(&#123;msg:&apos;数据返回结束&apos;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">app.use((err,req,res,next)=&gt;&#123;</span><br><span class="line">    res.status(401)</span><br><span class="line">    res.json(&#123;code:-1,msg:err.message&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(8001,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;port 8001 is listening!&apos;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/express/">express</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2018/04/26/NODE_001_01小型node服务器/" title="小型node服务器" itemprop="url">小型node服务器</a>
   </h1>
   <p class="article-author">By
@@ -511,784 +1084,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/18/REG_001_1_难以启齿的正则/" title="难以启齿的正则" itemprop="url">难以启齿的正则</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-18T14:44:33.000Z" itemprop="datePublished"> Published 2018-04-18</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="JS正则表达式"><a href="#JS正则表达式" class="headerlink" title="JS正则表达式"></a>JS正则表达式</h3><blockquote>
-<p>既然是正则那就先从字符串操作开始</p>
-</blockquote>
-<h4 id="search-‘xxx’"><a href="#search-‘xxx’" class="headerlink" title="search(‘xxx’)"></a>search(‘xxx’)</h4><ul>
-<li>字符串操作返回查找字符串的位置 </li>
-<li>没找到返回 -1</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;abcdef&apos;;</span><br><span class="line"></span><br><span class="line">console.log(str.search(&apos;a&apos;))  // 0</span><br><span class="line">console.log(str.search(&apos;b&apos;))  // 1</span><br><span class="line">console.log(str.search(&apos;c&apos;))  // 2</span><br><span class="line">console.log(str.search(&apos;d&apos;))  // 3</span><br><span class="line">console.log(str.search(&apos;e&apos;))  // 4</span><br><span class="line"></span><br><span class="line">console.log(str.search(&apos;x&apos;))  //  -1</span><br></pre></td></tr></table></figure>
-<h4 id="substring"><a href="#substring" class="headerlink" title="substring()"></a>substring()</h4><blockquote>
-<p>口诀「包头不包尾」(左闭右开)</p>
-</blockquote>
-<p>获取子字符串</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;abcdef&apos;;</span><br><span class="line">console.log(str.substring(2,5))  //cde</span><br><span class="line">console.log(str.substring(1))    // bcdef</span><br><span class="line">console.log(str.substring(6))  // &apos;&apos;空字符</span><br><span class="line">console.log(str.substing(-1))  //abcdef</span><br></pre></td></tr></table></figure>
-<h4 id="charAt"><a href="#charAt" class="headerlink" title="charAt()"></a>charAt()</h4><p>获取某个字符</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;abcdef&apos;;</span><br><span class="line">console.log(str.charAt(3))  //d</span><br></pre></td></tr></table></figure>
-<h4 id="split"><a href="#split" class="headerlink" title="split()"></a>split()</h4><p>分割字符串，获取数组</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;13-14-aaa-xxx&apos;;</span><br><span class="line">var arr = str.split(&apos;-&apos;);</span><br><span class="line">console.log(arr)  // [13,14,&apos;aaa&apos;,&apos;xxx&apos;]</span><br></pre></td></tr></table></figure>
-<h4 id="为什么要学正则"><a href="#为什么要学正则" class="headerlink" title="为什么要学正则"></a>为什么要学正则</h4><blockquote>
-<p>需求查找字符串里的数字</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;12 fff 87 er334 233 -=-=fa80&apos;;</span><br><span class="line">var arr = [];</span><br><span class="line">var tmp = &apos;&apos;;</span><br><span class="line"></span><br><span class="line">for(var i=0;i&lt;str.length;i++)&#123;</span><br><span class="line">    if(str.charAt(i) &gt;= &apos;0&apos; &amp;&amp; str.charAt(i) &lt;= &apos;9&apos;)&#123;</span><br><span class="line">        tmp+=str.charAt(i);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        if(tmp)&#123;</span><br><span class="line">            arr.push(tmp);</span><br><span class="line">            tmp = &apos;&apos;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">console.log(arr)  //[&apos;12&apos;,&apos;87&apos;,&apos;334&apos;,&apos;80&apos;]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>if 正则</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;12 fff 87 er334 233 -=-=fa80&apos;;</span><br><span class="line">var arr = [];</span><br><span class="line"></span><br><span class="line">arr = str.match(/\d+/g)</span><br><span class="line"></span><br><span class="line">console.log(arr) //[&apos;12&apos;,&apos;87&apos;,&apos;334&apos;,&apos;80&apos;]</span><br></pre></td></tr></table></figure>
-<h4 id="什么是正则"><a href="#什么是正则" class="headerlink" title="什么是正则"></a>什么是正则</h4><blockquote>
-<p>一串英文、数字  @ - 一串英文、各种文 「计算机」是看不懂的</p>
-</blockquote>
-<blockquote>
-<p>计算机只懂 0/1  、逻辑、程序 —-&gt;规则、模式</p>
-</blockquote>
-<ul>
-<li>强大的字符串匹配工具</li>
-<li>一种正常人类很难懂得文字</li>
-<li>RegExp对象</li>
-</ul>
-<h4 id="正则就是干"><a href="#正则就是干" class="headerlink" title="正则就是干"></a>正则就是干</h4><ul>
-<li>两种风格迥异的使用方式</li>
-</ul>
-<h5 id="需求1-看第一个例子查找字母-‘a’"><a href="#需求1-看第一个例子查找字母-‘a’" class="headerlink" title="需求1 看第一个例子查找字母 ‘a’"></a>需求1 看第一个例子查找字母 ‘a’</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// js风格</span><br><span class="line">var reg = new RegExp(&apos;a&apos;);</span><br><span class="line">var str = &apos;abcdef&apos;;</span><br><span class="line"></span><br><span class="line">console.log(str.search(reg));  // 0</span><br></pre></td></tr></table></figure>
-<p>另一种风格</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// perl风格</span><br><span class="line">var reg = /a/;</span><br><span class="line">var str = &apos;abcdef&apos;;</span><br><span class="line">console.log(str.search(reg));  // 0</span><br></pre></td></tr></table></figure>
-<h5 id="需求2-查找忽略大小写的字母-‘b’"><a href="#需求2-查找忽略大小写的字母-‘b’" class="headerlink" title="需求2 查找忽略大小写的字母  ‘b’"></a>需求2 查找忽略大小写的字母  ‘b’</h5><h5 id="忽略大小写之「i」-ignore"><a href="#忽略大小写之「i」-ignore" class="headerlink" title="忽略大小写之「i」(ignore)"></a>忽略大小写之「i」(ignore)</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// js风格</span><br><span class="line">var reg = new RegExp(&apos;b&apos;,&apos;i&apos;);</span><br><span class="line">var str = &apos;aBcdef&apos;;</span><br><span class="line"></span><br><span class="line">console.log(str.search(reg));  // 0</span><br></pre></td></tr></table></figure>
-<p>另一种风格</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// perl风格</span><br><span class="line">var reg = /a/i;</span><br><span class="line">var str = &apos;Abcdef&apos;;</span><br><span class="line">console.log(str.search(reg));  // 0</span><br></pre></td></tr></table></figure>
-<h5 id="search-和-match-的区别"><a href="#search-和-match-的区别" class="headerlink" title="search 和 match 的区别"></a>search 和 match 的区别</h5><blockquote>
-<p>search是查找匹配规则的字符(只找一次，找到匹配规则的第一个索引返回)</p>
-</blockquote>
-<blockquote>
-<p>match 是返回所有匹配规则的东西都取出来</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var reg = /\d/;</span><br><span class="line">var str = &apos;asdf 34  657 cs33&apos;;</span><br><span class="line">console.log(str.search(reg))  //5</span><br><span class="line">alert(str.match(reg)) // 3</span><br><span class="line">console.log(str.match(reg)) // [&quot;3&quot;, index: 5, input: &quot;asdf 34  657 cs33&quot;, groups: undefined]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>match返回3是因为 计算机很蠢，你只告诉它找数字，没告诉它找几个</p>
-</blockquote>
-<blockquote>
-<p>但是，正则天生懒惰想变勤奋你得加「g」</p>
-</blockquote>
-<h5 id="「g」global"><a href="#「g」global" class="headerlink" title="「g」global"></a>「g」global</h5><p>那你就给我勤奋一点！</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var reg = /\d/g;</span><br><span class="line">var str = &apos;asdf 34  657 cs33&apos;;</span><br><span class="line">console.log(str.match(reg))  // [&quot;3&quot;, &quot;4&quot;, &quot;6&quot;, &quot;5&quot;, &quot;7&quot;, &quot;3&quot;, &quot;3&quot;]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>怎么出来的都是个位的数字?</p>
-</blockquote>
-<blockquote>
-<p>因为你只告诉计算机取一个数字</p>
-</blockquote>
-<h5 id="量词-个数"><a href="#量词-个数" class="headerlink" title="量词(个数)"></a>量词(个数)</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var reg = /\d+/g;</span><br><span class="line">var str = &apos;asdf 34  657 cs33&apos;;</span><br><span class="line">console.log(str.match(reg)) // [&quot;34&quot;, &quot;657&quot;, &quot;33&quot;]</span><br></pre></td></tr></table></figure>
-<h5 id="replace"><a href="#replace" class="headerlink" title="replace()"></a>replace()</h5><blockquote>
-<p>把’a’替换成 0</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//仅第一个a被替换了  </span><br><span class="line">var str = &apos;abc aaa erv&apos;;</span><br><span class="line">console.log(str.replace(&apos;a&apos;,&apos;0&apos;))  // 0bc aaa erv</span><br></pre></td></tr></table></figure>
-<ul>
-<li>replace 配合 字符串去替换字符是非常弱爆的</li>
-<li>replace只有配合正则才能发挥真正的作用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;abc aaa erv&apos;;</span><br><span class="line"></span><br><span class="line">var reg = /a/;</span><br><span class="line">console.log(str.replace(reg,&apos;0&apos;)) // 0bc aaa erv</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>但是正则有全局匹配啊</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var reg2 = /a/g;</span><br><span class="line">console.log(str.replace(reg2,&apos;0&apos;)) // 0bc 000 erv</span><br></pre></td></tr></table></figure>
-<h5 id="replace之敏感词过滤"><a href="#replace之敏感词过滤" class="headerlink" title="replace之敏感词过滤"></a>replace之敏感词过滤</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var reg = /零售|中国|淘宝/g;</span><br><span class="line">var str = &apos;淘宝网是亚太地区较大的网络零售、商圈，由阿里巴巴集团在2003年5月创立。淘宝网 [1]  是中国深受欢迎的网购零售平台，拥有近5亿的注册用户数，每天有超过6000万的固定访客，同时每天的在线商品数已经超过了8亿件，平均每分钟售出4.8万件商品&apos;;</span><br><span class="line"></span><br><span class="line">console.log(str.replace(reg,&apos;**&apos;))</span><br></pre></td></tr></table></figure>
-<h4 id="元字符-方括号"><a href="#元字符-方括号" class="headerlink" title="元字符(方括号)"></a>元字符(方括号)</h4><blockquote>
-<p>需求匹配 以a或b或c开头+ ‘pc’结尾的字符</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[abc]pc</span><br><span class="line">apc bpc cpc √</span><br><span class="line">dpc epc fpc ×</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;apc xpc ppc bpc spc tpc&apos;;</span><br><span class="line">var reg = /[abc]pc/g;</span><br><span class="line">console.log(str.match(reg)) // [&quot;apc&quot;, &quot;bpc&quot;]</span><br></pre></td></tr></table></figure>
-<h4 id="元字符之范围"><a href="#元字符之范围" class="headerlink" title="元字符之范围"></a>元字符之范围</h4><ul>
-<li>任意字符 [abc]</li>
-<li>范围 [a-z] [0-9]</li>
-<li>排除 [^a]</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[a-z]   a到z的字母</span><br><span class="line">[0-9]   相当于 \d 匹配数字</span><br><span class="line">[^a-z]  除了a到z的字母</span><br><span class="line">[^a-z0-9] 除了a到z的字母和数字</span><br></pre></td></tr></table></figure>
-<h4 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a>转义字符</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.  点----任意字符</span><br><span class="line">\d  数字0-9         [0-9]</span><br><span class="line">\w  英文数字下划线   [a-z0-9_]</span><br><span class="line">\s  空白字符</span><br><span class="line">\D  非0-9            [^0-9]</span><br><span class="line">\W  非字母数字下划线  [^a-z0-9_]</span><br><span class="line">\S  非空白字符</span><br></pre></td></tr></table></figure>
-<h4 id="偷小说之替换html标签"><a href="#偷小说之替换html标签" class="headerlink" title="偷小说之替换html标签"></a>偷小说之替换html标签</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">var str = `&lt;p id=&quot;p1&quot;&gt;fdsadfdssafas&lt;/p&gt;</span><br><span class="line">&lt;p class=&quot;p2&quot;&gt;aaaaaaaaaaaa&lt;/p&gt;</span><br><span class="line">&lt;p disabled&gt;bbbbbbbbbbb&lt;/p&gt;</span><br><span class="line">&lt;span&gt;ccccccccccc&lt;/span&gt;</span><br><span class="line">&lt;div&gt;dddddddddddd&lt;/div&gt;</span><br><span class="line">&lt;p&gt;eeeeeeeeeeeee&lt;/p&gt;`;</span><br><span class="line"></span><br><span class="line">//你肯定想到的是 </span><br><span class="line">var reg = /&lt;.+&gt;/g;  // 这样会把遇到的第一个 &quot;&lt;&quot;一直匹配到最后一个&quot;&gt;&quot;</span><br><span class="line"></span><br><span class="line">//实际上应该是除了 &quot;&lt;&gt;&quot;以外</span><br><span class="line"></span><br><span class="line">var reg2 = /&lt;[^&lt;&gt;]+&gt;/g;</span><br><span class="line">console.log(str.replace(reg2,&apos;&apos;))</span><br></pre></td></tr></table></figure>
-<h4 id="量词：个数"><a href="#量词：个数" class="headerlink" title="量词：个数"></a>量词：个数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;n&#125; 正好出现n次</span><br><span class="line">&#123;n,m&#125;  最少n次，最多m次</span><br><span class="line">&#123;n,&#125;  最少n次，最多不限</span><br><span class="line"></span><br><span class="line">+  &lt;===&gt; &#123;1,&#125;</span><br><span class="line">?  &lt;===&gt; &#123;0,1&#125;</span><br><span class="line"></span><br><span class="line">*  &lt;===&gt; &#123;0,&#125; 可以可无  不推荐使用容易误导</span><br></pre></td></tr></table></figure>
-<h5 id="需求1-电话号码-除去区号010-022-0537"><a href="#需求1-电话号码-除去区号010-022-0537" class="headerlink" title="需求1 电话号码 (除去区号010/022/0537)"></a>需求1 电话号码 (除去区号010/022/0537)</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[1-9]\d&#123;7&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="需求2-qq号-qq号没有0开头的-5-11位"><a href="#需求2-qq号-qq号没有0开头的-5-11位" class="headerlink" title="需求2 qq号(qq号没有0开头的) 5-11位"></a>需求2 qq号(qq号没有0开头的) 5-11位</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[1-9]\d&#123;4,10&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="需求3-固定电话-010-87490623-86"><a href="#需求3-固定电话-010-87490623-86" class="headerlink" title="需求3 固定电话 010-87490623-86"></a>需求3 固定电话 010-87490623-86</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">010-87490623-86</span><br><span class="line">010是区号可有可无</span><br><span class="line">86是分机号也是可有可无</span><br><span class="line"></span><br><span class="line">前面的区号可有可无 (0\d&#123;2,3&#125;-)?</span><br><span class="line">座机号8位 [1-9]\d&#123;7&#125;</span><br><span class="line">分机号可有可无  (-\d&#123;1,5&#125;)?</span><br><span class="line"></span><br><span class="line">//最后</span><br><span class="line">(0\d&#123;2,3&#125;-)?[1-9]\d&#123;7&#125;(-\d&#123;1,5&#125;)?</span><br></pre></td></tr></table></figure>
-<h5 id="为什么不推荐用「-」"><a href="#为什么不推荐用「-」" class="headerlink" title="为什么不推荐用「*」"></a>为什么不推荐用「*」</h5><blockquote>
-<p>因为匹配数字的时候0次也算在内</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;12 fff 85 er552 333 -=-=fa22&apos;;</span><br><span class="line">console.log(str.match(/\d*/g))  </span><br><span class="line">// [&quot;12&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;85&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;552&quot;, &quot;&quot;, &quot;333&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;22&quot;, &quot;&quot;]</span><br></pre></td></tr></table></figure>
-<h5 id="行首-「-」行尾「-」"><a href="#行首-「-」行尾「-」" class="headerlink" title="行首 「^」行尾「$」"></a>行首 「^」行尾「$」</h5><h4 id="test"><a href="#test" class="headerlink" title="test()"></a>test()</h4><blockquote>
-<p>校验是否符合正则返回 true/false</p>
-</blockquote>
-<h5 id="校验邮箱"><a href="#校验邮箱" class="headerlink" title="校验邮箱"></a>校验邮箱</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var str = &apos;trustfor@sina.cn&apos;</span><br><span class="line">var reg = /^\w+@[a-z0-9]+\.[a-z]+$/i;</span><br><span class="line">if(reg.test(str))&#123;</span><br><span class="line">    //合法</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    //你丫写错了</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/18/JS005_01_tabs组件/" title="tabs组件" itemprop="url">tabs组件</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-18T12:06:38.000Z" itemprop="datePublished"> Published 2018-04-18</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<h4 id="base-on-jQuery-基于jquery-否则请别继续"><a href="#base-on-jQuery-基于jquery-否则请别继续" class="headerlink" title="base on jQuery(基于jquery,否则请别继续)"></a>base on jQuery(基于jquery,否则请别继续)</h4></blockquote>
-<h3 id="tabs组件"><a href="#tabs组件" class="headerlink" title="tabs组件"></a>tabs组件</h3><h4 id="HTML"><a href="#HTML" class="headerlink" title="HTML"></a>HTML</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;tabs&quot;&gt;</span><br><span class="line">    &lt;ol class=&quot;tabs-bar&quot;&gt;</span><br><span class="line">        &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">    &lt;/ol&gt;</span><br><span class="line">    &lt;ol class=&quot;tabs-content&quot;&gt;</span><br><span class="line">        &lt;li&gt;content 1&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;content 2&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;content 3&lt;/li&gt;</span><br><span class="line">    &lt;/ol&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">.tabs&#123;&#125;</span><br><span class="line">.tabs &gt; ol&#123;</span><br><span class="line">  list-style: none;</span><br><span class="line">  margin: 0; padding: 0;</span><br><span class="line">&#125;</span><br><span class="line">.tabs &gt; ol.tabs-bar&#123;</span><br><span class="line">  display: flex;</span><br><span class="line">  border-bottom: 1px solid red;</span><br><span class="line">&#125;</span><br><span class="line">.tabs &gt; ol.tabs-bar &gt; li&#123;</span><br><span class="line">  padding: 4px 8px;</span><br><span class="line">  border: 1px solid transparent;</span><br><span class="line">  border-bottom: 0;</span><br><span class="line">&#125;</span><br><span class="line">.tabs &gt; ol.tabs-bar &gt; li:hover&#123;</span><br><span class="line">  border-color: red;</span><br><span class="line">&#125;</span><br><span class="line">/* 选中项显示边框 */</span><br><span class="line">.tabs &gt; ol.tabs-bar &gt; li.active&#123;</span><br><span class="line">  border-color: blue;</span><br><span class="line">&#125;</span><br><span class="line">/* 内容默认隐藏 */</span><br><span class="line">.tabs &gt; ol.tabs-content &gt; li&#123;</span><br><span class="line">  display: none;</span><br><span class="line">&#125;</span><br><span class="line">/* 选中项显示内容 */</span><br><span class="line">.tabs &gt; ol.tabs-content &gt; li.active&#123;</span><br><span class="line">  display: block;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$(&apos;.tabs&apos;).each(function(index,element) &#123;</span><br><span class="line">    $(element).children(&apos;.tabs-bar&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">    $(element).children(&apos;.tabs-content&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">$(&apos;.tabs&apos;).on(&apos;click&apos;, &apos;.tabs-bar &gt; li&apos;, function(e) &#123;</span><br><span class="line">        var $li = $(e.currentTarget)</span><br><span class="line">        $li.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">        var index = $li.index()</span><br><span class="line">        //从当前选中的li往外找父级元素  而不是 $(&apos;.tabs .tabs-content&gt;li&apos;)  因为可能有多个 tabs组件</span><br><span class="line">        var $content = $li.closest(&apos;.tabs&apos;).find(&apos;.tabs-content&gt;li&apos;).eq(index)</span><br><span class="line">        $content.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>但是这样只是页面上没法复用 </p>
-<h4 id="面向对象的JS"><a href="#面向对象的JS" class="headerlink" title="面向对象的JS"></a>面向对象的JS</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">function Tabs(selector) &#123;</span><br><span class="line">  this.elements = $(selector)</span><br><span class="line">  this.init()</span><br><span class="line">  this.bindEvents()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Tabs.prototype.init = function() &#123;</span><br><span class="line">  this.elements.each(function(index, element) &#123;</span><br><span class="line">    $(element).children(&apos;.tabs-bar&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">    $(element).children(&apos;.tabs-content&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Tabs.prototype.bindEvents = function() &#123;</span><br><span class="line">  this.elements.on(&apos;click&apos;, &apos;.tabs-bar &gt; li&apos;, function(e) &#123;</span><br><span class="line">    var $li = $(e.currentTarget)</span><br><span class="line">    $li.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">    var index = $li.index()</span><br><span class="line">    var $content = $li.closest(&apos;.tabs&apos;).find(&apos;.tabs-content&gt;li&apos;).eq(index)</span><br><span class="line">    $content.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var tabs = new Tabs(&apos;.tabs&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="ES6写法-class"><a href="#ES6写法-class" class="headerlink" title="ES6写法(class)"></a>ES6写法(class)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">class Tabs &#123;</span><br><span class="line">  constructor(selector) &#123;</span><br><span class="line">    this.elements = $(selector)</span><br><span class="line">    this.init()</span><br><span class="line">    this.bindEvents()</span><br><span class="line">  &#125;</span><br><span class="line">  init() &#123;</span><br><span class="line">    this.elements.each(function(index, element) &#123;</span><br><span class="line">      $(element).children(&apos;.tabs-bar&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">      $(element).children(&apos;.tabs-content&apos;).children(&apos;li&apos;).eq(0).addClass(&apos;active&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  bindEvents() &#123;</span><br><span class="line">    this.elements.on(&apos;click&apos;, &apos;.tabs-bar &gt; li&apos;, function(e) &#123;</span><br><span class="line">      var $li = $(e.currentTarget)</span><br><span class="line">      $li.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">      var index = $li.index()</span><br><span class="line">      var $content = $li.closest(&apos;.tabs&apos;).find(&apos;.tabs-content&gt;li&apos;).eq(index)</span><br><span class="line">      $content.addClass(&apos;active&apos;).siblings().removeClass(&apos;active&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var tabs = new Tabs(&apos;.tabs&apos;)</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/JS不知深浅/">JS不知深浅</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/18/JS005_造轮子组件实现思路/" title="造轮子-组件实现思路" itemprop="url">造轮子-组件实现思路</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-18T11:19:14.000Z" itemprop="datePublished"> Published 2018-04-18</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="前端有哪些轮子"><a href="#前端有哪些轮子" class="headerlink" title="前端有哪些轮子"></a>前端有哪些轮子</h3><ol>
-<li><p>标准库的扩充</p>
-<ol>
-<li>underscore.js 扩充了 Array 和 Object 相关 API</li>
-<li>moment.js 扩充了 Date</li>
-<li>bluebird.js / hax/my-promise 实现了 Promise</li>
-<li>async.js 模拟了 async 操作符</li>
-<li>es5shim 用 ES 3 语法部分实现了 ES 5 特性</li>
-<li>handlebars.js 实现模板字符串功能</li>
-</ol>
-</li>
-<li><p>DOM 的扩充</p>
-<ol>
-<li>jQuery.js 操作 DOM</li>
-<li>video.js 操作 video</li>
-<li>Fabric.js 操作 canvas</li>
-</ol>
-</li>
-<li><p>UI 组件</p>
-<ol>
-<li>纯 CSS 的 UI 组件库，如 Bulma</li>
-<li>大而全的 UI 框架（CSS + JS），如 Bootstrap、Element UI</li>
-<li>垂直领域的 UI 组件<ul>
-<li>专门做轮播的 <a href="http://idangero.us/swiper/demos/" target="_blank" rel="noopener">Swiper</a></li>
-<li>专门做输入提示的 <a href="https://twitter.github.io/typeahead.js/" target="_blank" rel="noopener">typeahead</a></li>
-<li>专门做文件上传的 fine-uploader</li>
-<li>专门做 3D 瓦片效果的 <a href="https://micku7zu.github.io/vanilla-tilt.js/" target="_blank" rel="noopener">vanilla-tilt.js</a></li>
-<li>专门做视差效果的 <a href="http://matthew.wagerfield.com/parallax/" target="_blank" rel="noopener">parallax.js</a></li>
-<li>专门做数据可视化的 <a href="http://mbostock.github.io/d3/talk/20111116/airports.html" target="_blank" rel="noopener">D3.js</a></li>
-<li>专门做图表的 echarts.js</li>
-<li>专门做动画的 velocity.js</li>
-<li>专门做粒子效果的 particle.js</li>
-<li>专门做手势识别的 hammer.js</li>
-</ul>
-</li>
-</ol>
-</li>
-<li>编程思想类的轮子<ol>
-<li>实现 MVC 思想的 backbone.js</li>
-<li>实现 MVVM 思想的 AngularJS 1 和 Vue 1</li>
-<li>实现 Virtual DOM 的 React 和 Preact</li>
-<li>实现单向数据流（FLUX）思想的 Redux</li>
-<li>实现 Reactive 思想的 Rx.js</li>
-<li>实现 Rails 思想的 Ember.js</li>
-<li>实现函数式思想的 Ramda</li>
-</ol>
-</li>
-</ol>
-<h3 id="我们的重点"><a href="#我们的重点" class="headerlink" title="我们的重点"></a>我们的重点</h3><blockquote>
-<p>重点是 UI 组件，因为</p>
-</blockquote>
-<ol>
-<li>我们日常工作中经常用到的就是 UI 组件</li>
-<li>UI 组件一般是由 HTML、CSS 和 JS 组成，把 UI 组件做好了，就能更好的做网页</li>
-<li>UI 组件做起来更有趣，所有效果你都能用眼睛看到，而做编程思想类、DOM扩充类组件可能过于抽象</li>
-</ol>
-<h3 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h3><ul>
-<li>（内部）分层原则：正交原则</li>
-<li>（对外）封装原则：面向接口编程</li>
-</ul>
-<blockquote>
-<p>正交原则之x/y/z</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/jsnote_005_1.png" alt></p>
-<blockquote>
-<p>永远不要用 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$(&apos;#div&apos;).show() </span><br><span class="line">$(&apos;#div&apos;).hide()</span><br></pre></td></tr></table></figure>
-<p>因为你不知道 div以前display是什么</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/jsnote_005_2.png" alt></p>
-<blockquote>
-<p>你应该做的是用状态控制</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$(&apos;#div&apos;).addClass(&apos;active&apos;)</span><br><span class="line">$(&apos;#div&apos;).removeClass(&apos;active&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="内容、行为、样式分离原则"><a href="#内容、行为、样式分离原则" class="headerlink" title="内容、行为、样式分离原则"></a>内容、行为、样式分离原则</h4><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/jsnote_005_3.png" alt></p>
-<h4 id="面向接口编程"><a href="#面向接口编程" class="headerlink" title="面向接口编程"></a>面向接口编程</h4><blockquote>
-<p>你不该首先考虑代码怎么写</p>
-</blockquote>
-<blockquote>
-<p>你该考虑用户如何调用</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/jsnote_005_4.png" alt></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/JS不知深浅/">JS不知深浅</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/17/JS003_异步代码烧脑的原因/" title="异步代码烧脑的原因" itemprop="url">异步代码烧脑的原因</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-17T13:48:00.000Z" itemprop="datePublished"> Published 2018-04-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="同步与异步"><a href="#同步与异步" class="headerlink" title="同步与异步"></a>同步与异步</h3><p>同步：等待结果<br>异步：不等待结果</p>
-<blockquote>
-<p>注意，异步常常伴随回调一起出现，但是异步不是回调，回调也不一定是异步</p>
-</blockquote>
-<p>如下代码就是同步,只要fn内部的循环完毕才能执行下面的代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function fn()&#123;</span><br><span class="line">    for(var i=0;i&lt;5000000000;i++)&#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">var startTime = new Date().getTime();</span><br><span class="line">console.log(&apos;开始了&apos;)</span><br><span class="line">fn();</span><br><span class="line">var exeTime = new Date().getTime() - startTime;</span><br><span class="line">console.log(&apos;执行了&apos;+exeTime/1000+&apos;秒&apos;)</span><br></pre></td></tr></table></figure>
-<p>异步代码</p>
-<ul>
-<li>定时器就相当于浏览器设置了一个闹钟</li>
-<li>之后继续执行</li>
-<li>闹钟到了时间再去执行相应的代码</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//异步的 asyncFn</span><br><span class="line">function asyncFn(fn)&#123;</span><br><span class="line">    setTimeout(fn, 3000)</span><br><span class="line">&#125;</span><br><span class="line">console.log(1)</span><br><span class="line">asyncFn(()=&gt; console.log(&apos;wake up&apos;))</span><br><span class="line">console.log(2)</span><br></pre></td></tr></table></figure>
-<h3 id="前端经常遇到的异步"><a href="#前端经常遇到的异步" class="headerlink" title="前端经常遇到的异步"></a>前端经常遇到的异步</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//因为图片还没有加载完毕所以并不知道高度，(请禁用浏览器缓存在执行)</span><br><span class="line">document.getElementsByTagNames(&apos;img&apos;)[0].width // 宽度为 0</span><br><span class="line">console.log(&apos;done&apos;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>你应该在图片加载成功后在获取图片的高度</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">document.getElementsByTagNames(&apos;img&apos;)[0].onload = function()&#123;</span><br><span class="line">    console.log(this.width) // 宽度不为 0</span><br><span class="line">    console.log(&apos;real done&apos;)</span><br><span class="line">&#125;</span><br><span class="line">console.log(&apos;done&apos;)</span><br></pre></td></tr></table></figure>
-<h3 id="面试题中的异步"><a href="#面试题中的异步" class="headerlink" title="面试题中的异步"></a>面试题中的异步</h3><p>为啥点击li每次都打印 6</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;li&gt;11111111&lt;/li&gt;</span><br><span class="line">&lt;li&gt;22222222&lt;/li&gt;</span><br><span class="line">&lt;li&gt;33333333&lt;/li&gt;</span><br><span class="line">&lt;li&gt;44444444&lt;/li&gt;</span><br><span class="line">&lt;li&gt;55555555&lt;/li&gt;</span><br><span class="line">&lt;li&gt;66666666&lt;/li&gt;</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">let liList = document.querySelectorAll(&apos;li&apos;)</span><br><span class="line">for(var i=0; i&lt;liList.length; i++)&#123;</span><br><span class="line">    liList[i].onclick = function()&#123;</span><br><span class="line">        console.log(i)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">console.log(i)  //6</span><br></pre></td></tr></table></figure>
-<ol>
-<li>for循环用极短的时间执行完毕  我们假设 3 毫秒</li>
-<li>var i 有变量提升  即使循环之后仍然可以访问到i的值</li>
-<li>用户看到 Li 的时间绝对大于3 毫秒，每个 Li 点击事件已经初始化结束</li>
-<li>log(i) 还是外面的 i</li>
-</ol>
-<blockquote>
-<p>如何解决 把 var i 改为 let i 就可以了 </p>
-</blockquote>
-<p><a href="https://zhuanlan.zhihu.com/p/28140450" target="_blank" rel="noopener">详情参考</a></p>
-<h3 id="AJAX-中的异步"><a href="#AJAX-中的异步" class="headerlink" title="AJAX 中的异步"></a>AJAX 中的异步</h3><p>这样调用虽然是同步的，但是页面会失去响应，直到结果回来</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let request = $.ajax(&#123;</span><br><span class="line">  url: &apos;.&apos;,</span><br><span class="line">  async: false</span><br><span class="line">&#125;)</span><br><span class="line">console.log(request.responseText)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//异步方式</span><br><span class="line">$.ajax(&#123;</span><br><span class="line">    url: &apos;/&apos;,</span><br><span class="line">    async: true,</span><br><span class="line">    success: function(responseText)&#123;</span><br><span class="line">        console.log(responseText)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h3 id="异步的形式"><a href="#异步的形式" class="headerlink" title="异步的形式"></a>异步的形式</h3><p>一般有两种方式拿到异步结果</p>
-<ol>
-<li>傻逼方法：轮训<br> 老板叫你去买土豆，然后他就隔1分钟问一次买到土豆了吗？</li>
-<li>正规方法：回调<br> 老板叫你去买土豆并告诉你回来之后通知他，20分钟后你回来了告诉老板是否买到了土豆</li>
-</ol>
-<h3 id="回调的形式"><a href="#回调的形式" class="headerlink" title="回调的形式"></a>回调的形式</h3><ol>
-<li>Node.js 的 error-first 形式</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">fs.readFile(&apos;./1.txt&apos;, (error, content)=&gt;&#123;</span><br><span class="line">    if(error)&#123;</span><br><span class="line">        // 失败</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        // 成功</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>jQuery 的 success / error 形式</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">    url:&apos;/xxx&apos;,</span><br><span class="line">    success:()=&gt;&#123;&#125;,</span><br><span class="line">    error: ()=&gt;&#123;&#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>jQuery 的 done / fail / always 形式</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">    url:&apos;/xxx&apos;,</span><br><span class="line">&#125;).done( ()=&gt;&#123;&#125; ).fail( ()=&gt;&#123;&#125; ).always( ()=&gt; &#123;&#125;)</span><br></pre></td></tr></table></figure>
-<ol start="4">
-<li>Prosmise 的 then 形式</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//成功调第一个函数，失败调用第二个函数</span><br><span class="line">$.ajax(&#123;</span><br><span class="line">    url:&apos;/xxx&apos;,</span><br><span class="line">&#125;).then( ()=&gt;&#123;&#125;, ()=&gt;&#123;&#125; ).then( ()=&gt;&#123;&#125;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>ajax的 Prosmise跟真正的Promise有点不同</li>
-<li>它也可以一直.then().then().then() 这样链式操作</li>
-</ul>
-<p>Promise只是一种回调的形式</p>
-<h3 id="Promise规范"><a href="#Promise规范" class="headerlink" title="Promise规范"></a>Promise规范</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">    url:&apos;xxx&apos;</span><br><span class="line">&#125;).then(s1,e1)</span><br><span class="line">  .then(s2,e2)</span><br><span class="line">  .then(s3,e3)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如果是jquery,成功只会走进成功的分支   </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s1 ==&gt; s2 ==&gt; s3 </span><br><span class="line">e1 ==&gt; e2 ==&gt; e3</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="Promise规范是责任制"><a href="#Promise规范是责任制" class="headerlink" title="Promise规范是责任制"></a>Promise规范是责任制</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s1 e1 是第一责任人</span><br><span class="line">s2 e2 是第二责任人</span><br><span class="line">s3 e3 是第三责任人</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">    url:&apos;/aaa&apos;</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功1&apos;)</span><br><span class="line">    alert(xxxxx)  //xxxxx 没有定义</span><br><span class="line">&#125;,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;失败1&apos;)        </span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功2&apos;)</span><br><span class="line">&#125;,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;失败2&apos;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<ol>
-<li>s1 执行过程不够顺利报错了(就会产生错误的结果)</li>
-<li>于是第二责任人接收到的是一个烂尾工程 </li>
-<li>当做错误处理 走进e2</li>
-</ol>
-<blockquote>
-<p>如果没有 e2 就会报错到浏览器显示给开发者</p>
-</blockquote>
-<h5 id="帮你兜底的两种写法"><a href="#帮你兜底的两种写法" class="headerlink" title="帮你兜底的两种写法"></a>帮你兜底的两种写法</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">axios(&#123;</span><br><span class="line">    url:&apos;/aaa&apos;</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功1&apos;)</span><br><span class="line">    alert(xxxxx)  //xxxxx 没有定义</span><br><span class="line">&#125;,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;失败1&apos;)        </span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功2&apos;)</span><br><span class="line">&#125;).catch((err)=&gt;&#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">axios(&#123;</span><br><span class="line">    url:&apos;/aaa&apos;</span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功1&apos;)</span><br><span class="line">    alert(xxxxx)  //xxxxx 没有定义</span><br><span class="line">&#125;,()=&gt;&#123;</span><br><span class="line">    console.log(&apos;失败1&apos;)        </span><br><span class="line">&#125;).then(()=&gt;&#123;</span><br><span class="line">    console.log(&apos;成功2&apos;)</span><br><span class="line">&#125;).then(undefined,(err)=&gt;&#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h3 id="自己返回-Promise"><a href="#自己返回-Promise" class="headerlink" title="自己返回 Promise"></a>自己返回 Promise</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function buyApple()&#123;</span><br><span class="line">    var fn =(succ,err)=&gt;&#123;</span><br><span class="line">        var rnd = Math.random()</span><br><span class="line">        setTimeout(()=&gt;&#123;</span><br><span class="line">            if(rnd&gt;0.5)&#123;</span><br><span class="line">                succ(&apos;买到了苹果&apos;)</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                err(&apos;没买到苹果&apos;)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,2000)</span><br><span class="line">    &#125;</span><br><span class="line">    return new Promise(fn)   //fn.call(undefined,success,err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">var promise = buyApple();</span><br><span class="line">promise.then(</span><br><span class="line">    (data)=&gt;&#123;console.log(data)&#125;,</span><br><span class="line">    (err)=&gt;&#123;console.log(err)&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function ajax()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        做事</span><br><span class="line">        如果成功就调用 resolve</span><br><span class="line">        如果失败就调用 reject</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var promise = ajax()</span><br><span class="line">promise.then(successFn, errorFn)</span><br></pre></td></tr></table></figure>
-<p>Promise 深入阅读：<a href="http://www.cnblogs.com/hustskyking/p/promise.html" target="_blank" rel="noopener">http://www.cnblogs.com/hustskyking/p/promise.html</a><br>Promise/A+ 规范：<a href="https://segmentfault.com/a/1190000002452115" target="_blank" rel="noopener">https://segmentfault.com/a/1190000002452115</a></p>
-<h3 id="async-await"><a href="#async-await" class="headerlink" title="async / await"></a>async / await</h3><h5 id="await"><a href="#await" class="headerlink" title="await"></a>await</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function buyApple()&#123;</span><br><span class="line">    var fn =(succ,err)=&gt;&#123;</span><br><span class="line">        var rnd = Math.random()</span><br><span class="line">        setTimeout(()=&gt;&#123;</span><br><span class="line">            if(rnd&gt;0.5)&#123;</span><br><span class="line">                succ(&apos;买到了苹果&apos;)</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                err(&apos;没买到苹果&apos;)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,10000)</span><br><span class="line">    &#125;</span><br><span class="line">    return new Promise(fn)   //fn.call(undefined,success,err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var result = await buyApple();</span><br><span class="line">console.log(2)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>10秒之后返回买苹果的结果(成功/失败)<br>打印2</p>
-</blockquote>
-<ul>
-<li>await相当于 用异步的方式写同步的代码</li>
-<li>直到异步代码结果回来才把值赋给 result</li>
-</ul>
-<blockquote>
-<h4 id="await的用法就是-后面接一个返回Promise对象的函数"><a href="#await的用法就是-后面接一个返回Promise对象的函数" class="headerlink" title="await的用法就是 后面接一个返回Promise对象的函数"></a>await的用法就是 后面接一个返回Promise对象的函数</h4></blockquote>
-<h5 id="async"><a href="#async" class="headerlink" title="async"></a>async</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">function buyApple()&#123;</span><br><span class="line">    var fn =(succ,err)=&gt;&#123;</span><br><span class="line">        var rnd = Math.random()</span><br><span class="line">        setTimeout(()=&gt;&#123;</span><br><span class="line">            if(rnd&gt;0.5)&#123;</span><br><span class="line">                succ(&apos;买到了苹果&apos;)</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                err(&apos;没买到苹果&apos;)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,10000)</span><br><span class="line">    &#125;</span><br><span class="line">    return new Promise(fn)   //fn.call(undefined,success,err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">    var result = await buyApple()</span><br><span class="line">    return result</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var r = await fn().then(</span><br><span class="line">                    (data)=&gt;&#123;console.log(data)&#125;,</span><br><span class="line">                    (err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">console.log(1)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>分析1 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var r = await fn().then(</span><br><span class="line">                    (data)=&gt;&#123;console.log(data)&#125;,</span><br><span class="line">                    (err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">console.log(2)</span><br><span class="line">/*</span><br><span class="line">1.会直接打印2</span><br><span class="line">2. 10秒后打印  买苹果的结果</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>分析2</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var r = await fn().then(</span><br><span class="line">                    (data)=&gt;&#123;console.log(data)&#125;,</span><br><span class="line">                    (err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">console.log(2)</span><br><span class="line">/*</span><br><span class="line">10秒后打印  买苹果的结果</span><br><span class="line">然后打印2</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/JS不知深浅/">JS不知深浅</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/15/JS002你真的懂函数吗/" title="你真的懂函数吗" itemprop="url">你真的懂函数吗</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-15T15:34:44.000Z" itemprop="datePublished"> Published 2018-04-15</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h3><h4 id="匿名函数-就是声明的时候不给名字"><a href="#匿名函数-就是声明的时候不给名字" class="headerlink" title="匿名函数 就是声明的时候不给名字"></a>匿名函数 就是声明的时候不给名字</h4><blockquote>
-<p>function(){ return 1 ;} 你声明了它 但是又不能引用到它</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// function()&#123; return 1 ;&#125;  匿名函数 相当于废话    会报错   你只有给了引用才能使用</span><br><span class="line">//fn 记录的是函数的地址 ==&gt;引用</span><br><span class="line">var fn = function()&#123;</span><br><span class="line">return 1;</span><br><span class="line">&#125; </span><br><span class="line">console.log(fn.name) //fn</span><br><span class="line">var fn2 = fn;  //这里不是把function()&#123; return 1 ;&#125; 复制给fn2 而是把地址复制给fn2</span><br><span class="line">console.log(fn2.name) //fn</span><br></pre></td></tr></table></figure>
-<hr>
-<h4 id="具名函数"><a href="#具名函数" class="headerlink" title="具名函数"></a>具名函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function fn3()&#123;</span><br><span class="line">return 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(fn3); //可以访问   fn3它是一个变量  作用域是整个区域</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>将具名函数赋值给一个变量  它的作用域就变了 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var fn4 = function fn5()&#123;return 1;&#125;</span><br><span class="line">console.log(fn4.name)  //fn5</span><br><span class="line">// 这个具名函数的作用域就是他函数本身那部分  外部访问不到</span><br><span class="line">// console.log(fn5) //fn5 is not defined</span><br><span class="line">// console.log(fn5.name) //报错</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>全局作用域的函数 赋值给变量他的作用域不受影响</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function fn6()&#123;return 1;&#125;</span><br><span class="line">var fn7 = fn6;</span><br><span class="line">console.log(fn6.name) //fn6</span><br><span class="line">console.log(fn7.name) //fn6</span><br><span class="line">console.log(fn7) //function fn6()&#123;return 1;&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="箭头函数"><a href="#箭头函数" class="headerlink" title="箭头函数"></a>箭头函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var fn8 = ()=&gt;1; //无参数 返回1</span><br><span class="line">var fn9 = i=&gt;i+1; //有参数返回   参数+1；</span><br><span class="line">var fn10 =(i,j)=&gt;&#123;</span><br><span class="line">console.log(i)</span><br><span class="line">console.log(j)</span><br><span class="line">return i+j</span><br><span class="line">&#125; //有参数  并且函数内部有多条语句    </span><br><span class="line">console.log(fn8.name) //fn8 </span><br><span class="line">// 箭头函数和  匿名函数 具名函数唯一的区别就是  this(口诀：箭头函数内外this不变)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>fn1 调用的时候不会立即执行<br>而是会生成一个抽象语法树<br>校验里面的每句话  如果有错误就停止执行<br>没错再从头开始执行 </p>
-</blockquote>
-<h3 id="词法作用域"><a href="#词法作用域" class="headerlink" title="词法作用域"></a>词法作用域</h3><h4 id="一个函数能访问那些变量-在做词法分析的时候就确定了"><a href="#一个函数能访问那些变量-在做词法分析的时候就确定了" class="headerlink" title="一个函数能访问那些变量 在做词法分析的时候就确定了"></a>一个函数能访问那些变量 在做词法分析的时候就确定了</h4><blockquote>
-<p>词法树分析的是语义<br>只能确认a就是这个函数内部的a<br>不能确定的是“值”<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var global = 1;</span><br><span class="line">function fn1(param1)&#123;</span><br><span class="line">var local1 = &apos;local1&apos;;</span><br><span class="line">var local2 = &apos;local2&apos;;</span><br><span class="line">function fn2(param2)&#123;</span><br><span class="line">    var local2 = &apos;fn2 local2&apos;;</span><br><span class="line">    console.log(local1);</span><br><span class="line">    console.log(local2);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function fn3()&#123;</span><br><span class="line">    var local2 = &apos;fn3 local2&apos;;</span><br><span class="line">    fn2(local2);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-</blockquote>
-<h4 id="经典面试题"><a href="#经典面试题" class="headerlink" title="经典面试题"></a>经典面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">function b()&#123;</span><br><span class="line">console.log(a)  // a一定是1吗？</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>你在看看</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a =1;</span><br><span class="line">function b()&#123;</span><br><span class="line">console.log(a);</span><br><span class="line">&#125;</span><br><span class="line">...若干代码后 突然一句</span><br><span class="line">a = 2;</span><br><span class="line">b();  //打出来的一定是1吗？</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>词法作用域只能确定这个a是不是那个a,不能确定a的值是不是那个值</p>
-</blockquote>
-<h3 id="call-stack-调用栈"><a href="#call-stack-调用栈" class="headerlink" title="call stack 调用栈"></a>call stack 调用栈</h3><blockquote>
-<p>以后再更新。。。(没人考)</p>
-</blockquote>
-<h3 id="this-amp-arguments"><a href="#this-amp-arguments" class="headerlink" title="this &amp; arguments"></a>this &amp; arguments</h3><ul>
-<li><p>重要[参考链接]<br>(<a href="https://zhuanlan.zhihu.com/p/23804247" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/23804247</a>)</p>
-</li>
-<li><p>this 是隐藏的第一个参数，且必须是对象</p>
-</li>
-</ul>
-<blockquote>
-<ul>
-<li>call的第一个参数就是this</li>
-<li>call的第的哥参数后面的就是arguments(伪数组)</li>
-<li>fn() 等同于 fn.call() </li>
-<li>非严格模式下,fn()和fn.call() this会转变为window</li>
-<li>fn()是阉割版的fn.call()</li>
-</ul>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function f()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">    console.log(arguments)</span><br><span class="line">&#125;</span><br><span class="line">f.call() // window</span><br><span class="line">f.call(&#123;name:&apos;aaa&apos;&#125;) // &#123;name: &apos;aaa&apos;&#125;, []</span><br><span class="line">f.call(&#123;name:&apos;aaa&apos;&#125;,1) // &#123;name: &apos;aaa&apos;&#125;, [1]</span><br><span class="line">f.call(&#123;name:&apos;aaa&apos;&#125;,1,2) // &#123;name: &apos;aaa&apos;&#125;, [1,2]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="尽可能避免使用fn-的调用形式，因为会让你产生不知道this是谁的恐慌"><a href="#尽可能避免使用fn-的调用形式，因为会让你产生不知道this是谁的恐慌" class="headerlink" title="尽可能避免使用fn()的调用形式，因为会让你产生不知道this是谁的恐慌"></a>尽可能避免使用fn()的调用形式，因为会让你产生不知道this是谁的恐慌</h4></blockquote>
-<ul>
-<li>this 为什么必须是对象<br>因为 this 就是函数与对象之间的羁绊</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 第一步思考</span><br><span class="line">var person = &#123;</span><br><span class="line">            name: &apos;frank&apos;,</span><br><span class="line">            sayHi: function(person)&#123;</span><br><span class="line">                console.log(&apos;Hi, I am&apos; + person.name)</span><br><span class="line">            &#125;,</span><br><span class="line">            sayBye: function(person)&#123;</span><br><span class="line">                console.log(&apos;Bye, I am&apos; + person.name)</span><br><span class="line">            &#125;,</span><br><span class="line">            say: function(person, word)&#123;</span><br><span class="line">                console.log(word + &apos;, I am&apos; + person.name)</span><br><span class="line">            &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//这样写法很恶心每次都要把person传进去</span><br><span class="line">person.sayHi(person)</span><br><span class="line">person.sayBye(person)</span><br><span class="line">person.say(person, &apos;How are you&apos;)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">// 第二步思考</span><br><span class="line">// 能不能变成这样调用</span><br><span class="line">person.sayHi()</span><br><span class="line">person.sayBye()</span><br><span class="line">person.say(&apos;How are you&apos;)</span><br><span class="line"></span><br><span class="line">// 那么源代码就要改了</span><br><span class="line">var person = &#123;</span><br><span class="line">    name: &apos;frank&apos;,</span><br><span class="line">    sayHi: function()&#123;</span><br><span class="line">        console.log(&apos;Hi, I am&apos; + this.name)</span><br><span class="line">    &#125;,</span><br><span class="line">    sayBye: function()&#123;</span><br><span class="line">        console.log(&apos;Bye, I am&apos; + this.name)</span><br><span class="line">    &#125;,</span><br><span class="line">    say: function(word)&#123;</span><br><span class="line">        console.log(word + &apos;, I am&apos; + this.name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 如果你不想吃语法糖</span><br><span class="line">person.sayHi.call(person)</span><br><span class="line">person.sayBye.call(person)</span><br><span class="line">person.say.call(person, &apos;How are you&apos;)</span><br><span class="line"></span><br><span class="line">// 还是回到那句话：this 是 call 的第一个参数</span><br><span class="line">// this 是参数，所以，只有在调用的时候才能确定</span><br><span class="line">person.sayHi.call(&#123;name:&apos;haha&apos;&#125;)  // 这时 sayHi 里面的 this 就不是 person 了</span><br><span class="line">// this 真的很不靠谱</span><br><span class="line"></span><br><span class="line">// 新手疑惑的两种写法</span><br><span class="line">var fn = person.sayHi</span><br><span class="line">person.sayHi() // this === person</span><br><span class="line">fn()  // this === window</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>person.sayHi() 等价于 person.sayHi(person)<br>fn() 等价于 fn.call()</p>
-</blockquote>
-<h4 id="call-apply"><a href="#call-apply" class="headerlink" title="call / apply"></a>call / apply</h4><ul>
-<li>第一原则call的第一个参数是this</li>
-<li>apply是另一版本的call</li>
-</ul>
-<blockquote>
-<p>apply的使用场景就是在你不知道要传递的参数有多少个的情况</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn.call(asThis, p1,p2) 是函数的正常调用方式</span><br><span class="line">当你不确定参数的个数时，就使用 apply</span><br><span class="line">fn.apply(asThis, params)</span><br></pre></td></tr></table></figure>
-<h3 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h3><blockquote>
-<p>call 和 apply 是直接调用函数，而 bind 则是返回一个新函数（并没有调用原来的函数），这个新函数会 call 原来的函数，call 的参数由你指定。</p>
-</blockquote>
-<blockquote>
-<p>待更新。。。。。</p>
-</blockquote>
-<h3 id="柯里化"><a href="#柯里化" class="headerlink" title="柯里化"></a>柯里化</h3><p>返回函数的函数</p>
-<ul>
-<li><p>柯里化：将 f(x,y) 变成 f(x=1)(y) 或 f(y=1)x</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//柯里化之前</span><br><span class="line">function sum(x,y)&#123;</span><br><span class="line">    return x+y</span><br><span class="line">&#125;</span><br><span class="line">//柯里化之后</span><br><span class="line">function addOne(y)&#123;</span><br><span class="line">    return sum(1, y)</span><br><span class="line">&#125;</span><br><span class="line">//柯里化之前</span><br><span class="line">function Handlebar(template, data)&#123;</span><br><span class="line">    return template.replace(&apos;&#123;&#123;name&#125;&#125;&apos;, data.name)</span><br><span class="line">&#125;</span><br><span class="line">//柯里化之后</span><br><span class="line">function Handlebar(template)&#123;</span><br><span class="line">    return function(data)&#123;</span><br><span class="line">        return template.replace(&apos;&#123;&#123;name&#125;&#125;&apos;, data.name)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>  柯里化可以将真实计算拖延到最后再做<br>  关于柯里化的高级文章：</p>
-<ul>
-<li><a href="http://www.yinwang.org/blog-cn/2013/04/02/currying" target="_blank" rel="noopener">http://www.yinwang.org/blog-cn/2013/04/02/currying</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/31271179" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/31271179</a></li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>柯里化唯一的好处就是惰性求值</p>
-</blockquote>
-<h3 id="高阶函数："><a href="#高阶函数：" class="headerlink" title="高阶函数："></a>高阶函数：</h3><blockquote>
-<p>在数学和计算机科学中，高阶函数是至少满足下列一个条件的函数：<br>接受一个或多个函数作为输入：forEach sort map filter reduce</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">//接收一个函数</span><br><span class="line"></span><br><span class="line">[3,1,2].sort(function(a,b)&#123;return a-b&#125;)   [3,1,2].sort.call([3,1,2],fn)</span><br><span class="line">[1,2,3].forEach(function(val,idx,arr)&#123;&#125;)  [3,1,2].forEach.call([3,1,2],fn)</span><br><span class="line">[1,2,3].map(function(val,idx,arr)&#123;&#125;)      [3,1,2].map.call([3,1,2],fn)</span><br><span class="line">[1,2,3].filter(function(val,idx,arr)&#123;&#125;)   [3,1,2].filter.call([3,1,2],fn)</span><br><span class="line">[1,2,3].reduce(function()&#123;&#125;)              [3,1,2].reduce.call([3,1,2],fn)</span><br><span class="line"></span><br><span class="line">//输出一个函数</span><br><span class="line">function sum(a,b)&#123;return a+b&#125;</span><br><span class="line">function addOne(b)&#123;</span><br><span class="line">    return sum(1,b)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//输入一个函数，输出一个函数</span><br><span class="line">fn.bind.call(fn,&#123;&#125;,1,2,3);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>输出一个函数：lodash.curry</li>
-<li>不过它也可以同时满足两个条件：</li>
-<li>Function.prototype.bind</li>
-</ul>
-<blockquote>
-<p>高阶函数的好处就是任意组合</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1,2,3,4,5,6,7,8];</span><br><span class="line">var sum = 0;</span><br><span class="line">//求偶数和</span><br><span class="line">for(var i=0;i&lt;arr.length;i++)&#123;</span><br><span class="line">    if(arr[i]%2===0)&#123;</span><br><span class="line">        sum+=arr[i]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 高阶写法1</span><br><span class="line">arr.filter(function(n)&#123;</span><br><span class="line">    return n%2===0</span><br><span class="line">&#125;).reduce(function(prev,next)&#123;</span><br><span class="line">    return prev+next</span><br><span class="line">&#125;,0)</span><br><span class="line"></span><br><span class="line">//高阶写法2</span><br><span class="line">reduce(filter(arr,function(n)&#123;return n%2&#125;),function(prev,next)&#123;return prev+next&#125;,0)</span><br><span class="line">sort(filter(arr,function(n)&#123;return n%2===1&#125;),function(a,b)&#123;return a-b&#125;)</span><br></pre></td></tr></table></figure>
-<h3 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h3><ul>
-<li>名词形式：被当做参数的函数就是回调</li>
-<li>动词形式：调用这个回调</li>
-<li>注意回调跟异步没有任何关系</li>
-</ul>
-<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><ul>
-<li>返回对象的函数就是构造函数</li>
-<li>一般首字母大写</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var n = new Number(1)</span><br><span class="line">var bool = new Boolean(true)</span><br><span class="line">var s = new String(&apos;xxx&apos;);</span><br><span class="line">var obj = new Object();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">function Animal()&#123;</span><br><span class="line">    this.name = &apos;动物&apos;</span><br><span class="line">    //return this;  // 自动帮你返回一个对象</span><br><span class="line">&#125;</span><br><span class="line">// 只要你new一个函数  就会帮你返回一个对象</span><br><span class="line">var animal = new Animal();  //Animal.call(&#123;&#125;)</span><br></pre></td></tr></table></figure>
-<h3 id="箭头函数-1"><a href="#箭头函数-1" class="headerlink" title="箭头函数"></a>箭头函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function fn(x,y)&#123;</span><br><span class="line">    return x+y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var fn = (x,y)=&gt;x+y</span><br><span class="line">var fn = (x,y)=&gt;&#123;</span><br><span class="line">    //多句话要执行的时候</span><br><span class="line">    console.log(x)</span><br><span class="line">    return x+y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>箭头函数没有this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(function()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;.bind(&#123;name:&apos;aaa&apos;&#125;),1000)</span><br><span class="line">//打印出  &#123;name:&apos;aaa&apos;&#125;</span><br><span class="line"></span><br><span class="line">setTimeout(function()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">    setTimeout(function()&#123;</span><br><span class="line">        console.log(this)</span><br><span class="line">    &#125;,1000)</span><br><span class="line">&#125;.bind(&#123;name:&apos;aaa&apos;&#125;),1000)</span><br><span class="line">//第一秒  &#123;name:&apos;aaa&apos;&#125;</span><br><span class="line">//第二秒  window  第二个延时器相当于 fn.call()</span><br><span class="line">//call里没传递this就是 window</span><br><span class="line"></span><br><span class="line">//如果想两次都打印 &#123;name:&apos;aaa&apos;&#125;就要这样</span><br><span class="line">setTimeout(function()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">    setTimeout(function()&#123;</span><br><span class="line">        console.log(this)</span><br><span class="line">    &#125;.bind(this),1000)</span><br><span class="line">&#125;.bind(&#123;name:&apos;aaa&apos;&#125;),1000)</span><br><span class="line">//第二个延时器里的bind(this)  this就是 &#123;name:&apos;aaa&apos;&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>箭头函数干掉了this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(function()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">        console.log(this)</span><br><span class="line">    &#125;,1000)</span><br><span class="line">&#125;.bind(&#123;name:&apos;aaa&apos;&#125;),1000)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>js的漏洞 function(){} 等价于 function(){}.call()<br>call的第一个参数就是this<br>call不传递参数就是window</p>
-</blockquote>
-<blockquote>
-<h3 id="强迫症就是要给箭头函数加this？"><a href="#强迫症就是要给箭头函数加this？" class="headerlink" title="强迫症就是要给箭头函数加this？"></a>强迫症就是要给箭头函数加this？</h3></blockquote>
-<p>答案是不行  会被忽略</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var fn =()=&gt;&#123;console.log(this)&#125;</span><br><span class="line">fn.call(&#123;name:&apos;aaa&apos;&#125;)</span><br><span class="line"></span><br><span class="line">//打印window</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/JS不知深浅/">JS不知深浅</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2018/04/12/N058_vue组件间通信/" title="vue组件间通信" itemprop="url">vue组件间通信</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2018-04-12T15:58:22.000Z" itemprop="datePublished"> Published 2018-04-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h4 id="vue-父子通信"><a href="#vue-父子通信" class="headerlink" title="vue 父子通信"></a>vue 父子通信</h4><blockquote>
-<p>爸爸是咋叫儿子的！</p>
-</blockquote>
-<ul>
-<li>父组件在使用子组件时   绑定属性  :xxx=”你定义的值”</li>
-<li><p>子组件设置props属性,可以在页面上插值</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    props:[&apos;xxx&apos;],</span><br><span class="line">    template:`&lt;div&gt;&#123;&#123;xxx&#125;&#125;&lt;/div&gt; `</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;app&quot;&gt;</span><br><span class="line">  &lt;child :msg=&quot;data&quot;&gt;&lt;/child&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">Vue.component(&apos;child&apos;,&#123;</span><br><span class="line">  props:[&apos;msg&apos;],</span><br><span class="line">  template:`&lt;div&gt;</span><br><span class="line">              &lt;div&gt;子组件==&gt;&#123;&#123;msg&#125;&#125;&lt;/div&gt;</span><br><span class="line">            &lt;/div&gt;`</span><br><span class="line">&#125;)</span><br><span class="line">new Vue(&#123;</span><br><span class="line">  el:&apos;#app&apos;,</span><br><span class="line">  data:&#123;</span><br><span class="line">    data:&apos;我是父组件的数据&apos;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>儿子是怎样叫爸爸的！</p>
-</blockquote>
-<ul>
-<li>子组件向上要通过emit(‘xxx’),xxx是事件名称</li>
-<li>父组件使用子组件时，在子组件上监听事件 @xxx=”相应处理”</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- html如下 --&gt;</span><br><span class="line">&lt;div id=&quot;app&quot;&gt;</span><br><span class="line">  &lt;child @close=&quot;show=false&quot; v-show=&quot;show&quot;&gt;&lt;/child&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">//js如下</span><br><span class="line">Vue.component(&apos;child&apos;,&#123;</span><br><span class="line">  template:`&lt;div&gt;</span><br><span class="line">              &lt;div&gt;子组件&lt;/div&gt;</span><br><span class="line">              &lt;button @click=&quot;$emit(&apos;close&apos;)&quot;&gt;close&lt;/button&gt;</span><br><span class="line">            &lt;/div&gt;`</span><br><span class="line">&#125;)</span><br><span class="line">new Vue(&#123;</span><br><span class="line">  el:&apos;#app&apos;,</span><br><span class="line">  data:&#123;</span><br><span class="line">    msg:&apos;父组件的数据&apos;,</span><br><span class="line">    show:true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<h4 id="爷孙通信"><a href="#爷孙通信" class="headerlink" title="爷孙通信"></a>爷孙通信</h4><blockquote>
-<p>如果是爷孙？</p>
-</blockquote>
-<p>vue是不支持的，需要儿子叫爸爸，爸爸叫爷爷，这样层层传递</p>
-<ul>
-<li>所以在vue里爷孙通信是很麻烦的</li>
-<li>不过你可以使用单一事件管理组件eventHub来解决</li>
-<li><p>这里用使用最通俗的方式，你也可以挂载在Vue原型上</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$eventHub = new Vue()</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>重新构造一个Vue对象  专门用来负责管理通信</p>
-</li>
-<li>在嵌套的组件内部的created()里 eventHub.$on(‘xxx’,()=&gt;{相关逻辑处理})</li>
-<li>在子组件里eventHub.$emit(‘xxx’)触发<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- html --&gt;</span><br><span class="line">&lt;div id=&quot;app&quot;&gt;</span><br><span class="line">  &lt;father&gt;&lt;/father&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">....</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//js部分</span><br><span class="line"></span><br><span class="line">// 单一事件管理组件 vuex的前身</span><br><span class="line">var eventHub =new Vue();</span><br><span class="line"></span><br><span class="line">Vue.component(&apos;son&apos;,&#123;</span><br><span class="line">  template:`&lt;div&gt;</span><br><span class="line">              &lt;div&gt;我是子组件</span><br><span class="line">                 &lt;button @click=&quot;callFather&quot;&gt;发送给爸爸&lt;/button&gt;</span><br><span class="line">                 &lt;button @click=&quot;callGrandPa&quot;&gt;发送给爷爷&lt;/button&gt;</span><br><span class="line">              &lt;/div&gt;</span><br><span class="line">            &lt;/div&gt;`,</span><br><span class="line">  methods:&#123;</span><br><span class="line">    callFather()&#123;</span><br><span class="line">      eventHub.$emit(&apos;father&apos;)</span><br><span class="line">    &#125;,</span><br><span class="line">    callGrandPa()&#123;</span><br><span class="line">      eventHub.$emit(&apos;grandpa&apos;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">Vue.component(&apos;father&apos;,&#123;</span><br><span class="line">  template:`&lt;div&gt;</span><br><span class="line">              &lt;div&gt;父组件div&gt;</span><br><span class="line">              &lt;son&gt;&lt;/son&gt;</span><br><span class="line">            &lt;/div&gt;`,</span><br><span class="line">  created()&#123;</span><br><span class="line">      eventHub.$on(&apos;father&apos;,()=&gt;&#123;alert(&apos;儿子叫爸爸&apos;)&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">new Vue(&#123;</span><br><span class="line">  el:&apos;#app&apos;,</span><br><span class="line">  data:&#123;</span><br><span class="line">    data:&apos;我是爷爷&apos;,</span><br><span class="line">   </span><br><span class="line">  &#125;,</span><br><span class="line">  created()&#123;</span><br><span class="line">    eventHub.$on(&apos;grandpa&apos;,()=&gt;&#123;alert(&apos;儿子叫爷爷&apos;)&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/46/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/45/">45</a><a class="page-number" href="/page/46/">46</a><span class="page-number current">47</span><a class="page-number" href="/page/48/">48</a><a class="page-number" href="/page/49/">49</a><span class="space">&hellip;</span><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/48/">Next<span></span></a>
@@ -1401,13 +1196,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

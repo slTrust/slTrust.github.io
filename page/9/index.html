@@ -79,6 +79,681 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2019/11/01/ZB-034-03MyBatis动态sql/" title="ZB-034-03MyBatis动态sql" itemprop="url">ZB-034-03MyBatis动态sql</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-11-01T01:26:27.000Z" itemprop="datePublished"> Published 2019-11-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="动态sql——MyBatis的灵魂"><a href="#动态sql——MyBatis的灵魂" class="headerlink" title="动态sql——MyBatis的灵魂"></a>动态sql——MyBatis的灵魂</h3><ul>
+<li><code>&lt;if&gt;</code></li>
+<li><code>&lt;choose&gt;</code></li>
+<li><code>&lt;foreach&gt;</code></li>
+<li><code>&lt;script&gt;</code></li>
+</ul>
+<blockquote>
+<p><a href="https://mybatis.org/mybatis-3/dynamic-sql.html" target="_blank" rel="noopener">Dynamic SQL</a></p>
+</blockquote>
+<blockquote>
+<p>selectUserByName需求</p>
+</blockquote>
+<ul>
+<li><code>if</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># 如果你这样 ，name 没有时会报错</span><br><span class="line">&lt;select id=&quot;selectUserByName&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">    where</span><br><span class="line">    &lt;if test=&quot;name != null&quot;&gt;</span><br><span class="line">        name like #&#123;name&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">&lt;/select&gt;</span><br><span class="line"></span><br><span class="line"># 它会拼成这样</span><br><span class="line"># select * from user where</span><br><span class="line"></span><br><span class="line"># 你可以这样</span><br><span class="line">&lt;select id=&quot;selectUserByName&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">    &lt;if test=&quot;name != null&quot;&gt;</span><br><span class="line">        where name like #&#123;name&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>choose</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;chooseUser&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">    &lt;choose&gt;</span><br><span class="line">        &lt;when test=&quot;name ==&apos;wangwu&apos;&quot;&gt;</span><br><span class="line">            where name = &apos;wangwu&apos;</span><br><span class="line">        &lt;/when&gt;</span><br><span class="line">        &lt;otherwise&gt;</span><br><span class="line">            where name = &apos;zhangsan&apos;</span><br><span class="line">        &lt;/otherwise&gt;</span><br><span class="line">    &lt;/choose&gt;</span><br><span class="line">&lt;/select&gt;</span><br><span class="line"></span><br><span class="line">// 这里的坑在这</span><br><span class="line">&lt;when test=&quot;name ==&apos;wangwu&apos;&quot;&gt; </span><br><span class="line"></span><br><span class="line">不要写成这样 </span><br><span class="line">不要写成这样 </span><br><span class="line">不要写成这样 </span><br><span class="line">&lt;when test=&quot;name ==wangwu&quot;&gt;</span><br><span class="line">这样它会在运行时把 wangwu 当作查询User的字段而不是字符串</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>where / set</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;findActiveBlogLike&quot;</span><br><span class="line">     resultType=&quot;Blog&quot;&gt;</span><br><span class="line">  SELECT * FROM BLOG</span><br><span class="line">  &lt;where&gt;</span><br><span class="line">    &lt;if test=&quot;state != null&quot;&gt;</span><br><span class="line">         state = #&#123;state&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">    &lt;if test=&quot;title != null&quot;&gt;</span><br><span class="line">        AND title like #&#123;title&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">    &lt;if test=&quot;author != null and author.name != null&quot;&gt;</span><br><span class="line">        AND author_name like #&#123;author.name&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">  &lt;/where&gt;</span><br><span class="line">&lt;/select&gt;</span><br><span class="line"></span><br><span class="line">如果条件都不满足就会导致语法错误</span><br><span class="line">SELECT * FROM BLOG</span><br><span class="line">WHERE</span><br><span class="line"></span><br><span class="line">正确的做法是</span><br><span class="line">&lt;select id=&quot;findActiveBlogLike&quot;</span><br><span class="line">     resultType=&quot;Blog&quot;&gt;</span><br><span class="line">  SELECT * FROM BLOG</span><br><span class="line">  &lt;where&gt;</span><br><span class="line">    &lt;if test=&quot;state != null&quot;&gt;</span><br><span class="line">         state = #&#123;state&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">    &lt;if test=&quot;title != null&quot;&gt;</span><br><span class="line">        AND title like #&#123;title&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">    &lt;if test=&quot;author != null and author.name != null&quot;&gt;</span><br><span class="line">        AND author_name like #&#123;author.name&#125;</span><br><span class="line">    &lt;/if&gt;</span><br><span class="line">  &lt;/where&gt;</span><br><span class="line">&lt;/select&gt;</span><br><span class="line"></span><br><span class="line">如果条件不满足它就没有where</span><br></pre></td></tr></table></figure>
+<p>set语句也能动态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;update id=&quot;updateAuthorIfNecessary&quot;&gt;</span><br><span class="line">  update Author</span><br><span class="line">    &lt;set&gt;</span><br><span class="line">      &lt;if test=&quot;username != null&quot;&gt;username=#&#123;username&#125;,&lt;/if&gt;</span><br><span class="line">      &lt;if test=&quot;password != null&quot;&gt;password=#&#123;password&#125;,&lt;/if&gt;</span><br><span class="line">      &lt;if test=&quot;email != null&quot;&gt;email=#&#123;email&#125;,&lt;/if&gt;</span><br><span class="line">      &lt;if test=&quot;bio != null&quot;&gt;bio=#&#123;bio&#125;&lt;/if&gt;</span><br><span class="line">    &lt;/set&gt;</span><br><span class="line">  where id=#&#123;id&#125;</span><br><span class="line">&lt;/update&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>批量操作 <code>foreach</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// UserMapper.xml</span><br><span class="line">&lt;select id=&quot;selectIds&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select *</span><br><span class="line">    from user where id in</span><br><span class="line">    &lt;foreach item=&quot;item&quot; index=&quot;index&quot; collection=&quot;ids&quot;</span><br><span class="line">             open=&quot;(&quot; separator=&quot;,&quot; close=&quot;)&quot;&gt;</span><br><span class="line">      #&#123;item&#125;</span><br><span class="line">    &lt;/foreach&gt;</span><br><span class="line">&lt;/select&gt;</span><br><span class="line"></span><br><span class="line">// Sql.java</span><br><span class="line">Map&lt;String,Object&gt; param = new HashMap&lt;&gt;();</span><br><span class="line">param.put(&quot;ids&quot;, Arrays.asList(1,2));</span><br><span class="line">List&lt;User&gt; resUser = session.selectList(&quot;com.sql.xml.UserMapper.selectIds&quot;,param);</span><br><span class="line">System.out.println(resUser);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>script</code> 不常用</li>
+</ul>
+<p><strong>把xml里的内容放在注解里</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Update(&#123;&quot;&lt;script&gt;&quot;,</span><br><span class="line">  &quot;update Author&quot;,</span><br><span class="line">  &quot;  &lt;set&gt;&quot;,</span><br><span class="line">  &quot;    &lt;if test=&apos;username != null&apos;&gt;username=#&#123;username&#125;,&lt;/if&gt;&quot;,</span><br><span class="line">  &quot;    &lt;if test=&apos;password != null&apos;&gt;password=#&#123;password&#125;,&lt;/if&gt;&quot;,</span><br><span class="line">  &quot;    &lt;if test=&apos;email != null&apos;&gt;email=#&#123;email&#125;,&lt;/if&gt;&quot;,</span><br><span class="line">  &quot;    &lt;if test=&apos;bio != null&apos;&gt;bio=#&#123;bio&#125;&lt;/if&gt;&quot;,</span><br><span class="line">  &quot;  &lt;/set&gt;&quot;,</span><br><span class="line">  &quot;where id=#&#123;id&#125;&quot;,</span><br><span class="line">  &quot;&lt;/script&gt;&quot;&#125;)</span><br><span class="line">void updateAuthorValues(Author author);</span><br></pre></td></tr></table></figure>
+<h3 id="MyBatis实战"><a href="#MyBatis实战" class="headerlink" title="MyBatis实战"></a>MyBatis实战</h3><ul>
+<li><a href="https://github.com/hcsp/mybatis-in-action" target="_blank" rel="noopener">克隆项目</a></li>
+<li>运行<code>mvn initialize</code></li>
+<li><a href="https://github.com/hcsp/mybatis-in-action/pull/6" target="_blank" rel="noopener">我的PR</a></li>
+</ul>
+<blockquote>
+<p>涵盖内容</p>
+</blockquote>
+<ul>
+<li>CRUD</li>
+<li>联表操作</li>
+<li>association 关系映射</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/31/ZB-034-01MyBatis/" title="ZB-034-01MyBatis" itemprop="url">ZB-034-01MyBatis</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-31T14:08:50.000Z" itemprop="datePublished"> Published 2019-10-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="MyBatis是什么"><a href="#MyBatis是什么" class="headerlink" title="MyBatis是什么"></a>MyBatis是什么</h3><ul>
+<li>一个ORM框架</li>
+<li>国内基本都在用</li>
+<li>好处就是：简单/方便</li>
+</ul>
+<h4 id="为什么需要MyBatis"><a href="#为什么需要MyBatis" class="headerlink" title="为什么需要MyBatis?"></a>为什么需要MyBatis?</h4><blockquote>
+<p><a href="https://github.com/hcsp/practise-select-sql" target="_blank" rel="noopener">之前的JDBC sql练习</a></p>
+</blockquote>
+<p><strong>注意是裸的sql</strong> 还用了<code>PreparedStatement</code></p>
+<p><a href="https://github.com/hcsp/practise-select-sql/blob/dev_hjx/src/main/java/com/github/hcsp/sql/Sql.java" target="_blank" rel="noopener">我的PR</a></p>
+<ul>
+<li>过程非常痛苦</li>
+<li>不感受到痛苦就没动力学新技术</li>
+</ul>
+<h3 id="ORM"><a href="#ORM" class="headerlink" title="ORM"></a>ORM</h3><ul>
+<li>对象关系映射<ul>
+<li>自动完成对象到数据库的映射</li>
+</ul>
+</li>
+<li>Association<ul>
+<li>自动装配对象</li>
+</ul>
+</li>
+</ul>
+<h3 id="从零开始MyBatis"><a href="#从零开始MyBatis" class="headerlink" title="从零开始MyBatis"></a>从零开始MyBatis</h3><ul>
+<li>看<a href="https://mybatis.org/mybatis-3/" target="_blank" rel="noopener">官网</a>就够了</li>
+<li>首先配置日志框架，可以极大的提高排查问题的效率</li>
+<li>然后配置数据源</li>
+<li>Mapper:接口由MyBatis动态代理<ul>
+<li>优点：方便</li>
+<li>缺点：SQL复杂的时候不够方便</li>
+</ul>
+</li>
+<li>Mapper:用XML编写复杂SQL<ul>
+<li>优点：可以方便地使用MyBatis强大功能</li>
+<li>缺点：SQL和代码分离</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>数据库到底是什么</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">数据库实际就是一个URL</span><br><span class="line"></span><br><span class="line">你的webApp应用</span><br><span class="line">-------------</span><br><span class="line">| JVM       |</span><br><span class="line">|           |  url</span><br><span class="line">|           |-------&gt; Database</span><br><span class="line">|           | 连接串</span><br><span class="line">-------------</span><br><span class="line"></span><br><span class="line">那 MyBatis呢？ </span><br><span class="line"></span><br><span class="line">你的webApp应用</span><br><span class="line">-------------</span><br><span class="line">| JVM       |</span><br><span class="line">|           |  url</span><br><span class="line">|           |-------&gt; Database</span><br><span class="line">|    MyBatis| 连接串</span><br><span class="line">-------------</span><br><span class="line">MyBatis它只是JVM里运行的一小段程序而已</span><br><span class="line">它通过底层调用JDBC和数据库进行交互</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        ---------</span><br><span class="line">obj --&gt; |       |</span><br><span class="line">        |MyBatis| --&gt; sql语句</span><br><span class="line">obj &lt;-- |       |</span><br><span class="line">        ---------</span><br></pre></td></tr></table></figure>
+<h4 id="MyBatis从零开始"><a href="#MyBatis从零开始" class="headerlink" title="MyBatis从零开始"></a>MyBatis从零开始</h4><ul>
+<li>拷贝项目<a href="https://github.com/hcsp/practise-select-sql" target="_blank" rel="noopener">在这个项目的基础上进行MyBatis配置</a></li>
+<li><a href="https://mybatis.org/mybatis-3/" target="_blank" rel="noopener">打开官网</a> 直接看英文</li>
+<li>点击 <a href="https://mybatis.org/mybatis-3/getting-started.html" target="_blank" rel="noopener">Getting Started</a></li>
+<li><p>看到第一段就是让你添加依赖到 pom.xml里</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.mybatis&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;mybatis&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;x.x.x&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后 搜索  <a href="https://mvnrepository.com/artifact/org.mybatis" target="_blank" rel="noopener">mybatis maven</a></p>
+</li>
+<li><p>选择最近版的就行</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">添加到pom.xml里 刷新一下</span><br><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.mybatis/mybatis --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.mybatis&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;mybatis&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.5.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Building SqlSessionFactory from XML</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">// 文档提供了例子代码</span><br><span class="line">String resource = &quot;org/mybatis/example/mybatis-config.xml&quot;;</span><br><span class="line">InputStream inputStream = Resources.getResourceAsStream(resource);</span><br><span class="line">SqlSessionFactory sqlSessionFactory =</span><br><span class="line">  new SqlSessionFactoryBuilder().build(inputStream);</span><br><span class="line">  </span><br><span class="line">// 新建一个配置文件  </span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE configuration</span><br><span class="line">  PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span><br><span class="line">  &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;environments default=&quot;development&quot;&gt;</span><br><span class="line">    &lt;environment id=&quot;development&quot;&gt;</span><br><span class="line">      &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line">      &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;driver&quot; value=&quot;$&#123;driver&#125;&quot;/&gt;</span><br><span class="line">        &lt;property name=&quot;url&quot; value=&quot;$&#123;url&#125;&quot;/&gt;</span><br><span class="line">        &lt;property name=&quot;username&quot; value=&quot;$&#123;username&#125;&quot;/&gt;</span><br><span class="line">        &lt;property name=&quot;password&quot; value=&quot;$&#123;password&#125;&quot;/&gt;</span><br><span class="line">      &lt;/dataSource&gt;</span><br><span class="line">    &lt;/environment&gt;</span><br><span class="line">  &lt;/environments&gt;</span><br><span class="line">  &lt;mappers&gt;</span><br><span class="line">    &lt;mapper resource=&quot;org/mybatis/example/BlogMapper.xml&quot;/&gt;</span><br><span class="line">  &lt;/mappers&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意 maven的项目约定就是一切资源放在 resources 下 (图片/配置等)</p>
+</li>
+<li>所以我们在 src/main/resources/db/myBatis/config.xml 内容同上</li>
+<li>运行 <code>mvn initialize</code> 初始化数据</li>
+<li>修改我们的配置文件<code>src/main/resources/db/myBatis/config.xml</code> 的内容</li>
+<li>因为我们的数据库是 h2 </li>
+<li>搜h2 database driver classname 得到 <code>org.h2.Driver</code></li>
+<li>修改配置为</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE configuration</span><br><span class="line">        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;environments default=&quot;development&quot;&gt;</span><br><span class="line">        &lt;environment id=&quot;development&quot;&gt;</span><br><span class="line">            &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line">            &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line">                &lt;property name=&quot;driver&quot; value=&quot;org.h2.Driver&quot;/&gt;</span><br><span class="line">                &lt;!--</span><br><span class="line">                &lt;property name=&quot;url&quot; value=&quot;jdbc:h2:file:&lt;你的项目文件夹地址&gt;/target/test&quot;/&gt;</span><br><span class="line">                --&gt;</span><br><span class="line">                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;password&quot; value=&quot;Jxi1Oxc92qSj&quot;/&gt;</span><br><span class="line">            &lt;/dataSource&gt;</span><br><span class="line">        &lt;/environment&gt;</span><br><span class="line">    &lt;/environments&gt;</span><br><span class="line">    &lt;mappers&gt;</span><br><span class="line">        &lt;!-- 先注释掉这句 因为你还没配置 --&gt;</span><br><span class="line">        &lt;!-- &lt;mapper resource=&quot;org/mybatis/example/BlogMapper.xml&quot;/&gt; --&gt;</span><br><span class="line">    &lt;/mappers&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>到<code>src/main/java/com.github.hcsp.sql.Sql.java</code></li>
+<li>修改一下</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class Sql &#123;</span><br><span class="line">    // 用户信息</span><br><span class="line">    public static class User &#123;</span><br><span class="line">        Integer id;</span><br><span class="line">        String name;</span><br><span class="line">        String tel;</span><br><span class="line">        String address;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public String toString() &#123;</span><br><span class="line">            return &quot;User&#123;&quot; + &quot;id=&quot; + id + &quot;, name=&apos;&quot; + name + &apos;\&apos;&apos; + &quot;, tel=&apos;&quot; + tel + &apos;\&apos;&apos; + &quot;, address=&apos;&quot; + address + &apos;\&apos;&apos; + &apos;&#125;&apos;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    interface UserMapper&#123;</span><br><span class="line">        @Select(&quot;select * from user&quot;)</span><br><span class="line">        List&lt;User&gt; getUsers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 注意，运行这个方法之前，请先运行mvn initialize把测试数据灌入数据库</span><br><span class="line">    public static void main(String[] args) throws SQLException, IOException &#123;</span><br><span class="line">        String resource = &quot;db/myBatis/config.xml&quot;;</span><br><span class="line">        InputStream inputStream = Resources.getResourceAsStream(resource);</span><br><span class="line">        SqlSessionFactory sqlSessionFactory =</span><br><span class="line">                new SqlSessionFactoryBuilder().build(inputStream);</span><br><span class="line"></span><br><span class="line">        try (SqlSession session = sqlSessionFactory.openSession()) &#123;</span><br><span class="line">            UserMapper mapper = session.getMapper(UserMapper.class);</span><br><span class="line">            System.out.println(mapper.getUsers());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 报错了</span><br><span class="line">Exception in thread &quot;main&quot; org.apache.ibatis.binding.BindingException: Type interface com.github.hcsp.sql.Sql$UserMapper is not known to the MapperRegistry.</span><br><span class="line">	at org.apache.ibatis.binding.MapperRegistry.getMapper(MapperRegistry.java:47)</span><br><span class="line">	at org.apache.ibatis.session.Configuration.getMapper(Configuration.java:779)</span><br><span class="line">	at org.apache.ibatis.session.defaults.DefaultSqlSession.getMapper(DefaultSqlSession.java:291)</span><br><span class="line">	at com.github.hcsp.sql.Sql.main(Sql.java:233)</span><br><span class="line"></span><br><span class="line">直接搜索这个错误 得到答案 https://stackoverflow.com/questions/4263832/type-interface-is-not-known-to-the-mapperregistry-exception-using-mybatis?r=SearchResults</span><br><span class="line">意思是你要注册一下在xml里</span><br><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;mapper class=&quot;com.github.hcsp.sql.Sql$UserMapper&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br><span class="line"></span><br><span class="line">注意 内部类要用 $ </span><br><span class="line"></span><br><span class="line">此时成功查询出了数据</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>此时你该惊叹它的强大</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">interface UserMapper&#123;</span><br><span class="line">    @Select(&quot;select * from user&quot;)</span><br><span class="line">    List&lt;User&gt; getUsers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">你就写了一个接口，都没去写实现，就能拿到List&lt;User&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="配置日志"><a href="#配置日志" class="headerlink" title="配置日志"></a><a href="https://mybatis.org/mybatis-3/logging.html" target="_blank" rel="noopener">配置日志</a></h4><p>在我们的 config.xml里添加官方的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;settings&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;</span><br><span class="line">    ...</span><br><span class="line">  &lt;/settings&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line">添加到我们的代码里</span><br><span class="line"></span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;environments default=&quot;development&quot;&gt;</span><br><span class="line">        &lt;environment id=&quot;development&quot;&gt;</span><br><span class="line">            &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line">            &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line">                &lt;property name=&quot;driver&quot; value=&quot;org.h2.Driver&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;url&quot; value=&quot;jdbc:h2:file:/Users/admin/Desktop/practise-select-sql/target/test&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;password&quot; value=&quot;Jxi1Oxc92qSj&quot;/&gt;</span><br><span class="line">            &lt;/dataSource&gt;</span><br><span class="line">        &lt;/environment&gt;</span><br><span class="line">    &lt;/environments&gt;</span><br><span class="line">    &lt;mappers&gt;</span><br><span class="line">        &lt;mapper class=&quot;com.github.hcsp.sql.Sql$UserMapper&quot;/&gt;</span><br><span class="line">        &lt;!--&lt;mapper resource=&quot;org/db.myBatis/example/BlogMapper.xml&quot;/&gt;--&gt;</span><br><span class="line">    &lt;/mappers&gt;</span><br><span class="line">    &lt;settings&gt;</span><br><span class="line">        &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;</span><br><span class="line">    &lt;/settings&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br><span class="line">结果 &lt;configuration&gt; 飙红了 为什么？</span><br><span class="line">踩坑不够多</span><br><span class="line"></span><br><span class="line">答案是 settings要放在最前面</span><br><span class="line">如下</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;settings&gt;</span><br><span class="line">        &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;</span><br><span class="line">    &lt;/settings&gt;</span><br><span class="line">    &lt;environments default=&quot;development&quot;&gt;</span><br><span class="line">        &lt;environment id=&quot;development&quot;&gt;</span><br><span class="line">            &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line">            &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line">                &lt;property name=&quot;driver&quot; value=&quot;org.h2.Driver&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;url&quot; value=&quot;jdbc:h2:file:/Users/admin/Desktop/practise-select-sql/target/test&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;password&quot; value=&quot;Jxi1Oxc92qSj&quot;/&gt;</span><br><span class="line">            &lt;/dataSource&gt;</span><br><span class="line">        &lt;/environment&gt;</span><br><span class="line">    &lt;/environments&gt;</span><br><span class="line">    &lt;mappers&gt;</span><br><span class="line">        &lt;mapper class=&quot;com.github.hcsp.sql.Sql$UserMapper&quot;/&gt;</span><br><span class="line">        &lt;!--&lt;mapper resource=&quot;org/db.myBatis/example/BlogMapper.xml&quot;/&gt;--&gt;</span><br><span class="line">    &lt;/mappers&gt;</span><br><span class="line"></span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br><span class="line">运行我们的程序，结果报错了</span><br><span class="line">Caused by: java.lang.ClassNotFoundException: org.apache.log4j.Priority</span><br><span class="line">意思你引入了配置 但是没告诉这个类在哪 所以找不到</span><br><span class="line">搜索 maven org.apache.log4j.Priority</span><br><span class="line">得到 https://mvnrepository.com/artifact/log4j/log4j</span><br><span class="line"></span><br><span class="line">复制它的坐标 到 pom.xml里</span><br><span class="line">&lt;!-- https://mvnrepository.com/artifact/log4j/log4j --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;log4j&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;log4j&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.2.17&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">继续运行项目 成功  但是打印了警告信息</span><br></pre></td></tr></table></figure>
+<p>继续看文档，说要配置一下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">新建 src/main/resources/log4j.properties 文件</span><br><span class="line"></span><br><span class="line"># Global logging configuration</span><br><span class="line">log4j.rootLogger=ERROR, stdout</span><br><span class="line"># MyBatis logging configuration...</span><br><span class="line">log4j.logger.org.mybatis.example.BlogMapper=TRACE</span><br><span class="line"># Console output...</span><br><span class="line">log4j.appender.stdout=org.apache.log4j.ConsoleAppender</span><br><span class="line">log4j.appender.stdout.layout=org.apache.log4j.PatternLayout</span><br><span class="line">log4j.appender.stdout.layout.ConversionPattern=%5p [%t] - %m%n</span><br></pre></td></tr></table></figure>
+<p>继续运行项目，发现警告消失了</p>
+<blockquote>
+<p>日志是需要系统学习的，因为他有不同的等级</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">之所以刚刚没有任何信息打印是因为 日志等级是 ERROR</span><br><span class="line"></span><br><span class="line">我们修改为 DEBUG</span><br><span class="line"></span><br><span class="line">log4j.rootLogger=DEBUG, stdout</span><br><span class="line"></span><br><span class="line">运行项目，此时能清楚的看到sql语句执行过程</span><br><span class="line">DEBUG [main] - Logging initialized using &apos;class org.apache.ibatis.logging.log4j.Log4jImpl&apos; adapter.</span><br><span class="line">DEBUG [main] - Logging initialized using &apos;class org.apache.ibatis.logging.log4j.Log4jImpl&apos; adapter.</span><br><span class="line">DEBUG [main] - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line">DEBUG [main] - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line">DEBUG [main] - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line">DEBUG [main] - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line">DEBUG [main] - Opening JDBC Connection</span><br><span class="line">DEBUG [main] - Created connection 1848125895.</span><br><span class="line">DEBUG [main] - Setting autocommit to false on JDBC Connection [conn0: url=jdbc:h2:file:/Users/admin/Desktop/practise-select-sql/target/test user=ROOT]</span><br><span class="line">DEBUG [main] - ==&gt;  Preparing: select * from user </span><br><span class="line">DEBUG [main] - ==&gt; Parameters: </span><br><span class="line">DEBUG [main] - &lt;==      Total: 4</span><br><span class="line">[User&#123;id=1, name=&apos;zhangsan&apos;, tel=&apos;tel1&apos;, address=&apos;beijing&apos;&#125;, User&#123;id=2, name=&apos;lisi&apos;, tel=&apos;tel2&apos;, address=&apos;shanghai&apos;&#125;, User&#123;id=3, name=&apos;wangwu&apos;, tel=&apos;tel3&apos;, address=&apos;shanghai&apos;&#125;, User&#123;id=4, name=&apos;zhangsan&apos;, tel=&apos;tel4&apos;, address=&apos;shenzhen&apos;&#125;]</span><br><span class="line">DEBUG [main] - Resetting autocommit to true on JDBC Connection [conn0: url=jdbc:h2:file:/Users/admin/Desktop/practise-select-sql/target/test user=ROOT]</span><br><span class="line">DEBUG [main] - Closing JDBC Connection [conn0: url=jdbc:h2:file:/Users/admin/Desktop/practise-select-sql/target/test user=ROOT]</span><br><span class="line">DEBUG [main] - Returned connection 1848125895 to pool.</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/31/ZB-034-02MyBatis的xml方式/" title="ZB-034-02MyBatis的xml方式" itemprop="url">ZB-034-02MyBatis的xml方式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-31T14:08:26.000Z" itemprop="datePublished"> Published 2019-10-31</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="Mapper核心有两种实现"><a href="#Mapper核心有两种实现" class="headerlink" title="Mapper核心有两种实现"></a>Mapper核心有两种实现</h3><ul>
+<li>Mapper:接口由MyBatis动态代理 (上一篇就是这种方式)<ul>
+<li>优点：方便</li>
+<li>缺点：SQL复杂的时候不够方便</li>
+</ul>
+</li>
+<li>Mapper:用XML编写复杂SQL<ul>
+<li>优点：可以方便地使用MyBatis强大功能</li>
+<li>缺点：SQL和代码分离</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<h4 id="使用xml写复杂sql"><a href="#使用xml写复杂sql" class="headerlink" title="使用xml写复杂sql"></a>使用xml写复杂sql</h4></blockquote>
+<ul>
+<li>继续看<a href="https://mybatis.org/mybatis-3/getting-started.html" target="_blank" rel="noopener">文档的Exploring Mapped SQL Statements部分</a></li>
+<li><p>新建 <code>src/main/resources/db/myBatis/UserMapper.xml</code><br>  内容如下</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper</span><br><span class="line">  PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span><br><span class="line">  &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line">&lt;mapper namespace=&quot;org.mybatis.example.BlogMapper&quot;&gt;</span><br><span class="line">  &lt;select id=&quot;selectBlog&quot; resultType=&quot;Blog&quot;&gt;</span><br><span class="line">    select * from Blog where id = #&#123;id&#125;</span><br><span class="line">  &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改内容</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper</span><br><span class="line">        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span><br><span class="line">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line">&lt;!-- namespace 这个随便写 就是用来管理你的mapper--&gt;</span><br><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;map&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">  &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>把我们的<code>UserMapper.xml</code> 添加到config.xml里</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;!--&lt;mapper class=&quot;com.github.hcsp.sql.Sql$UserMapper&quot;/&gt;--&gt;</span><br><span class="line">    &lt;mapper resource=&quot;db/myBatis/UserMapper.xml&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如何用这个xml呢？ 很明显 <strong>xml里的sql和代码分离了，让你来回找目录</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) throws SQLException, IOException &#123;</span><br><span class="line">    String resource = &quot;db/myBatis/config.xml&quot;;</span><br><span class="line">    InputStream inputStream = Resources.getResourceAsStream(resource);</span><br><span class="line">    SqlSessionFactory sqlSessionFactory =</span><br><span class="line">            new SqlSessionFactoryBuilder().build(inputStream);</span><br><span class="line"></span><br><span class="line">    try (SqlSession session = sqlSessionFactory.openSession()) &#123;</span><br><span class="line">     </span><br><span class="line">        // xml方式</span><br><span class="line">        System.out.println( session.selectList(&quot;com.sql.xml.UserMapper.selectUser&quot;));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果报错可能你没添加这个 UserMapper.xml到 config.xml里</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Mapper的一切"><a href="#Mapper的一切" class="headerlink" title="Mapper的一切"></a>Mapper的一切</h3><ul>
+<li>parameterType<ul>
+<li>参数的 <code>${} 和 #{}</code></li>
+<li>参数是按照 JavaBean约定读取的 getter/setter</li>
+</ul>
+</li>
+<li><p>resultType</p>
+<ul>
+<li><p>typeAlias 简化 resultType</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># 在UserMapper.xml resultType 很长</span><br><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;com.github.hcsp.sql.Sql$User&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># typeAlias 帮你做一个映射 别名 注意它必须放在前面</span><br><span class="line"># 第一步修改 config.xml </span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;settings&gt;</span><br><span class="line">        &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;</span><br><span class="line">    &lt;/settings&gt;</span><br><span class="line">    &lt;!-- 添加别名映射 --&gt;</span><br><span class="line">    &lt;typeAliases&gt;</span><br><span class="line">        &lt;typeAlias alias=&quot;User&quot; type=&quot;com.github.hcsp.sql.Sql$User&quot;/&gt;</span><br><span class="line">    &lt;/typeAliases&gt;</span><br><span class="line">    &lt;environments default=&quot;development&quot;&gt;</span><br><span class="line">        &lt;environment id=&quot;development&quot;&gt;</span><br><span class="line">            &lt;transactionManager type=&quot;JDBC&quot;/&gt;</span><br><span class="line">            &lt;dataSource type=&quot;POOLED&quot;&gt;</span><br><span class="line">                &lt;property name=&quot;driver&quot; value=&quot;org.h2.Driver&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;url&quot; value=&quot;jdbc:h2:file:/Users/huangjiaxi/Downloads/practise-select-sql/target/test&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;</span><br><span class="line">                &lt;property name=&quot;password&quot; value=&quot;Jxi1Oxc92qSj&quot;/&gt;</span><br><span class="line">            &lt;/dataSource&gt;</span><br><span class="line">        &lt;/environment&gt;</span><br><span class="line">    &lt;/environments&gt;</span><br><span class="line">    &lt;mappers&gt;</span><br><span class="line">        &lt;mapper resource=&quot;db/myBatis/UserMapper.xml&quot;/&gt;</span><br><span class="line">    &lt;/mappers&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br><span class="line"># 第二步修改 UserMapper.xml</span><br><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select * from user</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>写参数是按照 Java Bean约定的 getter/setter</p>
+</li>
+</ul>
+</li>
+<li>Association</li>
+</ul>
+<blockquote>
+<p>返回为map</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 修改UserMapper.xml</span><br><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;map&quot;&gt;</span><br><span class="line">      select * from user</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br><span class="line"></span><br><span class="line"># 此时返回的是 map</span><br><span class="line"># 如下</span><br><span class="line">[</span><br><span class="line">&#123;CREATED_AT=2019-10-31 21:30:05.072, ADDRESS=beijing, TEL=tel1, UPDATED_AT=2019-10-31 21:30:05.072, ID=1, NAME=zhangsan&#125;, </span><br><span class="line">&#123;CREATED_AT=2019-10-31 21:30:05.072, ADDRESS=shanghai, TEL=tel2, UPDATED_AT=2019-10-31 21:30:05.072, ID=2, NAME=lisi&#125;, </span><br><span class="line">&#123;CREATED_AT=2019-10-31 21:30:05.072, ADDRESS=shanghai, TEL=tel3, UPDATED_AT=2019-10-31 21:30:05.072, ID=3, NAME=wangwu&#125;,</span><br><span class="line">&#123;CREATED_AT=2019-10-31 21:30:05.072, ADDRESS=shenzhen, TEL=tel4, UPDATED_AT=2019-10-31 21:30:05.072, ID=4, NAME=zhangsan&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我想返回的是一个User</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 修改UserMapper.xml</span><br><span class="line"># com.github.hcsp.sql.Sql$User  &quot;$&quot;代表连接的是内部类</span><br><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;com.github.hcsp.sql.Sql$User&quot;&gt;</span><br><span class="line">      select * from user</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br><span class="line"></span><br><span class="line"># 返回数据为</span><br><span class="line">[</span><br><span class="line">User&#123;id=1, name=&apos;zhangsan&apos;, tel=&apos;tel1&apos;, address=&apos;beijing&apos;&#125;, </span><br><span class="line">User&#123;id=2, name=&apos;lisi&apos;, tel=&apos;tel2&apos;, address=&apos;shanghai&apos;&#125;, </span><br><span class="line">User&#123;id=3, name=&apos;wangwu&apos;, tel=&apos;tel3&apos;, address=&apos;shanghai&apos;&#125;, </span><br><span class="line">User&#123;id=4, name=&apos;zhangsan&apos;, tel=&apos;tel4&apos;, address=&apos;shenzhen&apos;&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h4 id="他们的值是怎么设置进去的？"><a href="#他们的值是怎么设置进去的？" class="headerlink" title="他们的值是怎么设置进去的？"></a>他们的值是怎么设置进去的？</h4><p>答案是：<strong>Java Bean</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">如果没有 setId() 会咋样？</span><br><span class="line"></span><br><span class="line">答案是 扫这个 Bean 是否是 id 这个 field</span><br></pre></td></tr></table></figure>
+<h4 id="需求变更，我要找id-1的用户"><a href="#需求变更，我要找id-1的用户" class="headerlink" title="需求变更，我要找id=1的用户"></a>需求变更，我要找id=1的用户</h4><blockquote>
+<p>修改 UserMapper.xml</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;mapper namespace=&quot;com.sql.xml.UserMapper&quot;&gt;</span><br><span class="line">    &lt;select id=&quot;selectUser&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">      select * from user where id=#&#123;id&#125;</span><br><span class="line">    &lt;/select&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br><span class="line"></span><br><span class="line">修改 之前的查询语句</span><br><span class="line">public static void main(String[] args) throws SQLException, IOException &#123;</span><br><span class="line">    // ...</span><br><span class="line"></span><br><span class="line">    try (SqlSession session = sqlSessionFactory.openSession()) &#123;</span><br><span class="line"></span><br><span class="line">        User user = new User();</span><br><span class="line">        user.id = 3;</span><br><span class="line">        // 传递一个 user 对象进去</span><br><span class="line">        System.out.println( session.selectList(</span><br><span class="line">                    &quot;com.sql.xml.UserMapper.selectUser&quot;,</span><br><span class="line">                        user</span><br><span class="line">                    )</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">    // ...</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 返回</span><br><span class="line">DEBUG [main] - ==&gt;  Preparing: select * from user where id=? </span><br><span class="line">DEBUG [main] - ==&gt; Parameters: 3(Integer)</span><br><span class="line">DEBUG [main] - &lt;==      Total: 1</span><br><span class="line">[User&#123;id=3, name=&apos;wangwu&apos;, tel=&apos;tel3&apos;, address=&apos;shanghai&apos;&#125;]</span><br></pre></td></tr></table></figure>
+<h4 id="参数的-和-的区别"><a href="#参数的-和-的区别" class="headerlink" title="参数的 ${} 和 #{}的区别"></a>参数的 <code>${} 和 #{}</code>的区别</h4><ul>
+<li><code>#{}</code> 把传入的值带入， <strong>防sql注入</strong></li>
+<li><code>${}</code> 替换这个值,它会带来 “注入” 问题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">User user = new User();</span><br><span class="line">user.name = &quot;wangwu&quot;;</span><br><span class="line">// 传递一个 user 对象进去</span><br><span class="line">System.out.println( session.selectList(</span><br><span class="line">            &quot;com.sql.xml.UserMapper.selectUser&quot;,</span><br><span class="line">                user</span><br><span class="line">            )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"># 如果 sql是这样</span><br><span class="line">select * from user where name=#&#123;name&#125;</span><br><span class="line">select * from user where name=&quot;wangwu&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 如果 sql是这样</span><br><span class="line">select * from user where name=$&#123;name&#125;</span><br><span class="line">select * from user where name=wangwu // 这会报错的</span><br><span class="line">你只能这样</span><br><span class="line">select * from user where name=&apos;$&#123;name&#125;&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="这个User对象是必须的吗？"><a href="#这个User对象是必须的吗？" class="headerlink" title="这个User对象是必须的吗？"></a>这个User对象是必须的吗？</h4><p>不是：你可以用map</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String,String&gt; param = new HashMap&lt;&gt;();</span><br><span class="line">param.put(&quot;name&quot;,&quot;wangwu&quot;);</span><br><span class="line">System.out.println( session.selectList(</span><br><span class="line">        &quot;com.sql.xml.UserMapper.selectUser&quot;,</span><br><span class="line">        param</span><br><span class="line">        )</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/30/ZB-033-02注解如何工作的/" title="ZB-033-02注解如何工作的" itemprop="url">ZB-033-02注解如何工作的</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-30T15:26:45.000Z" itemprop="datePublished"> Published 2019-10-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="注解是如何⼯作的？"><a href="#注解是如何⼯作的？" class="headerlink" title="注解是如何⼯作的？"></a>注解是如何⼯作的？</h3><ul>
+<li>注解仅仅是⼀段信息，它⾃⼰⽆法⼯作</li>
+<li>换句话说，没有东⻄处理它们的话，注解没有任何卵⽤</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/30/ZB-033-01注解/" title="ZB-033-01注解" itemprop="url">ZB-033-01注解</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-30T12:22:40.000Z" itemprop="datePublished"> Published 2019-10-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="注解是什么"><a href="#注解是什么" class="headerlink" title="注解是什么"></a>注解是什么</h3><ul>
+<li>还记得Class是什么么？<ul>
+<li>Class是Java类的说明书(堆里的某个地方存着)</li>
+<li>你（还可以通过反射）或者JVM通过阅读该说明书，创建类的实例</li>
+</ul>
+</li>
+<li>注解就是说明书中的⼀⼩段信息/⽂本/标记/标签<ul>
+<li>Annotation</li>
+<li>可以携带参数</li>
+<li>可以在运⾏时被阅读</li>
+</ul>
+</li>
+</ul>
+<p>举例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">你的衣服里，有个说明书写着 涤纶 不可水洗... 一些洗涤信息</span><br><span class="line"></span><br><span class="line">狼人杀 的身份 狼人/村民... </span><br><span class="line">王者荣耀的位置  打野/法师/射手/ADC/肉</span><br><span class="line">渣男 ... </span><br><span class="line"></span><br><span class="line">这些都是一种标签</span><br></pre></td></tr></table></figure>
+<p>例子代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">public class AuthController &#123;</span><br><span class="line">    private UserService userService;</span><br><span class="line"></span><br><span class="line">    private AuthenticationManager authentionManager;</span><br><span class="line"></span><br><span class="line">    @Inject</span><br><span class="line">    public AuthController(UserService userService , AuthenticationManager authentionManager) &#123;</span><br><span class="line">        this.userService = userService;</span><br><span class="line">        this.authentionManager = authentionManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @GetMapping(&quot;/auth&quot;)</span><br><span class="line">    @ResponseBody //方法的返回值限定在 response body里</span><br><span class="line">    public Object auth()&#123;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这就是注解的一切。</p>
+<blockquote>
+<p>为什么加了<code>@xxx</code> 之后就莫名其妙成功了？</p>
+</blockquote>
+<ul>
+<li>注解就是一小段信息，至于怎么处理注解这段信息，不是注解关心的问题</li>
+</ul>
+<h3 id="注解的写法"><a href="#注解的写法" class="headerlink" title="注解的写法"></a>注解的写法</h3><ul>
+<li>新建⼀个类的时候选择注解</li>
+<li>元注解<ul>
+<li>@Rentention</li>
+<li>@Target</li>
+<li>@Documented</li>
+<li>@Inherited  继承 子类还可以看到这个注解 没卵用</li>
+<li>@Repeatable  可以重复 平时用不到</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>写一个我们的注解</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com;</span><br><span class="line"></span><br><span class="line">@interface SpringBootApplication &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class MyApplication &#123;</span><br><span class="line"></span><br><span class="line">    @SpringBootApplication</span><br><span class="line">    private String user;</span><br><span class="line"></span><br><span class="line">    @SpringBootApplication</span><br><span class="line">    public void OrderService()&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 可以加在 Class上</span><br><span class="line">// 可以加在 成员变量上</span><br><span class="line">// 可以加在 方法上</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注解 <code>@Target</code> 和 <code>@</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">// 只允许放在方法上</span><br><span class="line">@Target(ElementType.METHOD)</span><br><span class="line">@interface SpringBootApplication &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Target(&#123;</span><br><span class="line">        ElementType.METHOD, // 只允许放在方法上</span><br><span class="line">        ElementType.CONSTRUCTOR,// 只允许放在构造器上</span><br><span class="line">        ElementType.FIELD,// 只允许放在 字段上</span><br><span class="line">        ElementType.TYPE ,// 只允许放在 类型上</span><br><span class="line">        ElementType.PARAMETER, // 只允许放在 参数上</span><br><span class="line">        ElementType.TYPE_PARAMETER, // 类型参数</span><br><span class="line">         ElementType.PACKAGE , // 放在包上</span><br><span class="line">&#125;)</span><br><span class="line">@interface SpringBootApplication &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@SpringBootApplication</span><br><span class="line">public class MyApplication &#123;</span><br><span class="line"></span><br><span class="line">    @SpringBootApplication</span><br><span class="line">    public MyApplication(String user) &#123;</span><br><span class="line">        this.user = user;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @SpringBootApplication</span><br><span class="line">    private String user;</span><br><span class="line"></span><br><span class="line">    @SpringBootApplication</span><br><span class="line">    public void OrderService(@SpringBootApplication String xx)&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Retention(RetentionPolicy.CLASS) </span><br><span class="line">@interface SpringBootApplication &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// RetentionPolicy.SOURCE 注解会被编译器丢弃</span><br><span class="line">// RetentionPolicy.CLASS 默认行为，会被虚拟机记录下来 记录在 class文件里 但不会被虚拟机运行的时候保留</span><br><span class="line">// RetentionPolicy.RUNTIME 注解会被记录在编译器也会在 虚拟机运行时 保留</span><br><span class="line"></span><br><span class="line">// 反射拿不到 SOURCE/CLASS 等级的注解信息</span><br></pre></td></tr></table></figure>
+<h3 id="注解的属性"><a href="#注解的属性" class="headerlink" title="注解的属性"></a>注解的属性</h3><blockquote>
+<p>可以有哪些？</p>
+<ul>
+<li>基本数据类型+String+类以及它们的数组</li>
+<li>默认值</li>
+<li>名为value的属性</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">比如一件外套 </span><br><span class="line">它的说明书(注解)</span><br><span class="line"></span><br><span class="line">@洗涤手段([干洗])</span><br><span class="line">class 外套</span><br><span class="line"></span><br><span class="line">@洗涤手段([水洗])</span><br><span class="line">class 毛衣</span><br><span class="line"></span><br><span class="line">看代码</span><br><span class="line">package com;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Target(&#123;</span><br><span class="line">        ElementType.METHOD,</span><br><span class="line">        ElementType.CONSTRUCTOR,</span><br><span class="line">        ElementType.FIELD,</span><br><span class="line">        ElementType.TYPE,</span><br><span class="line">        ElementType.PARAMETER,</span><br><span class="line">        ElementType.TYPE_PARAMETER,</span><br><span class="line">        ElementType.PACKAGE</span><br><span class="line">&#125;)</span><br><span class="line">@Retention(RetentionPolicy.SOURCE)</span><br><span class="line">@interface 洗涤手段 &#123;</span><br><span class="line"></span><br><span class="line">    // 属性仅仅支持 基本数据类型 + String + 类 以及它们的数组</span><br><span class="line">    String value() default &quot;干洗&quot;;</span><br><span class="line">    // 成分</span><br><span class="line">    String[] 成分() default &quot;纯棉&quot;;</span><br><span class="line">    </span><br><span class="line">    // 还可以这样 Class a();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@洗涤手段(value =&quot;水洗&quot;,成分=&#123;&quot;纯棉&quot;,&quot;涤纶&quot;&#125;)</span><br><span class="line">public class 毛衣 &#123;</span><br><span class="line"></span><br><span class="line">    @洗涤手段</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    @洗涤手段</span><br><span class="line">    public void 洗衣服(@洗涤手段 String xx)&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="JDK的⾃带注解-了解即可"><a href="#JDK的⾃带注解-了解即可" class="headerlink" title="JDK的⾃带注解(了解即可)"></a>JDK的⾃带注解(了解即可)</h4><ul>
+<li>@Deprecated 提示你这是个被废弃的方法</li>
+<li>@Override</li>
+<li>@SuppressWarnings  忽略警告</li>
+<li>@FunctionalInterface  标记警告 仅仅用来标记 删了也能正常工作</li>
+</ul>
+<blockquote>
+<p>@Override 目的是防止你犯错误</p>
+</blockquote>
+<ul>
+<li>它不是强制的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    static class Animal&#123;</span><br><span class="line">        void xxxx1234567890()&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class Cat extends Animal&#123;</span><br><span class="line">        @Override</span><br><span class="line">        void xxxx1234567890() &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 没有注解 你拼错了 以为自己重写了 实际没有</span><br><span class="line">        void xxxx12345678901() &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>@SuppressWarnings</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 忽略警告</span><br><span class="line">@SuppressWarnings(&quot;unchecked&quot;)</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    List list = new ArrayList&lt;Object&gt;();</span><br><span class="line"></span><br><span class="line">    list.add(0);</span><br><span class="line">    list.get(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="扩展链接"><a href="#扩展链接" class="headerlink" title="扩展链接"></a>扩展链接</h4></blockquote>
+<ul>
+<li><a href="https://blog.csdn.net/qq1404510094/article/details/80577555" target="_blank" rel="noopener">https://blog.csdn.net/qq1404510094/article/details/80577555</a></li>
+<li><a href="https://www.cnblogs.com/yangming1996/p/9295168.html" target="_blank" rel="noopener">https://www.cnblogs.com/yangming1996/p/9295168.html</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/30/ZB-032-02范型的绑定/" title="ZB-032-02范型的绑定" itemprop="url">ZB-032-02范型的绑定</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-30T12:21:30.000Z" itemprop="datePublished"> Published 2019-10-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<p>先看这样的代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public static Integer max(Integer a , Integer b)&#123;</span><br><span class="line">    return a &gt; b ? a : b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Long max(Long a , Long b)&#123;</span><br><span class="line">    return a &gt; b ? a : b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Double max(Double a , Double b)&#123;</span><br><span class="line">    return a &gt; b ? a : b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 很啰嗦很重复</span><br></pre></td></tr></table></figure>
+<p>有了范型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 第一步简化代码成这样</span><br><span class="line">public static T max (T a, T b)&#123;</span><br><span class="line">    // 此时 范型类型实际是 Object 因此 是不能用 &gt; 或者 &lt; 的</span><br><span class="line">    return a &gt; b ? a : b;</span><br><span class="line">&#125;</span><br><span class="line">// 第二步 你知道 Integer/Long/Double 都是 Number的子类型 它们都是实现了Comparable接口 因此是可以比较的</span><br><span class="line"></span><br><span class="line">// 定义传递的范型的一个约定 是 继承 Comparable 的因此可以 compareTo 的</span><br><span class="line">public static &lt;T extends Comparable&gt; T max (T a, T b)&#123;</span><br><span class="line">    return a.compareTo(b) &gt;= 0 ? a : b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你可以这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">max(1.0,2.0); // 你传递的是 Double 因此返回是 Double</span><br><span class="line">max(1,2); // 你传递的是 Integer 因此返回是 Integer</span><br><span class="line">max(1L,2L); // 你传递的是 Long 因此返回是 Long</span><br><span class="line">max(&quot;aaa&quot;,&quot;bbb&quot;); // 你传递的是 String 因此返回是 String</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>让你疑惑的地方 <code>max(&quot;aaa&quot;,1)</code> 竟然通过了编译为什么？</p>
+</blockquote>
+<ul>
+<li>范型的约束条件是 <code>&lt;T extends Comparable&gt;</code></li>
+<li>String/Integer 都是 Comparable 的实现类</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;T extends Comparable&gt; T max (T a, T b)&#123;</span><br><span class="line">    return a.compareTo(b) &gt;= 0 ? a : b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">max(&quot;aaa&quot;,1)</span><br><span class="line">// 等价于 max(Comparable,Comparable)</span><br></pre></td></tr></table></figure>
+<p><strong>虽然能通过编译，但是运行会报错，在本文最后会解释</strong></p>
+<blockquote>
+<p>传递多个类型</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;A extends Comparable,B extends Comparable,C extends Comparable&gt; A max2 (A a,  B b, C c)&#123;</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>取第一个list第一个元素</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static String first(List&lt;String&gt; list)&#123;</span><br><span class="line">    return list.get(0);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Integer first(List&lt;Integer&gt; list)&#123;</span><br><span class="line">    return list.get(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用范型后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;T&gt; T first(List&lt;T&gt; list)&#123;</span><br><span class="line">    return list.get(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="范型的绑定"><a href="#范型的绑定" class="headerlink" title="范型的绑定"></a>范型的绑定</h3><ul>
+<li><code>? extends</code>要求范型是某种类型及其子类型</li>
+<li><code>? super</code> 要求范型是某种类型及其父类型</li>
+<li><code>Collections.sort</code></li>
+</ul>
+<blockquote>
+<p>按照参数绑定</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;T extends Comparable&gt; T max (T a, T b)&#123;</span><br><span class="line">    return a.compareTo(b) &gt;= 0 ? a : b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>按照返回值绑定</p>
+</blockquote>
+<p>让一个方法的返回值根据接受者动态的去改变</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        String s = cast(&quot;&quot;);</span><br><span class="line">        Object o = cast(new Object());</span><br><span class="line">        Integer i = cast(1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static &lt;T&gt; T cast(Object obj)&#123;</span><br><span class="line">        return (T) obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>? super xx</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package com.loder.demo;</span><br><span class="line"></span><br><span class="line">import java.util.*;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    static class Animal&#123;&#125;</span><br><span class="line"></span><br><span class="line">    static class Cat extends Animal&#123;&#125;</span><br><span class="line"></span><br><span class="line">    public static &lt;T&gt; void sort(List&lt;T&gt; list, Comparator&lt;? super T&gt; c)&#123;</span><br><span class="line">        list.sort(c);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class AnimalComparator implements Comparator&lt;Animal&gt;&#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public int compare(Animal o1, Animal o2) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class CatComparator implements Comparator&lt;Cat&gt;&#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public int compare(Cat o1, Cat o2) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        // List&lt;T&gt; list, Comparator&lt;? super T&gt; c</span><br><span class="line">        // 除了 Cat 还可以是 Cat 的父类型</span><br><span class="line">        sort(new ArrayList&lt;Cat&gt;(),new CatComparator());</span><br><span class="line">        sort(new ArrayList&lt;Cat&gt;(),new AnimalComparator());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="翻车问题重现"><a href="#翻车问题重现" class="headerlink" title="翻车问题重现"></a>翻车问题重现</h3><blockquote>
+<p><code>max(&quot;aa&quot;,1)</code> 通过编译，但是运行报错？</p>
+</blockquote>
+<ul>
+<li>通过编译时因为刚才说了 <code>String/Integer都是 Comparable 的子类型</code></li>
+<li>报错是因为Comparable没有范型参数 导致传入的是一个裸类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line"></span><br><span class="line">    public static &lt;T extends Comparable&gt; T max (T a, T b)&#123;</span><br><span class="line">        return a.compareTo(b) &gt;= 0 ? a : b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">       max(&quot;aa&quot;,1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 报错</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.String</span><br></pre></td></tr></table></figure>
+<p>修改代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;T extends Comparable&lt;T&gt;&gt; T max (T a, T b)&#123;</span><br><span class="line">    return a.compareTo(b) &gt;= 0 ? a : b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 此时 编译期就报错了</span><br><span class="line"> max(&quot;aa&quot;,1);</span><br></pre></td></tr></table></figure>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><blockquote>
+<p><a href="https://github.com/hcsp/make-method-generic" target="_blank" rel="noopener">将方法范型化</a></p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/hcsp/make-method-generic/pull/14" target="_blank" rel="noopener">PR</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    // 这里有四个结构、功能非常相似的方法，请尝试将其范型化，以简化代码</span><br><span class="line">    // 范型化之后的方法签名应该如下所示：</span><br><span class="line">    // public static boolean inAscOrder(T a, T b, T c)</span><br><span class="line">    public static boolean inAscOrder1(int a, int b, int c) &#123;</span><br><span class="line">        return a &lt;= b &amp;&amp; b &lt;= c;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static boolean inAscOrder2(long a, long b, long c) &#123;</span><br><span class="line">        return a &lt;= b &amp;&amp; b &lt;= c;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static boolean inAscOrder3(double a, double b, double c) &#123;</span><br><span class="line">        return a &lt;= b &amp;&amp; b &lt;= c;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static &lt;T extends Comparable&lt;T&gt;&gt; boolean inAscOrder(T a, T b, T c)&#123;</span><br><span class="line">        return a.compareTo(b) &lt;= 0 &amp;&amp; b.compareTo(c) &lt;= 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(inAscOrder1(1, 2, 3));</span><br><span class="line">        System.out.println(inAscOrder2(1L, 2L, 3L));</span><br><span class="line">        System.out.println(inAscOrder3(1d, 2d, 3d));</span><br><span class="line"></span><br><span class="line">        System.out.println(inAscOrder(1, 2, 3));</span><br><span class="line">        System.out.println(inAscOrder(1L, 2L, 3L));</span><br><span class="line">        System.out.println(inAscOrder(1d, 2d, 3d));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a href="https://github.com/hcsp/generic-binary-tree" target="_blank" rel="noopener">范型化的二叉树</a></p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/hcsp/generic-binary-tree/pull/12" target="_blank" rel="noopener">PR</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.generics;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.List;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    static class IntBinaryTreeNode &#123;</span><br><span class="line">        int value;</span><br><span class="line">        IntBinaryTreeNode left;</span><br><span class="line">        IntBinaryTreeNode right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class StringBinaryTreeNode &#123;</span><br><span class="line">        String value;</span><br><span class="line">        StringBinaryTreeNode left;</span><br><span class="line">        StringBinaryTreeNode right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class DoubleBinaryTreeNode &#123;</span><br><span class="line">        double value;</span><br><span class="line">        DoubleBinaryTreeNode left;</span><br><span class="line">        DoubleBinaryTreeNode right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 你看，上面三种&quot;二叉树节点&quot;结构相似，内容重复，请将其范型化，以节省代码</span><br><span class="line">    static class BinaryTreeNode&lt;T&gt; &#123;</span><br><span class="line">        T value;</span><br><span class="line">        BinaryTreeNode&lt;T&gt; left;</span><br><span class="line">        BinaryTreeNode&lt;T&gt; right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 范型化之后，请再编写一个算法，对二叉树进行中序遍历，返回中序遍历的结果</span><br><span class="line">    public static &lt;T&gt; List&lt;T&gt; inorderTraversal(BinaryTreeNode&lt;T&gt; root) &#123;</span><br><span class="line">        ArrayList&lt;T&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line">        collectValue(root, list);</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static &lt;T&gt; void collectValue(BinaryTreeNode&lt;T&gt; node, ArrayList&lt;T&gt; list) &#123;</span><br><span class="line">        if (node == null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        // 中序遍历递归 先左 再root 最后右</span><br><span class="line">        collectValue(node.left, list);</span><br><span class="line">        list.add(node.value);</span><br><span class="line">        collectValue(node.right, list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2019/10/30/ZB-032-01范型的由来和范型擦除/" title="ZB-032-01范型的由来和范型擦除" itemprop="url">ZB-032-01范型的由来和范型擦除</a>
   </h1>
   <p class="article-author">By
@@ -623,633 +1298,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/28/ZB-030-03反射/" title="ZB-030-03反射" itemprop="url">ZB-030-03反射</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-28T15:28:33.000Z" itemprop="datePublished"> Published 2019-10-28</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><ul>
-<li>根据参数创建一个对象？</li>
-<li>根据参数调用一个方法？</li>
-<li>根据参数动态获取一个属性？</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException &#123;</span><br><span class="line">        String className = &quot;java.lang.String&quot;;</span><br><span class="line">        Class c = Class.forName(className);</span><br><span class="line">        Object object = c.getConstructor().newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>JVM的堆里有一个地方存了，Cat的Class对象(Cat的说明书)</p>
-</blockquote>
-<p>你可以通过这样一个<code>Class.forName(String className)</code> 传递一个类的名字</p>
-<p><strong>注意这个类名是 全限定类名</strong><br><strong>注意这个类名是 全限定类名</strong><br><strong>注意这个类名是 全限定类名</strong></p>
-<p>此时虚拟机根据你的要求加载这个类进来，然后你就能进行一些诡异的操作了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 比如这个</span><br><span class="line">Object object = c.getConstructor().newInstance();</span><br><span class="line"></span><br><span class="line">// 不建议用这个 c.newInstance();  jdk9里废弃里  考虑兼容性 不建议使用</span><br></pre></td></tr></table></figure>
-<h4 id="这样创建意味着什么？"><a href="#这样创建意味着什么？" class="headerlink" title="这样创建意味着什么？"></a>这样创建意味着什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String className = &quot;java.lang.String&quot;;</span><br><span class="line">Class c = Class.forName(className);</span><br><span class="line">Object object = c.getConstructor().newInstance();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 意味着你不再需要这样的调用，</span><br><span class="line">// 而是使用 一个传递的名字，意味着你拥有了无与伦比的灵活性</span><br><span class="line">new String();</span><br><span class="line">new Cat();</span><br><span class="line">new ArrayList();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>调用方法,访问成员属性</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) throws NoSuchMethodException, NoSuchFieldException, InvocationTargetException, IllegalAccessException &#123;</span><br><span class="line">        Cat cat = new Cat();</span><br><span class="line">        cat.getClass().getMethod(args[0]).invoke(cat);</span><br><span class="line">        cat.getClass().getField(args[1]).get(cat);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="反射扩展"><a href="#反射扩展" class="headerlink" title="反射扩展"></a>反射扩展</h3><p>-spring-framework里的 ReflectionUtils</p>
-<ul>
-<li>invokeMethod<ul>
-<li>Method</li>
-<li>Class</li>
-<li>Field</li>
-</ul>
-</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/28/ZB-030-02类加载和ClassLoader/" title="ZB-030-02类加载和ClassLoader" itemprop="url">ZB-030-02类加载和ClassLoader</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-28T14:19:56.000Z" itemprop="datePublished"> Published 2019-10-28</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="不止一份说明书"><a href="#不止一份说明书" class="headerlink" title="不止一份说明书"></a>不止一份说明书</h3><p>你的程序扩展了</p>
-<p>此时 你有了如下多的类型</p>
-<ul>
-<li>Cat</li>
-<li>Dog</li>
-<li>Pig</li>
-<li>…</li>
-<li>或者内置的 ArrayList</li>
-</ul>
-<p>它们都是从 对应的说明书创建的？</p>
-<blockquote>
-<p>问题来了？这个 <strong>说明书，这个Class对象</strong> 那里来的</p>
-</blockquote>
-<ul>
-<li>绝不可能是凭空出现，一定是从什么地方拿到的</li>
-</ul>
-<h3 id="Class对象的生命周期"><a href="#Class对象的生命周期" class="headerlink" title="Class对象的生命周期"></a>Class对象的生命周期</h3><ul>
-<li><strong>它在第一次被使用的时候加载</strong></li>
-</ul>
-<p>Class对象就是一个 类型(如Cat) 的说明书</p>
-<p>上篇文章的例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Animal</span><br><span class="line">-|Cat</span><br><span class="line">--|WhiteCat</span><br><span class="line"></span><br><span class="line">在内存中初始的时候，</span><br><span class="line">一个 WhiteCat 它的一部分区域是 Cat,在一部分是 Animal</span><br><span class="line"></span><br><span class="line">意思就是 </span><br><span class="line">你要创建一个 WhiteCat 就必须 先创建 Cat，创建 Cat 就必须 先创建Animal</span><br><span class="line"></span><br><span class="line">换句话说，</span><br><span class="line">你想要一个 WhiteCat，你首先要用到 Cat,然后创建 Cat 又必须用到 Animal</span><br><span class="line">这个过程是一层一层递归的</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="HelloWorld-运行过程"><a href="#HelloWorld-运行过程" class="headerlink" title="HelloWorld 运行过程"></a>HelloWorld 运行过程</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;HelloWorld&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// IDEA里 右键运行</span><br><span class="line"></span><br><span class="line">你以为的</span><br><span class="line">运行------》 HelloWorld</span><br><span class="line"></span><br><span class="line">实际上</span><br><span class="line"></span><br><span class="line">运行---》</span><br><span class="line">    第一步 编译 从 Main.java--&gt; Main.class</span><br><span class="line">    第二步 帮你拼了一个 java命令 运行你的 Main.class </span><br><span class="line">    打印出 HelloWorld</span><br><span class="line"></span><br><span class="line">// 复制这行拼接的命令</span><br><span class="line">在终端里执行，你发现跟你点 运行 没区别</span><br><span class="line"></span><br><span class="line">// 我们可以给这个命令行加参数</span><br><span class="line"></span><br><span class="line">让他打印 类加载 顺序</span><br><span class="line"></span><br><span class="line">-verbose:class</span><br><span class="line"></span><br><span class="line">// 在这个后面</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  ...</span><br><span class="line"></span><br><span class="line">但是非常啰嗦</span><br><span class="line"></span><br><span class="line">你可以在命令的最后 加上 管道操作</span><br><span class="line"></span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  </span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">| grep 过滤词（我们自己类的包名如 com.xxx）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">你会看到 形如</span><br><span class="line">[Loaded com.io.demo.Animal from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.Cat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.WhiteCat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line"></span><br><span class="line">意思就是这个类 从那里来</span><br></pre></td></tr></table></figure>
-<h4 id="回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？"><a href="#回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？" class="headerlink" title="回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？"></a>回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？</h4><p>上面的过程解释了，说明书什么时候被加载。</p>
-<p><strong>那它是那里来的呢？</strong></p>
-<p>答案是你自己写的类 从你编写的 xxx.java 编译后的 xxx.class里来(target目录里)</p>
-<blockquote>
-<p>你看到的是瞬间加载你的类，实际做了很多事</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">加载之前是 xxx.class</span><br><span class="line"></span><br><span class="line">加载 Loading (读取)===&gt; </span><br><span class="line">                进行一系列操作</span><br><span class="line"></span><br><span class="line">                验证==》防止恶意代码搞坏jvm</span><br><span class="line">                准备==》</span><br><span class="line">                解析===》</span><br><span class="line">                        初始化</span><br><span class="line">                        把一个 class文件 变到 内存里  </span><br><span class="line">                        使得根据对应的说明书 可以创建对应的对象</span><br></pre></td></tr></table></figure>
-<h4 id="第三个问题？说明书被谁加载的"><a href="#第三个问题？说明书被谁加载的" class="headerlink" title="第三个问题？说明书被谁加载的"></a>第三个问题？说明书被谁加载的</h4><p>答案就是 <strong>Classloader</strong></p>
-<h3 id="Class和-Classloader"><a href="#Class和-Classloader" class="headerlink" title="Class和 Classloader"></a>Class和 Classloader</h3><h4 id="Classloader-负责从外部系统中加载一个类"><a href="#Classloader-负责从外部系统中加载一个类" class="headerlink" title="Classloader 负责从外部系统中加载一个类"></a>Classloader 负责从外部系统中加载一个类</h4><ul>
-<li>这个类对应的Java文件并不需要存在 <code>你可以没有Cat.java,你可以通过Cat.class</code></li>
-<li>这个类(字节码))并不一定需要存在<code>你也可以没有Cat.class,你可以从网上下载，文件的本质是字节流，可以动态生产</code></li>
-<li><p>这是java世界丰富多彩的基石</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">比如我想要一个 五条腿的猫</span><br><span class="line">动态创建一个 Cat5 </span><br><span class="line">Cat5 extends Cat </span><br><span class="line">这个Cat5的说明书 你可以直接在内存里捏造出来，不需要和外界打交道</span><br><span class="line"></span><br><span class="line">这个操作就是 动态字节码增强</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Classloader的双亲委派加载模型</p>
-<ul>
-<li>首先 <strong>Classloader 负责从外部系统中加载一个类</strong></li>
-<li>外部是不安全的，总会有恶意的代码，比如 他想搞坏你的String<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// src/main下建立如下代码</span><br><span class="line">package java.lang;</span><br><span class="line"></span><br><span class="line">public class String &#123;</span><br><span class="line">    // 我是一个坏人</span><br><span class="line">    // 我在自己定义的 String 里 做坏事</span><br><span class="line"></span><br><span class="line">    public String() &#123;</span><br><span class="line">        throw new IllegalStateException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// </span><br><span class="line">package com.xxx.demo;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        new String();</span><br><span class="line">        // 此时 点进去发现 会优先选择官方的 String</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 答案就是 双亲委派加载模型</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="双亲委派加载模型"><a href="#双亲委派加载模型" class="headerlink" title="双亲委派加载模型"></a>双亲委派加载模型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</span><br><span class="line">    throws ClassNotFoundException</span><br><span class="line">&#123;</span><br><span class="line">    synchronized (getClassLoadingLock(name)) &#123;</span><br><span class="line">        // First, check if the class has already been loaded</span><br><span class="line">        Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">        if (c == null) &#123;</span><br><span class="line">            long t0 = System.nanoTime();</span><br><span class="line">            try &#123;</span><br><span class="line">                // 它有父亲的话，首先从父亲加载</span><br><span class="line">                if (parent != null) &#123;</span><br><span class="line">                    c = parent.loadClass(name, false);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    c = findBootstrapClassOrNull(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                // ClassNotFoundException thrown if class not found</span><br><span class="line">                // from the non-null parent class loader</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 父亲加载失败，尝试自己加载</span><br><span class="line">            if (c == null) &#123;</span><br><span class="line">                </span><br><span class="line">                // If still not found, then invoke findClass in order</span><br><span class="line">                // to find the class.</span><br><span class="line">                long t1 = System.nanoTime();</span><br><span class="line">                c = findClass(name);</span><br><span class="line"></span><br><span class="line">                // this is the defining class loader; record the stats</span><br><span class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                sun.misc.PerfCounter.getFindClasses().increment();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="这个模型的好处？"><a href="#这个模型的好处？" class="headerlink" title="这个模型的好处？"></a>这个模型的好处？</h4></blockquote>
-<p>比如刚刚的<code>new String();</code>这样的基础的类，出于安全性的考虑都是由最顶端的启动类加载器加载的，这样就保证了安全</p>
-<p>所以我们自造的恶意的 类无法被加载。</p>
-<h4 id="Java语言规范-JLS-和Java虚拟机规范-JVMS"><a href="#Java语言规范-JLS-和Java虚拟机规范-JVMS" class="headerlink" title="Java语言规范(JLS)和Java虚拟机规范(JVMS)"></a>Java语言规范(JLS)和Java虚拟机规范(JVMS)</h4><ul>
-<li>java 和 jvm实际是分离的，它们的联系就是字节码，而字节码可以不由java生成</li>
-<li>这种分离提供了JVM上运行其他语言的可能</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/28/ZB-030-01Java的类与Class/" title="ZB-030-01Java的类与Class" itemprop="url">ZB-030-01Java的类与Class</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-28T13:39:19.000Z" itemprop="datePublished"> Published 2019-10-28</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="Java的类与Class"><a href="#Java的类与Class" class="headerlink" title="Java的类与Class"></a>Java的类与Class</h3><p>先看一个例子</p>
-<p>Animal.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class Animal &#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>Cat.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public class Cat extends Animal &#123;</span><br><span class="line">    public void catchMouse()&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>WhiteCat.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        Object obj = new WhiteCat();</span><br><span class="line">        // 为什么可以直接赋值给 Object？</span><br><span class="line"></span><br><span class="line">        /*</span><br><span class="line">        这就是 继承啊</span><br><span class="line">        因为在java世界里 任何的类都继承了 Object 类，它是整个java世界的基础(根)</span><br><span class="line">        所以 java中 任何的类都是 Object的子类</span><br><span class="line">        */</span><br><span class="line"></span><br><span class="line">        // obj.catchMouse();</span><br><span class="line">        // 为什么报错</span><br><span class="line">        /*</span><br><span class="line">        因为 java 是一个强类型语言，因此</span><br><span class="line">        在 Object obj = new WhiteCat(); 时 obj 是 Object类型的</span><br><span class="line">        因此编译时 Object 没有 catchMouse() 所以会报错</span><br><span class="line">        */</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="RTTI-Run-Time-Type-Identification-运行时类型识别"><a href="#RTTI-Run-Time-Type-Identification-运行时类型识别" class="headerlink" title="RTTI(Run-Time Type Identification) 运行时类型识别"></a>RTTI(Run-Time Type Identification) 运行时类型识别</h4><p>在任何时刻，任何一个对象都清楚的知道自己是什么类型的。</p>
-<blockquote>
-<p><code>Object.getClass()</code></p>
-</blockquote>
-<p>在整个 java 运行期间 任何一个对象都可以在任何时候知道自己是什么类型的</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 这个方法就是 </span><br><span class="line">// obj.getClass();</span><br><span class="line"></span><br><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        Object obj = new WhiteCat();</span><br><span class="line">        System.out.println(obj.getClass());</span><br><span class="line">        // class com.io.demo.WhiteCat</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="一个Class-对象就是一个类的说明书"><a href="#一个Class-对象就是一个类的说明书" class="headerlink" title="一个Class 对象就是一个类的说明书"></a>一个Class 对象就是一个类的说明书</h4><blockquote>
-<p>Class 和 类的关系</p>
-</blockquote>
-<p>什么是 JVM ？ 就是一个虚拟的计算机，所有的java代码都可以在里面跑。</p>
-<blockquote>
-<p>我们平常写的 java代码是什么</p>
-</blockquote>
-<p>(源代码)xxx.java 写完后经过 编译变成 xxx.class (也就是通常所说的字节码) 它是java跨平台的基石</p>
-<p>jvm 可以跑 xxx.class 这样就实现了 一处编写，处处运行</p>
-<blockquote>
-<p>JVM里有什么</p>
-</blockquote>
-<ul>
-<li>栈 (方法栈)</li>
-<li>堆 java中 所有的对象都是在 堆里 分配的<ul>
-<li>new Cat() 的过程就是在 堆里创建</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>Cat 是如何创建的呢？</p>
-</blockquote>
-<p>我想创建一个 Cat,它长什么样子有什么属性，这些东西存在那里？ </p>
-<p><strong>这个信息就在堆里一个很奇怪的地方存着，叫做 class文件</strong></p>
-<p>一个Class对象就是一个类的说明书</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Cat extends Animal &#123;</span><br><span class="line">    public String[] leg;</span><br><span class="line">    public String head;</span><br><span class="line">    public String tail;</span><br><span class="line">    </span><br><span class="line">    public static int count;</span><br><span class="line">    </span><br><span class="line">    public void catchMouse()&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>此时当你 <code>new Cat()</code> 时候，JVM就会根据 Cat的说明书 把它创建出来。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 于是你疯狂造猫</span><br><span class="line">new Cat()</span><br><span class="line">new Cat()</span><br><span class="line">new Cat()</span><br><span class="line">。。。</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这些猫 有什么共同点呢？</p>
-</blockquote>
-<ul>
-<li>都是同一份说明书上生产出来的</li>
-<li>每只猫都有独立的属性 leg / head / tail</li>
-<li><code>public static int count</code> 本质是什么 归属于 这份说明书的，每个 cat对象共享这份说明书。</li>
-</ul>
-<blockquote>
-<p>这个Cat的说明书是什么？</p>
-</blockquote>
-<ul>
-<li>Class对象</li>
-<li>静态变量归属于这个 Class对象</li>
-</ul>
-<blockquote>
-<p>instanceof 瞬间豁然开朗</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">obj instanceof Cat</span><br><span class="line"> </span><br><span class="line">通过 obj.getClass()</span><br><span class="line">知道每个对象到底是什么类型的</span><br><span class="line"></span><br><span class="line">因此它当然清楚知道 它到底是什么类型的</span><br></pre></td></tr></table></figure>
-<h4 id="刚刚的Cat说明书在jvm内部开辟的一小块空间"><a href="#刚刚的Cat说明书在jvm内部开辟的一小块空间" class="headerlink" title="刚刚的Cat说明书在jvm内部开辟的一小块空间"></a>刚刚的Cat说明书在jvm内部开辟的一小块空间</h4><p>它是非常特殊的，因为所有的类型基本上都只存在一份说明书</p>
-<p>这个东西在 java7之前 叫做 <strong>永久代</strong></p>
-<p>java8之后叫做 <strong>元空间</strong></p>
-<blockquote>
-<p>将来你在工作的某一天迟早会碰到这样一个异常</p>
-</blockquote>
-<ul>
-<li>Java7之前叫做 OutOfMemory:PermGen</li>
-<li>Java8之后 叫做 MetaSpace</li>
-</ul>
-<p>当你看到它们的时候，基本上是你的类出问题了</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>每个对象创建出来的时候都需要一份说明书。</p>
-<p>一个Class对象就是一份说明书，</p>
-<p>因此你总是可以问一个对象<code>obj.getClass()</code> 你是从哪里装配出来的</p>
-<p>然后对象说,我是从这个类 装配出来的，这就是 Class 文件的本质。</p>
-<p>因此 你很容易实现 <code>instanceof</code> 判断</p>
-<blockquote>
-<p>强制类型转换</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Object obj = new WhiteCat();</span><br><span class="line">Integer i = (Integer) obj;</span><br><span class="line"></span><br><span class="line">// 此时你会得到一个异常</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.ClassCastException: com.io.demo.WhiteCat cannot be cast to java.lang.Integer</span><br><span class="line">	at com.io.demo.WhiteCat.main(WhiteCat.java:7)</span><br></pre></td></tr></table></figure>
-<p><strong>为什么报错？</strong></p>
-<p>首先强制类型转换本来就是不安全的，编译器允许你这样做</p>
-<p>但是它在运行时会出问题，因为每个对象都清楚的知道自己是从什么对象创建出来的。</p>
-<p>所以会报错</p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/11/ZB-029-02字符串和编码/" title="ZB-029-02字符串和编码" itemprop="url">ZB-029-02字符串和编码</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-11T14:18:32.000Z" itemprop="datePublished"> Published 2019-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="字符串和编码"><a href="#字符串和编码" class="headerlink" title="字符串和编码"></a>字符串和编码</h3><ul>
-<li>⼀个⼈类世界中的字符如何转换成计算机世界中的字节？ 如 “一”<ul>
-<li>⼀定在某个神奇的⻆落存在⼀种映射关系</li>
-<li>我们称这种映射关系为 <strong>字符集</strong></li>
-<li>将⼈类能看懂的字符变成字节，叫做 <strong>编码</strong></li>
-<li>将字节变成⼈类能看懂的字符，叫做 <strong>解码</strong></li>
-</ul>
-</li>
-</ul>
-<h3 id="字符集：Unicode"><a href="#字符集：Unicode" class="headerlink" title="字符集：Unicode"></a>字符集：Unicode</h3><ul>
-<li>每个数字代表⼀个字符，叫做“码点”（code point）</li>
-<li>那我能不能直接拿来变成字节啊？<ul>
-<li>可以……但是没必要。</li>
-</ul>
-</li>
-<li>最常⻅的两种编码⽅案：<ul>
-<li>UTF-16：Java程序内部的存储⽅法</li>
-<li>UTF-8<ul>
-<li>Mac/Linux默认编码是UTF-8</li>
-<li>Windows默认的中⽂编码是GBK <ul>
-<li>为什么 windows 不用 UTF-8呢？</li>
-<li>答案是： windows 在使用时 UTF-8还没发明</li>
-</ul>
-</li>
-<li>如果没有意外，把你所有的编码⽅案都改成UTF-8(支持度最好的解决方案)</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="Google-小技巧"><a href="#Google-小技巧" class="headerlink" title="Google 小技巧"></a>Google 小技巧</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 只在 当前站内搜索</span><br><span class="line">site:github.com</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 排除 某站的内容</span><br><span class="line">java -csdn</span><br><span class="line"></span><br><span class="line"># 搜索 内容必须是连在一起的</span><br><span class="line">&quot;java string&quot;</span><br><span class="line"></span><br><span class="line"># 搜指定格式</span><br><span class="line">重构改善现有代码 filetype:pdf</span><br><span class="line"></span><br><span class="line"># 常用数据</span><br><span class="line">名单 filetype:xls</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/11/ZB-029-01字符串原理/" title="ZB-029-01字符串原理" itemprop="url">ZB-029-01字符串原理</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-11T13:16:57.000Z" itemprop="datePublished"> Published 2019-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="Java字符串详解"><a href="#Java字符串详解" class="headerlink" title="Java字符串详解"></a>Java字符串详解</h3><h4 id="字符串是最重要的引用类型之一"><a href="#字符串是最重要的引用类型之一" class="headerlink" title="字符串是最重要的引用类型之一"></a>字符串是最重要的引用类型之一</h4><ul>
-<li>互联网基本只干一件事：处理字符串<ul>
-<li>你随便打开一个网址</li>
-<li>为什么很少听说 拿 C/C++ 去写一个互联网应用 ，因为 它们的字符串处理简直是灾难</li>
-</ul>
-</li>
-<li>能处理好字符串是web服务器的基本要求<ul>
-<li>Php</li>
-<li>Python</li>
-<li>Java</li>
-<li>Ruby </li>
-<li>…</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>非常推荐把 Java的 String 类 通读一遍</p>
-</blockquote>
-<ul>
-<li>不要怕它是英文的注释 <strong>仔细想想 谁一开始就什么都会的呢？ 谁一开始就会英语的呢？</strong></li>
-<li>一个东西如果难 说明它是一个机遇，说明别人干不了这事，而你能干这事说明你比别人厉害</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * The &#123;@code String&#125; class represents character strings. All</span><br><span class="line"> * string literals in Java programs, such as &#123;@code &quot;abc&quot;&#125;, are</span><br><span class="line"> * implemented as instances of this class.</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * Strings are constant; their values cannot be changed after they</span><br><span class="line"> * are created. String buffers support mutable strings.</span><br><span class="line"> * Because String objects are immutable they can be shared. For example:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     String str = &quot;abc&quot;;</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;&lt;p&gt;</span><br><span class="line"> * is equivalent to:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     char data[] = &#123;&apos;a&apos;, &apos;b&apos;, &apos;c&apos;&#125;;</span><br><span class="line"> *     String str = new String(data);</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;&lt;p&gt;</span><br><span class="line"> * Here are some more examples of how strings can be used:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     System.out.println(&quot;abc&quot;);</span><br><span class="line"> *     String cde = &quot;cde&quot;;</span><br><span class="line"> *     System.out.println(&quot;abc&quot; + cde);</span><br><span class="line"> *     String c = &quot;abc&quot;.substring(2,3);</span><br><span class="line"> *     String d = cde.substring(1, 2);</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * The class &#123;@code String&#125; includes methods for examining</span><br><span class="line"> * individual characters of the sequence, for comparing strings, for</span><br><span class="line"> * searching strings, for extracting substrings, and for creating a</span><br><span class="line"> * copy of a string with all characters translated to uppercase or to</span><br><span class="line"> * lowercase. Case mapping is based on the Unicode Standard version</span><br><span class="line"> * specified by the &#123;@link java.lang.Character Character&#125; class.</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * The Java language provides special support for the string</span><br><span class="line"> * concatenation operator (&amp;nbsp;+&amp;nbsp;), and for conversion of</span><br><span class="line"> * other objects to strings. String concatenation is implemented</span><br><span class="line"> * through the &#123;@code StringBuilder&#125;(or &#123;@code StringBuffer&#125;)</span><br><span class="line"> * class and its &#123;@code append&#125; method.</span><br><span class="line"> * String conversions are implemented through the method</span><br><span class="line"> * &#123;@code toString&#125;, defined by &#123;@code Object&#125; and</span><br><span class="line"> * inherited by all classes in Java. For additional information on</span><br><span class="line"> * string concatenation and conversion, see Gosling, Joy, and Steele,</span><br><span class="line"> * &lt;i&gt;The Java Language Specification&lt;/i&gt;.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt; Unless otherwise noted, passing a &lt;tt&gt;null&lt;/tt&gt; argument to a constructor</span><br><span class="line"> * or method in this class will cause a &#123;@link NullPointerException&#125; to be</span><br><span class="line"> * thrown.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;A &#123;@code String&#125; represents a string in the UTF-16 format</span><br><span class="line"> * in which &lt;em&gt;supplementary characters&lt;/em&gt; are represented by &lt;em&gt;surrogate</span><br><span class="line"> * pairs&lt;/em&gt; (see the section &lt;a href=&quot;Character.html#unicode&quot;&gt;Unicode</span><br><span class="line"> * Character Representations&lt;/a&gt; in the &#123;@code Character&#125; class for</span><br><span class="line"> * more information).</span><br><span class="line"> * Index values refer to &#123;@code char&#125; code units, so a supplementary</span><br><span class="line"> * character uses two positions in a &#123;@code String&#125;.</span><br><span class="line"> * &lt;p&gt;The &#123;@code String&#125; class provides methods for dealing with</span><br><span class="line"> * Unicode code points (i.e., characters), in addition to those for</span><br><span class="line"> * dealing with Unicode code units (i.e., &#123;@code char&#125; values).</span><br><span class="line"> *</span><br><span class="line"> * @author  Lee Boynton</span><br><span class="line"> * @author  Arthur van Hoff</span><br><span class="line"> * @author  Martin Buchholz</span><br><span class="line"> * @author  Ulf Zibis</span><br><span class="line"> * @see     java.lang.Object#toString()</span><br><span class="line"> * @see     java.lang.StringBuffer</span><br><span class="line"> * @see     java.lang.StringBuilder</span><br><span class="line"> * @see     java.nio.charset.Charset</span><br><span class="line"> * @since   JDK1.0</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
-<p><strong><code>@see</code></strong> 的意思就是为了了解当前的类，你可能需要看看别的类(参考文献/友情链接)</p>
-<blockquote>
-<p>在 IDEA 里 一个对象长什么样 是由它的 <code>toString</code> 决定的</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class MyObject&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;hahaha&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="字符串的不可变性-它是引用类型"><a href="#字符串的不可变性-它是引用类型" class="headerlink" title="字符串的不可变性(它是引用类型)"></a>字符串的不可变性(它是引用类型)</h3><ul>
-<li>为什么字符串是不可变的？<ul>
-<li>安全：<strong>线程安全，存储安全</strong></li>
-</ul>
-</li>
-<li>缺点，<strong>每当修改的时候都需要重复创建新的对象</strong></li>
-</ul>
-<h4 id="String-为什么不可变"><a href="#String-为什么不可变" class="headerlink" title="String 为什么不可变"></a>String 为什么不可变</h4><blockquote>
-<p>API 层面</p>
-</blockquote>
-<ul>
-<li>它肚子里有个 字符数组的容器 <code>private final char value[]</code></li>
-<li>class String 它是 <strong>final</strong> 的</li>
-<li>char value[] 它是 <strong>final</strong> 的 这个数组不能改变指向</li>
-<li>String 类中 所有公开的 API 方法中 都没提供改变 value 值的操作，所以 String 是不可变的</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public final class String</span><br><span class="line">    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence &#123;</span><br><span class="line">    /** The value is used for character storage. */</span><br><span class="line">    private final char value[];</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>不可变的真实原因</p>
-</blockquote>
-<ol>
-<li>在一个 HashMap 里，它有哈希值，它有若干个<strong>桶</strong> 每个桶里存固定的 <code>hashCode</code> </li>
-<li>假如你声明了一个 <code>HashMap&lt;String,Object&gt;</code> 会把这个 String 算一个 hashCode() 会被当作 key 存到 桶里去</li>
-<li><p><code>Object.hashCode()</code> java世界约定 把一个对象映射成一个整数，方便进行高效的哈希表查找，它有三个约定</p>
-<ul>
-<li>同一对象无论何时，在 java的整个生命周期里，必须一致性的返回相同的整数 <strong>就因为这个规定，导致String不可变</strong></li>
-<li>如果两个对象相等那么必须返回一样的 hashCode<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 代码证明</span><br><span class="line">如 </span><br><span class="line">String x = &quot;a&quot; // 假设此时 hashCode 是 1</span><br><span class="line">x = &quot;ab&quot; // 此时我们让他的 HashCode 变吗？</span><br><span class="line">// 如果变 就违反了 hashCode() 的第一个约定 </span><br><span class="line">// 如果不变 就违反了 第二个约定 </span><br><span class="line"></span><br><span class="line">// 所以</span><br><span class="line">String x = &quot;a&quot;  此时它是一个对象 地址 111</span><br><span class="line">x = &quot;ab&quot; 此时重新生成了一个对象 地址(引用)从111指向了 200</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>为了让我们在哈希桶中 安全的使用 String , <strong>String必须不可变</strong></p>
-</li>
-</ol>
-<h3 id="我就要修改-String-怎么办"><a href="#我就要修改-String-怎么办" class="headerlink" title="我就要修改 String 怎么办?"></a>我就要修改 String 怎么办?</h3><blockquote>
-<p>千万不要这样</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String s = &quot;0&quot;;</span><br><span class="line">for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    s = s + i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="StringBuilder"><a href="#StringBuilder" class="headerlink" title="StringBuilder"></a>StringBuilder</h4><ul>
-<li>不能当作 Hash桶的 key,因为它是可变的</li>
-<li>线程不安全</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">StringBuilder s = new StringBuilder(&quot;0&quot;);</span><br><span class="line">for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    // 可以级联 操作</span><br><span class="line">    s.append(i).append(&quot;-&quot;).append(&quot;-&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>判断回文</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(</span><br><span class="line">    new StringBuilder(&quot;ABA&quot;).reverse().toString().equals(&quot;ABA&quot;)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h4 id="StringBuffer"><a href="#StringBuffer" class="headerlink" title="StringBuffer"></a>StringBuffer</h4><ul>
-<li>可变</li>
-<li>线程安全(有 同步问题 慢)，可变字符序列</li>
-</ul>
-<h4 id="StringBuffer-和-StringBuilder-区别"><a href="#StringBuffer-和-StringBuilder-区别" class="headerlink" title="StringBuffer 和 StringBuilder 区别"></a>StringBuffer 和 StringBuilder 区别</h4><ul>
-<li>它们都可变</li>
-<li>StringBuffer 线程安全 / StringBuilder 线程不安全</li>
-</ul>
-<h4 id="那我要修改怎么办？"><a href="#那我要修改怎么办？" class="headerlink" title="那我要修改怎么办？"></a>那我要修改怎么办？</h4><ul>
-<li>StringBuilder<ul>
-<li>优先使⽤，线程不安全，速度快</li>
-</ul>
-</li>
-<li>StringBuffer<ul>
-<li>线程安全，速度相对较慢</li>
-</ul>
-</li>
-</ul>
-<h4 id="字符串的内部构造和常⽤API"><a href="#字符串的内部构造和常⽤API" class="headerlink" title="字符串的内部构造和常⽤API"></a>字符串的内部构造和常⽤API</h4><ul>
-<li>不可变性是如何保证的？</li>
-<li><p>hash值是如何存储的？ </p>
-<ul>
-<li><strong>缓存</strong> 因为已经不可变了，没必要重新生成 </li>
-<li>String 源码里 的 hash 变量 就是用来缓存 hash值的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">/** Cache the hash code for the string */</span><br><span class="line">private int hash; // Default to 0</span><br><span class="line"></span><br><span class="line">public int hashCode() &#123;</span><br><span class="line">      int h = hash;</span><br><span class="line">      if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">          char val[] = value;</span><br><span class="line"></span><br><span class="line">          for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">              h = 31 * h + val[i];</span><br><span class="line">          &#125;</span><br><span class="line">          hash = h;</span><br><span class="line">      &#125;</span><br><span class="line">      return h;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">这就是 hashCode 在 String 中的实现</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">重点来了</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line"></span><br><span class="line">如果多线程呢？</span><br><span class="line">潜在问题  假如两个线程 同时访问 时候  当前这俩都是 hash = 0</span><br><span class="line">然后同时计算，并创建 hash = xxx</span><br><span class="line"></span><br><span class="line">虽然有线程安全问题，但是不要紧</span><br><span class="line">因为 即使存在多个线程同时访问，但是 算出的结果都是一样的</span><br><span class="line"></span><br><span class="line">虽然执行过程不是线程安全的，但是 算出的 hash 结果一致。</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>我如何使⽤字符串随⼼所欲地完成⼯作？</p>
-</li>
-<li>还不够的，StringUtils补上</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/10/11/ZB-028-01算法数据结构/" title="ZB-028-01算法数据结构" itemprop="url">ZB-028-01算法数据结构</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-10-11T13:16:30.000Z" itemprop="datePublished"> Published 2019-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/8/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/10/">Next<span></span></a>
@@ -1362,13 +1410,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

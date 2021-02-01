@@ -1,0 +1,642 @@
+
+ <!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>HTTP01网络各种层 | Almost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Stevin">
+    
+
+    
+    <meta name="description" content="网络基础使用HTTP协议 访问Web 打开浏览器输入 taobao.com 套壳应用里内嵌网址 命令行里 访问 www.baidu.com  HTTP的版本 HTTP/1.0 最早的  HTTP/1.1 主流的 后续还有 HTTP/2.0  URI 和 URL区别 URI 统一资源标识符 某一互联网资源，宽泛的范围 ftp上的某个资源 http服务器上的一个 txt文件 等等     URL 统一">
+<meta name="keywords" content="http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP01网络各种层">
+<meta property="og:url" content="http://yoursite.com/2021/01/15/HTTP01网络各种层/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="网络基础使用HTTP协议 访问Web 打开浏览器输入 taobao.com 套壳应用里内嵌网址 命令行里 访问 www.baidu.com  HTTP的版本 HTTP/1.0 最早的  HTTP/1.1 主流的 后续还有 HTTP/2.0  URI 和 URL区别 URI 统一资源标识符 某一互联网资源，宽泛的范围 ftp上的某个资源 http服务器上的一个 txt文件 等等     URL 统一">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-02-01T15:43:17.123Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTP01网络各种层">
+<meta name="twitter:description" content="网络基础使用HTTP协议 访问Web 打开浏览器输入 taobao.com 套壳应用里内嵌网址 命令行里 访问 www.baidu.com  HTTP的版本 HTTP/1.0 最早的  HTTP/1.1 主流的 后续还有 HTTP/2.0  URI 和 URL区别 URI 统一资源标识符 某一互联网资源，宽泛的范围 ftp上的某个资源 http服务器上的一个 txt文件 等等     URL 统一">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Almost" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Almost" title="Almost"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Almost">Almost</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:yoursite.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/15/HTTP01网络各种层/" title="HTTP01网络各种层" itemprop="url">HTTP01网络各种层</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-15T15:30:20.000Z" itemprop="datePublished"> Published 2021-01-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#网络基础"><span class="toc-number">1.</span> <span class="toc-text">网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用HTTP协议-访问Web"><span class="toc-number">1.0.1.</span> <span class="toc-text">使用HTTP协议 访问Web</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP的版本"><span class="toc-number">1.0.2.</span> <span class="toc-text">HTTP的版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#URI-和-URL区别"><span class="toc-number">1.1.</span> <span class="toc-text">URI 和 URL区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OSI7层模型和TCP-IP4层模型"><span class="toc-number">1.2.</span> <span class="toc-text">OSI7层模型和TCP/IP4层模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OSI模型-7层模型"><span class="toc-number">1.2.1.</span> <span class="toc-text">OSI模型 (7层模型)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-IP四层模型-（应传网数）"><span class="toc-number">1.2.2.</span> <span class="toc-text">TCP/IP四层模型 （应传网数）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#来个例子-豪门之间的通信"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">来个例子 豪门之间的通信</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#粗略理解-http协议"><span class="toc-number">1.2.3.</span> <span class="toc-text">粗略理解 http协议</span></a></li></ol></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="网络基础"><a href="#网络基础" class="headerlink" title="网络基础"></a>网络基础</h1><h3 id="使用HTTP协议-访问Web"><a href="#使用HTTP协议-访问Web" class="headerlink" title="使用HTTP协议 访问Web"></a>使用HTTP协议 访问Web</h3><ul>
+<li>打开浏览器输入 taobao.com</li>
+<li>套壳应用里内嵌网址</li>
+<li>命令行里 访问 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></li>
+</ul>
+<h3 id="HTTP的版本"><a href="#HTTP的版本" class="headerlink" title="HTTP的版本"></a>HTTP的版本</h3><ul>
+<li>HTTP/1.0 最早的 </li>
+<li>HTTP/1.1 <strong>主流的</strong></li>
+<li>后续还有 HTTP/2.0</li>
+</ul>
+<h2 id="URI-和-URL区别"><a href="#URI-和-URL区别" class="headerlink" title="URI 和 URL区别"></a>URI 和 URL区别</h2><ul>
+<li>URI 统一资源标识符<ul>
+<li>某一互联网资源，宽泛的范围<ul>
+<li>ftp上的某个资源</li>
+<li>http服务器上的一个 txt文件</li>
+<li>等等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>URL 统一资源定位符 （网址）</li>
+</ul>
+<h2 id="OSI7层模型和TCP-IP4层模型"><a href="#OSI7层模型和TCP-IP4层模型" class="headerlink" title="OSI7层模型和TCP/IP4层模型"></a>OSI7层模型和TCP/IP4层模型</h2><h3 id="OSI模型-7层模型"><a href="#OSI模型-7层模型" class="headerlink" title="OSI模型 (7层模型)"></a>OSI模型 (7层模型)</h3><p>记忆口诀—— <strong>应表会传网数物</strong></p>
+<ul>
+<li>应用层</li>
+<li>表示层</li>
+<li>会话层</li>
+<li>传输层</li>
+<li>网络层</li>
+<li>数据链路层</li>
+<li>物理层</li>
+</ul>
+<p>记忆一下即可，已被 TCP/IP四层模型取代</p>
+<h3 id="TCP-IP四层模型-（应传网数）"><a href="#TCP-IP四层模型-（应传网数）" class="headerlink" title="TCP/IP四层模型 （应传网数）"></a>TCP/IP四层模型 （应传网数）</h3><h4 id="来个例子-豪门之间的通信"><a href="#来个例子-豪门之间的通信" class="headerlink" title="来个例子 豪门之间的通信"></a>来个例子 豪门之间的通信</h4><ul>
+<li><p>豪门望族，规矩多，还得有礼仪</p>
+</li>
+<li><p>step01 写信的规则 <strong>(应用层)</strong></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">尊敬的xxx:</span><br><span class="line">  代表我和我家和您进行问候！</span><br><span class="line">  邀请xxx时来一起 high</span><br><span class="line"></span><br><span class="line">  您的朋友：</span><br><span class="line">    yyy</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step002 把信给管家 <strong>(传输层)</strong> ，这种小事交给管家去做<ul>
+<li>豪门a的管家给豪门b的管家通通信<ul>
+<li>A我们家要给你们家发信了</li>
+<li>B收到，你发吧</li>
+<li>A收到，我发了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>step003 邮差 <strong>(网络层)</strong><ul>
+<li>B家族的地址和小区名称</li>
+</ul>
+</li>
+<li>step004 邮筒 <strong>(数据链路层)</strong><ul>
+<li>信的大小不能超过 xx寸，太大了邮筒放不进去，还要贴邮票</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>应用层</p>
+</blockquote>
+<p>  应用层是大多数普通与网络相关的程序为了通过网络与其他程序通信所使用的层。这个层的处理过程是应用特有的；数据从网络相关的程序以这种应用内部使用的格式进行传送，然后被编码成标准协议的格式。每一个应用层协议一般都会使用到传输层协议TCP和UDP协议之一：</p>
+<p>运行在TCP协议上的协议：</p>
+<ul>
+<li>HTTP（80端口），主要用于普通浏览。</li>
+<li>HTTPS（443端口）,HTTP协议的安全版本。</li>
+<li>FTP（20和21端口），由名知义，用于文件传输。</li>
+<li>POP3（110端口），收邮件用。</li>
+<li>SMTP（25端口），用来发送电子邮件。</li>
+<li>SSH（22端口），用于加密安全登陆用。</li>
+</ul>
+<p>运行在UDP协议上的协议：</p>
+<ul>
+<li>DHCP（67端口，动态主机配置协议），动态配置IP地址。</li>
+</ul>
+<p>其他：</p>
+<ul>
+<li>DNS（Domain Name Service，域名服务），用于完成地址查找，邮件转发等工作（运行在TCP和UDP协议上）。</li>
+<li>SNMP（Simple Network Management Protocol，简单网络管理协议），用于网络信息的收集和网络管理。</li>
+<li>ARP（Address Resolution Protocol，地址解析协议），用于动态解析以太网硬件的地址。</li>
+</ul>
+<blockquote>
+<p>传输层</p>
+</blockquote>
+<p>解决诸如端到端可靠性（数据是否已经到达目的地？）和保证数据按照正确的顺序到达这样的问题。TCP、UDP都是传输层协议。</p>
+<blockquote>
+<p>网络层</p>
+</blockquote>
+<p>解决在一个单一网络上传输数据包的问题。IP协议是网络层协议。</p>
+<blockquote>
+<p>数据链路层</p>
+</blockquote>
+<p>它是数据包从一个设备的网络层传输到另外一个设备的网络层的方法。这个过程能够在网卡的软件驱动程序中控制或者专用芯片中控制。这将完成如添加报头准备发送、通过实体介质实际发送这样一些数据链路功能。另一端，链路层将完成数据帧接收、去除报头并且将接收到的包传到网络层。</p>
+<h3 id="粗略理解-http协议"><a href="#粗略理解-http协议" class="headerlink" title="粗略理解 http协议"></a>粗略理解 http协议</h3><ul>
+<li>打开 chrome 输入 baidu.com </li>
+<li>调试模式 network 选项</li>
+<li>选择一个http请求 右键 copy request headers/ response headers</li>
+</ul>
+<p>request</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;87&quot;, &quot; Not;A Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;87&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cookie: PSTM=1587438853; BIDUPSID=1E44DAEF1B34E707E2BCE796151A30D5; BAIDUID=212F1EB08E8B84AD626014F0EED3983F:SL=0:NR=10:FG=1; BD_UPN=123253; MCITY=-131%3A; BDUSS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDUSS_BFESS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; __yjs_duid=1_0f057bc5e273f735bb3b90c9f7fb3bf91608867444564; BDSFRCVID_BFESS=4iDOJeC62xkxsV7rg5g6KwgregKaGx6TH6aokUReTbdIYJeK4QwiEG0PDf8g0Ku-yxYDogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; BDSFRCVID=u_-OJeC62CWHCSOrgOLXKwgreU1oMPQTH6aoFxh6Z3kqjmbLtEppEG0P8M8g0Ku-8Uu8ogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; H_BDCLCKID_SF=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; H_BDCLCKID_SF_BFESS=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; delPer=0; BD_CK_SAM=1; PSINO=2; BAIDUID_BFESS=8A88B5E71009B0079D8E6B45E8F33721:FG=1; BD_HOME=1; BDRCVFR[feWj1Vr5u3D]=I67x6TjHwwYf0; Hm_lvt_aec699bb6442ba076c8981c6dc490771=1607495989,1607755061,1608720675,1609259205; Hm_lpvt_aec699bb6442ba076c8981c6dc490771=1609259205; COOKIE_SESSION=30608_8_9_5_53_38_0_2_9_6_1_1_0_0_2_4_1609228598_1609144332_1609259204%7C9%2398408_356_1609144328%7C9; H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; H_PS_645EC=fc05%2B%2BlWgGb0cU%2B%2BbxUlUMSOqIsEiSUpRrm1pdbAFhR7A8t6VjcWGqbPXM8TdxnFox3C; sug=0; sugstore=0; ORIGIN=0; bdime=0; BA_HECTOR=ak2la1048h81a4a02c1fup8b50q</span><br></pre></td></tr></table></figure>
+<p>response</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 2</span><br><span class="line">Bdqid: 0xc2b78305000219a6</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line">Date: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Expires: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=116; path=/</span><br><span class="line">Set-Cookie: BD_HOME=1; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Traceid: 1609343343346522650614030827221594282406</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-title="HTTP01网络各种层 | Almost" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2021/01/16/HTTP02三次握手四度挥手/" title="HTTP02三次握手四度挥手">
+  <strong>上一篇：</strong><br/>
+  <span>
+  HTTP02三次握手四度挥手</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2020/10/12/移动端-004-移动端常见问题/"  title="移动端-004-移动端常见问题">
+ <strong>下一篇：</strong><br/> 
+ <span>移动端-004-移动端常见问题
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#网络基础"><span class="toc-number">1.</span> <span class="toc-text">网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用HTTP协议-访问Web"><span class="toc-number">1.0.1.</span> <span class="toc-text">使用HTTP协议 访问Web</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP的版本"><span class="toc-number">1.0.2.</span> <span class="toc-text">HTTP的版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#URI-和-URL区别"><span class="toc-number">1.1.</span> <span class="toc-text">URI 和 URL区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OSI7层模型和TCP-IP4层模型"><span class="toc-number">1.2.</span> <span class="toc-text">OSI7层模型和TCP/IP4层模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#OSI模型-7层模型"><span class="toc-number">1.2.1.</span> <span class="toc-text">OSI模型 (7层模型)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-IP四层模型-（应传网数）"><span class="toc-number">1.2.2.</span> <span class="toc-text">TCP/IP四层模型 （应传网数）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#来个例子-豪门之间的通信"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">来个例子 豪门之间的通信</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#粗略理解-http协议"><span class="toc-number">1.2.3.</span> <span class="toc-text">粗略理解 http协议</span></a></li></ol></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/oak/" title="oak">oak<sup>71</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/前端知识点/" title="前端知识点">前端知识点<sup>43</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/java/" title="java">java<sup>37</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Node后端/" title="Node后端">Node后端<sup>36</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M06/" title="M06">M06<sup>29</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/fullstack/" title="fullstack">fullstack<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M07/" title="M07">M07<sup>27</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>26</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M08/" title="M08">M08<sup>25</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ReactWheels/" title="ReactWheels">ReactWheels<sup>24</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M04/" title="M04">M04<sup>22</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M03/" title="M03">M03<sup>20</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M02/" title="M02">M02<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/React入门/" title="React入门">React入门<sup>17</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TS入门/" title="TS入门">TS入门<sup>16</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CSS/" title="CSS">CSS<sup>10</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/ES6速学/" title="ES6速学">ES6速学<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/M01/" title="M01">M01<sup>9</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/vue/" title="vue">vue<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mongodb/" title="mongodb">mongodb<sup>7</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
+            
+          </li>
+        
+          <li>
+            
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">Weibo</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=b3593ceb&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Larry Page in Google. <br/>
+			This is my blog,believe it or not.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/2176287895" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2021 
+		
+		<a href="/about" target="_blank" title="Stevin">Stevin</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

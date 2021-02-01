@@ -79,6 +79,633 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2019/10/28/ZB-030-03反射/" title="ZB-030-03反射" itemprop="url">ZB-030-03反射</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-28T15:28:33.000Z" itemprop="datePublished"> Published 2019-10-28</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><ul>
+<li>根据参数创建一个对象？</li>
+<li>根据参数调用一个方法？</li>
+<li>根据参数动态获取一个属性？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException &#123;</span><br><span class="line">        String className = &quot;java.lang.String&quot;;</span><br><span class="line">        Class c = Class.forName(className);</span><br><span class="line">        Object object = c.getConstructor().newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>JVM的堆里有一个地方存了，Cat的Class对象(Cat的说明书)</p>
+</blockquote>
+<p>你可以通过这样一个<code>Class.forName(String className)</code> 传递一个类的名字</p>
+<p><strong>注意这个类名是 全限定类名</strong><br><strong>注意这个类名是 全限定类名</strong><br><strong>注意这个类名是 全限定类名</strong></p>
+<p>此时虚拟机根据你的要求加载这个类进来，然后你就能进行一些诡异的操作了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 比如这个</span><br><span class="line">Object object = c.getConstructor().newInstance();</span><br><span class="line"></span><br><span class="line">// 不建议用这个 c.newInstance();  jdk9里废弃里  考虑兼容性 不建议使用</span><br></pre></td></tr></table></figure>
+<h4 id="这样创建意味着什么？"><a href="#这样创建意味着什么？" class="headerlink" title="这样创建意味着什么？"></a>这样创建意味着什么？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String className = &quot;java.lang.String&quot;;</span><br><span class="line">Class c = Class.forName(className);</span><br><span class="line">Object object = c.getConstructor().newInstance();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 意味着你不再需要这样的调用，</span><br><span class="line">// 而是使用 一个传递的名字，意味着你拥有了无与伦比的灵活性</span><br><span class="line">new String();</span><br><span class="line">new Cat();</span><br><span class="line">new ArrayList();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>调用方法,访问成员属性</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) throws NoSuchMethodException, NoSuchFieldException, InvocationTargetException, IllegalAccessException &#123;</span><br><span class="line">        Cat cat = new Cat();</span><br><span class="line">        cat.getClass().getMethod(args[0]).invoke(cat);</span><br><span class="line">        cat.getClass().getField(args[1]).get(cat);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="反射扩展"><a href="#反射扩展" class="headerlink" title="反射扩展"></a>反射扩展</h3><p>-spring-framework里的 ReflectionUtils</p>
+<ul>
+<li>invokeMethod<ul>
+<li>Method</li>
+<li>Class</li>
+<li>Field</li>
+</ul>
+</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/28/ZB-030-02类加载和ClassLoader/" title="ZB-030-02类加载和ClassLoader" itemprop="url">ZB-030-02类加载和ClassLoader</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-28T14:19:56.000Z" itemprop="datePublished"> Published 2019-10-28</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="不止一份说明书"><a href="#不止一份说明书" class="headerlink" title="不止一份说明书"></a>不止一份说明书</h3><p>你的程序扩展了</p>
+<p>此时 你有了如下多的类型</p>
+<ul>
+<li>Cat</li>
+<li>Dog</li>
+<li>Pig</li>
+<li>…</li>
+<li>或者内置的 ArrayList</li>
+</ul>
+<p>它们都是从 对应的说明书创建的？</p>
+<blockquote>
+<p>问题来了？这个 <strong>说明书，这个Class对象</strong> 那里来的</p>
+</blockquote>
+<ul>
+<li>绝不可能是凭空出现，一定是从什么地方拿到的</li>
+</ul>
+<h3 id="Class对象的生命周期"><a href="#Class对象的生命周期" class="headerlink" title="Class对象的生命周期"></a>Class对象的生命周期</h3><ul>
+<li><strong>它在第一次被使用的时候加载</strong></li>
+</ul>
+<p>Class对象就是一个 类型(如Cat) 的说明书</p>
+<p>上篇文章的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Animal</span><br><span class="line">-|Cat</span><br><span class="line">--|WhiteCat</span><br><span class="line"></span><br><span class="line">在内存中初始的时候，</span><br><span class="line">一个 WhiteCat 它的一部分区域是 Cat,在一部分是 Animal</span><br><span class="line"></span><br><span class="line">意思就是 </span><br><span class="line">你要创建一个 WhiteCat 就必须 先创建 Cat，创建 Cat 就必须 先创建Animal</span><br><span class="line"></span><br><span class="line">换句话说，</span><br><span class="line">你想要一个 WhiteCat，你首先要用到 Cat,然后创建 Cat 又必须用到 Animal</span><br><span class="line">这个过程是一层一层递归的</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="HelloWorld-运行过程"><a href="#HelloWorld-运行过程" class="headerlink" title="HelloWorld 运行过程"></a>HelloWorld 运行过程</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;HelloWorld&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// IDEA里 右键运行</span><br><span class="line"></span><br><span class="line">你以为的</span><br><span class="line">运行------》 HelloWorld</span><br><span class="line"></span><br><span class="line">实际上</span><br><span class="line"></span><br><span class="line">运行---》</span><br><span class="line">    第一步 编译 从 Main.java--&gt; Main.class</span><br><span class="line">    第二步 帮你拼了一个 java命令 运行你的 Main.class </span><br><span class="line">    打印出 HelloWorld</span><br><span class="line"></span><br><span class="line">// 复制这行拼接的命令</span><br><span class="line">在终端里执行，你发现跟你点 运行 没区别</span><br><span class="line"></span><br><span class="line">// 我们可以给这个命令行加参数</span><br><span class="line"></span><br><span class="line">让他打印 类加载 顺序</span><br><span class="line"></span><br><span class="line">-verbose:class</span><br><span class="line"></span><br><span class="line">// 在这个后面</span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  ...</span><br><span class="line"></span><br><span class="line">但是非常啰嗦</span><br><span class="line"></span><br><span class="line">你可以在命令的最后 加上 管道操作</span><br><span class="line"></span><br><span class="line">/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/bin/java -verbose:class  </span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">| grep 过滤词（我们自己类的包名如 com.xxx）</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">你会看到 形如</span><br><span class="line">[Loaded com.io.demo.Animal from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.Cat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line">[Loaded com.io.demo.WhiteCat from file:/Users/xxx/Desktop/xxx/target/classes/]</span><br><span class="line"></span><br><span class="line">意思就是这个类 从那里来</span><br></pre></td></tr></table></figure>
+<h4 id="回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？"><a href="#回到刚才的问题-我想创建一个-Cat-Dog-ArrayList-说明书放在一个地方存着。说明书从那里来的？" class="headerlink" title="回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？"></a>回到刚才的问题 我想创建一个 Cat/Dog/ArrayList,说明书放在一个地方存着。说明书从那里来的？</h4><p>上面的过程解释了，说明书什么时候被加载。</p>
+<p><strong>那它是那里来的呢？</strong></p>
+<p>答案是你自己写的类 从你编写的 xxx.java 编译后的 xxx.class里来(target目录里)</p>
+<blockquote>
+<p>你看到的是瞬间加载你的类，实际做了很多事</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">加载之前是 xxx.class</span><br><span class="line"></span><br><span class="line">加载 Loading (读取)===&gt; </span><br><span class="line">                进行一系列操作</span><br><span class="line"></span><br><span class="line">                验证==》防止恶意代码搞坏jvm</span><br><span class="line">                准备==》</span><br><span class="line">                解析===》</span><br><span class="line">                        初始化</span><br><span class="line">                        把一个 class文件 变到 内存里  </span><br><span class="line">                        使得根据对应的说明书 可以创建对应的对象</span><br></pre></td></tr></table></figure>
+<h4 id="第三个问题？说明书被谁加载的"><a href="#第三个问题？说明书被谁加载的" class="headerlink" title="第三个问题？说明书被谁加载的"></a>第三个问题？说明书被谁加载的</h4><p>答案就是 <strong>Classloader</strong></p>
+<h3 id="Class和-Classloader"><a href="#Class和-Classloader" class="headerlink" title="Class和 Classloader"></a>Class和 Classloader</h3><h4 id="Classloader-负责从外部系统中加载一个类"><a href="#Classloader-负责从外部系统中加载一个类" class="headerlink" title="Classloader 负责从外部系统中加载一个类"></a>Classloader 负责从外部系统中加载一个类</h4><ul>
+<li>这个类对应的Java文件并不需要存在 <code>你可以没有Cat.java,你可以通过Cat.class</code></li>
+<li>这个类(字节码))并不一定需要存在<code>你也可以没有Cat.class,你可以从网上下载，文件的本质是字节流，可以动态生产</code></li>
+<li><p>这是java世界丰富多彩的基石</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">比如我想要一个 五条腿的猫</span><br><span class="line">动态创建一个 Cat5 </span><br><span class="line">Cat5 extends Cat </span><br><span class="line">这个Cat5的说明书 你可以直接在内存里捏造出来，不需要和外界打交道</span><br><span class="line"></span><br><span class="line">这个操作就是 动态字节码增强</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Classloader的双亲委派加载模型</p>
+<ul>
+<li>首先 <strong>Classloader 负责从外部系统中加载一个类</strong></li>
+<li>外部是不安全的，总会有恶意的代码，比如 他想搞坏你的String<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// src/main下建立如下代码</span><br><span class="line">package java.lang;</span><br><span class="line"></span><br><span class="line">public class String &#123;</span><br><span class="line">    // 我是一个坏人</span><br><span class="line">    // 我在自己定义的 String 里 做坏事</span><br><span class="line"></span><br><span class="line">    public String() &#123;</span><br><span class="line">        throw new IllegalStateException();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// </span><br><span class="line">package com.xxx.demo;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        new String();</span><br><span class="line">        // 此时 点进去发现 会优先选择官方的 String</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 答案就是 双亲委派加载模型</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="双亲委派加载模型"><a href="#双亲委派加载模型" class="headerlink" title="双亲委派加载模型"></a>双亲委派加载模型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</span><br><span class="line">    throws ClassNotFoundException</span><br><span class="line">&#123;</span><br><span class="line">    synchronized (getClassLoadingLock(name)) &#123;</span><br><span class="line">        // First, check if the class has already been loaded</span><br><span class="line">        Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">        if (c == null) &#123;</span><br><span class="line">            long t0 = System.nanoTime();</span><br><span class="line">            try &#123;</span><br><span class="line">                // 它有父亲的话，首先从父亲加载</span><br><span class="line">                if (parent != null) &#123;</span><br><span class="line">                    c = parent.loadClass(name, false);</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    c = findBootstrapClassOrNull(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                // ClassNotFoundException thrown if class not found</span><br><span class="line">                // from the non-null parent class loader</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 父亲加载失败，尝试自己加载</span><br><span class="line">            if (c == null) &#123;</span><br><span class="line">                </span><br><span class="line">                // If still not found, then invoke findClass in order</span><br><span class="line">                // to find the class.</span><br><span class="line">                long t1 = System.nanoTime();</span><br><span class="line">                c = findClass(name);</span><br><span class="line"></span><br><span class="line">                // this is the defining class loader; record the stats</span><br><span class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                sun.misc.PerfCounter.getFindClasses().increment();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="这个模型的好处？"><a href="#这个模型的好处？" class="headerlink" title="这个模型的好处？"></a>这个模型的好处？</h4></blockquote>
+<p>比如刚刚的<code>new String();</code>这样的基础的类，出于安全性的考虑都是由最顶端的启动类加载器加载的，这样就保证了安全</p>
+<p>所以我们自造的恶意的 类无法被加载。</p>
+<h4 id="Java语言规范-JLS-和Java虚拟机规范-JVMS"><a href="#Java语言规范-JLS-和Java虚拟机规范-JVMS" class="headerlink" title="Java语言规范(JLS)和Java虚拟机规范(JVMS)"></a>Java语言规范(JLS)和Java虚拟机规范(JVMS)</h4><ul>
+<li>java 和 jvm实际是分离的，它们的联系就是字节码，而字节码可以不由java生成</li>
+<li>这种分离提供了JVM上运行其他语言的可能</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/28/ZB-030-01Java的类与Class/" title="ZB-030-01Java的类与Class" itemprop="url">ZB-030-01Java的类与Class</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-28T13:39:19.000Z" itemprop="datePublished"> Published 2019-10-28</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="Java的类与Class"><a href="#Java的类与Class" class="headerlink" title="Java的类与Class"></a>Java的类与Class</h3><p>先看一个例子</p>
+<p>Animal.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class Animal &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>Cat.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public class Cat extends Animal &#123;</span><br><span class="line">    public void catchMouse()&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>WhiteCat.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        Object obj = new WhiteCat();</span><br><span class="line">        // 为什么可以直接赋值给 Object？</span><br><span class="line"></span><br><span class="line">        /*</span><br><span class="line">        这就是 继承啊</span><br><span class="line">        因为在java世界里 任何的类都继承了 Object 类，它是整个java世界的基础(根)</span><br><span class="line">        所以 java中 任何的类都是 Object的子类</span><br><span class="line">        */</span><br><span class="line"></span><br><span class="line">        // obj.catchMouse();</span><br><span class="line">        // 为什么报错</span><br><span class="line">        /*</span><br><span class="line">        因为 java 是一个强类型语言，因此</span><br><span class="line">        在 Object obj = new WhiteCat(); 时 obj 是 Object类型的</span><br><span class="line">        因此编译时 Object 没有 catchMouse() 所以会报错</span><br><span class="line">        */</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="RTTI-Run-Time-Type-Identification-运行时类型识别"><a href="#RTTI-Run-Time-Type-Identification-运行时类型识别" class="headerlink" title="RTTI(Run-Time Type Identification) 运行时类型识别"></a>RTTI(Run-Time Type Identification) 运行时类型识别</h4><p>在任何时刻，任何一个对象都清楚的知道自己是什么类型的。</p>
+<blockquote>
+<p><code>Object.getClass()</code></p>
+</blockquote>
+<p>在整个 java 运行期间 任何一个对象都可以在任何时候知道自己是什么类型的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 这个方法就是 </span><br><span class="line">// obj.getClass();</span><br><span class="line"></span><br><span class="line">public class WhiteCat extends Cat &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        Object obj = new WhiteCat();</span><br><span class="line">        System.out.println(obj.getClass());</span><br><span class="line">        // class com.io.demo.WhiteCat</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="一个Class-对象就是一个类的说明书"><a href="#一个Class-对象就是一个类的说明书" class="headerlink" title="一个Class 对象就是一个类的说明书"></a>一个Class 对象就是一个类的说明书</h4><blockquote>
+<p>Class 和 类的关系</p>
+</blockquote>
+<p>什么是 JVM ？ 就是一个虚拟的计算机，所有的java代码都可以在里面跑。</p>
+<blockquote>
+<p>我们平常写的 java代码是什么</p>
+</blockquote>
+<p>(源代码)xxx.java 写完后经过 编译变成 xxx.class (也就是通常所说的字节码) 它是java跨平台的基石</p>
+<p>jvm 可以跑 xxx.class 这样就实现了 一处编写，处处运行</p>
+<blockquote>
+<p>JVM里有什么</p>
+</blockquote>
+<ul>
+<li>栈 (方法栈)</li>
+<li>堆 java中 所有的对象都是在 堆里 分配的<ul>
+<li>new Cat() 的过程就是在 堆里创建</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Cat 是如何创建的呢？</p>
+</blockquote>
+<p>我想创建一个 Cat,它长什么样子有什么属性，这些东西存在那里？ </p>
+<p><strong>这个信息就在堆里一个很奇怪的地方存着，叫做 class文件</strong></p>
+<p>一个Class对象就是一个类的说明书</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Cat extends Animal &#123;</span><br><span class="line">    public String[] leg;</span><br><span class="line">    public String head;</span><br><span class="line">    public String tail;</span><br><span class="line">    </span><br><span class="line">    public static int count;</span><br><span class="line">    </span><br><span class="line">    public void catchMouse()&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此时当你 <code>new Cat()</code> 时候，JVM就会根据 Cat的说明书 把它创建出来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 于是你疯狂造猫</span><br><span class="line">new Cat()</span><br><span class="line">new Cat()</span><br><span class="line">new Cat()</span><br><span class="line">。。。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这些猫 有什么共同点呢？</p>
+</blockquote>
+<ul>
+<li>都是同一份说明书上生产出来的</li>
+<li>每只猫都有独立的属性 leg / head / tail</li>
+<li><code>public static int count</code> 本质是什么 归属于 这份说明书的，每个 cat对象共享这份说明书。</li>
+</ul>
+<blockquote>
+<p>这个Cat的说明书是什么？</p>
+</blockquote>
+<ul>
+<li>Class对象</li>
+<li>静态变量归属于这个 Class对象</li>
+</ul>
+<blockquote>
+<p>instanceof 瞬间豁然开朗</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">obj instanceof Cat</span><br><span class="line"> </span><br><span class="line">通过 obj.getClass()</span><br><span class="line">知道每个对象到底是什么类型的</span><br><span class="line"></span><br><span class="line">因此它当然清楚知道 它到底是什么类型的</span><br></pre></td></tr></table></figure>
+<h4 id="刚刚的Cat说明书在jvm内部开辟的一小块空间"><a href="#刚刚的Cat说明书在jvm内部开辟的一小块空间" class="headerlink" title="刚刚的Cat说明书在jvm内部开辟的一小块空间"></a>刚刚的Cat说明书在jvm内部开辟的一小块空间</h4><p>它是非常特殊的，因为所有的类型基本上都只存在一份说明书</p>
+<p>这个东西在 java7之前 叫做 <strong>永久代</strong></p>
+<p>java8之后叫做 <strong>元空间</strong></p>
+<blockquote>
+<p>将来你在工作的某一天迟早会碰到这样一个异常</p>
+</blockquote>
+<ul>
+<li>Java7之前叫做 OutOfMemory:PermGen</li>
+<li>Java8之后 叫做 MetaSpace</li>
+</ul>
+<p>当你看到它们的时候，基本上是你的类出问题了</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>每个对象创建出来的时候都需要一份说明书。</p>
+<p>一个Class对象就是一份说明书，</p>
+<p>因此你总是可以问一个对象<code>obj.getClass()</code> 你是从哪里装配出来的</p>
+<p>然后对象说,我是从这个类 装配出来的，这就是 Class 文件的本质。</p>
+<p>因此 你很容易实现 <code>instanceof</code> 判断</p>
+<blockquote>
+<p>强制类型转换</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Object obj = new WhiteCat();</span><br><span class="line">Integer i = (Integer) obj;</span><br><span class="line"></span><br><span class="line">// 此时你会得到一个异常</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.ClassCastException: com.io.demo.WhiteCat cannot be cast to java.lang.Integer</span><br><span class="line">	at com.io.demo.WhiteCat.main(WhiteCat.java:7)</span><br></pre></td></tr></table></figure>
+<p><strong>为什么报错？</strong></p>
+<p>首先强制类型转换本来就是不安全的，编译器允许你这样做</p>
+<p>但是它在运行时会出问题，因为每个对象都清楚的知道自己是从什么对象创建出来的。</p>
+<p>所以会报错</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/11/ZB-029-02字符串和编码/" title="ZB-029-02字符串和编码" itemprop="url">ZB-029-02字符串和编码</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-11T14:18:32.000Z" itemprop="datePublished"> Published 2019-10-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="字符串和编码"><a href="#字符串和编码" class="headerlink" title="字符串和编码"></a>字符串和编码</h3><ul>
+<li>⼀个⼈类世界中的字符如何转换成计算机世界中的字节？ 如 “一”<ul>
+<li>⼀定在某个神奇的⻆落存在⼀种映射关系</li>
+<li>我们称这种映射关系为 <strong>字符集</strong></li>
+<li>将⼈类能看懂的字符变成字节，叫做 <strong>编码</strong></li>
+<li>将字节变成⼈类能看懂的字符，叫做 <strong>解码</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="字符集：Unicode"><a href="#字符集：Unicode" class="headerlink" title="字符集：Unicode"></a>字符集：Unicode</h3><ul>
+<li>每个数字代表⼀个字符，叫做“码点”（code point）</li>
+<li>那我能不能直接拿来变成字节啊？<ul>
+<li>可以……但是没必要。</li>
+</ul>
+</li>
+<li>最常⻅的两种编码⽅案：<ul>
+<li>UTF-16：Java程序内部的存储⽅法</li>
+<li>UTF-8<ul>
+<li>Mac/Linux默认编码是UTF-8</li>
+<li>Windows默认的中⽂编码是GBK <ul>
+<li>为什么 windows 不用 UTF-8呢？</li>
+<li>答案是： windows 在使用时 UTF-8还没发明</li>
+</ul>
+</li>
+<li>如果没有意外，把你所有的编码⽅案都改成UTF-8(支持度最好的解决方案)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="Google-小技巧"><a href="#Google-小技巧" class="headerlink" title="Google 小技巧"></a>Google 小技巧</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 只在 当前站内搜索</span><br><span class="line">site:github.com</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 排除 某站的内容</span><br><span class="line">java -csdn</span><br><span class="line"></span><br><span class="line"># 搜索 内容必须是连在一起的</span><br><span class="line">&quot;java string&quot;</span><br><span class="line"></span><br><span class="line"># 搜指定格式</span><br><span class="line">重构改善现有代码 filetype:pdf</span><br><span class="line"></span><br><span class="line"># 常用数据</span><br><span class="line">名单 filetype:xls</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/11/ZB-029-01字符串原理/" title="ZB-029-01字符串原理" itemprop="url">ZB-029-01字符串原理</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-11T13:16:57.000Z" itemprop="datePublished"> Published 2019-10-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="Java字符串详解"><a href="#Java字符串详解" class="headerlink" title="Java字符串详解"></a>Java字符串详解</h3><h4 id="字符串是最重要的引用类型之一"><a href="#字符串是最重要的引用类型之一" class="headerlink" title="字符串是最重要的引用类型之一"></a>字符串是最重要的引用类型之一</h4><ul>
+<li>互联网基本只干一件事：处理字符串<ul>
+<li>你随便打开一个网址</li>
+<li>为什么很少听说 拿 C/C++ 去写一个互联网应用 ，因为 它们的字符串处理简直是灾难</li>
+</ul>
+</li>
+<li>能处理好字符串是web服务器的基本要求<ul>
+<li>Php</li>
+<li>Python</li>
+<li>Java</li>
+<li>Ruby </li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>非常推荐把 Java的 String 类 通读一遍</p>
+</blockquote>
+<ul>
+<li>不要怕它是英文的注释 <strong>仔细想想 谁一开始就什么都会的呢？ 谁一开始就会英语的呢？</strong></li>
+<li>一个东西如果难 说明它是一个机遇，说明别人干不了这事，而你能干这事说明你比别人厉害</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * The &#123;@code String&#125; class represents character strings. All</span><br><span class="line"> * string literals in Java programs, such as &#123;@code &quot;abc&quot;&#125;, are</span><br><span class="line"> * implemented as instances of this class.</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * Strings are constant; their values cannot be changed after they</span><br><span class="line"> * are created. String buffers support mutable strings.</span><br><span class="line"> * Because String objects are immutable they can be shared. For example:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     String str = &quot;abc&quot;;</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;&lt;p&gt;</span><br><span class="line"> * is equivalent to:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     char data[] = &#123;&apos;a&apos;, &apos;b&apos;, &apos;c&apos;&#125;;</span><br><span class="line"> *     String str = new String(data);</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;&lt;p&gt;</span><br><span class="line"> * Here are some more examples of how strings can be used:</span><br><span class="line"> * &lt;blockquote&gt;&lt;pre&gt;</span><br><span class="line"> *     System.out.println(&quot;abc&quot;);</span><br><span class="line"> *     String cde = &quot;cde&quot;;</span><br><span class="line"> *     System.out.println(&quot;abc&quot; + cde);</span><br><span class="line"> *     String c = &quot;abc&quot;.substring(2,3);</span><br><span class="line"> *     String d = cde.substring(1, 2);</span><br><span class="line"> * &lt;/pre&gt;&lt;/blockquote&gt;</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * The class &#123;@code String&#125; includes methods for examining</span><br><span class="line"> * individual characters of the sequence, for comparing strings, for</span><br><span class="line"> * searching strings, for extracting substrings, and for creating a</span><br><span class="line"> * copy of a string with all characters translated to uppercase or to</span><br><span class="line"> * lowercase. Case mapping is based on the Unicode Standard version</span><br><span class="line"> * specified by the &#123;@link java.lang.Character Character&#125; class.</span><br><span class="line"> * &lt;p&gt;</span><br><span class="line"> * The Java language provides special support for the string</span><br><span class="line"> * concatenation operator (&amp;nbsp;+&amp;nbsp;), and for conversion of</span><br><span class="line"> * other objects to strings. String concatenation is implemented</span><br><span class="line"> * through the &#123;@code StringBuilder&#125;(or &#123;@code StringBuffer&#125;)</span><br><span class="line"> * class and its &#123;@code append&#125; method.</span><br><span class="line"> * String conversions are implemented through the method</span><br><span class="line"> * &#123;@code toString&#125;, defined by &#123;@code Object&#125; and</span><br><span class="line"> * inherited by all classes in Java. For additional information on</span><br><span class="line"> * string concatenation and conversion, see Gosling, Joy, and Steele,</span><br><span class="line"> * &lt;i&gt;The Java Language Specification&lt;/i&gt;.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt; Unless otherwise noted, passing a &lt;tt&gt;null&lt;/tt&gt; argument to a constructor</span><br><span class="line"> * or method in this class will cause a &#123;@link NullPointerException&#125; to be</span><br><span class="line"> * thrown.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;A &#123;@code String&#125; represents a string in the UTF-16 format</span><br><span class="line"> * in which &lt;em&gt;supplementary characters&lt;/em&gt; are represented by &lt;em&gt;surrogate</span><br><span class="line"> * pairs&lt;/em&gt; (see the section &lt;a href=&quot;Character.html#unicode&quot;&gt;Unicode</span><br><span class="line"> * Character Representations&lt;/a&gt; in the &#123;@code Character&#125; class for</span><br><span class="line"> * more information).</span><br><span class="line"> * Index values refer to &#123;@code char&#125; code units, so a supplementary</span><br><span class="line"> * character uses two positions in a &#123;@code String&#125;.</span><br><span class="line"> * &lt;p&gt;The &#123;@code String&#125; class provides methods for dealing with</span><br><span class="line"> * Unicode code points (i.e., characters), in addition to those for</span><br><span class="line"> * dealing with Unicode code units (i.e., &#123;@code char&#125; values).</span><br><span class="line"> *</span><br><span class="line"> * @author  Lee Boynton</span><br><span class="line"> * @author  Arthur van Hoff</span><br><span class="line"> * @author  Martin Buchholz</span><br><span class="line"> * @author  Ulf Zibis</span><br><span class="line"> * @see     java.lang.Object#toString()</span><br><span class="line"> * @see     java.lang.StringBuffer</span><br><span class="line"> * @see     java.lang.StringBuilder</span><br><span class="line"> * @see     java.nio.charset.Charset</span><br><span class="line"> * @since   JDK1.0</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+<p><strong><code>@see</code></strong> 的意思就是为了了解当前的类，你可能需要看看别的类(参考文献/友情链接)</p>
+<blockquote>
+<p>在 IDEA 里 一个对象长什么样 是由它的 <code>toString</code> 决定的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class MyObject&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;hahaha&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="字符串的不可变性-它是引用类型"><a href="#字符串的不可变性-它是引用类型" class="headerlink" title="字符串的不可变性(它是引用类型)"></a>字符串的不可变性(它是引用类型)</h3><ul>
+<li>为什么字符串是不可变的？<ul>
+<li>安全：<strong>线程安全，存储安全</strong></li>
+</ul>
+</li>
+<li>缺点，<strong>每当修改的时候都需要重复创建新的对象</strong></li>
+</ul>
+<h4 id="String-为什么不可变"><a href="#String-为什么不可变" class="headerlink" title="String 为什么不可变"></a>String 为什么不可变</h4><blockquote>
+<p>API 层面</p>
+</blockquote>
+<ul>
+<li>它肚子里有个 字符数组的容器 <code>private final char value[]</code></li>
+<li>class String 它是 <strong>final</strong> 的</li>
+<li>char value[] 它是 <strong>final</strong> 的 这个数组不能改变指向</li>
+<li>String 类中 所有公开的 API 方法中 都没提供改变 value 值的操作，所以 String 是不可变的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public final class String</span><br><span class="line">    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence &#123;</span><br><span class="line">    /** The value is used for character storage. */</span><br><span class="line">    private final char value[];</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不可变的真实原因</p>
+</blockquote>
+<ol>
+<li>在一个 HashMap 里，它有哈希值，它有若干个<strong>桶</strong> 每个桶里存固定的 <code>hashCode</code> </li>
+<li>假如你声明了一个 <code>HashMap&lt;String,Object&gt;</code> 会把这个 String 算一个 hashCode() 会被当作 key 存到 桶里去</li>
+<li><p><code>Object.hashCode()</code> java世界约定 把一个对象映射成一个整数，方便进行高效的哈希表查找，它有三个约定</p>
+<ul>
+<li>同一对象无论何时，在 java的整个生命周期里，必须一致性的返回相同的整数 <strong>就因为这个规定，导致String不可变</strong></li>
+<li>如果两个对象相等那么必须返回一样的 hashCode<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 代码证明</span><br><span class="line">如 </span><br><span class="line">String x = &quot;a&quot; // 假设此时 hashCode 是 1</span><br><span class="line">x = &quot;ab&quot; // 此时我们让他的 HashCode 变吗？</span><br><span class="line">// 如果变 就违反了 hashCode() 的第一个约定 </span><br><span class="line">// 如果不变 就违反了 第二个约定 </span><br><span class="line"></span><br><span class="line">// 所以</span><br><span class="line">String x = &quot;a&quot;  此时它是一个对象 地址 111</span><br><span class="line">x = &quot;ab&quot; 此时重新生成了一个对象 地址(引用)从111指向了 200</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>为了让我们在哈希桶中 安全的使用 String , <strong>String必须不可变</strong></p>
+</li>
+</ol>
+<h3 id="我就要修改-String-怎么办"><a href="#我就要修改-String-怎么办" class="headerlink" title="我就要修改 String 怎么办?"></a>我就要修改 String 怎么办?</h3><blockquote>
+<p>千万不要这样</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String s = &quot;0&quot;;</span><br><span class="line">for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    s = s + i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="StringBuilder"><a href="#StringBuilder" class="headerlink" title="StringBuilder"></a>StringBuilder</h4><ul>
+<li>不能当作 Hash桶的 key,因为它是可变的</li>
+<li>线程不安全</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">StringBuilder s = new StringBuilder(&quot;0&quot;);</span><br><span class="line">for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">    // 可以级联 操作</span><br><span class="line">    s.append(i).append(&quot;-&quot;).append(&quot;-&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>判断回文</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(</span><br><span class="line">    new StringBuilder(&quot;ABA&quot;).reverse().toString().equals(&quot;ABA&quot;)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h4 id="StringBuffer"><a href="#StringBuffer" class="headerlink" title="StringBuffer"></a>StringBuffer</h4><ul>
+<li>可变</li>
+<li>线程安全(有 同步问题 慢)，可变字符序列</li>
+</ul>
+<h4 id="StringBuffer-和-StringBuilder-区别"><a href="#StringBuffer-和-StringBuilder-区别" class="headerlink" title="StringBuffer 和 StringBuilder 区别"></a>StringBuffer 和 StringBuilder 区别</h4><ul>
+<li>它们都可变</li>
+<li>StringBuffer 线程安全 / StringBuilder 线程不安全</li>
+</ul>
+<h4 id="那我要修改怎么办？"><a href="#那我要修改怎么办？" class="headerlink" title="那我要修改怎么办？"></a>那我要修改怎么办？</h4><ul>
+<li>StringBuilder<ul>
+<li>优先使⽤，线程不安全，速度快</li>
+</ul>
+</li>
+<li>StringBuffer<ul>
+<li>线程安全，速度相对较慢</li>
+</ul>
+</li>
+</ul>
+<h4 id="字符串的内部构造和常⽤API"><a href="#字符串的内部构造和常⽤API" class="headerlink" title="字符串的内部构造和常⽤API"></a>字符串的内部构造和常⽤API</h4><ul>
+<li>不可变性是如何保证的？</li>
+<li><p>hash值是如何存储的？ </p>
+<ul>
+<li><strong>缓存</strong> 因为已经不可变了，没必要重新生成 </li>
+<li>String 源码里 的 hash 变量 就是用来缓存 hash值的<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">/** Cache the hash code for the string */</span><br><span class="line">private int hash; // Default to 0</span><br><span class="line"></span><br><span class="line">public int hashCode() &#123;</span><br><span class="line">      int h = hash;</span><br><span class="line">      if (h == 0 &amp;&amp; value.length &gt; 0) &#123;</span><br><span class="line">          char val[] = value;</span><br><span class="line"></span><br><span class="line">          for (int i = 0; i &lt; value.length; i++) &#123;</span><br><span class="line">              h = 31 * h + val[i];</span><br><span class="line">          &#125;</span><br><span class="line">          hash = h;</span><br><span class="line">      &#125;</span><br><span class="line">      return h;</span><br><span class="line">&#125;</span><br><span class="line">/*</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">这就是 hashCode 在 String 中的实现</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">重点来了</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line">第一次访问的时候  它会被创建出来 ，以后在被访问就直接用</span><br><span class="line"></span><br><span class="line">如果多线程呢？</span><br><span class="line">潜在问题  假如两个线程 同时访问 时候  当前这俩都是 hash = 0</span><br><span class="line">然后同时计算，并创建 hash = xxx</span><br><span class="line"></span><br><span class="line">虽然有线程安全问题，但是不要紧</span><br><span class="line">因为 即使存在多个线程同时访问，但是 算出的结果都是一样的</span><br><span class="line"></span><br><span class="line">虽然执行过程不是线程安全的，但是 算出的 hash 结果一致。</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>我如何使⽤字符串随⼼所欲地完成⼯作？</p>
+</li>
+<li>还不够的，StringUtils补上</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/10/11/ZB-028-01算法数据结构/" title="ZB-028-01算法数据结构" itemprop="url">ZB-028-01算法数据结构</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2019-10-11T13:16:30.000Z" itemprop="datePublished"> Published 2019-10-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/oak/">oak</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2019/10/10/ZB-027-03Stream的Collector/" title="ZB-027-03Stream的Collector" itemprop="url">ZB-027-03Stream的Collector</a>
   </h1>
   <p class="article-author">By
@@ -532,779 +1159,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/26/ZB-025-04Maven生命周期详解和插件配置/" title="ZB-025-04Maven生命周期详解和插件配置" itemprop="url">ZB-025-04Maven生命周期详解和插件配置</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-26T01:35:18.000Z" itemprop="datePublished"> Published 2019-09-26</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="Spotbugs-自动化字节码bug检查工具"><a href="#Spotbugs-自动化字节码bug检查工具" class="headerlink" title="Spotbugs 自动化字节码bug检查工具"></a>Spotbugs 自动化字节码bug检查工具</h3><ul>
-<li>它的前身叫做 findbugs ，但是很不幸的是从 java9以后就不维护了。</li>
-<li>它的后续叫做 Spotbugs</li>
-</ul>
-<blockquote>
-<p>引入 <a href="https://spotbugs.github.io/" target="_blank" rel="noopener">Spotbugs</a></p>
-</blockquote>
-<ul>
-<li>打开链接 <a href="https://spotbugs.github.io/" target="_blank" rel="noopener">Spotbugs 官网</a></li>
-<li>找到 Using SpotBugs<ul>
-<li>由于我们用的 maven构建 选择 <a href="https://spotbugs.readthedocs.io/en/latest/maven.html" target="_blank" rel="noopener">maven</a></li>
-</ul>
-</li>
-<li><p>直接复制它的例子代码</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">&lt;groupId&gt;com.github.spotbugs&lt;/groupId&gt;</span><br><span class="line">&lt;artifactId&gt;spotbugs-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">&lt;version&gt;3.1.12&lt;/version&gt;</span><br><span class="line">&lt;dependencies&gt;</span><br><span class="line">    &lt;!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;com.github.spotbugs&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spotbugs&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;4.0.0-beta3&lt;/version&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br><span class="line">&lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>继续看文档 spotbugs goal 意思是 “目标” 提示了一个 check命令</p>
-</li>
-<li>然后到你的项目里 运行 <code>mvn spotbugs:check</code>，最后发现我们的代码 Build Success </li>
-<li><p>那就手写一个 bug ,在 main 方法里</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) throws IOException &#123;</span><br><span class="line">    Integer i = null;</span><br><span class="line">    if(i == 1)&#123;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 很明显会发生空指针异常</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>再次运行<code>mvn spotbugs:check</code> 但是依然 Build Success</p>
-<ul>
-<li>这是因为，<strong>你没有给这个插件绑定一个阶段</strong> </li>
-<li>它分析的是字节码</li>
-</ul>
-</li>
-<li><p>为 这个 spotbugs指定阶段 , 添加 <code>executions</code></p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">    &lt;groupId&gt;com.github.spotbugs&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spotbugs-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.1.12&lt;/version&gt;</span><br><span class="line">    &lt;dependencies&gt;</span><br><span class="line">        &lt;!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs --&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;com.github.spotbugs&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;spotbugs&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;4.0.0-beta3&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">    &lt;/dependencies&gt;</span><br><span class="line">    &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;spotbugs&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;verify&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">                &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">        &lt;/execution&gt;</span><br><span class="line">    &lt;/executions&gt;</span><br><span class="line">&lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>运行 <code>mvn verify</code> 此时给我们丢了一个错误出来</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ERROR] Null pointer dereference of i in com.github.hcsp.Main.main(String[]) [com.github.hcsp.Main] Dereferenced at Main.java:[line 23] NP_ALWAYS_NULL</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>继续看 spotbugs 的文档 发现有个<code>gui goal</code></p>
-<ul>
-<li>运行 <code>mvn spotbugs:gui</code> 会出现一个图形界面</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>一个刚刚的代码疑问</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Integer i = null;</span><br><span class="line">if(i == 1)&#123;</span><br><span class="line">    System.out.println();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 其中</span><br><span class="line">i == 1 会被处理成 i.equals(1) 吗？</span><br><span class="line">如果你是写 java, 在 java中 == 永远不会自动变成 .equals()</span><br></pre></td></tr></table></figure>
-<h3 id="Maven详解"><a href="#Maven详解" class="headerlink" title="Maven详解"></a>Maven详解</h3><blockquote>
-<p>它有一套生命周期 你可以搜索 <a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html" target="_blank" rel="noopener">maven lifecycle</a></p>
-</blockquote>
-<ul>
-<li>它会把这个生命周期的流程 从头到尾 执行一遍</li>
-</ul>
-<blockquote>
-<p>这些生命周期的阶段会执行什么呢？</p>
-</blockquote>
-<ul>
-<li>默认情况什么都不做，除非你告诉它做什么</li>
-</ul>
-<blockquote>
-<p>怎么告诉？通过另外一个机制</p>
-</blockquote>
-<ul>
-<li>插件 plugin</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mvn</span><br><span class="line">    |validate |</span><br><span class="line">    |         |</span><br><span class="line">    |...      |</span><br><span class="line">    |compile--|--&lt; 默认插件 maven-compiler-plugin</span><br><span class="line">                        绑定到compile 阶段</span><br><span class="line">                        于是执行此工作，这个工作叫做 goal 目标</span><br><span class="line">    |         |</span><br><span class="line">    |test  ---|--&gt; surefile 官方测试插件 自动绑定到test阶段</span><br><span class="line">    |         |</span><br><span class="line">    |...      |         自定义插件 maven-checkstyle-plugin : </span><br><span class="line">                                你可以指定绑定的阶段</span><br><span class="line">    |         |</span><br><span class="line">    |verify   |</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>自定义插件 指定阶段</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">    &lt;artifactId&gt;maven-checkstyle-plugin&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.0.0&lt;/version&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">        &lt;configLocation&gt;$&#123;basedir&#125;/.circleci/checkstyle.xml&lt;/configLocation&gt;</span><br><span class="line">        &lt;includeTestSourceDirectory&gt;true&lt;/includeTestSourceDirectory&gt;</span><br><span class="line">        &lt;enableRulesSummary&gt;false&lt;/enableRulesSummary&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">    &lt;executions&gt;</span><br><span class="line">        &lt;execution&gt;</span><br><span class="line">            &lt;id&gt;compile&lt;/id&gt;</span><br><span class="line">            &lt;phase&gt;compile&lt;/phase&gt;</span><br><span class="line">            &lt;goals&gt;</span><br><span class="line">                &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">            &lt;/goals&gt;</span><br><span class="line">        &lt;/execution&gt;</span><br><span class="line">    &lt;/executions&gt;</span><br><span class="line">    &lt;dependencies&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;com.puppycrawl.tools&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;checkstyle&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;8.22&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">    &lt;/dependencies&gt;</span><br><span class="line">&lt;/plugin&gt;</span><br><span class="line"></span><br><span class="line">重点看  execution</span><br><span class="line">&lt;execution&gt;</span><br><span class="line">    &lt;id&gt;compile&lt;/id&gt;</span><br><span class="line">    &lt;phase&gt;compile&lt;/phase&gt;</span><br><span class="line">    &lt;goals&gt;</span><br><span class="line">        &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">    &lt;/goals&gt;</span><br><span class="line">&lt;/execution&gt;</span><br><span class="line">意思是 这个插件有个 goal 是 check ，阶段绑定在 compile 阶段</span><br><span class="line">因此 maven运行在 compile阶段的时候，就知道要执行它</span><br><span class="line"></span><br><span class="line">如果我绑定两个阶段呢？会先执行谁呢？</span><br><span class="line">谁先声明的绑定谁</span><br><span class="line"></span><br><span class="line">你还可以把它修改为 verify 阶段，这样 在 compile 阶段就不会执行它了</span><br><span class="line">&lt;execution&gt;</span><br><span class="line">    &lt;id&gt;verify&lt;/id&gt;</span><br><span class="line">    &lt;phase&gt;verify&lt;/phase&gt;</span><br><span class="line">    &lt;goals&gt;</span><br><span class="line">        &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">    &lt;/goals&gt;</span><br><span class="line">&lt;/execution&gt;</span><br><span class="line"></span><br><span class="line">可不可以在 compile 和 verify 阶段都执行？ </span><br><span class="line">可以，只要你不觉得费劲，我们允许你做这么蛋疼的事情～～～</span><br><span class="line">为什么允许这样呢？ 因为你可以会在不同阶段传递不同的参数</span><br><span class="line">&lt;execution&gt;</span><br><span class="line">    &lt;id&gt;compile&lt;/id&gt;</span><br><span class="line">    &lt;phase&gt;compile&lt;/phase&gt;</span><br><span class="line">    &lt;goals&gt;</span><br><span class="line">        &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">    &lt;/goals&gt;</span><br><span class="line">&lt;/execution&gt;</span><br><span class="line">&lt;execution&gt;</span><br><span class="line">    &lt;id&gt;verify&lt;/id&gt;</span><br><span class="line">    &lt;phase&gt;verify&lt;/phase&gt;</span><br><span class="line">    &lt;goals&gt;</span><br><span class="line">        &lt;goal&gt;check&lt;/goal&gt;</span><br><span class="line">    &lt;/goals&gt;</span><br><span class="line">&lt;/execution&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="当你执行-mvn-verify时-会怎样？"><a href="#当你执行-mvn-verify时-会怎样？" class="headerlink" title="当你执行 mvn verify时 会怎样？"></a>当你执行 mvn verify时 会怎样？</h4></blockquote>
-<ul>
-<li>首先 maven 会从头把 lifecycle 的每个阶段从头执行到 verify阶段</li>
-<li>每当执行到每个阶段的时候，它会看看这个阶段有没有绑定某个插件的 目标 goal,如果有就执行，没有就什么都不做</li>
-<li>这就是 maven 标准，就是maven自动化</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/25/ZB-025-03确定算法和重构/" title="ZB-025-03确定算法和重构" itemprop="url">ZB-025-03确定算法和重构</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-25T01:35:18.000Z" itemprop="datePublished"> Published 2019-09-25</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="确定算法"><a href="#确定算法" class="headerlink" title="确定算法"></a>确定算法</h3><ul>
-<li>为什么互联网称为“网”，爬虫被称为“爬虫”<ul>
-<li>从一个节点出发，遍历所有节点</li>
-</ul>
-</li>
-<li>算法：广度优先算法的一个变体<ul>
-<li><strong>非常建议自己手写相关算法</strong><ul>
-<li>广度优先/队列数据结构/JDK的队列实现</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>如何扩展？<ul>
-<li>慢慢的把烂代码，啰嗦的代码去掉</li>
-<li>假如我想要未来换数据库/上ES</li>
-<li>爬虫的通用化</li>
-</ul>
-</li>
-</ul>
-<h4 id="开始实践"><a href="#开始实践" class="headerlink" title="开始实践"></a>开始实践</h4><blockquote>
-<p>新开一个分支 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b basic-algorithm</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>先来一个死循环</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">        // 待处理的链接池</span><br><span class="line">        List&lt;String&gt; linkPool = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        // 已经处理的链接池</span><br><span class="line">        Set&lt;String&gt; processedLinks = new HashSet&lt;&gt;();</span><br><span class="line">        linkPool.add(&quot;https://sina.cn&quot;);</span><br><span class="line"></span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(linkPool.isEmpty())&#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String link = linkPool.get(0);</span><br><span class="line">            if(processedLinks.contains(link))&#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 过滤外链</span><br><span class="line">            if(!link.contains(&quot;sina.cn&quot;))&#123;</span><br><span class="line">                // 这是我们不感兴趣的不管他</span><br><span class="line">                continue;</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line">                CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">                HttpGet httpGet = new HttpGet(&quot;https://sina.cn/&quot;);</span><br><span class="line">                try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">                    System.out.println(response1.getStatusLine());</span><br><span class="line">                    HttpEntity entity1 = response1.getEntity();</span><br><span class="line">                    System.out.println(EntityUtils.toString(entity1));</span><br><span class="line">                &#125;</span><br><span class="line">                // 此时需要 jsoup</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>jsoup maven</p>
-</blockquote>
-<p>添加依赖</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.jsoup&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jsoup&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.12.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>继续解析网页</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp;</span><br><span class="line"></span><br><span class="line">import org.apache.http.HttpEntity;</span><br><span class="line">import org.apache.http.client.methods.CloseableHttpResponse;</span><br><span class="line">import org.apache.http.client.methods.HttpGet;</span><br><span class="line">import org.apache.http.impl.client.CloseableHttpClient;</span><br><span class="line">import org.apache.http.impl.client.HttpClients;</span><br><span class="line">import org.apache.http.util.EntityUtils;</span><br><span class="line">import org.jsoup.Jsoup;</span><br><span class="line">import org.jsoup.nodes.Document;</span><br><span class="line">import org.jsoup.nodes.Element;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.List;</span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">        // 待处理的链接池</span><br><span class="line">        List&lt;String&gt; linkPool = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        // 已经处理的链接池</span><br><span class="line">        Set&lt;String&gt; processedLinks = new HashSet&lt;&gt;();</span><br><span class="line">        linkPool.add(&quot;https://sina.cn&quot;);</span><br><span class="line"></span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(linkPool.isEmpty())&#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">//            String link = linkPool.get(linkPool.size() - 1);</span><br><span class="line">//            // ArrayList从底部删除更有效率</span><br><span class="line">//            linkPool.remove(linkPool.size() - 1);</span><br><span class="line"></span><br><span class="line">            // 简化为一行</span><br><span class="line">            String link = linkPool.remove(linkPool.size() - 1);</span><br><span class="line"></span><br><span class="line">            if(processedLinks.contains(link))&#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 过滤外链</span><br><span class="line">            if ( link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link) ) &#123;</span><br><span class="line">                // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line"></span><br><span class="line">                System.out.println(link);</span><br><span class="line">                if(link.startsWith(&quot;//&quot;))&#123;</span><br><span class="line">                    link = &quot;https:&quot; + link;</span><br><span class="line">                    System.out.println(&quot;处理后的link:&quot;+link);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">                HttpGet httpGet = new HttpGet(link);</span><br><span class="line">                httpGet.addHeader(&quot;User-Agent&quot;,&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">                    System.out.println(response1.getStatusLine());</span><br><span class="line">                    HttpEntity entity1 = response1.getEntity();</span><br><span class="line">                    String html = EntityUtils.toString(entity1);</span><br><span class="line"></span><br><span class="line">                    Document doc = Jsoup.parse(html);</span><br><span class="line"></span><br><span class="line">                    ArrayList&lt;Element&gt; links = doc.select(&quot;a&quot;);</span><br><span class="line"></span><br><span class="line">                    for(Element aTag:links)&#123;</span><br><span class="line">                        // 丢到链接池里</span><br><span class="line">                        linkPool.add(aTag.attr(&quot;href&quot;));</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    // 假如这是个新闻的详情页就存入数据库，否则，就什么都不做</span><br><span class="line">                    /*</span><br><span class="line">                    新闻详情有 标题/内容</span><br><span class="line">                     */</span><br><span class="line">                    ArrayList&lt;Element&gt; articleTags = doc.select(&quot;article&quot;);</span><br><span class="line">                    if(!articleTags.isEmpty())&#123;</span><br><span class="line">                        for (Element articleTag:articleTags)&#123;</span><br><span class="line">                            String title = articleTags.get(0).child(0).text();</span><br><span class="line">                            System.out.println(title);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    processedLinks.add(link);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // 这是我们不感兴趣的不管他</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="重构"><a href="#重构" class="headerlink" title="重构"></a>重构</h3><p>上面代码里有这样一个条件来筛选我们要的网址</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 过滤外链</span><br><span class="line">if ( (link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link)) &amp;&amp; !link.contains(&quot;passport.sina.cn&quot;) ) &#123;</span><br><span class="line">    // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">`</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>通常情况下，这么多的条件下</p>
-</blockquote>
-<ul>
-<li>你会写注释，我们不反对写注释，<ul>
-<li>注释可能会过时，有一天条件变了，但是注释你没改</li>
-<li>或者两年后代码不停的变更</li>
-<li>一个过时的注释，比不写注释还要糟糕，因为他给了你错误的信息</li>
-</ul>
-</li>
-<li>最聪明的方法是 提取方法并给一个名字</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">private static boolean isIntresetingLink(String link)&#123;</span><br><span class="line">    return (link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link)) &amp;&amp; !link.contains(&quot;passport.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 还可以继续简化</span><br><span class="line">private static boolean isIntresetingLink(String link)&#123;</span><br><span class="line">    return (isNewsPage(link) || isIndexPage(link)) &amp;&amp; isNotLoginPage(link);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">private static boolean isNewsPage(String link)&#123;</span><br><span class="line">    return link.contains(&quot;news.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private static boolean isIndexPage(String link)&#123;</span><br><span class="line">    return &quot;https://sina.cn&quot;.equals(link);</span><br><span class="line">&#125;</span><br><span class="line">private static boolean isNotLoginPage(String link)&#123;</span><br><span class="line">    return !link.contains(&quot;passport.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 此时的 if</span><br><span class="line">if(isIntresetingLink(link))&#123;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>每当你要写注释的时候，请先尝试重构，让注释显得多余</strong></p>
-<h4 id="继续优化-提取函数"><a href="#继续优化-提取函数" class="headerlink" title="继续优化,提取函数"></a>继续优化,提取函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">private static Document httpGetAndParseHtml(String link)&#123;</span><br><span class="line">    if(link.startsWith(&quot;//&quot;))&#123;</span><br><span class="line">        link = &quot;https:&quot; + link;</span><br><span class="line">        System.out.println(&quot;处理后的link:&quot;+link);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">    HttpGet httpGet = new HttpGet(link);</span><br><span class="line">    httpGet.addHeader(&quot;User-Agent&quot;,&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">        System.out.println(response1.getStatusLine());</span><br><span class="line">        HttpEntity entity1 = response1.getEntity();</span><br><span class="line">        String html = EntityUtils.toString(entity1);</span><br><span class="line">        return  Jsoup.parse(html);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>IDEA重构技巧</p>
-</blockquote>
-<ul>
-<li>选中你的代码块 </li>
-<li>右键 Refactor -&gt; Extract -&gt; Method -&gt; 写个方法名</li>
-</ul>
-<blockquote>
-<p><strong>三个好处</strong></p>
-</blockquote>
-<ul>
-<li>你是个人类，你大脑处理信息是有限的，因此100行的代码 和10行的小方法，10行的更容易被处理和理解</li>
-<li>短的方法容易被复用，越短小的方法越容易复用，而复用所有代码的书写原则，不要重复你自己</li>
-<li>对于Java来说你可以对复用方法进行覆盖，实现多态的功能</li>
-</ul>
-<h4 id="提交代码"><a href="#提交代码" class="headerlink" title="提交代码"></a>提交代码</h4><ul>
-<li>01我们在新分支 basic-algorithm</li>
-<li>02提交我们的代码<ul>
-<li><code>git add .</code></li>
-<li><code>git commit</code> 在vi里写你的信息</li>
-<li><code>git push</code> 此时报错了，因为远程仓库没有你的这个分支</li>
-<li><code>git push --set-upstream origin basic-algorithm</code>  </li>
-</ul>
-</li>
-<li><p>03打开你的 github 我的是 <a href="https://github.com/slTrust/xdml-crawler/" target="_blank" rel="noopener">https://github.com/slTrust/xdml-crawler/</a></p>
-<ul>
-<li>页面会显示一个你最近的提交信息 点击 <code>Compare &amp; pull request</code> 绿色按钮</li>
-<li>点击 Create pull request</li>
-<li>此时它会开始跑CI ，我们这个代码是会失败的 在 Details里<ul>
-<li>有任何错误请看 日志的内容 红色的 ERROR</li>
-</ul>
-</li>
-<li>改正我们的代码，再次执行 02 步操作</li>
-<li>此时页面刷新以下，多了你最新的 commit , 此时代码通过了检查，意味着我们可以合并了</li>
-<li><p>Merge pull request 合并很有讲究的，它有三个选项</p>
-<ul>
-<li><p>Create a merge commit<br>等价于 </p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git merge basic-algorithm</span><br><span class="line"># 它会产生一个新的提交</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Squash and merge<br>等价于</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git merge --squash</span><br><span class="line">好处是 比方你这个分支有两个或100个 提交</span><br><span class="line">他给你压缩成一个提交，这样你回滚的时候非常方便</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Rebase and merge</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rebase</span><br><span class="line">自行尝试</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>04 此时我们尝试 <code>Squash and merge</code> ,然后点击 <code>Squash and merge</code></p>
-<ul>
-<li>此时弹出一个文本框，意思是 你本来有多个commit 现在压缩成一个 commit </li>
-<li>你需要为压扁的这个 commit 定义 提交信息 ， 默认是把之前的提交信息列出来</li>
-<li>我们稍微修改下信息， 然后点击 Confirm squash and merge</li>
-</ul>
-</li>
-<li>05 此时去看你的仓库的 commit</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/24/ZB-025-02从零开始爬虫/" title="ZB-025-02从零开始爬虫" itemprop="url">ZB-025-02从零开始爬虫</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-24T15:35:18.000Z" itemprop="datePublished"> Published 2019-09-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <blockquote>
-<p><a href="https://github.com/slTrust/xdml-crawler/" target="_blank" rel="noopener">代码仓库</a></p>
-</blockquote>
-<h3 id="从零开始"><a href="#从零开始" class="headerlink" title="从零开始"></a>从零开始</h3><ul>
-<li>Github-new</li>
-<li>新建项目<ul>
-<li>mvn archetype 使用骨架 2400+种选择</li>
-<li>IDEA new 使用 ide创建</li>
-<li>从别人那里抄一个 (最常用)</li>
-</ul>
-</li>
-<li>.gitignore</li>
-<li>README</li>
-<li>配置基本的代码质量检查插件<ul>
-<li>越早代价越低 (保证代码质量)</li>
-</ul>
-</li>
-</ul>
-<h3 id="开始写代码"><a href="#开始写代码" class="headerlink" title="开始写代码"></a>开始写代码</h3><blockquote>
-<p>001 github新建仓库</p>
-</blockquote>
-<ul>
-<li><a href="https://github.com/slTrust/xdml-crawler" target="_blank" rel="noopener">xdml-crawler</a></li>
-<li>克隆到本地</li>
-</ul>
-<blockquote>
-<p>002 去 <a href="https://github.com/hcsp/read-write-files" target="_blank" rel="noopener">https://github.com/hcsp/read-write-files</a> 里 把 src和 pom.xml抄过来</p>
-</blockquote>
-<p><code>修改 .gitignore</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">*.iml</span><br><span class="line">target/</span><br><span class="line">.idea/</span><br><span class="line"></span><br><span class="line">以上三个目录是不改被提交的</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>003 IDEA open项目 选择 我们的文件夹里的pom.xml</p>
-</blockquote>
-<ul>
-<li>删除 pom.xml里的所有依赖</li>
-<li>继续拷贝 <a href="https://github.com/hcsp/read-write-files](https://github.com/hcsp/read-write-files)" target="_blank" rel="noopener">https://github.com/hcsp/read-write-files](https://github.com/hcsp/read-write-files)</a> 它的 <code>.circleci</code> 目录</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cp -r [你的clone目录]/read-write-files-master/.circleci  .</span><br><span class="line"></span><br><span class="line"># 删除 .circleci/verifyWhitelist.sh</span><br><span class="line"># 删除 .circleci/whitelist.txt</span><br></pre></td></tr></table></figure>
-<h4 id="项目的设计流程-自顶向下-团队"><a href="#项目的设计流程-自顶向下-团队" class="headerlink" title="项目的设计流程-自顶向下 (团队))"></a>项目的设计流程-自顶向下 (团队))</h4><ul>
-<li>多人协作</li>
-<li>模块化<ul>
-<li>各模块指责明确，界限清晰</li>
-<li>基本的文档</li>
-<li>基本的接口</li>
-</ul>
-</li>
-<li>小步提交<ul>
-<li>因为大的变更难以review</li>
-<li>因为大的变更冲突更加棘手</li>
-</ul>
-</li>
-</ul>
-<h4 id="项目的设计流程-自低向上-自己"><a href="#项目的设计流程-自低向上-自己" class="headerlink" title="项目的设计流程-自低向上 (自己)"></a>项目的设计流程-自低向上 (自己)</h4><ul>
-<li>单打独斗<ul>
-<li>先实现功能</li>
-<li>在实现功能过程中不停的抽取公共部分<ul>
-<li>每当写出很啰嗦的代码的时候，就该重构了</li>
-<li>DRY:每当你复制/粘贴的时候，就该重构了</li>
-</ul>
-</li>
-<li>通过重构实现模块化/接口化</li>
-</ul>
-</li>
-</ul>
-<h4 id="项目的演进：可扩展性"><a href="#项目的演进：可扩展性" class="headerlink" title="项目的演进：可扩展性"></a>项目的演进：可扩展性</h4><ul>
-<li>单线程-&gt;多线程</li>
-<li>console -&gt; H2 database</li>
-<li>H2 database -&gt; Elasticsearch</li>
-</ul>
-<h4 id="项目的演进：正确性"><a href="#项目的演进：正确性" class="headerlink" title="项目的演进：正确性"></a>项目的演进：正确性</h4><blockquote>
-<p>如何保证代码改动不会破坏原先的功能？</p>
-</blockquote>
-<ul>
-<li>测试</li>
-</ul>
-<h4 id="如何养成好的代码习惯"><a href="#如何养成好的代码习惯" class="headerlink" title="如何养成好的代码习惯"></a>如何养成好的代码习惯</h4><blockquote>
-<p><a href="https://github.com/hcsp/hexadecimal-character/pull/54/files/456abb148210fd69a5467ee5f9f5a518947da75a" target="_blank" rel="noopener">你都看不下去的代码</a></p>
-</blockquote>
-<ul>
-<li>不要妥协，你自己看代码都觉得说不过去。</li>
-</ul>
-<h4 id="项目目标"><a href="#项目目标" class="headerlink" title="项目目标"></a>项目目标</h4><ul>
-<li>爬去新浪新闻页，存储</li>
-<li><a href="https://news.sina.com.cn/" target="_blank" rel="noopener">https://news.sina.com.cn/</a><ul>
-<li>01新网站一般不做反爬</li>
-<li>02它有手机站 非常简单 <a href="http://sina.cn/?from=sinacom" target="_blank" rel="noopener">http://sina.cn/?from=sinacom</a></li>
-<li>03难能可贵的是 utf-8编码</li>
-</ul>
-</li>
-</ul>
-<h3 id="爬取新浪数据"><a href="#爬取新浪数据" class="headerlink" title="爬取新浪数据"></a>爬取新浪数据</h3><ul>
-<li><a href="https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient" target="_blank" rel="noopener">httpclient apache maven</a></li>
-<li><a href="https://hc.apache.org/httpcomponents-client-4.5.x/quickstart.html" target="_blank" rel="noopener">httpclient apache 文档</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient --&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;httpclient&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;4.5.9&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>添加测试的依赖</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.4.2&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.4.2&lt;/version&gt;</span><br><span class="line">    &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>添加冒烟测试类SmokeTest.java</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp;</span><br><span class="line"></span><br><span class="line">import org.junit.jupiter.api.Test;</span><br><span class="line"></span><br><span class="line">public class SmokeTest &#123;</span><br><span class="line">    @Test</span><br><span class="line">    public void test()&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>运行 <code>mvn test</code> 成功则提交我们的代码</p>
-</blockquote>
-<ul>
-<li>如果你不小心 <code>git add .</code>把你的 <code>.idea目录add了</code>  <ul>
-<li>你不想add的文件咋办? —&gt; <code>git reset HEAD .idea</code> 取消它的 add</li>
-</ul>
-</li>
-<li>如果你不小心 <code>git add .</code>把你的 <code>.idea目录add了</code> 而且还 commit了怎么办？<ul>
-<li>第一个办法<code>git reset HEAD~1</code> 向后回滚一个提交</li>
-<li>第二个办法 IDEA里 version control 选择log 选择上一次提交 右键<code>Reset Current Branch To Here</code></li>
-</ul>
-</li>
-<li>如果你不小心 <code>git add .</code>把你的 <code>.idea目录add了</code> 而且还 commit了 甚至 git push了怎么办？<ul>
-<li>由于我们现在只有一个 master ，所以你去看代码 应该有一个 不想提交的文件 <code>.idea</code><ul>
-<li>第一步 如果是在 master在你本地 <code>git log</code> 查看你刚刚提交的 id</li>
-<li>第二步 <code>git revert id号</code> 形如 <code>git revert  05995e358c631ebdccc2f1fb34b5ff44719fc303</code></li>
-<li>它的缺点是会撤销刚才的提交，而且你之前的提交也没了</li>
-<li>如果你是在主干的化，建议直接把它删掉</li>
-</ul>
-</li>
-<li>推荐的做法:<ul>
-<li>先还原代码 git log 看所有提交id</li>
-<li><code>git reset id号</code></li>
-<li><code>git reset HEAD --hard</code></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>实际操作</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">commit 了 还 push 了</span><br><span class="line">如果是在自己的分支上，那就用同样的方式操作,并且 force push</span><br><span class="line">否则，如果在主干上，或者你害怕不敢那么操作，老老实实把多提交的文件删掉</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">具体操作如下</span><br><span class="line">git reset HEAD~1</span><br><span class="line"># 修改 .gitignore 添加 .idea</span><br><span class="line">git add .</span><br><span class="line">git commit -m &quot;我修改了刚刚的错误&quot;</span><br><span class="line"># 此时你看提交信息</span><br><span class="line">git status</span><br><span class="line"># 提示你如下内容</span><br><span class="line"># 位于分支 master</span><br><span class="line"># 您的分支和 &apos;origin/master&apos; 出现了偏离，</span><br><span class="line"># 并且分别有 1 和 1 处不同的提交。</span><br><span class="line">#  （使用 &quot;git pull&quot; 来合并远程分支）</span><br><span class="line"></span><br><span class="line"># 此时你直接 push 是 失败的</span><br><span class="line"># 你只能 force</span><br><span class="line">git push -f</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>修改 <code>.circleci.yml</code></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">version: 2</span><br><span class="line">jobs:</span><br><span class="line">  test:</span><br><span class="line">    docker:</span><br><span class="line">      - image: circleci/openjdk:8u212-jdk-stretch</span><br><span class="line">    steps:</span><br><span class="line">      - checkout</span><br><span class="line">      - restore_cache:</span><br><span class="line">          key: hcsp-&#123;&#123; checksum &quot;pom.xml&quot; &#125;&#125;</span><br><span class="line">      - run:</span><br><span class="line">          name: Run Maven tests</span><br><span class="line">          command: mvn clean test</span><br><span class="line">      - save_cache: # saves the project dependencies</span><br><span class="line">          paths:</span><br><span class="line">            - ~/.m2</span><br><span class="line">          key: hcsp-&#123;&#123; checksum &quot;pom.xml&quot; &#125;&#125;</span><br><span class="line">workflows:</span><br><span class="line">  version: 2</span><br><span class="line">  default:</span><br><span class="line">    jobs:</span><br><span class="line">      - test</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>提交</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>此时提交有个潜规则</p>
-</blockquote>
-<ul>
-<li><a href="https://chris.beams.io/posts/git-commit/" target="_blank" rel="noopener">how to write commit message</a><ul>
-<li>第一行是个总结</li>
-<li>其他是描述你这个变更做了什么</li>
-<li>每行不超过72字符</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>IDEA点击 commit</p>
-</blockquote>
-<p>提交信息内容</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">修改CI配置</span><br><span class="line"></span><br><span class="line">使之能够在CircleCI上运行。</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>然后 push</p>
-</blockquote>
-<h4 id="CircleCI上添加项目"><a href="#CircleCI上添加项目" class="headerlink" title="CircleCI上添加项目"></a>CircleCI上添加项目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">搜索 circleci</span><br><span class="line">得到 https://circleci.com/</span><br><span class="line">登录 用 github</span><br><span class="line">右上角 go to app</span><br><span class="line">add project &gt; 选择你的项目 --》 set up Project ---&gt; Start building</span><br><span class="line">然后开始自动化测试</span><br><span class="line"></span><br><span class="line">此后你每次 push代码的时候 都会自动 运行测试，保证代码正确性的不二选择</span><br></pre></td></tr></table></figure>
-<h4 id="新开分支，提-PR-然后合并主分支"><a href="#新开分支，提-PR-然后合并主分支" class="headerlink" title="新开分支，提 PR 然后合并主分支"></a>新开分支，提 PR 然后合并主分支</h4><blockquote>
-<p>开分支</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b new-feature</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>此时，你去掉了代码里一段注释</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">//        String html = getIndexPage();</span><br><span class="line">        CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">        HttpGet httpGet = new HttpGet(&quot;https://sina.cn/&quot;);</span><br><span class="line">        try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">            System.out.println(response1.getStatusLine());</span><br><span class="line">            HttpEntity entity1 = response1.getEntity();</span><br><span class="line">            System.out.println(EntityUtils.toString(entity1));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>提交 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m &quot;Remove comments&quot;</span><br><span class="line"></span><br><span class="line">git push</span><br><span class="line"># 此时失败了 因为 远程没有你的新分支</span><br><span class="line">git push --set-upstream origin new-feature</span><br><span class="line"></span><br><span class="line"># 此时打开你的代码仓库</span><br><span class="line"># 这时这个新的提交在仓库上显示了 点击 Compare &amp; pull request</span><br><span class="line"></span><br><span class="line"># 文本框里输入你的描述</span><br><span class="line">在这里写你的新功能描述，等待CI检查通过，或者你的 team leader 的 code review.</span><br><span class="line"></span><br><span class="line"># 点击 create pull request</span><br><span class="line"></span><br><span class="line"># 测试通过之后 点击 merge pull request</span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/24/ZB-025-01多线程爬虫实战/" title="ZB-025-01多线程爬虫实战" itemprop="url">ZB-025-01多线程爬虫实战</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-24T15:29:18.000Z" itemprop="datePublished"> Published 2019-09-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="做一个项目的原则-潜规则"><a href="#做一个项目的原则-潜规则" class="headerlink" title="做一个项目的原则(潜规则)"></a>做一个项目的原则(潜规则)</h3><h4 id="把每个项目当作人生里最好的一个项目来精雕细琢"><a href="#把每个项目当作人生里最好的一个项目来精雕细琢" class="headerlink" title="把每个项目当作人生里最好的一个项目来精雕细琢"></a>把每个项目当作人生里最好的一个项目来精雕细琢</h4><ul>
-<li>积累自己的Reputation(声誉)</li>
-<li>一丝不苟的写好文档</li>
-<li>代码质量++ (你当前能力阶段最好的质量)</li>
-<li>你的认真是肯定能获得回报的</li>
-</ul>
-<h4 id="使用标准化-业界公认的模式和流程"><a href="#使用标准化-业界公认的模式和流程" class="headerlink" title="使用标准化/业界公认的模式和流程"></a>使用标准化/业界公认的模式和流程</h4><ul>
-<li>没有多余的内容 如 <code>.idea 文件夹就是多余的 IDEA生成的</code></li>
-</ul>
-<h4 id="几乎-没有本地依赖，使用者能够无障碍地运行"><a href="#几乎-没有本地依赖，使用者能够无障碍地运行" class="headerlink" title="(几乎)没有本地依赖，使用者能够无障碍地运行"></a>(几乎)没有本地依赖，使用者能够无障碍地运行</h4><ul>
-<li>你的java项目里引用了一个本地库文件，只在你的代码里有</li>
-</ul>
-<h4 id="小步快跑"><a href="#小步快跑" class="headerlink" title="小步快跑"></a>小步快跑</h4><ul>
-<li>不要妄图一气呵成</li>
-<li>成就感</li>
-<li>越小的变更越容易debug</li>
-</ul>
-<h3 id="我们的项目原则"><a href="#我们的项目原则" class="headerlink" title="我们的项目原则"></a>我们的项目原则</h3><blockquote>
-<h4 id="强制-使用-GitHub-主干-分支模型进行开发"><a href="#强制-使用-GitHub-主干-分支模型进行开发" class="headerlink" title="[强制]使用 GitHub + 主干/分支模型进行开发"></a>[强制]使用 GitHub + 主干/分支模型进行开发</h4><ul>
-<li>禁止直接<code>push master</code></li>
-<li>所有的变更通过 PR 进行</li>
-</ul>
-</blockquote>
-<blockquote>
-<h4 id="强制-自动化代码质量检查-测试"><a href="#强制-自动化代码质量检查-测试" class="headerlink" title="[强制]自动化代码质量检查 + 测试"></a>[强制]自动化代码质量检查 + 测试</h4></blockquote>
-<ul>
-<li>Checkstyle/SpotBugs</li>
-<li>最基本的自动化测试覆盖</li>
-</ul>
-<blockquote>
-<h4 id="一切工作自动化"><a href="#一切工作自动化" class="headerlink" title="一切工作自动化"></a>一切工作自动化</h4></blockquote>
-<ul>
-<li>数据库建表</li>
-<li>创建测试数据</li>
-</ul>
-<blockquote>
-<h4 id="规范化提交流程"><a href="#规范化提交流程" class="headerlink" title="规范化提交流程"></a>规范化提交流程</h4></blockquote>
-<ul>
-<li>经过代码工具检查</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/24/ZB-024-03线程池和Callable和Future/" title="ZB-024-03线程池和Callable和Future" itemprop="url">ZB-024-03线程池和Callable和Future</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-24T14:27:34.000Z" itemprop="datePublished"> Published 2019-09-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="线程池与Callable-Future"><a href="#线程池与Callable-Future" class="headerlink" title="线程池与Callable/Future"></a>线程池与Callable/Future</h1><h3 id="什么是线程池"><a href="#什么是线程池" class="headerlink" title="什么是线程池"></a>什么是线程池</h3><ul>
-<li>线程是昂贵的（Java线程模型的缺陷）<ul>
-<li>一个线程就是一个工人，每开一个线程意味着 你的JVM里就一个工人开始执行你的代码</li>
-<li>生活里公司里人员流动的成本是很高的，你要重新培养它。线程也是一样</li>
-<li><strong>java的线程和操作系统的线程相绑定，java的线程调度依赖于操作系统的线程调度，因此很昂贵，随意你不能随心所欲的在操作系统里开线程</strong></li>
-</ul>
-</li>
-<li>线程池是预先定义好的若⼲个线程</li>
-<li><p>Java中的线程池</p>
-<h3 id="Callable-Future"><a href="#Callable-Future" class="headerlink" title="Callable/Future"></a>Callable/Future</h3></li>
-<li><p>类⽐Runnable，Callable可以返回值，抛出异常</p>
-</li>
-<li>Future代表⼀个“未来才会返回的结果”</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">import java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line">public class WordCount &#123;</span><br><span class="line">    public static void main(String[] args) throws ExecutionException, InterruptedException &#123;</span><br><span class="line">        // 创建固定数量的线程池</span><br><span class="line">        ExecutorService threadPool = Executors.newFixedThreadPool(10);</span><br><span class="line"></span><br><span class="line">        //new Callable&lt;T&gt;()&#123;...&#125; T代表返回值</span><br><span class="line"></span><br><span class="line">        // 返回数字</span><br><span class="line">        Future&lt;Integer&gt; future1 = threadPool.submit(new Callable&lt;Integer&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public Integer call() throws Exception &#123;</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">                return 0;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        // 返回字符串</span><br><span class="line">        Future&lt;String&gt; future2 = threadPool.submit(new Callable&lt;String&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public String call() throws Exception &#123;</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">                return &quot;abc&quot;;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        // 抛出异常</span><br><span class="line">        Future&lt;Object&gt; future3 = threadPool.submit(new Callable&lt;Object&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public Object call() throws Exception &#123;</span><br><span class="line">                throw new RuntimeException();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        /*</span><br><span class="line">        submit 和  new Thread().start(); 一样会立刻执行，是异步的 不会阻塞当前线程的执行</span><br><span class="line">        submit 的返回值是个 Future</span><br><span class="line">        threadPool.submit( ... );</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        Future 代表一个未来</span><br><span class="line">        */</span><br><span class="line"></span><br><span class="line">        // 它会等这个结果回来打印</span><br><span class="line">        System.out.println(future1.get());</span><br><span class="line">        System.out.println(future2.get());</span><br><span class="line">        System.out.println(future3.get());</span><br><span class="line"></span><br><span class="line">        // 你等不及了,取消一个</span><br><span class="line">        // future2.cancel(100);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="实战：多线程的WordCount"><a href="#实战：多线程的WordCount" class="headerlink" title="实战：多线程的WordCount"></a>实战：多线程的WordCount</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.io.*;</span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.List;</span><br><span class="line">import java.util.Map;</span><br><span class="line">import java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line">public class WordCount &#123;</span><br><span class="line">    private final int threadNum;</span><br><span class="line">    private ExecutorService threadPool;</span><br><span class="line">    public WordCount(int threadNum) &#123;</span><br><span class="line">        threadPool = Executors.newFixedThreadPool(threadNum);</span><br><span class="line">        this.threadNum = threadNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 统计文件中各单词的数量</span><br><span class="line">    public Map&lt;String, Integer&gt; count(File file) throws FileNotFoundException, ExecutionException, InterruptedException &#123;</span><br><span class="line">        BufferedReader reader = new BufferedReader(new FileReader(file));</span><br><span class="line"></span><br><span class="line">        List&lt;Future&lt;Map&lt;String,Integer&gt;&gt;&gt; futures = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        // 开多个线程，每个线程读取文件的一行内容，并将其中的单词统计结果返回</span><br><span class="line">        // 最后，主线程将 工作线程返回的结果汇总在一起</span><br><span class="line">        for (int i = 0; i &lt; threadNum; i++) &#123;</span><br><span class="line">            futures.add(threadPool.submit(new WorkerJob(reader)));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 合并</span><br><span class="line">        Map&lt;String,Integer&gt; finalResult = new HashMap&lt;&gt;();</span><br><span class="line">        for (Future&lt;Map&lt;String,Integer&gt;&gt; future:futures) &#123;</span><br><span class="line">            Map&lt;String,Integer&gt; resultFromWorker = future.get();</span><br><span class="line">            mergeWorkerResultIntoFinalResult(resultFromWorker,finalResult);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        return finalResult;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private void mergeWorkerResultIntoFinalResult(Map&lt;String, Integer&gt; resultFromWorker,</span><br><span class="line">                                                  Map&lt;String, Integer&gt; finalResult) &#123;</span><br><span class="line">        for (Map.Entry&lt;String,Integer&gt; entry: resultFromWorker.entrySet()) &#123;</span><br><span class="line">            String word = entry.getKey();</span><br><span class="line">            int mergedResult = finalResult.getOrDefault(word,0) + entry.getValue();</span><br><span class="line">            finalResult.put(word,mergedResult);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static class WorkerJob implements Callable&lt;Map&lt;String ,Integer&gt;&gt; &#123;</span><br><span class="line">        private BufferedReader reader;</span><br><span class="line"></span><br><span class="line">        public WorkerJob(BufferedReader reader) &#123;</span><br><span class="line">            this.reader = reader;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public Map&lt;String, Integer&gt; call() throws Exception &#123;</span><br><span class="line">            String line = null;</span><br><span class="line">            Map&lt;String,Integer&gt; result = new HashMap&lt;&gt;();</span><br><span class="line">            while ((line=reader.readLine())!= null)&#123;</span><br><span class="line">                String[] words = line.split(&quot; &quot;);</span><br><span class="line">                for (String word: words) &#123;</span><br><span class="line">                    result.put(word,result.getOrDefault(word,0) + 1);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            return result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2019/09/24/ZB-024-02生产者消费者模型/" title="ZB-024-02生产者消费者模型" itemprop="url">ZB-024-02生产者消费者模型</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2019-09-24T13:26:46.000Z" itemprop="datePublished"> Published 2019-09-24</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="生产者消费者模型"><a href="#生产者消费者模型" class="headerlink" title="生产者消费者模型"></a><a href="https://github.com/hcsp/producer-consumer" target="_blank" rel="noopener">生产者消费者模型</a></h3><ul>
-<li>生产者和消费者之间有一个盘子</li>
-<li>盘子只能有一个包子</li>
-<li>生产者创造了一个包子 放置到盘子上。此时不会继续生产，而是等消费者把盘子上的包子吃了，再去生产 即盘子是空的菜生产</li>
-<li>消费者吃掉一个包子后，就不会在吃了，而是等待生产者 生产 即盘子上有包子才消费</li>
-</ul>
-<p><a href="https://github.com/hcsp/producer-consumer/pull/22" target="_blank" rel="noopener">1.Object.wait/notify解决</a></p>
-<p><a href="https://github.com/hcsp/producer-consumer/pull/23" target="_blank" rel="noopener">2.Lock/Condition解决</a></p>
-<p><a href="https://github.com/hcsp/producer-consumer/pull/24" target="_blank" rel="noopener">3.BlockingQueue解决</a></p>
-<h4 id="方式一：Object-wait-notify"><a href="#方式一：Object-wait-notify" class="headerlink" title="方式一：Object.wait/notify"></a>方式一：Object.wait/notify</h4><p>Boss.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        Container container = new Container();</span><br><span class="line">        Object lock = new Object();</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(container, lock);</span><br><span class="line">        Consumer consumer = new Consumer(container, lock);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Container.java  放置包子的盘子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line"></span><br><span class="line">public class Container &#123;</span><br><span class="line">    private Optional&lt;Integer&gt; value = Optional.empty();</span><br><span class="line"></span><br><span class="line">    public Optional&lt;Integer&gt; getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setValue(Optional&lt;Integer&gt; value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Consumer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    Object lock;</span><br><span class="line"></span><br><span class="line">    public Consumer(Container container, Object lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            synchronized (lock) &#123;</span><br><span class="line">                // 只要盘子是空的 它就等待</span><br><span class="line">                while (!container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子不是空的就消费</span><br><span class="line">                Integer value = container.getValue().get();</span><br><span class="line">                // 清空盘子的内容</span><br><span class="line">                container.setValue(Optional.empty());</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + value);</span><br><span class="line"></span><br><span class="line">                // 唤醒生产者</span><br><span class="line">                lock.notify();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Producer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.Random;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    Object lock;</span><br><span class="line"></span><br><span class="line">    public Producer(Container container, Object lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            synchronized (lock) &#123;</span><br><span class="line">                // 只要盘子里有东西 它就必须等待</span><br><span class="line">                while (container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        lock.wait();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子是空的就生产</span><br><span class="line">                int r = new Random().nextInt();</span><br><span class="line">                System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">                container.setValue(Optional.of(r));</span><br><span class="line">                // 唤醒消费者</span><br><span class="line">                lock.notify();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="方式二：Lock-Condition"><a href="#方式二：Lock-Condition" class="headerlink" title="方式二：Lock/Condition"></a>方式二：Lock/Condition</h4><p>Boss.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        ReentrantLock lock = new ReentrantLock();</span><br><span class="line">        Container container = new Container(lock);</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(container, lock);</span><br><span class="line">        Consumer consumer = new Consumer(container, lock);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Container.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.concurrent.locks.Condition;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Container &#123;</span><br><span class="line"></span><br><span class="line">    private Condition notConsumedYet; // 还没被消费掉</span><br><span class="line">    private Condition notProducedYet; // 还没被生产出来</span><br><span class="line">    private Optional&lt;Integer&gt; value = Optional.empty();</span><br><span class="line"></span><br><span class="line">    public Container(ReentrantLock lock) &#123;</span><br><span class="line">        this.notConsumedYet = lock.newCondition();</span><br><span class="line">        this.notProducedYet = lock.newCondition();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Condition getNotConsumedYet() &#123;</span><br><span class="line">        return notConsumedYet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Condition getNotProducedYet() &#123;</span><br><span class="line">        return notProducedYet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Optional&lt;Integer&gt; getValue() &#123;</span><br><span class="line">        return value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setValue(Optional&lt;Integer&gt; value) &#123;</span><br><span class="line">        this.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Consumer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    ReentrantLock lock;</span><br><span class="line"></span><br><span class="line">    public Consumer(Container container, ReentrantLock lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                lock.lock();</span><br><span class="line">                // 只要盘子是空的 它就等待</span><br><span class="line">                while (!container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        container.getNotProducedYet().await();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子不是空的就消费</span><br><span class="line">                Integer value = container.getValue().get();</span><br><span class="line">                // 清空盘子的内容</span><br><span class="line">                container.setValue(Optional.empty());</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + value);</span><br><span class="line"></span><br><span class="line">                // 唤醒生产者</span><br><span class="line">                container.getNotConsumedYet().signal();</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Producer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Optional;</span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    Container container;</span><br><span class="line">    ReentrantLock lock;</span><br><span class="line"></span><br><span class="line">    public Producer(Container container, ReentrantLock lock) &#123;</span><br><span class="line">        this.container = container;</span><br><span class="line">        this.lock = lock;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                lock.lock();</span><br><span class="line">                // 只要盘子里有东西 它就必须等待</span><br><span class="line">                while (container.getValue().isPresent()) &#123;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        container.getNotConsumedYet().await();</span><br><span class="line">                    &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                // 盘子是空的就生产</span><br><span class="line">                int r = new Random().nextInt();</span><br><span class="line">                System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">                container.setValue(Optional.of(r));</span><br><span class="line">                // 唤醒消费者</span><br><span class="line">                container.getNotProducedYet().signal();</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="方式三：BlockingQueue"><a href="#方式三：BlockingQueue" class="headerlink" title="方式三：BlockingQueue"></a>方式三：BlockingQueue</h4><blockquote>
-<p>signalQueue 是控制线程调度的 实际就是个开关</p>
-</blockquote>
-<p>Boss.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line">import java.util.concurrent.LinkedBlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Boss &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        // 请实现一个生产者/消费者模型，其中：</span><br><span class="line">        // 生产者生产10个随机的整数供消费者使用（随机数可以通过new Random().nextInt()获得）</span><br><span class="line">        // 使得标准输出依次输出它们，例如：</span><br><span class="line">        // Producing 42</span><br><span class="line">        // Consuming 42</span><br><span class="line">        // Producing -1</span><br><span class="line">        // Consuming -1</span><br><span class="line">        // ...</span><br><span class="line">        // Producing 10086</span><br><span class="line">        // Consuming 10086</span><br><span class="line">        // Producing -12345678</span><br><span class="line">        // Consuming -12345678</span><br><span class="line"></span><br><span class="line">        BlockingDeque&lt;Integer&gt; queue = new LinkedBlockingDeque&lt;&gt;(1);</span><br><span class="line">        // 控制线程的调度</span><br><span class="line">        BlockingDeque&lt;Integer&gt; signalQueue = new LinkedBlockingDeque&lt;&gt;(1);</span><br><span class="line"></span><br><span class="line">        Producer producer = new Producer(queue, signalQueue);</span><br><span class="line">        Consumer consumer = new Consumer(queue, signalQueue);</span><br><span class="line"></span><br><span class="line">        producer.start();</span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        producer.join();</span><br><span class="line">        producer.join();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Consumer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Consumer extends Thread &#123;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; queue;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; signalQueue;</span><br><span class="line"></span><br><span class="line">    public Consumer(BlockingDeque&lt;Integer&gt; queue, BlockingDeque&lt;Integer&gt; signalQueue) &#123;</span><br><span class="line">        this.queue = queue;</span><br><span class="line">        this.signalQueue = signalQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                System.out.println(&quot;Consuming &quot; + queue.take());</span><br><span class="line">                signalQueue.put(0);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Producer.java</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp.multithread;</span><br><span class="line"></span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.BlockingDeque;</span><br><span class="line"></span><br><span class="line">public class Producer extends Thread &#123;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; queue;</span><br><span class="line">    BlockingDeque&lt;Integer&gt; signalQueue;</span><br><span class="line"></span><br><span class="line">    public Producer(BlockingDeque&lt;Integer&gt; queue, BlockingDeque&lt;Integer&gt; signalQueue) &#123;</span><br><span class="line">        this.queue = queue;</span><br><span class="line">        this.signalQueue = signalQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            int r = new Random().nextInt();</span><br><span class="line">            System.out.println(&quot;Producing &quot; + r);</span><br><span class="line">            try &#123;</span><br><span class="line">                queue.put(r);</span><br><span class="line">                signalQueue.take();</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/oak/">oak</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/9/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/11/">Next<span></span></a>
@@ -1417,13 +1271,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

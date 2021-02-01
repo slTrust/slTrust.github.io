@@ -79,6 +79,723 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/11/30/N029_01_JS避免相互影响之作用域/" title="JS之使用局部变量" itemprop="url">JS之使用局部变量</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-30T01:27:42.000Z" itemprop="datePublished"> Published 2017-11-30</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="全局变量的危害"><a href="#全局变量的危害" class="headerlink" title="全局变量的危害"></a>全局变量的危害</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">html里有一个id=&quot;parent&quot;的div</span><br><span class="line">&lt;div id=&quot;xxx&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    //这句已经有问题了  你无意之间把window.parent覆盖了</span><br><span class="line">    console.log(parent)  //现在parent已经是那个id=&quot;xxx&quot;的div了</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>所以你应该避免使用全局变量，使用局部变量</p>
+<h4 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h4><blockquote>
+<p>JS里的var声明只有在函数内才有块级作用域</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function x()&#123;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    console.log(parent) //这里的是 id=&quot;xxx&quot;的div</span><br><span class="line">&#125;</span><br><span class="line">x.call();</span><br><span class="line">console.log(parent) //这里的parent是window的属性</span><br></pre></td></tr></table></figure>
+<h4 id="立即调用函数"><a href="#立即调用函数" class="headerlink" title="立即调用函数"></a>立即调用函数</h4><blockquote>
+<p>如上节代码所示，立即调用函数就是声明一个函数然后立刻调用</p>
+</blockquote>
+<p>因为避免使用全局变量所以你不该声明这个「x」的函数，因为这样已经产生了一个全局变量「x」</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function()&#123;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    console.log(parent) //这里的是 id=&quot;xxx&quot;的div</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但是这样会报错，原因是如果你直接声明一个「匿名函数 」并调用，浏览器里会直接报错说语法错误</p>
+</blockquote>
+<p>我们可以使用如下小技巧</p>
+<ol>
+<li><p>直接把匿名函数加调用的整体用 「括号」括起来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line">    function()&#123;</span><br><span class="line">        //相关处理</span><br><span class="line">    &#125;()</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>直接把匿名函数用「括号」括起来，然后再调用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(function()&#123;</span><br><span class="line">        //相关处理    </span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>加减号或者取反(「+」「-」「!」「~」)</p>
+</li>
+</ol>
+<p>这些运算符是告诉浏览器我不是再声明一个函数而是在求值，但是这个值我不关心(爱是多少是多少)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">-function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">!function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">~function()&#123;&#125;()</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>因为这个局部变量问题的使用太过麻烦,ES6终于狠心给JS升级了</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    let parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    let a = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent) // 全局变量的window的parent属性</span><br><span class="line">console.log(a) //报错  因为 a是局部变量</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>{ } 左大括号右大括号之内的内容代表块级作用域，但是你不能用var</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    var parent = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent)  // 1 又把window.parent给覆盖了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>因为var会变量提升，所以实际的代码是这个效果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var parent; //变量提升</span><br><span class="line">&#123;</span><br><span class="line">    parent = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所以在ES6出来之前也就是2015年以前如果你想用局部变量就要这样</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~function()&#123;&#125;()</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/11/29/N028_自己实现一个jQuery/" title="自己实现一个jQuery" itemprop="url">自己实现一个jQuery</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-29T07:27:42.000Z" itemprop="datePublished"> Published 2017-11-29</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="What-is-jQuery"><a href="#What-is-jQuery" class="headerlink" title="What is jQuery?"></a>What is jQuery?</h1><blockquote>
+<p>核心就是一句话 The Write Less,Do More（写更少，做更多）  ， ok ， let’s go！</p>
+</blockquote>
+<ul>
+<li>addClass( )功能  （最渣版）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;ul&gt;</span><br><span class="line">    &lt;li id=&quot;item1&quot;&gt;选项1&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item2&quot;&gt;选项2&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item3&quot;&gt;选项3&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item4&quot;&gt;选项4&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item5&quot;&gt;选项5&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如何给id=”item3” 添加样式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function addClass(node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        node.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// item3 通过id名可以直接获取元素</span><br><span class="line">addClass(item3,[&apos;red&apos;]); </span><br><span class="line">// 你也可以这样</span><br><span class="line">addClass(document.getElementById(&apos;item4&apos;),[&apos;red&apos;])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：通过id获取元素不是100%没问题的，你要是非 id=”parent”  这样就不好使,你可以打印看看parent是啥</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>这样只是初步封装了方法,但是方法是还在全局作用域,你叫addClass 到时候别人也叫addClass 你可能就被覆盖了  我们是有版权的   来来来 来个帅气签名！</p>
+</blockquote>
+<h3 id="addClass-签名版"><a href="#addClass-签名版" class="headerlink" title="addClass( ) (签名版)"></a>addClass( ) (签名版)</h3><blockquote>
+<p>命名空间：给全局对象挂载一个对象 window.myDom = { }<br>然后在你挂载的myDom 对象上挂载你的属性 、方法</p>
+</blockquote>
+<blockquote>
+<p>这比之前好在哪里？</p>
+</blockquote>
+<blockquote>
+<p>好在有“从属”关系而不是“零散“的变量<br>（至少在阿里没落前）我是阿里的前端  相比 我是一个前端 那个更有份量呢？ </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">window.myDom = &#123;&#125;;</span><br><span class="line">myDom.addClass = function (node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        node.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">myDom.addClass(item3,[&apos;red&apos;]);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你肯定会不爽因为还不如之前用着爽了  每次还得加命名前缀<br>  myDom.fn(param)<br>  myDom.fn2(param)<br>  直接 item3.addClass([‘red’]) 才爽 有需求就会有改进</li>
+</ul>
+<h3 id="反正都是Node的api-我直接改原型不就好了-于是乎！你又挖了个坑"><a href="#反正都是Node的api-我直接改原型不就好了-于是乎！你又挖了个坑" class="headerlink" title="反正都是Node的api 我直接改原型不就好了 于是乎！你又挖了个坑"></a>反正都是Node的api 我直接改原型不就好了 于是乎！你又挖了个坑</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Node.prototype.addClass =  function (node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        this.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> item3.addClass([&apos;red&apos;]);  //你遂了心意了</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这样的后果是别人也这样改原型，而且也添加个addClass<br>是不是心好累！  为啥？此乃优良传统<br>山寨一下 改改加点“我想出”的功能 我就敢说我的比你好！ （王者荣耀 与 dota ）<br>why?你用上了爱迪生的电灯泡 我就问你，你是自己发明一个还是在借鉴他？<br>看得远是因为我站在巨人的肩膀上！</li>
+</ul>
+<h3 id="我们是讲版权的我的就是我的"><a href="#我们是讲版权的我的就是我的" class="headerlink" title="我们是讲版权的我的就是我的"></a>我们是讲版权的我的就是我的</h3><h4 id="我自创一个Node2行不行-以后可能还有Node3"><a href="#我自创一个Node2行不行-以后可能还有Node3" class="headerlink" title="我自创一个Node2行不行 以后可能还有Node3"></a>我自创一个Node2行不行 以后可能还有Node3</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">window.Node2 = function(node)&#123;</span><br><span class="line">            return &#123;</span><br><span class="line">                addClass:function(classArr)&#123;</span><br><span class="line">                    var len = classArr.length;</span><br><span class="line">                    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">                        node.classList.add(classArr[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">var node2 = Node2(item4);</span><br><span class="line">node2.addClass([&apos;red&apos;]);  //完美</span><br><span class="line">// Node2(item5).addClass([&apos;red&apos;])   是不是有种似曾相识的感觉</span><br></pre></td></tr></table></figure>
+<h3 id="说好的jQuery呢？-你把Node2替换成jQuery-在试试"><a href="#说好的jQuery呢？-你把Node2替换成jQuery-在试试" class="headerlink" title="说好的jQuery呢？ 你把Node2替换成jQuery  在试试"></a>说好的jQuery呢？ 你把Node2替换成jQuery  在试试</h3><blockquote>
+<p>是不是有点感觉了   这是最简单版  以后会慢慢高大上的</p>
+</blockquote>
+<h3 id="jQuery最强大的莫过于选择器-Selector"><a href="#jQuery最强大的莫过于选择器-Selector" class="headerlink" title="jQuery最强大的莫过于选择器 Selector"></a>jQuery最强大的莫过于选择器 Selector</h3><blockquote>
+<p>你肯定听说过一句话  “选择大于能力” (啊！没听过？  现在听过了！)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">window.jQyery = function(nodeOrSelector)&#123;</span><br><span class="line">            let node ; </span><br><span class="line">            if(typeof nodeOrSelector ===&apos;string&apos;)&#123;</span><br><span class="line">                node = document.querySelector(nodeOrSelector);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                node = nodeOrSelector;</span><br><span class="line">            &#125;</span><br><span class="line">            return &#123;</span><br><span class="line">                addClass:function(classArr)&#123;</span><br><span class="line">                    var len = classArr.length;</span><br><span class="line">                    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">                        node.classList.add(classArr[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">var jqyery = jQyery(item4);</span><br><span class="line">jqyery.addClass([&apos;red&apos;]);</span><br></pre></td></tr></table></figure>
+<h3 id="如果用过的人肯定知道jQuery选择器返回的是个伪数组才对"><a href="#如果用过的人肯定知道jQuery选择器返回的是个伪数组才对" class="headerlink" title="如果用过的人肯定知道jQuery选择器返回的是个伪数组才对"></a>如果用过的人肯定知道jQuery选择器返回的是个伪数组才对</h3><blockquote>
+<p>我们使用querySelectorAll()它返回的是一个节点数组（伪数组）</p>
+</blockquote>
+<blockquote>
+<p>然后给我们内部声明的 nodes 复制获取的每个节点</p>
+</blockquote>
+<blockquote>
+<p>如果是节点数组就挨个拷贝  如果是一个 我也把你搞成伪数组哪怕就一个甚至没有<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">window.jQyery = function(nodeOrSelector)&#123;</span><br><span class="line">            let nodes = &#123;&#125;; </span><br><span class="line">            if(typeof nodeOrSelector ===&apos;string&apos;)&#123;</span><br><span class="line">                let temp = document.querySelectorAll(nodeOrSelector);</span><br><span class="line">                for(let i=0;i&lt;temp.length;i++)&#123;</span><br><span class="line">                    nodes[i] = temp[i];</span><br><span class="line">                &#125;   </span><br><span class="line">                nodes.length = temp.length;</span><br><span class="line">            &#125;else if(nodeOrSelector instanceof Node)&#123;</span><br><span class="line">                nodes = &#123;</span><br><span class="line">                    0:nodeOrSelector,</span><br><span class="line">                    length:1</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            nodes.addClass = function(classes)&#123;</span><br><span class="line">                for(let i=0;i&lt;classes.length;i++)&#123;</span><br><span class="line">                    for(let j=0;j&lt;nodes.length;j++)&#123;</span><br><span class="line">                        nodes[j].classList.add(classes[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                return nodes;</span><br><span class="line">            &#125; </span><br><span class="line">            return nodes;</span><br><span class="line">        &#125;</span><br><span class="line">//这样我们就可以用$(选择器)调用了</span><br><span class="line">window.$ = jQyery;</span><br><span class="line">//$(item3).addClass([&apos;red&apos;]);</span><br><span class="line">$(&apos;ul li&apos;).addClass([&apos;red&apos;])</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="你肯定会疑惑-为啥每次都-return-nodes-gt-答案就是链式操作"><a href="#你肯定会疑惑-为啥每次都-return-nodes-gt-答案就是链式操作" class="headerlink" title="你肯定会疑惑 为啥每次都 return nodes ==&gt; 答案就是链式操作"></a>你肯定会疑惑 为啥每次都 return nodes ==&gt; 答案就是链式操作</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(&apos;ul li&apos;).addClass([&apos;red&apos;]).Text(&apos;hi&apos;); //Text 我们还没有实现  ok 马上开始</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在内部继续挂载方法   Text( ) 你传递参数就代表设置text你不传递就代表get</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">nodes.Text = function (text)&#123;</span><br><span class="line">    if(text === undefined)&#123;</span><br><span class="line">        var texts = [];</span><br><span class="line">        for(let i=0;i&lt;nodes.length;i++)&#123;</span><br><span class="line">            texts.push(nodes[i].textContent);</span><br><span class="line">        &#125;</span><br><span class="line">        return texts;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        for(let i=0;i&lt;nodes.length;i++)&#123;</span><br><span class="line">            nodes[i].textContent = text;</span><br><span class="line">        &#125;</span><br><span class="line">        return nodes;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>欢迎批评指正！ </p>
+</blockquote>
+<h3 id="END"><a href="#END" class="headerlink" title="END"></a>END</h3>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/11/27/N027_DOM_API/" title="DOM_API" itemprop="url">DOM_API</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-27T09:58:43.000Z" itemprop="datePublished"> Published 2017-11-27</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="DOM-API"><a href="#DOM-API" class="headerlink" title="DOM_API"></a>DOM_API</h3><blockquote>
+<p>我们写HTML时会先写一个文档头&lt;!Doctype html&gt; 然后html head body</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;!Doctype html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">    &lt;head&gt;&lt;/head&gt;</span><br><span class="line">    &lt;body&gt;&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>head/body是可以省略的，这其实就是一棵树 </p>
+</blockquote>
+<p><img src="https://sltrust.github.io/note/img/note027_0.png" alt="1"></p>
+<p>这是我们大脑中对html的理解，而不是内存中的理解 </p>
+<p><img src="https://sltrust.github.io/note/img/note027_1.png" alt="2"></p>
+<p>内存里是DOM（Document Object Model）文档对象模型</p>
+<p><img src="https://sltrust.github.io/note/img/note027_2.png" alt="3"><br><img src="https://sltrust.github.io/note/img/note027_3.png" alt="4"></p>
+<ul>
+<li>页面上所有标签都有跟它对应的构造函数</li>
+<li>浏览器只要看到一个标签就会给给它构造出来一个对应的内存中的对象</li>
+<li>页面中的节点通过（构造函数）==&gt; 对象</li>
+</ul>
+<blockquote>
+<p>这就是DOM api 如果你想操作一个节点就可以操作这个对象对应的api</p>
+</blockquote>
+<p>Node接口</p>
+<p>1.属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">childNodes</span><br><span class="line">firstChild</span><br><span class="line">innerText</span><br><span class="line">lastChild</span><br><span class="line">nextSibling</span><br><span class="line">nodeName</span><br><span class="line">nodeType</span><br><span class="line">nodeValue</span><br><span class="line">outerText</span><br><span class="line">ownerDocument</span><br><span class="line">parentElement</span><br><span class="line">parentNode</span><br><span class="line">previousSibling</span><br><span class="line">textContent</span><br></pre></td></tr></table></figure>
+<ul>
+<li>document //  document</li>
+<li>document.documentElement //html</li>
+<li>document.body  // 代表body</li>
+</ul>
+<h4 id="childNodes-amp-amp-children"><a href="#childNodes-amp-amp-children" class="headerlink" title="childNodes &amp;&amp; children"></a>childNodes &amp;&amp; children</h4><blockquote>
+<p>如果是节点是包含回车的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">document.body.childNodes //获取body下所有子节点 (注意子节点不是子元素,回车也是文本节点)</span><br><span class="line">document.body.children //获取body下所有子元素</span><br></pre></td></tr></table></figure>
+<h4 id="firstChild-lastChild-amp-amp-firstElementChild-lastElementChild"><a href="#firstChild-lastChild-amp-amp-firstElementChild-lastElementChild" class="headerlink" title="firstChild/lastChild &amp;&amp; firstElementChild lastElementChild"></a>firstChild/lastChild &amp;&amp; firstElementChild lastElementChild</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">document.body.firstChild  //body的第一个子节点  注意是子节点  回车也是文本节点</span><br><span class="line">document.body.lastChild   //body的最后一个子节点  注意是子节点  回车也是文本节点</span><br><span class="line"></span><br><span class="line">document.body.firstElementChild  //body的第一个子节点  注意是子节点  回车也是文本节点</span><br><span class="line">document.body.lastElementChild   //body的最后一个子节点  注意是子节点  回车也是文本节点</span><br></pre></td></tr></table></figure>
+<h4 id="previousSibling-nextSibling-amp-amp-previousElementSibling-nextElementSibling"><a href="#previousSibling-nextSibling-amp-amp-previousElementSibling-nextElementSibling" class="headerlink" title="previousSibling nextSibling &amp;&amp; previousElementSibling nextElementSibling"></a>previousSibling nextSibling &amp;&amp; previousElementSibling nextElementSibling</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//兄弟节点 与 兄弟元素</span><br><span class="line">document.head.previousSibling  //head前一个节点</span><br><span class="line">document.head.nextSibling      //head后一个节点</span><br><span class="line"></span><br><span class="line">document.head.previousElementSibling  //head前一个元素</span><br><span class="line">document.head.nextElementSibling      //head后一个元素</span><br></pre></td></tr></table></figure>
+<h4 id="nodeName"><a href="#nodeName" class="headerlink" title="nodeName"></a>nodeName</h4><blockquote>
+<p>只有svg元素 返回的是小写”svg” 其他标签返回的都是大写</p>
+</blockquote>
+<h4 id="nodeType"><a href="#nodeType" class="headerlink" title="nodeType"></a>nodeType</h4><ul>
+<li>返回节点的节点类型 是数值（为啥是数值，因为以前的内存紧张 节省内存 8M是豪华配置 ）</li>
+<li>1代表元素节点</li>
+<li>3代表文本节点 </li>
+<li>除了这个 1、3它还存了一个常量 用来表示节点类型 Node.ELEMENT_NODE &gt;</li>
+</ul>
+<blockquote>
+<p>自行MDN</p>
+</blockquote>
+<ul>
+<li>1 元素节点</li>
+<li>3 文本节点</li>
+<li>7</li>
+<li>8 注释节点</li>
+<li>9 Document节点</li>
+<li>11 DocumentFragment 节点</li>
+</ul>
+<h4 id="innerText-amp-amp-textContent"><a href="#innerText-amp-amp-textContent" class="headerlink" title="innerText &amp;&amp; textContent"></a>innerText &amp;&amp; textContent</h4><blockquote>
+<p>在IE发明innerText之前 前端想要获取htmls代码的文本需要这样写</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    1&lt;span&gt;2&lt;/span&gt;3&lt;span&gt;&lt;/span&gt;4</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">var text =&apos;&apos;;</span><br><span class="line">for(var i=0;i&lt;div.childNodes.length;i++)&#123;</span><br><span class="line">    if(div.childNodes[i].nodeType === 3)&#123;</span><br><span class="line">        text += div.childNodes[i].nodeValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>于是IE发明了 innerText 你爱用不用我自己觉得很爽</p>
+</blockquote>
+<blockquote>
+<p>FF说了 你IE又搞特殊 于是FF出了个 textContent</p>
+</blockquote>
+<p>innerText &amp;&amp; textContent区别</p>
+<ul>
+<li>textContent 会获取所有元素的内容，包括 script 和 style 元素，然而 innerText 不会。</li>
+<li>innerText意识到样式，并且不会返回隐藏元素的文本，而textContent会。</li>
+<li>由于 innerText 受 CSS 样式的影响，它会触发重排（reflow），但textContent 不会。</li>
+<li>与 textContent 不同的是, 在 Internet Explorer (对于小于等于 IE11 的版本) 中对 innerText 进行修改， 不仅会移除当前元素的子节点，而且还会永久性地破坏所有后代文本节点（所以不可能再次将节点再次插入到任何其他元素或同一元素中）。</li>
+</ul>
+<h4 id="到底用谁"><a href="#到底用谁" class="headerlink" title="到底用谁"></a>到底用谁</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;textContent&apos; in document.body ? document.body.textContent : document.body.innerText</span><br></pre></td></tr></table></figure>
+<p>2.方法（如果一个属性是函数，那么这个属性就也叫做方法；换言之，方法是函数属性）</p>
+<ul>
+<li>createElement()  //创建节点</li>
+<li>appendChild()  </li>
+<li>cloneNode()   //复制一个节点   有一个参数[param] true/false 默认false true代表深拷贝</li>
+<li>contains()    //Node.contains()返回的是一个布尔值，来表示传入的节点是否为该节点的后代节点。</li>
+<li>hasChildNodes() //判断一个节点是否有后代节点</li>
+<li>insertBefore() </li>
+<li>isEqualNode()  //节点是否相等 div2 = div1.cloneNode(true);   div2.isEqualNode(div1) 返回true</li>
+<li>isSameNode()   //判断是否相同(就是是不是同一个)  你与你自己肯定是同一个人  1===1</li>
+<li>removeChild()  //移除一个节点，但是这个节点不是真的没了，还在内存里 只是从页面移除了</li>
+<li>replaceChild() //替换一个节点，但是这个节点不是真的没了，还在内存里 只是从页面移除了</li>
+<li>normalize() // 常规化 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var wrapper = document.createElement(&quot;div&quot;);</span><br><span class="line"></span><br><span class="line">wrapper.appendChild(document.createTextNode(&quot;Part 1 &quot;));</span><br><span class="line">wrapper.appendChild(document.createTextNode(&quot;Part 2 &quot;));</span><br><span class="line"></span><br><span class="line">// 这时(规范化之前),wrapper.childNodes.length === 2</span><br><span class="line">// wrapper.childNodes[0].textContent === &quot;Part 1 &quot;</span><br><span class="line">// wrapper.childNodes[1].textContent === &quot;Part 2 &quot;</span><br><span class="line"></span><br><span class="line">wrapper.normalize();</span><br><span class="line">// 现在(规范化之后), wrapper.childNodes.length === 1</span><br><span class="line">// wrapper.childNodes[0].textContent === &quot;Part 1 Part 2&quot;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>搞清楚英文单词的意思就知道用法</p>
+</blockquote>
+<p>如果发现知道英文后依然不明白用法，看 MDN 的例子即可，如 normalize</p>
+<blockquote>
+<p>DOM APi 无外乎「增删改查」</p>
+</blockquote>
+<h3 id="Document-接口"><a href="#Document-接口" class="headerlink" title="Document 接口"></a>Document 接口</h3><h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4><ul>
+<li>anchors  //废弃 详情mdn 返回a标签 集合</li>
+<li>body </li>
+<li>characterSet  //返回字符集</li>
+<li>childElementCount  //返回元素个数</li>
+<li>children //返回子元素 伪数组</li>
+<li>doctype //返回文档头</li>
+<li>documentElement //返回页面根元素 html</li>
+<li>domain  //返回域名</li>
+<li>fullscreen</li>
+<li>head</li>
+<li>hidden</li>
+<li>images </li>
+<li>links</li>
+<li>location</li>
+<li>onxxxxxxxxx  //监听事件</li>
+<li>origin   </li>
+<li>plugins //安装的插件 静态集合</li>
+<li>readyState </li>
+<li>referrer  //你访问一个网址  浏览器会问你的引荐者是谁  不然就会被拒之门外</li>
+<li>scripts </li>
+<li>scrollingElement</li>
+<li>styleSheets</li>
+<li>title</li>
+<li>visibilityState</li>
+</ul>
+<h4 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h4><ul>
+<li>close()</li>
+<li>createDocumentFragment()</li>
+<li>createElement()</li>
+<li>createTextNode()</li>
+<li>execCommand()</li>
+<li>exitFullscreen()</li>
+<li>getElementById()</li>
+<li>getElementsByClassName()</li>
+<li>getElementsByName()</li>
+<li>getElementsByTagName()</li>
+<li>getSelection()</li>
+<li>hasFocus()</li>
+<li>open()</li>
+<li>querySelector()</li>
+<li>querySelectorAll()</li>
+<li>registerElement()</li>
+<li>write()</li>
+<li>writeln()</li>
+</ul>
+<h2 id="考点"><a href="#考点" class="headerlink" title="考点"></a>考点</h2><ol>
+<li>previousSibling nextSibling </li>
+<li>innerText 和 textContent 的区别</li>
+<li>nodeType  1代表元素节点  3代表文本节点</li>
+<li>cloneNode() 设置参数可以深拷贝</li>
+<li>isEqualNode isSameNode 的区别  isEqualNode是两个节点是否一个样 isSameNode 是 是否是同一个  </li>
+<li>normalize() 主要体现mdn的作用</li>
+</ol>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/11/25/N026_JS里的Function/" title="JS里的Function" itemprop="url">JS里的Function</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-25T09:44:34.000Z" itemprop="datePublished"> Published 2017-11-25</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h4 id="函数的基本结构"><a href="#函数的基本结构" class="headerlink" title="函数的基本结构"></a>函数的基本结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function fn(参数1，参数2)&#123;</span><br><span class="line">  //不写return  它会自动返回 undefined  </span><br><span class="line">  return undefined</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="函数的五种声明方式"><a href="#函数的五种声明方式" class="headerlink" title="函数的五种声明方式"></a>函数的五种声明方式</h4><p>1.第一种  具名函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function x(a,b)&#123;</span><br><span class="line">  return a+b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.第二种 声明一个匿名函数 但是不能单独使用，会报错<br>需要赋值给一个变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// function (a,b)&#123;return a+b&#125; 报错</span><br><span class="line">var fn = function(a,b)&#123;return a+b&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.第三种 具名的函数赋值给一个变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var x = function y(a,b)&#123;return a+b;&#125;</span><br><span class="line">//console.log(y) 报错 y没有定义</span><br><span class="line">//但是单独定义一个函数  function x()&#123;&#125;  </span><br><span class="line">//然后console.log(x) 不会报错</span><br><span class="line">//js又一垃圾之处  不一致性  语法没有错误   原因在于作用域 </span><br><span class="line">// function x()&#123;&#125; 全局作用域</span><br><span class="line">// var x = function y()&#123; //作用域在函数里面&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.第四种 window.Function 全局对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var f = new Function(&apos;a&apos;,&apos;b&apos;,&apos;return a+b&apos;);</span><br><span class="line"></span><br><span class="line">//面试题  假定n=1</span><br><span class="line">var f = new Function(&apos;a&apos;,&apos;b&apos;,&apos;return a+&apos;+n+&apos;b&apos;)</span><br><span class="line">f(1,2)  //4</span><br></pre></td></tr></table></figure></p>
+<p>5.第五种 箭头函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var f = (x,y)=&gt;&#123;return x+y&#125;</span><br><span class="line">var f2 = (x,y) =&gt;x+y;</span><br><span class="line">var f3 = x=&gt;x*2;</span><br><span class="line">var f4 = (x,y)=&gt;&#123;var a = 1; var b =2; return a+b+x+y;&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="函数的name属性"><a href="#函数的name属性" class="headerlink" title="函数的name属性"></a>函数的name属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function f()&#123;&#125;</span><br><span class="line">f.name // &quot;f&quot;</span><br><span class="line">var f2 = function()&#123;&#125;</span><br><span class="line">f2.name // &quot;f2&quot;</span><br><span class="line">var f3 =function f4()&#123;&#125;</span><br><span class="line">f3.name // &quot;f4&quot;</span><br><span class="line">f5 = new Function(&apos;x&apos;,&apos;y&apos;,&apos;return x+y&apos;);</span><br><span class="line">f5.name //&quot;anonymous&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="函数的本质"><a href="#函数的本质" class="headerlink" title="函数的本质"></a>函数的本质</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function sum(x,y)&#123;</span><br><span class="line">    return x+y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> sum(1,2)      &lt;==&gt;     sum.call(undefined,1,2)</p>
+</blockquote>
+<blockquote>
+<p> 小白都这样用 sum(1,2)   sum(2,5)  这个是语法糖 但是对你深入没有任何帮助<br> 硬核玩家这样用  sum.call(undefined,1,2)  </p>
+</blockquote>
+<blockquote>
+<h4 id="只有sum-call-调用的方式-你才能真正理解-this"><a href="#只有sum-call-调用的方式-你才能真正理解-this" class="headerlink" title="只有sum.call()调用的方式  你才能真正理解  this"></a>只有sum.call()调用的方式  你才能真正理解  this</h4></blockquote>
+<h3 id="this-amp-amp-arguments"><a href="#this-amp-amp-arguments" class="headerlink" title="this &amp;&amp; arguments"></a>this &amp;&amp; arguments</h3><ul>
+<li>f.call(undefined,1,2) 的第一个参数是 this</li>
+<li>f.call(undefined,1,2) 第一个后面的参数是 arguments<blockquote>
+<p><img src="https://sltrust.github.io/note/img/note026_1.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var f = function()&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line">f.call(1)    //1</span><br><span class="line">f.call(&apos;sss&apos;) //&apos;sss&apos;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 潜规则   普通模式下 如果this是undefined 浏览器会自动把this变成window</span><br><span class="line">f.call(undefined)   // window</span><br><span class="line"></span><br><span class="line">//如果是严格模式  this就是原本的值</span><br><span class="line">var f2 = function()&#123;</span><br><span class="line">    &apos;use strict&apos;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line">f2.call(undefined);  // undefined</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ul>
+<h6 id="arguments"><a href="#arguments" class="headerlink" title="arguments"></a>arguments</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var f = function()&#123;</span><br><span class="line">    console.log(arguments);</span><br><span class="line">&#125;</span><br><span class="line">f.call(undefined,1,2,3)    </span><br><span class="line">/*</span><br><span class="line">&#123;</span><br><span class="line">0:1,</span><br><span class="line">1:2,</span><br><span class="line">2:3,</span><br><span class="line">length:3</span><br><span class="line">callee:f()&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>arguments 不是数组 它的原型链中没有Array.prototype</p>
+</blockquote>
+<h4 id="call-stack-调用栈"><a href="#call-stack-调用栈" class="headerlink" title="call stack 调用栈"></a>call stack 调用栈</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="作用域面试题"><a href="#作用域面试题" class="headerlink" title="作用域面试题"></a>作用域面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">function f1()&#123;</span><br><span class="line">    var a  = 2;</span><br><span class="line">    f2.call();</span><br><span class="line">    console.log(a);</span><br><span class="line">    </span><br><span class="line">    function f2()&#123;</span><br><span class="line">        var a =3;</span><br><span class="line">        console.log(a);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">f1.call();</span><br><span class="line">console.log(a);</span><br><span class="line">// 3</span><br><span class="line">// 2</span><br><span class="line">// 1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">function f1()&#123;</span><br><span class="line">    f2.call();</span><br><span class="line">    console.log(a);</span><br><span class="line">    var a= 2 ; //变量提升</span><br><span class="line">    </span><br><span class="line">    function f2()&#123;</span><br><span class="line">        var a =3;</span><br><span class="line">        console.log(a);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">f1.call();</span><br><span class="line">console.log(a);</span><br><span class="line">// 3</span><br><span class="line">// undefined</span><br><span class="line">// 1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意分析时要把所有变量提升</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">function f1()&#123;</span><br><span class="line">    console.log(a);</span><br><span class="line">    var a= 2 ; //变量提升</span><br><span class="line">    f4.call();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function f4()&#123;</span><br><span class="line">    console.log(a);</span><br><span class="line">&#125;</span><br><span class="line">f1.call();</span><br><span class="line">console.log(a);</span><br><span class="line">//   undefined</span><br><span class="line">//   1</span><br><span class="line">//   1</span><br></pre></td></tr></table></figure>
+<h4 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a  = 1;</span><br><span class="line">function f4()&#123;</span><br><span class="line">  console.log(a);</span><br><span class="line">&#125;</span><br><span class="line">//如果一个函数，使用了它范围外的变量，那么这个就叫闭包</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/11/23/N025_JS里的Array/" title="JS里的Array" itemprop="url">JS里的Array</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-23T09:15:16.000Z" itemprop="datePublished"> Published 2017-11-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="基本类型-amp-amp-复杂类型"><a href="#基本类型-amp-amp-复杂类型" class="headerlink" title="基本类型 &amp;&amp; 复杂类型"></a>基本类型 &amp;&amp; 复杂类型</h3><blockquote>
+<p>复杂类型的对象使用不使用new都会返回对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Objcet(1)  // 返回一个Number对象</span><br><span class="line">Object(&apos;sss&apos;) //返回一个String对象</span><br><span class="line">Object(true)  //返回一个 Boolean对象</span><br><span class="line">Object() // 返回一个对象 &#123;&#125;</span><br><span class="line">new Object() //返回一个对象&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">String(1) //  &apos;1&apos;</span><br><span class="line">String(true)  // &apos;true&apos;</span><br><span class="line">String(null)  //  &apos;null&apos;</span><br><span class="line"></span><br><span class="line">new String(1)  // String对象</span><br><span class="line">new String(&apos;sss&apos;)  //String对象</span><br><span class="line"></span><br><span class="line">Number(1)  //  数值类型  1</span><br><span class="line">Number(&apos;sss&apos;)  // 数值类型  NaN</span><br><span class="line"></span><br><span class="line">new Number(1)  // Number对象</span><br><span class="line"></span><br><span class="line">Boolean(1)  // true</span><br><span class="line">new Boolean(1)  //Boolean对象</span><br><span class="line">new Boolean(&apos;   &apos;) //Boolean对象</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><img src="https://sltrust.github.io/note/img/note025_2.png" alt></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//不一致性的一个恶心的问题</span><br><span class="line">var arr = new Array(3); //这个数组的length为3</span><br><span class="line">//arr[0]未指定 arr[1]未指定 arr[2] 未指定</span><br><span class="line">console.log(0 in arr) //false</span><br><span class="line">console.log(1 in arr) //false</span><br><span class="line">console.log(2 in arr) //false</span><br></pre></td></tr></table></figure>
+<blockquote>
+</blockquote>
+<h4 id="JS七种数据类型"><a href="#JS七种数据类型" class="headerlink" title="JS七种数据类型"></a>JS七种数据类型</h4><blockquote>
+<p>number   string   boolean   symbol   null   undefined   object</p>
+</blockquote>
+<h4 id="五个falsy值"><a href="#五个falsy值" class="headerlink" title="五个falsy值"></a>五个falsy值</h4><blockquote>
+<p>0 NaN 空字符 null undefined</p>
+</blockquote>
+<h4 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h4><blockquote>
+<p>用法</p>
+</blockquote>
+<h5 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a1 = [&apos;a&apos;,&apos;b&apos;];   //推荐使用</span><br><span class="line">var a2 = new Array(&apos;a&apos;,&apos;b&apos;)</span><br><span class="line">// 两种方式没区别</span><br></pre></td></tr></table></figure>
+<h4 id="不一致性-Array-3-和-Array-3-3-坑爹之处"><a href="#不一致性-Array-3-和-Array-3-3-坑爹之处" class="headerlink" title="不一致性 Array(3) 和 Array(3,3) (坑爹之处)"></a>不一致性 Array(3) 和 Array(3,3) (坑爹之处)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a1 = Array(3) //单个参数  声明了length = 3 的数组 每个值是undefined</span><br><span class="line">var a2 = Array(2,3) // 声明了 length = 2 的数组  [2,3]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><img src="https://sltrust.github.io/note/img/note025_01.png" alt></p>
+</blockquote>
+<h4 id="function-amp-amp-Function"><a href="#function-amp-amp-Function" class="headerlink" title="function &amp;&amp; Function"></a>function &amp;&amp; Function</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//function 是关键字  </span><br><span class="line">//Function是全局对象</span><br><span class="line"></span><br><span class="line">//声明方式  </span><br><span class="line">//具名函数</span><br><span class="line">function fn ()&#123; &#125;</span><br><span class="line"></span><br><span class="line">// 匿名函数</span><br><span class="line">function()&#123; &#125;   </span><br><span class="line"></span><br><span class="line">var f2 = new Function(&apos;a&apos;,&apos;b&apos;,&apos;return a+b&apos;);   //闲的蛋疼才用   很极限的情况下才会应用</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var f = function ()&#123;return &apos;a&apos;;&#125;</span><br><span class="line">// var a = 1的变体  只不过  function存在堆里 f 存的是引用</span><br></pre></td></tr></table></figure>
+<h4 id="继续研究数组"><a href="#继续研究数组" class="headerlink" title="继续研究数组"></a>继续研究数组</h4><blockquote>
+<p><img src="https://sltrust.github.io/note/img/note025_03.png" alt></p>
+</blockquote>
+<h4 id="Array-amp-amp-伪数组"><a href="#Array-amp-amp-伪数组" class="headerlink" title="Array &amp;&amp; 伪数组"></a>Array &amp;&amp; 伪数组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var arr = [1,2,3];</span><br><span class="line">for(var i=0;i&lt;arr.length;i++)&#123;</span><br><span class="line">  console.log(arr[i])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//伪数组</span><br><span class="line">var obj = &#123;0:1,1:2,2:3,length:3&#125;</span><br><span class="line">for(var i=0;i&lt;obj.length;i++)&#123;</span><br><span class="line">  console.log(obj[i])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>数组与伪数组的区别就是  伪数组的原型链里没有Array.prototype这一层<br><img src="https://sltrust.github.io/note/img/note025_04.png" alt></p>
+</blockquote>
+<h4 id="forEach"><a href="#forEach" class="headerlink" title="forEach"></a>forEach</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var a =[1,2,3]</span><br><span class="line">a.forEach(function(val,idx,arr)&#123; </span><br><span class="line">  //遍历方法要接受一个函数</span><br><span class="line">  //函数有三个参数  val是值 idx是索引  arr就是这个数组对象</span><br><span class="line">  console.log(val,idx,arr)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//接受一个函数并执行</span><br><span class="line">function myExe( fn)&#123;</span><br><span class="line">  fn(666);</span><br><span class="line">&#125;</span><br><span class="line">myExe(function(xxx)&#123;</span><br><span class="line">                console.log(xxx)</span><br><span class="line">            &#125;)</span><br><span class="line">// 666</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>简化版forEach<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function forEach(arr,fn)&#123;</span><br><span class="line">    for(var i=0;i&lt;arr.length;i++)&#123;</span><br><span class="line">        fn(arr[i],i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var arr = [&apos;a&apos;,&apos;b&apos;,&apos;c&apos;]</span><br><span class="line">forEach(arr,function(v,i)&#123;console.log(v,i)&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//数组的forEach</span><br><span class="line">arr.forEach(function(v,i)&#123;</span><br><span class="line">                     console.log(v,i)</span><br><span class="line">            &#125;)</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>疑惑 为什么a.forEach() 没有像我们的forEach一样传递 arr呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arr.forEach(function()&#123;&#125;) </span><br><span class="line">//等价于下面的形式</span><br><span class="line">arr.forEach.call(arr,function()&#123;&#125;)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>再看<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;0:&apos;a&apos;,1:&apos;b&apos;,2:&apos;c&apos;,length:2&#125;;</span><br><span class="line">obj.forEach = function(fn)&#123;</span><br><span class="line">    for(var i=0;i&lt;this.length;i++)&#123;</span><br><span class="line">        fn(this[i],i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//forEach实际上接收了 obj 就是用this来接收</span><br><span class="line">// js蛋疼之处</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="sort"><a href="#sort" class="headerlink" title="sort()"></a>sort()</h5><p>它内置的排序一般是快排<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a = [5,3,2,1,4];</span><br><span class="line">a.sort(); // 1,2,3,4,5 默认升序</span><br><span class="line">//你也可以传递一个函数 函数的返回值为正数、0或负数</span><br><span class="line">a.sort(function(x,y)&#123;return x-y;&#125;)  //1,2,3,4,5</span><br><span class="line">a.sort(function(x,y)&#123;function y-x&#125;;) //5,4,3,2,1</span><br></pre></td></tr></table></figure></p>
+<h3 id="复杂的排序"><a href="#复杂的排序" class="headerlink" title="复杂的排序"></a>复杂的排序</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">hash = &#123;</span><br><span class="line">    &apos;马云&apos;:167.22,</span><br><span class="line">    &apos;马化腾&apos;:379,</span><br><span class="line">    &apos;李彦宏&apos;:229.11</span><br><span class="line">&#125;;</span><br><span class="line">//按资产排序 倒序</span><br><span class="line">var a = [&apos;马云&apos;,&apos;马化腾&apos;,&apos;李彦宏&apos;]</span><br><span class="line">a.sort(function(x,y)&#123;</span><br><span class="line">    return hash[y] - hash[x]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h5 id="join"><a href="#join" class="headerlink" title="join"></a>join</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a = [1,2,3];</span><br><span class="line">a.join() ; //1,2,3</span><br><span class="line">a.join(&apos;--&apos;) //1--2--3</span><br></pre></td></tr></table></figure>
+<h5 id="concat"><a href="#concat" class="headerlink" title="concat()"></a>concat()</h5><blockquote>
+<p>concat会返回一个新的数组<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a = [1,2,3]</span><br><span class="line">var b = [4,5,6]</span><br><span class="line">var c = a.concat(b);</span><br><span class="line">// 返回一个新的数组  [1,2,3,4,5,6]  </span><br><span class="line"></span><br><span class="line">// 非常厉害的用法快速复制一个数组</span><br><span class="line">var d =a.concat([]) // 新数组 [1,2,3]</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="map"><a href="#map" class="headerlink" title="map()"></a>map()</h5><blockquote>
+<p>跟forEach的区别</p>
+<ul>
+<li>forEach没有返回值</li>
+<li>map有返回值<br>map的含义 是映射<br><img src="https://sltrust.github.io/note/img/note025_5.png" alt><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a = [1,2,3]</span><br><span class="line">a.map(function()&#123;return value*2&#125;) // [2,3,6]</span><br><span class="line">//箭头函数的写法</span><br><span class="line">a.map(value=&gt;value*2)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<h5 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h5><blockquote>
+<p>过滤<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a = [1,2,3,4,5,6,7,8,9,10]</span><br><span class="line">a.filter(function(value)&#123;</span><br><span class="line">    return value%2===0;</span><br><span class="line">&#125;)</span><br><span class="line">// [2,4,6,8,10]</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h5><blockquote>
+<p>减少 降<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var a = [1,2,3,4,5,6,7,8,9,10]</span><br><span class="line">//第一个参数是一个函数 函数有两个参数 第一个参数 之前的结果 当前的值</span><br><span class="line">//第二个参数代表初始值</span><br><span class="line">a.reduce(function(sum,n)&#123;</span><br><span class="line">  return sum+n</span><br><span class="line">&#125;,0) </span><br><span class="line">// 55</span><br><span class="line"></span><br><span class="line">//箭头函数</span><br><span class="line">a.reduce((sum,n)=&gt;sum+n,0);</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="map用reduce代替"><a href="#map用reduce代替" class="headerlink" title="map用reduce代替"></a>map用reduce代替</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var a  = [1,2,3];</span><br><span class="line">a.reduce(function(arr,n)&#123;</span><br><span class="line">  arr.push(n*2);</span><br><span class="line">  return arr</span><br><span class="line">&#125;,[])  //[2,4,6]</span><br></pre></td></tr></table></figure>
+<h5 id="filter用reduce代替"><a href="#filter用reduce代替" class="headerlink" title="filter用reduce代替"></a>filter用reduce代替</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a  = [1,2,3,4,5,6,7,8,9,10];</span><br><span class="line">a.reduce(function(arr,n)&#123;</span><br><span class="line">  if(n%2===0)&#123;</span><br><span class="line">    arr.push(n)</span><br><span class="line">  &#125;</span><br><span class="line">  return arr</span><br><span class="line">&#125;,[])  //[2,4,6,8,10]</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/11/21/N022_JS里的对象/" title="JS里的对象" itemprop="url">JS里的对象</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-11-21T08:06:04.000Z" itemprop="datePublished"> Published 2017-11-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="全局对象global-浏览器上叫window"><a href="#全局对象global-浏览器上叫window" class="headerlink" title="全局对象global (浏览器上叫window)"></a>全局对象global (浏览器上叫window)</h3><blockquote>
+<p>不管你在哪个网页都可以访问到这个对象—window<br>它有很多属性<br>global.parseInt()<br>golbal.parseFloat()<br>…</p>
+</blockquote>
+<p>假设浏览器分给js一部分内存   如果内存里空空如也我们就什么也调用不了</p>
+<blockquote>
+<p>每次浏览器生成的时候就生成一个global<br><img src="https://sltrust.github.io/note/img/note022_1.png" alt><br><img src="https://sltrust.github.io/note/img/note022_2.png" alt></p>
+</blockquote>
+<h4 id="Number"><a href="#Number" class="headerlink" title="Number"></a>Number</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var n = 1;</span><br><span class="line">var n2 = new Number(1);</span><br><span class="line">// n2是  Number对象  提供很多方法  可以 n2.toString() n2.toFixed(2)</span><br><span class="line">//但是  n 也可以  n.toString()   n.toFixed(2) 但是 n是一个基本类型 没有方法</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><img src="https://sltrust.github.io/note/img/note022_3.png" alt><br>JS设计之初因为BOSS要求JS要像JAVA 作者为了满足老板的需求“长得像JAVA”<br>所以出现了 var n2 = new Number() 但实际上没有人用<br>JS实际用法 是 var  n  = 1;</p>
+</blockquote>
+<h5 id="但是它是怎么解决基本类型-调用方法的呢？"><a href="#但是它是怎么解决基本类型-调用方法的呢？" class="headerlink" title="但是它是怎么解决基本类型 调用方法的呢？"></a>但是它是怎么解决基本类型 调用方法的呢？</h5><p> 妙计：临时转换<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var n  = 1;</span><br><span class="line"> n.toString() </span><br><span class="line">// 调用toString()的时候 产生一个临时的对象  temp</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>step1  temp  = new Number(n);</li>
+<li>step2  temp.toSrring();</li>
+<li>step3  方法调用结束后销毁 temp对象</li>
+</ul>
+<p>这样我就永远不用使用new Number()去创建一个number对象 并调用其相关方法</p>
+<blockquote>
+<p>调用过程<br><img src="https://sltrust.github.io/note/img/note022_4.png" alt><br>基本类型的xxx是多少<br><img src="https://sltrust.github.io/note/img/note022_5.png" alt></p>
+</blockquote>
+<h5 id="String对象"><a href="#String对象" class="headerlink" title="String对象"></a>String对象</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">slice() // 切片方法  &apos;hello&apos;.slice(1,3)  输出  el   口诀包头不包尾</span><br><span class="line">concat() //字符串拼接  </span><br><span class="line">trim() //去除首尾空格</span><br></pre></td></tr></table></figure>
+<h5 id="Boolean对象"><a href="#Boolean对象" class="headerlink" title="Boolean对象"></a>Boolean对象</h5><blockquote>
+<p>一个“坑”点<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var b1 = false;</span><br><span class="line">var b2 = new Boolean(false);</span><br><span class="line">if(b1)&#123;console.log(1)&#125;  //不会打印1</span><br><span class="line">if(b2)&#123;console.log(2)&#125;  //打印2  因为所有对象转换为boolean值都是true</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="Object对象"><a href="#Object对象" class="headerlink" title="Object对象"></a>Object对象</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var o1  = &#123; &#125;;</span><br><span class="line">var o2 = new Object();</span><br><span class="line">// o1和o2没区别  都是对象</span><br><span class="line">//注意一点 凡是新声明的对象  都是不相等的  o1 !== o2</span><br></pre></td></tr></table></figure>
+<h4 id="共有属性-prototype"><a href="#共有属性-prototype" class="headerlink" title="共有属性 prototype"></a>共有属性 prototype</h4><blockquote>
+<p>不同类型对象都有一个toString() 和valueOf()<br><img src="https://sltrust.github.io/note/img/note022_6.png" alt></p>
+</blockquote>
+<blockquote>
+<p>如果方法挂载到 对象上就会要出现很多的key<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__proto__ //隐藏在对象里 特定的指向 该类型的共有属性</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p><img src="https://sltrust.github.io/note/img/note022_7.png" alt><br><img src="https://sltrust.github.io/note/img/note022_8.png" alt><br>原型链 ==&gt; 这样一层一层向上指的过程 形成了一个链条<br><img src="https://sltrust.github.io/note/img/note022_9.png" alt></p>
+</blockquote>
+<h3 id="prototype-就是共有属性"><a href="#prototype-就是共有属性" class="headerlink" title="prototype 就是共有属性"></a>prototype 就是共有属性</h3><blockquote>
+<p><img src="https://sltrust.github.io/note/img/note022_10.png" alt><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String.prototype是 String的共有属性 （这里是防止它没有，系统生成的）</span><br><span class="line">s.__proto__ 是String共有属性的引用 (这个是实际使用的)</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="烧脑部分"><a href="#烧脑部分" class="headerlink" title="烧脑部分"></a>烧脑部分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__proto__与 prototype</span><br><span class="line">// var n = new Number()</span><br><span class="line">// var b = new Boolean()</span><br><span class="line">// var s = new String()</span><br><span class="line">// var o = new Object()</span><br></pre></td></tr></table></figure>
+<p><img src="https://sltrust.github.io/note/img/note022_11.png" alt><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">var 对象 = new 函数()</span><br><span class="line">对象.__proto__  === 函数.prototype</span><br><span class="line"></span><br><span class="line">var s = new String()</span><br><span class="line">s.__proto__ === String.prototype // true</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//烧脑的来了</span><br><span class="line">// 函数.prototype也是一个对象</span><br><span class="line">函数.prototype.__proto__ === Object.prototype // true</span><br><span class="line"></span><br><span class="line">//再次烧脑 函数是不是一个对象  ==》是</span><br><span class="line">//  var obj2 = 函数</span><br><span class="line">//  obj2.__proto__ === Function.prototype</span><br><span class="line">函数.__proto__ === Function.prototype</span><br><span class="line">Function.__proto__ === Function.prototype</span><br><span class="line">// Function.prototype也是一个对象</span><br><span class="line"> Function.prototype.__proto__ === Object.prototype</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Function.__proto__ === Function.prototype //true</span><br></pre></td></tr></table></figure></p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">对象.__proto__  === 函数.prototype</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Object.__proto__ === Function.prototype</span><br><span class="line">Object.prototype.__proto__ 实际是 null</span><br></pre></td></tr></table></figure>
+<p><img src="https://sltrust.github.io/note/img/note022_12.png" alt></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/11/19/N021_JS里的类型/" title="JS里的类型" itemprop="url">JS里的类型</a>
   </h1>
   <p class="article-author">By
@@ -519,864 +1236,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/23/N012_01_CSS伪元素和技巧/" title="CSS伪元素和技巧" itemprop="url">CSS伪元素和技巧</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-23T14:44:20.000Z" itemprop="datePublished"> Published 2017-10-23</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="什么是伪元素"><a href="#什么是伪元素" class="headerlink" title="什么是伪元素"></a>什么是伪元素</h3><p>如果有一个div</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;hi&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">div::before&#123;content:&apos;「&apos;&#125;</span><br><span class="line">dis::after&#123;content:&apos;」&apos;&#125;</span><br></pre></td></tr></table></figure>
-<p>添加如下css,你会发现生成为 「hi」，这就是伪元素，你也可以改变伪元素的display为block那样它就变成了一个块元素</p>
-<h3 id="用CSS实现各种图形"><a href="#用CSS实现各种图形" class="headerlink" title="用CSS实现各种图形"></a>用CSS实现各种图形</h3><blockquote>
-<p>如果你会用google就搜索「css tricks shape」</p>
-</blockquote>
-<p><a href="https://css-tricks.com/examples/ShapesOfCSS/" target="_blank" rel="noopener">css tricks shape</a></p>
-<h3 id="如何实现颜色渐变"><a href="#如何实现颜色渐变" class="headerlink" title="如何实现颜色渐变"></a>如何实现颜色渐变</h3><blockquote>
-<p>如果你会用google就搜索「css3 linear gradient generator」</p>
-</blockquote>
-<p><a href="http://www.colorzilla.com/gradient-editor/" target="_blank" rel="noopener">css线性渐变生成器</a></p>
-<h3 id="生成动画"><a href="#生成动画" class="headerlink" title="生成动画"></a>生成动画</h3><blockquote>
-<p>如果你会用google就搜索「css3 animation generator」</p>
-</blockquote>
-<blockquote>
-<p>可能你没搜到那就搜索「anmiation mdn」肯定有代码给你抄</p>
-</blockquote>
-<h3 id="生成阴影"><a href="#生成阴影" class="headerlink" title="生成阴影"></a>生成阴影</h3><blockquote>
-<p>如果你会用google就搜索「css shadow generator」</p>
-</blockquote>
-<p><a href="https://www.cssmatic.com/box-shadow" target="_blank" rel="noopener">css阴影生成器</a></p>
-<h3 id="画出太极"><a href="#画出太极" class="headerlink" title="画出太极"></a>画出太极</h3><p>如果你第一次画肯定是这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#taiji&#123;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    height: 200px;</span><br><span class="line">    width: 200px;</span><br><span class="line">    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(0,0,0,1) 50%,rgba(0,0,0,1) 100%); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#taiji .lbox,#taiji .rbox&#123;</span><br><span class="line">    float:left;</span><br><span class="line">    width:100px;</span><br><span class="line">    height: 100px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #fff;</span><br><span class="line">    margin-top:50px;</span><br><span class="line">&#125; </span><br><span class="line">#taiji .rbox&#123;</span><br><span class="line">    float:left;</span><br><span class="line">    background: black;</span><br><span class="line">&#125;</span><br><span class="line">#taiji .lson,#taiji .rson&#123;</span><br><span class="line">    height: 30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    background: #000;</span><br><span class="line">    margin:35px auto;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">&#125;</span><br><span class="line">#taiji .rson&#123;</span><br><span class="line">    background:#fff;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;taiji&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;lbox&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;lson&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;rbox&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;rson&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<p>如果你喜欢深挖css</p>
-<p>预览我做的 <a href="https://sltrust.github.io/learnCss/taiji3.html" target="_blank" rel="noopener">https://sltrust.github.io/learnCss/taiji3.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#taiji&#123;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    height: 200px;</span><br><span class="line">    width: 200px;</span><br><span class="line">    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(0,0,0,1) 50%,rgba(0,0,0,1) 100%); </span><br><span class="line">    position: relative;</span><br><span class="line">    animation-duration:3s;</span><br><span class="line">    animation-name:circlearount;</span><br><span class="line">    animation-iteration-count: infinite;</span><br><span class="line">    animation-timing-function: linear;</span><br><span class="line">&#125;</span><br><span class="line">@keyframes circlearount&#123;</span><br><span class="line">    from&#123;</span><br><span class="line">        transform: rotate(0deg);</span><br><span class="line">    &#125;</span><br><span class="line">    to&#123;</span><br><span class="line">        transform: rotate(360deg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">div#taiji::before&#123;</span><br><span class="line">    content:&apos;&apos;;</span><br><span class="line">    position: absolute;</span><br><span class="line">    height:  30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #fff;</span><br><span class="line">    border:35px solid #000;</span><br><span class="line">    top:50px;</span><br><span class="line">    left:0;</span><br><span class="line">&#125;</span><br><span class="line">div#taiji::after&#123;</span><br><span class="line">    content:&apos;&apos;;</span><br><span class="line">    position: absolute;</span><br><span class="line">    height: 30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #000;</span><br><span class="line">    border:35px solid #fff;</span><br><span class="line">    top:50px;</span><br><span class="line">    right:0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;taiji&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/22/N011CSS布局与定位/" title="CSS布局与定位" itemprop="url">CSS布局与定位</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-22T14:44:20.000Z" itemprop="datePublished"> Published 2017-10-22</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="CSS布局与定位"><a href="#CSS布局与定位" class="headerlink" title="CSS布局与定位"></a>CSS布局与定位</h2><p>题外话如果你想要一个高清的背景图你可以去 <a href="https://alpha.wallhaven.cc/" target="_blank" rel="noopener">wallhaven</a></p>
-<h4 id="div的高度由谁决定-核心知识点"><a href="#div的高度由谁决定-核心知识点" class="headerlink" title="div的高度由谁决定(核心知识点)"></a>div的高度由谁决定(核心知识点)</h4><blockquote>
-<p>div的高度由其内部文档流元素的高度总和决定</p>
-</blockquote>
-<h4 id="文档流是什么-核心知识点"><a href="#文档流是什么-核心知识点" class="headerlink" title="文档流是什么(核心知识点)"></a>文档流是什么(核心知识点)</h4><blockquote>
-<p>文档内元素的流动方向</p>
-</blockquote>
-<ol>
-<li>如果你是一个内联元素,就是从左往右流动,如果宽度不够(流动遇到阻碍,它就换行继续从左往右)</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">...</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>如果你是一个块级元素,就是从上往下,每个块级元素另起一行</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">...</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<p>如图</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_01.png" alt></p>
-<h4 id="热干面的笑话"><a href="#热干面的笑话" class="headerlink" title="热干面的笑话"></a>热干面的笑话</h4><p>外语认为单词的不可分割性导致 老外学中文 “热干面” 他会连续的把字向英语单词一样读出来</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_02.png" alt></p>
-<p>答案是因为文化差异「haaaaaaaaaaaaaaaaa」 会被当作一个单词而不像汉字一样可以分开</p>
-<blockquote>
-<p>你想分开它怎么办</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">span&#123;word-break:break-all&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="inline-block"><a href="#inline-block" class="headerlink" title="inline-block"></a>inline-block</h4><p>想要块级元素 变成一行 </p>
-<blockquote>
-<p>本来可以float实现,但是很多人不会于是css3推出 inline-block</p>
-</blockquote>
-<p>但是这是个触发很多问题的属性,会导致很多恶心的问题(建议float)</p>
-<h4 id="内联元素的高度由什么决定-很难很难的知识点"><a href="#内联元素的高度由什么决定-很难很难的知识点" class="headerlink" title="内联元素的高度由什么决定(很难很难的知识点)"></a>内联元素的高度由什么决定(很难很难的知识点)</h4><p>这要从与前端不相关的问题说起</p>
-<blockquote>
-<p>回忆起你上小学学汉语拼音的时候「四线谱」</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_03.png" alt></p>
-<blockquote>
-<p>你写汉字会中线对齐吗？ 明显不会<br>你写第二行的时候你会紧贴着第一行吗？明显也不会(多少都会留一些空隙表示分割)</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_04.png" alt></p>
-<blockquote>
-<p>即使在我们知道了字有「建议行高」的存在，但是内联元素的高度仍然是不确定的</p>
-</blockquote>
-<ul>
-<li>因为不同字体设计的建议行高不同 </li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_05.png" alt></p>
-<blockquote>
-<h4 id="结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定"><a href="#结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定" class="headerlink" title="结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定"></a>结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定</h4></blockquote>
-<h4 id="我们怎么避免内联元素这些奇怪的问题"><a href="#我们怎么避免内联元素这些奇怪的问题" class="headerlink" title="我们怎么避免内联元素这些奇怪的问题"></a>我们怎么避免内联元素这些奇怪的问题</h4><p>假设需求是 span 16px 高度40px</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">    span&#123;font-size:16px;&#125;</span><br><span class="line">    div&#123;</span><br><span class="line">        line-height:24px;</span><br><span class="line">        padding:6px 0;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line"></span><br><span class="line">&lt;div&gt;</span><br><span class="line">    &lt;span&gt;你好&lt;/span&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>在font-size比较小的时候，可以用line-height控制</li>
-<li>建议设置的行高稍大于字体的大小</li>
-</ul>
-<h4 id="迫不得已的-height-最容易出bug的属性"><a href="#迫不得已的-height-最容易出bug的属性" class="headerlink" title="迫不得已的 height (最容易出bug的属性)"></a>迫不得已的 height (最容易出bug的属性)</h4><blockquote>
-<p>初学前端的你是不是经常看到设计图之后立刻一个 height:300px;</p>
-</blockquote>
-<ul>
-<li>一定不要写height,我们刚已经说了div的高度由其内部文档流元素的高度总和决定</li>
-<li><p>你上来一个 height:300px; 万一div里面文档流高度301你怎么办？</p>
-</li>
-<li><p>不到情非得已千万不要写高度</p>
-</li>
-</ul>
-<h4 id="脱离文档流"><a href="#脱离文档流" class="headerlink" title="脱离文档流"></a>脱离文档流</h4><blockquote>
-<p>请问 .main的高度是多少？ 300px</p>
-</blockquote>
-<ol>
-<li>div1 脱离了文档流</li>
-<li>.main的高度由其内部文档流元素的高度总和决定</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如果一个元素它是fixed定位，它的宽度就不会向外扩展</p>
-</blockquote>
-<ul>
-<li>如果你fixed的元素原来是宽度占满的，通常要设置 width:100%;</li>
-</ul>
-<h4 id="width-100-bug的根源"><a href="#width-100-bug的根源" class="headerlink" title="width:100%(bug的根源)"></a>width:100%(bug的根源)</h4><ul>
-<li>如果你没什么事，千万不要加width:100%;</li>
-</ul>
-<blockquote>
-<p>如果你fixed定位的元素有padding:20px; 再加上width:100%;那么它就比它爸爸的宽度还要大</p>
-</blockquote>
-<p>div1的宽度已经比 main大了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;padding:20px;width:100%&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>套路</p>
-</blockquote>
-<ul>
-<li>移除fixed元素的padding</li>
-<li>在fixed元素内部在包含一个div,让这个div有padding</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;width:100%&quot;&gt;</span><br><span class="line">        &lt;div style=&quot;padding:20px;&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="背景图自适应"><a href="#背景图自适应" class="headerlink" title="背景图自适应"></a>背景图自适应</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    background-img:url(./img/aa.png);</span><br><span class="line">    background-position:center center;</span><br><span class="line">    background-size:cover;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="宽度自适应"><a href="#宽度自适应" class="headerlink" title="宽度自适应"></a>宽度自适应</h4><ul>
-<li>不要写 width:1000px 这样你怎么拖拽网页它都是1000px</li>
-</ul>
-<blockquote>
-<p>max-width:940px; 网页宽度小于940的时候它也跟着缩小</p>
-</blockquote>
-<h4 id="div水平居中的套路"><a href="#div水平居中的套路" class="headerlink" title="div水平居中的套路"></a>div水平居中的套路</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    margin-left:auto;</span><br><span class="line">    margin-right:auto;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="不接受宽高设置的-span"><a href="#不接受宽高设置的-span" class="headerlink" title="不接受宽高设置的 span"></a>不接受宽高设置的 span</h4><ul>
-<li>因为span是内联元素(display:inline)设置宽高是无效的</li>
-<li>通常你要设置 display:inline-block</li>
-</ul>
-<blockquote>
-<p>需求一个span 内容是 hello 宽70 高30你会怎么办</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/*新手*/</span><br><span class="line">span&#123;</span><br><span class="line">    display:inline-block;</span><br><span class="line">    height:30px;</span><br><span class="line">    width:70px;</span><br><span class="line">    line-height:30px;</span><br><span class="line">    text-align:center;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*老司机   </span><br><span class="line">1.先看不设置样式时hello会占据多少的宽高</span><br><span class="line">2.经发现宽38px高22px</span><br><span class="line">3.设置line-height:22px因为不同机器上字体表现的高度有所差异</span><br><span class="line">*/</span><br><span class="line">span&#123;</span><br><span class="line">    display:inline-block;</span><br><span class="line">    padding:4px 16px;</span><br><span class="line">    line-height:22px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="css画三角形"><a href="#css画三角形" class="headerlink" title="css画三角形"></a>css画三角形</h4><ul>
-<li>border属性的使用</li>
-</ul>
-<ol>
-<li><p>先画个带边框的盒子</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:50px;</span><br><span class="line">    width:50px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>给四个边框四个颜色</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:50px;</span><br><span class="line">    width:50px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>把div高度和宽度设置为0，四个三角出现了</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将上边框宽度设置为0</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">    border-top-width:0px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将其他方向的border颜色设置为透明</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid transparent;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">    border-top-width:0px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="iconfont-字体图标的使用"><a href="#iconfont-字体图标的使用" class="headerlink" title="iconfont 字体图标的使用"></a>iconfont 字体图标的使用</h4><p><a href="http://www.iconfont.cn/" target="_blank" rel="noopener">iconfont</a></p>
-<ol>
-<li>建议你先登录一下，有好几种那种都可以</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_06.png" alt></p>
-<ol start="2">
-<li>搜搜你需要的图标然后添加购物车</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_07.png" alt></p>
-<ol start="3">
-<li>点击购物车,添加新项目.如xxx</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_08.png" alt></p>
-<ol start="4">
-<li>添加项目成功后,你可以看到如下内容</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_09.png" alt></p>
-<ol start="5">
-<li>点击查看在线链接然后生成文件,然后引入到项目中,然后点击使用帮助对着文档抄</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_10.png" alt></p>
-<ol start="6">
-<li>以下是步骤</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_11.png" alt></p>
-<blockquote>
-<p>以上步骤后你就可以使用 svg了</p>
-</blockquote>
-<ul>
-<li>如何控制svg的大小 height/width</li>
-<li>如何控制svg的背景色 fill</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">svg&#123;</span><br><span class="line">    height:30px;</span><br><span class="line">    width:30px;</span><br><span class="line">    fill:#0089e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/21/N010_CSS/" title="CSS" itemprop="url">CSS</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-21T14:44:20.000Z" itemprop="datePublished"> Published 2017-10-21</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="CSS-Cascading-Style-Sheets"><a href="#CSS-Cascading-Style-Sheets" class="headerlink" title="CSS (Cascading Style Sheets)"></a>CSS (Cascading Style Sheets)</h2><h3 id="CSS历史"><a href="#CSS历史" class="headerlink" title="CSS历史"></a>CSS历史</h3><p><a href="https://en.wikipedia.org/wiki/Cascading_Style_Sheets#History" target="_blank" rel="noopener">英文维基百科</a></p>
-<blockquote>
-<p>凯斯kei丁(如果你实在不知道第一个咋读)注意！中文维基已经落后很久了</p>
-</blockquote>
-<ol>
-<li><p>两个人合作发明了 CSS<br>1994年哈肯·维姆·莱提出了CSS的最初建议。伯特·波斯（Bert Bos）当时正在设计一个叫做“Argo”的浏览器，他们决定一起合作设计CSS。</p>
-</li>
-<li><p>W3C 开始接管 CSS<br>1997年初，W3C内组织了专门管CSS的工作组，其负责人是克里斯·里雷。</p>
-</li>
-<li><p>CSS 2.1<br>1998年5月W3C发表了CSS2<br>CSS2.1修改了CSS2中的一些错误，删除了其中基本不被支持的内容和增加了一些已有的浏览器的扩展内容。</p>
-</li>
-<li><p>CSS 3<br>从 2011 年开始 CSS 被分为多个模块单独升级，统称为 CSS 3。这些模块有：<br>CSS 选择器 level 3<br>CSS 媒体查询 level 3<br>CSS Color level 3<br>更多请 google 搜索 CSS spec <a href="https://www.w3.org/Style/CSS/specs.en.html" target="_blank" rel="noopener">你可以看看</a></p>
-</li>
-<li><p>CSS 4?<br>不好意思，没有 CSS 4，只有各个模块的 level 4(每个功能独立写文档)</p>
-</li>
-</ol>
-<blockquote>
-<p>ps 文档很多 学海无涯生命有限，所以我们要先用在学，碰到了再去细究</p>
-</blockquote>
-<p>周边工具</p>
-<ul>
-<li>LESS CSS<br>一种简化、功能更多的 CSS 语言 中文官网 英文官网</li>
-<li>SASS<br>一种简化、功能更多的 CSS 语言（请自行搜索中英文官网）</li>
-<li>PostCSS<br>一种 CSS 处理程序</li>
-</ul>
-<blockquote>
-<p>建议是，先不要看周边工具，学好最朴素的 CSS，然后升级就很容易了。</p>
-</blockquote>
-<h3 id="CSS-学习资源"><a href="#CSS-学习资源" class="headerlink" title="CSS 学习资源"></a>CSS 学习资源</h3><ol>
-<li>Google: 关键词 MDN</li>
-<li><a href="https://css-tricks.com/" target="_blank" rel="noopener">CSS Tricks</a>（ 「居中」搜索 center css tricks）</li>
-<li>Google: 阮一峰 css</li>
-<li>张鑫旭的 240 多篇 CSS 博客</li>
-<li><a href="https://tympanus.net/codrops/category/playground/" target="_blank" rel="noopener">Codrops 炫酷 CSS 效果</a></li>
-<li>CSS揭秘 (如果买书只推荐这一本,你买前端书千万别买中国人写的。。。)</li>
-<li><a href="http://cndevdocs.com/" target="_blank" rel="noopener">CSS 2.1 中文 spec</a></li>
-<li><a href="http://adamschwartz.co/magic-of-css/" target="_blank" rel="noopener">Magic of CSS 免费在线书</a>(如果你三天8h看完直接成为CSS大神)</li>
-</ol>
-<blockquote>
-<p>建议是：中文学习资源只看大 V 的（毕竟他们要维护形象不能瞎写），英文资源看 CSS Tricks、MDN 和 Codrops。书的话作用不大，最权威的书其实是文档。</p>
-</blockquote>
-<ul>
-<li>如果你想快速上手，就先写小 demo 再学理论。</li>
-<li>如果你想一鸣惊人，就仔细看 CSS 规范文档。</li>
-</ul>
-<h3 id="开始写-CSS"><a href="#开始写-CSS" class="headerlink" title="开始写 CSS"></a>开始写 CSS</h3><ol>
-<li>引入 CSS 的三/四种方式</li>
-<li>从最小的东西开始入手</li>
-<li>逐渐变大</li>
-<li>学会组织 CSS（以后再说）</li>
-<li>自己写 CSS UI 库</li>
-</ol>
-<h4 id="引入CSS的四种方式"><a href="#引入CSS的四种方式" class="headerlink" title="引入CSS的四种方式"></a>引入CSS的四种方式</h4><ol>
-<li><p>行间样式(内联样式)</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p style=&quot;color:red;&quot;&gt;&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>style标签 (内嵌样式)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        p&#123;color:red;&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>link引入</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;link href=&quot;mystyle.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;/&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>import导入</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=&quot;text/css&quot;&gt; @import url(./b.css)&lt;/style&gt;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="li-的小圆点问题"><a href="#li-的小圆点问题" class="headerlink" title="li 的小圆点问题"></a>li 的小圆点问题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">li&#123;list-style:none;&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="默认样式"><a href="#默认样式" class="headerlink" title="默认样式"></a>默认样式</h4><blockquote>
-<p>除了div和span其他所有标签都有默认样式（css一个问题就是要清除默认样式）具体你可以搜 base.css/reset.css</p>
-</blockquote>
-<h4 id="float-一定会出问题"><a href="#float-一定会出问题" class="headerlink" title="float 一定会出问题"></a>float 一定会出问题</h4><blockquote>
-<p>如果你非要深究为什么那你就回答我为啥 color:red;字会变红</p>
-</blockquote>
-<p>解决 float 的bug 业界已经同一有了一个规范就是 .clearfix</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note010_01.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.clearfix::after&#123;</span><br><span class="line">    content:&apos;&apos;,</span><br><span class="line">    display:block;</span><br><span class="line">    clear:both;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>口诀</p>
-<ol>
-<li>子集浮动父级要清浮动(class=”clearfix”)</li>
-<li>同级一个浮动其他都浮动</li>
-</ol>
-<h4 id="选择器-“-gt-”加与不加的区别"><a href="#选择器-“-gt-”加与不加的区别" class="headerlink" title="选择器 “&gt;”加与不加的区别"></a>选择器 “&gt;”加与不加的区别</h4><p>直接子集</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/* 匹配.topNavBar的儿子nav nav的儿子ul */</span><br><span class="line">.topNavBar &gt; nav &gt; ul</span><br></pre></td></tr></table></figure>
-<h4 id="默认字体大小-16px"><a href="#默认字体大小-16px" class="headerlink" title="默认字体大小 16px"></a>默认字体大小 16px</h4><p>工具使用</p>
-<blockquote>
-<p>chrome ==&gt; F12 ==&gt;Elements==&gt; styles/computed</p>
-</blockquote>
-<h4 id="a标签默认样式"><a href="#a标签默认样式" class="headerlink" title="a标签默认样式"></a>a标签默认样式</h4><p>text-decoration:underline</p>
-<blockquote>
-<p>如果你实在不知道用法，搜索 mdn text-decoration</p>
-</blockquote>
-<h4 id="ul里li-鼠标滑过有边框的效果"><a href="#ul里li-鼠标滑过有边框的效果" class="headerlink" title="ul里li 鼠标滑过有边框的效果"></a>ul里li 鼠标滑过有边框的效果</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">    ul&#123;border:1px solid red;&#125;</span><br><span class="line">    li&#123;list-style:none;&#125;</span><br><span class="line">    li&#123;float:left; ;&#125;</span><br><span class="line">    li:hover&#123;border:1px solid red;&#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;ul class=&quot;clearfix&quot;&gt;</span><br><span class="line">    &lt;li&gt;111&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;222&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;333&lt;/li&gt;</span><br><span class="line">    &lt;/ul&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
-<p>你会发现鼠标滑过的时候字在发抖</p>
-<blockquote>
-<p>套路就是在li一开始就设置边框，只不过颜色是透明的</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">li&#123;border:1px solid transparent;&#125;</span><br><span class="line">li:hover:&#123;border:1px solid red;&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="li里的a标签为什么有时候比li大"><a href="#li里的a标签为什么有时候比li大" class="headerlink" title="li里的a标签为什么有时候比li大"></a>li里的a标签为什么有时候比li大</h4><p>答案是因为a是 display:inline</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a&#123;display:block;&#125;</span><br><span class="line"></span><br><span class="line">&lt;li&gt;</span><br><span class="line">    &lt;a href=&quot;javascrip:;&quot;&gt;关于&lt;/a&gt;</span><br><span class="line">&lt;/li&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="inherit-值啥意思"><a href="#inherit-值啥意思" class="headerlink" title="inherit 值啥意思"></a>inherit 值啥意思</h4><p>inherit意思是继承的意思就是你爸爸什么样你就继承过来</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">body&#123;color:#333;&#125;</span><br><span class="line">a&#123;color:inherit;&#125;</span><br></pre></td></tr></table></figure>
-<p>如果你不写a{color:inherit;} a标签有默认样式就会是蓝色的</p>
-<p>清除a的默认样式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&#123;color:inherit;text-decoration:none;&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="span之间有什么"><a href="#span之间有什么" class="headerlink" title="span之间有什么"></a>span之间有什么</h4><p>如果你回车了不管你空了多少行，span直接都会有一个空格</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;aaa&lt;/span&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;span&gt;bbb&lt;/span&gt;</span><br><span class="line">&lt;span&gt;ccc&lt;/span&gt;</span><br><span class="line">&lt;span&gt;ddd&lt;/span&gt;</span><br></pre></td></tr></table></figure>
-<p>你应该这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;aaa&lt;/span&gt;&lt;span&gt;bbb&lt;/span&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="给你个需求"><a href="#给你个需求" class="headerlink" title="给你个需求"></a>给你个需求</h4><blockquote>
-<p>我需要一个 div 高30px，div 里有一行字垂直居中，字的大小为 14px，应该怎么写 CSS?</p>
-</blockquote>
-<ul>
-<li>给 div 的样式为 font-size: 14px; line-height: 20px; padding: 5px 0;</li>
-<li>给 div 的样式为 font-size: 14px; line-height: 24px; padding: 3px 0;</li>
-<li>给 div 的样式为 font-size: 14px; line-height: 30px; </li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/19/N009_1_HTML续2/" title="HTML续2" itemprop="url">HTML续2</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-19T11:25:50.000Z" itemprop="datePublished"> Published 2017-10-19</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="HTML续"><a href="#HTML续" class="headerlink" title="HTML续"></a>HTML续</h2><p>一些标签总结</p>
-<h3 id="跳转页面"><a href="#跳转页面" class="headerlink" title="跳转页面"></a>跳转页面</h3><ul>
-<li>a 发起get请求</li>
-<li>form 发起post请求(默认get但是谁这么无聊)</li>
-</ul>
-<blockquote>
-<p>回忆知识点：get是获取内容，post是上传内容</p>
-</blockquote>
-<h3 id="form-标签"><a href="#form-标签" class="headerlink" title="form 标签"></a>form 标签</h3><ul>
-<li>如果form 里没有提交按钮就无法提交，除非你用JS</li>
-<li>method 请求方式(没人用get)只有两个值 get/post</li>
-<li>action 请求路径</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;index2.html&quot; method=&quot;post&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;text&quot; name=&quot;username&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;text&quot; name=&quot;password&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;提交&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
-<p>如上你点击提交后我们在chrome里点击Network</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note009_01.png" alt></p>
-<blockquote>
-<p>如果提交的是中文,就把对应字符的UTF-8编码每个字节分开并加一个%</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Content-Type: application/x-www-form-urlencoded</span><br></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note009_02.png" alt></p>
-<h4 id="问题1-form-标签在哪些情况下可以被用户提交"><a href="#问题1-form-标签在哪些情况下可以被用户提交" class="headerlink" title="问题1 form 标签在哪些情况下可以被用户提交"></a>问题1 form 标签在哪些情况下可以被用户提交</h4><ol>
-<li>form 标签里面有一个 input type=submit 的元素</li>
-<li>form 标签里面有一个 button 元素，button 的 type 属性为空</li>
-</ol>
-<p>详细讲一下第二种</p>
-<blockquote>
-<p>form里存在一个button它会升级为提交按钮</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;index2.html&quot; method=&quot;post&quot;&gt;</span><br><span class="line">     &lt;input type=&quot;text&quot; name=&quot;username&quot;&gt;</span><br><span class="line">     &lt;button&gt;提交&lt;/button&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果你添加了 type=”button” 就无法提交</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;button type=&quot;button&quot;&gt;提交&lt;/button&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果你是 input的button也是无法提交的</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=&quot;button&quot; value=&quot;提交&quot;&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="问题2-form-标签里面的-input-加不加-name-属性有什么区别？"><a href="#问题2-form-标签里面的-input-加不加-name-属性有什么区别？" class="headerlink" title="问题2 form 标签里面的 input 加不加 name 属性有什么区别？"></a>问题2 form 标签里面的 input 加不加 name 属性有什么区别？</h4><blockquote>
-<p>如果 input 不加 name，那么在表单提交时，input 的值就不会出现在请求里</p>
-</blockquote>
-<h4 id="form与-a标签一样-也有target属性"><a href="#form与-a标签一样-也有target属性" class="headerlink" title="form与 a标签一样 也有target属性"></a>form与 a标签一样 也有target属性</h4><p>行为同 a标签一样  具体看上一篇博客</p>
-<ul>
-<li>_blank</li>
-<li>_slef</li>
-<li>_parent</li>
-<li>_top</li>
-</ul>
-<h3 id="checkbox"><a href="#checkbox" class="headerlink" title="checkbox"></a>checkbox</h3><blockquote>
-<p>问题1 有时候你想点击「免单」也会勾选此时发现无法勾选</p>
-</blockquote>
-<ul>
-<li>给input添加id=”xxx” </li>
-<li>给触发的文本套上 label标签并指定 for=”xxx”</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=&quot;checkbox&quot;&gt;免单</span><br><span class="line"></span><br><span class="line">&lt;!-- 你应该这样 --&gt;</span><br><span class="line">&lt;input type=&quot;checkbox&quot; id=&quot;free&quot;&gt;</span><br><span class="line">&lt;label for=&quot;free&quot;&gt;免单&lt;/label&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>老司机应该这样,直接用label把整体包起来</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;label&gt;账号&lt;input type=&quot;text&quot; name=&quot;username&quot;&gt;&lt;/label&gt;</span><br><span class="line">&lt;label&gt;密码&lt;input type=&quot;password&quot; name=&quot;password&quot;&gt;&lt;/label&gt;</span><br><span class="line">&lt;label&gt;&lt;input type=&quot;checkbox&quot;&gt;免单&lt;/label&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>问题2 如果是多个复选框</p>
-</blockquote>
-<p>你应该让它们的name相同</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;label&gt;&lt;input type=&quot;checkbox&quot; name=&quot;fruit&quot; value=&quot;apple&quot;&gt;苹果&lt;/label&gt;</span><br><span class="line">&lt;label&gt;&lt;input type=&quot;checkbox&quot; name=&quot;fruit&quot; value=&quot;banana&quot;&gt;香蕉&lt;/label&gt;</span><br><span class="line"></span><br><span class="line">提交后参数会形如  fruit=apple&amp;fruir=banana</span><br></pre></td></tr></table></figure>
-<h3 id="radio-单选框"><a href="#radio-单选框" class="headerlink" title="radio 单选框"></a>radio 单选框</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;man&quot;&gt;男&lt;/label&gt;</span><br><span class="line">&lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;woman&quot;&gt;女&lt;/label&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="select-下拉选"><a href="#select-下拉选" class="headerlink" title="select 下拉选"></a>select 下拉选</h3><blockquote>
-<p>如果想多选请添加 multiple属性</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;select name=&quot;local&quot;&gt;</span><br><span class="line">    &lt;option value=&quot;&quot;&gt;&lt;/option&gt;</span><br><span class="line">    &lt;option value=&quot;1&quot;&gt;北京&lt;/option&gt;</span><br><span class="line">    &lt;option value=&quot;2&quot;&gt;天津&lt;/option&gt;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="textarea-文本域"><a href="#textarea-文本域" class="headerlink" title="textarea 文本域"></a>textarea 文本域</h3><ol>
-<li>默认它可以拖动的  要用style控制 resize:none;</li>
-<li>建议用CSS控制它的宽高</li>
-<li>它提供的cols和rows是不准的 列和行设置</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;textarea name=&quot;&quot; cols=&quot;30&quot; style=&quot;resize:none;&quot;rows=&quot;10&quot;&gt;&lt;/textarea&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="table-标签-用的很少"><a href="#table-标签-用的很少" class="headerlink" title="table 标签 (用的很少)"></a>table 标签 (用的很少)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;table&gt;</span><br><span class="line">    &lt;thead&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;th&gt;姓名&lt;/th&gt;&lt;th&gt;班级&lt;/th&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">    &lt;/thead&gt;</span><br><span class="line">    &lt;tbody&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;hjx&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;aaa&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">    &lt;/tbody&gt;</span><br><span class="line">    &lt;tfoot&gt;&lt;/tfoot&gt;</span><br><span class="line">&lt;/table&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="table之慎用标签-colgroup-col"><a href="#table之慎用标签-colgroup-col" class="headerlink" title="table之慎用标签 colgroup col"></a>table之慎用标签 colgroup col</h4><blockquote>
-<p>之所以慎用，就因为2017年11月某天我知道它的用法然后就用了，结果导致一个bug(firefox里不支持这个标签#仅对应2017年11月那个我使用的firefox版本)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;table border=1&gt;</span><br><span class="line">    &lt;colgroup&gt;</span><br><span class="line">      &lt;col width=100&gt;</span><br><span class="line">      &lt;col width=200&gt;</span><br><span class="line">    &lt;/colgroup&gt;</span><br><span class="line">    &lt;thead&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;th&gt;姓名&lt;/th&gt;</span><br><span class="line">        &lt;th&gt;班级&lt;/th&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">    &lt;/thead&gt;</span><br><span class="line">    &lt;tbody&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;hjx&lt;/td&gt;</span><br><span class="line">        &lt;td&gt;1&lt;/td&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">      &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;aaa&lt;/td&gt;</span><br><span class="line">        &lt;td&gt;2&lt;/td&gt;</span><br><span class="line">      &lt;/tr&gt;</span><br><span class="line">    &lt;/tbody&gt;</span><br><span class="line">    &lt;tfoot&gt;</span><br><span class="line">        &lt;tr&gt;</span><br><span class="line">            &lt;td&gt;xxx&lt;/td&gt;</span><br><span class="line">            &lt;td&gt;22&lt;/td&gt;</span><br><span class="line">        &lt;/tr&gt;</span><br><span class="line">    &lt;/tfoot&gt;</span><br><span class="line">&lt;/table&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>PS建议控制 td 样式还是追随大众使用 class</p>
-</blockquote>
-<h4 id="thead-tbody-tfoot如果顺序错了会咋样"><a href="#thead-tbody-tfoot如果顺序错了会咋样" class="headerlink" title="thead tbody tfoot如果顺序错了会咋样"></a>thead tbody tfoot如果顺序错了会咋样</h4><blockquote>
-<p>不管你怎样放置它们的顺序，即使F12里查到对应标签顺序是你写的顺序，但是浏览器会自动纠错依然会以thead tbody tfoot的顺序展现在表格上</p>
-</blockquote>
-<h4 id="不写thead-tfoot-会咋样"><a href="#不写thead-tfoot-会咋样" class="headerlink" title="不写thead/tfoot 会咋样"></a>不写thead/tfoot 会咋样</h4><blockquote>
-<p>没有问题</p>
-</blockquote>
-<h4 id="不写tbody会咋样"><a href="#不写tbody会咋样" class="headerlink" title="不写tbody会咋样"></a>不写tbody会咋样</h4><blockquote>
-<p>它会自动帮你生成tbody 并把 tr放在里面</p>
-</blockquote>
-<h4 id="最后说一下默认表格设置了边框是很丑的，一般要设置边框融合"><a href="#最后说一下默认表格设置了边框是很丑的，一般要设置边框融合" class="headerlink" title="最后说一下默认表格设置了边框是很丑的，一般要设置边框融合"></a>最后说一下默认表格设置了边框是很丑的，一般要设置边框融合</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">table&#123;border-collapse:collapse&#125;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/18/N009_0_HTML续/" title="HTML续" itemprop="url">HTML续</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-18T13:02:23.000Z" itemprop="datePublished"> Published 2017-10-18</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="html一些标签总结"><a href="#html一些标签总结" class="headerlink" title="html一些标签总结"></a>html一些标签总结</h3><h4 id="iframe"><a href="#iframe" class="headerlink" title="iframe"></a>iframe</h4><p>通常用来嵌套一个页面如百度</p>
-<ul>
-<li>它的宽高是由自己决定的，而且你只能设置宽度100%，高度100%是没用的(CSS蛋疼之处)</li>
-<li>如果你用iframe会明显感觉页面变卡了</li>
-<li>它一般会出现在五年前的项目里</li>
-<li>frameborder=”0”是去除iframe的边框的(3d边框)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=&quot;http://www.baidu.com&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
-<h5 id="iframe-和-a标签一起使用时会发生什么？"><a href="#iframe-和-a标签一起使用时会发生什么？" class="headerlink" title="iframe 和 a标签一起使用时会发生什么？"></a>iframe 和 a标签一起使用时会发生什么？</h5><ul>
-<li>给iframe 加上name属性  如name=”xxx”</li>
-<li>给a 加上target属性    如target=”xxx”</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe name=&quot;xxx&quot; src=&quot;#&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</span><br><span class="line">&lt;a target=&quot;xxx&quot; href=&quot;http://www.baidu.com&quot;&gt;百度&lt;/a&gt;</span><br><span class="line">&lt;a target=&quot;xxx&quot; href=&quot;http://www.qq.com&quot;&gt;QQ&lt;/a&gt;</span><br></pre></td></tr></table></figure>
-<p>这样页面上你点击「百度」iframe就会显示百度的网页，点击「QQ」就会显示qq的网页</p>
-<h5 id="iframe的src属性也可以写相对路径，包含页面"><a href="#iframe的src属性也可以写相对路径，包含页面" class="headerlink" title="iframe的src属性也可以写相对路径，包含页面"></a>iframe的src属性也可以写相对路径，包含页面</h5><p>前提你至少得开一个本地服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe src=&quot;./index2.html&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="a-标签"><a href="#a-标签" class="headerlink" title="a 标签"></a>a 标签</h4><p>我们分别写四个target它们都会在哪里打开呢？</p>
-<p>建立如下文件 </p>
-<p>index3.html</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">index3页面</span><br><span class="line">&lt;a target=&quot;_blank&quot; href=&quot;http://www.baidu.com&quot;&gt;百度&lt;/a&gt;</span><br><span class="line">&lt;a target=&quot;_self&quot; href=&quot;http://www.qq.com&quot;&gt;QQ&lt;/a&gt;</span><br><span class="line">&lt;a target=&quot;_parent&quot; href=&quot;http://www.jd.com&quot;&gt;京东&lt;/a&gt;</span><br><span class="line">&lt;a target=&quot;_top&quot; href=&quot;http://www.taobao.com&quot;&gt;淘宝&lt;/a&gt;</span><br></pre></td></tr></table></figure>
-<p>index2.html</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index2页面</span><br><span class="line">&lt;iframe src=&quot;./index3.html&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
-<p>index.html</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index页面</span><br><span class="line">&lt;iframe src=&quot;./index2.html&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>你可以 http-server的工具 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#全局安装</span><br><span class="line">npm install http-server -g  </span><br><span class="line">#开启本地服务 </span><br><span class="line">http-server -c-1</span><br></pre></td></tr></table></figure>
-<ul>
-<li>_blank 会新开一个窗口打开</li>
-<li>_self 会在自己页面打开，如上结果会在index3页面打开</li>
-<li>_parent 会在父页面打开，如上结果会在index2页面打开</li>
-<li>_top 会在顶级窗口打开， 如上结果会在index页面打开</li>
-</ul>
-<h5 id="a标签之-download-属性"><a href="#a标签之-download-属性" class="headerlink" title="a标签之 download 属性"></a>a标签之 download 属性</h5><blockquote>
-<p>download可以下载东西，可能是安装包可能是网页</p>
-</blockquote>
-<ul>
-<li><p>如果不加download<br>服务器要设置 Content-Type:application/octet-stream</p>
-</li>
-<li><p>加了 download 就可以直接下载</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a  href=&quot;http://www.qq.com&quot; download&gt;下载&lt;/a&gt;</span><br></pre></td></tr></table></figure>
-<h5 id="a标签纸-href属性"><a href="#a标签纸-href属性" class="headerlink" title="a标签纸 href属性"></a>a标签纸 href属性</h5><blockquote>
-<p>只写qq.com会跳转到 qq.com的网页吗？  不会</p>
-</blockquote>
-<p>因为这是一个相对地址</p>
-<blockquote>
-<p>比如你在命令行里  touch 1.txt / open 1.txt 都是相对当前命令行的目录执行的</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a  href=&quot;qq.com&quot;&gt;qq&lt;/a&gt;</span><br></pre></td></tr></table></figure>
-<p>修改 href=”//qq.com”</p>
-<blockquote>
-<p>代表以当前协议打开</p>
-</blockquote>
-<ul>
-<li><p>如果你是一个本地文件打开是文件协议 file协议</p>
-</li>
-<li><p>如果你想打开qq.com的网页,你需要以http协议打开</p>
-</li>
-</ul>
-<p>那么你要下载一个 http-server 的工具，这样就能本地开一个node服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#全局安装</span><br><span class="line">npm install http-server -g  </span><br><span class="line">#开启本地服务   -c-1代表不要缓存</span><br><span class="line">http-server -c-1</span><br></pre></td></tr></table></figure>
-<h6 id="href-”-qq-com”是-无协议绝对地址自动继承协议"><a href="#href-”-qq-com”是-无协议绝对地址自动继承协议" class="headerlink" title="href=”//qq.com”是 无协议绝对地址自动继承协议"></a>href=”//qq.com”是 无协议绝对地址自动继承协议</h6><h6 id="href-”xxx-html”-相对路径"><a href="#href-”xxx-html”-相对路径" class="headerlink" title="href=”xxx.html” 相对路径"></a>href=”xxx.html” 相对路径</h6><ul>
-<li>A /index.html/xxx.html</li>
-<li>B /xxx.html √</li>
-</ul>
-<h6 id="href-”-name-hjx”"><a href="#href-”-name-hjx”" class="headerlink" title="href=”?name=hjx”"></a>href=”?name=hjx”</h6><ul>
-<li>A 保存</li>
-<li>B 这样很自然 √  如果你点击会发起get请求并把参数拼接到当前url上</li>
-</ul>
-<h6 id="href-”-sss”-锚点是不发请求了"><a href="#href-”-sss”-锚点是不发请求了" class="headerlink" title="href=”#sss” 锚点是不发请求了"></a>href=”#sss” 锚点是不发请求了</h6><h6 id="href-”javascript-”-伪协议"><a href="#href-”javascript-”-伪协议" class="headerlink" title="href=”javascript:;” 伪协议"></a>href=”javascript:;” 伪协议</h6><h4 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href=&quot;&quot;&gt;link&lt;/a&gt; 标签被点击后会发生什么？</span><br><span class="line">当前页面刷新</span><br><span class="line"></span><br><span class="line">&lt;a href=&quot;/..&quot;&gt;link&lt;/a&gt; 标签被点击后会发生什么？</span><br><span class="line">浏览器发起 GET / HTTP/1.1请求</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>我想写一个a标签,但是点击之后不要跳转</p>
-</blockquote>
-<ul>
-<li>写#(锚点) 页面会动</li>
-<li>不写href属性 a就跟span一样了</li>
-<li>伪协议 href=”javascript:;”</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2017/10/17/N008_HTML/" title="HTML" itemprop="url">HTML</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2017-10-17T13:02:23.000Z" itemprop="datePublished"> Published 2017-10-17</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="HTML-Hypertext-Markup-Language"><a href="#HTML-Hypertext-Markup-Language" class="headerlink" title="HTML Hypertext Markup Language"></a>HTML Hypertext Markup Language</h3><p><a href="https://en.wikipedia.org/wiki/HTML" target="_blank" rel="noopener">维基百科HTML</a></p>
-<h4 id="HTML-的版本（W3C-组织制定规范）"><a href="#HTML-的版本（W3C-组织制定规范）" class="headerlink" title="HTML 的版本（W3C 组织制定规范）"></a>HTML 的版本（W3C 组织制定规范）</h4><ul>
-<li>HTML 4.01</li>
-<li>XHTML</li>
-<li>HTML 5 √(我们从这里开始学)</li>
-<li>HTML 5.1</li>
-</ul>
-<h4 id="规范文档（Specifications）"><a href="#规范文档（Specifications）" class="headerlink" title="规范文档（Specifications）"></a>规范文档（Specifications）</h4><blockquote>
-<p>你可以google 搜  html spec <a href="https://www.w3.org/TR/html5/" target="_blank" rel="noopener">这个网址</a></p>
-</blockquote>
-<ol>
-<li>由 W3C 写文档（李爵士）</li>
-<li>W3C 根据浏览器的实际情况总结文档，并不是凭空想象<h4 id="DOCTYPE-文档头"><a href="#DOCTYPE-文档头" class="headerlink" title="DOCTYPE 文档头"></a>DOCTYPE 文档头</h4></li>
-</ol>
-<ul>
-<li>用来选择文档类型</li>
-<li>除了 HTML 5 的 DOCTYPE，其他都很难记：<a href="https://www.w3.org/QA/2002/04/valid-dtd-list.html" target="_blank" rel="noopener">https://www.w3.org/QA/2002/04/valid-dtd-list.html</a></li>
-<li>如果你没写 DOCTYPE，那你就惨了</li>
-</ul>
-<h4 id="html-head-body"><a href="#html-head-body" class="headerlink" title="html / head / body"></a>html / head / body</h4><p>head可省略吗？ body可省略吗？ 可以</p>
-<h4 id="省略标签"><a href="#省略标签" class="headerlink" title="省略标签"></a>省略标签</h4><h4 id="常见标签：a、form、input、button、h1、p、ul、ol、small、strong、div、span、kbd、video、audio、svg"><a href="#常见标签：a、form、input、button、h1、p、ul、ol、small、strong、div、span、kbd、video、audio、svg" class="headerlink" title="常见标签：a、form、input、button、h1、p、ul、ol、small、strong、div、span、kbd、video、audio、svg"></a>常见标签：a、form、input、button、h1、p、ul、ol、small、strong、div、span、kbd、video、audio、svg</h4><ul>
-<li>基本上，你知道标签对应单词的意思，就知道这个标签怎么用了（语义化）</li>
-<li>除了 div 和 span，其他标签都有默认样式</li>
-<li>MDN 上有所有标签的文档</li>
-</ul>
-<h4 id="如何查看-MDN-文档"><a href="#如何查看-MDN-文档" class="headerlink" title="如何查看 MDN 文档"></a>如何查看 MDN 文档</h4><p>Google：关键词 + MDN</p>
-<h4 id="HTML-中-b-标签和-strong-标签有什么区别"><a href="#HTML-中-b-标签和-strong-标签有什么区别" class="headerlink" title="HTML 中 b 标签和 strong 标签有什么区别"></a>HTML 中 b 标签和 strong 标签有什么区别</h4><p>b 表示样式上的加粗，strong 是逻辑状态表示内容重要。strong表示语气很强烈含有感情成分</p>
-<h4 id="p-标签的英文全称是什么？"><a href="#p-标签的英文全称是什么？" class="headerlink" title="p 标签的英文全称是什么？"></a>p 标签的英文全称是什么？</h4><p>paragraph</p>
-<h4 id="a-标签的英文全称是什么"><a href="#a-标签的英文全称是什么" class="headerlink" title="a 标签的英文全称是什么"></a>a 标签的英文全称是什么</h4><p>anchor</p>
-<h4 id="什么是空元素"><a href="#什么是空元素" class="headerlink" title="什么是空元素"></a>什么是空元素</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">input/img/meta/link/hr/br/col....</span><br></pre></td></tr></table></figure>
-<p><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/%E7%A9%BA%E5%85%83%E7%B4%A0" target="_blank" rel="noopener">空元素</a></p>
-<h4 id="HTML5推荐写法"><a href="#HTML5推荐写法" class="headerlink" title="HTML5推荐写法"></a>HTML5推荐写法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- 更加严格的写法要自闭合 --&gt;</span><br><span class="line">&lt;input type=&quot;text&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&lt;-- H5推荐的用法 --&gt;</span><br><span class="line">&lt;input type=&quot;text&quot;&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="div-span-可以写在head里吗？"><a href="#div-span-可以写在head里吗？" class="headerlink" title="div span 可以写在head里吗？"></a>div span 可以写在head里吗？</h4><p>答案是不可以，但是你写了HTML会自动纠错将你写的div放到body里</p>
-<h4 id="可替换元素"><a href="#可替换元素" class="headerlink" title="可替换元素"></a>可替换元素</h4><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/Replaced_element" target="_blank" rel="noopener">可替换元素</a></p>
-<h4 id="w3cschool-html测试题"><a href="#w3cschool-html测试题" class="headerlink" title="w3cschool html测试题"></a>w3cschool html测试题</h4><p><a href="https://www.w3schools.com/quiztest/quiztest.asp?qtest=HTML" target="_blank" rel="noopener">测试题</a></p>
-<h4 id="HTML究竟要不要管元素是不是块级元素还是内联元素"><a href="#HTML究竟要不要管元素是不是块级元素还是内联元素" class="headerlink" title="HTML究竟要不要管元素是不是块级元素还是内联元素"></a>HTML究竟要不要管元素是不是块级元素还是内联元素</h4><ul>
-<li>HTML是不管块级元素和内联元素的区别的</li>
-<li>HTML只定义这是什么，不管样式</li>
-<li>样式由CSS控制     </li>
-</ul>
-<p>所以写HTML时候一定不要想样式问题 </p>
-<h4 id="写页面千万别自己设计"><a href="#写页面千万别自己设计" class="headerlink" title="写页面千万别自己设计"></a>写页面千万别自己设计</h4><blockquote>
-<p>你可以去 dribbble.com 你可以看到外国优秀设计师的作品</p>
-</blockquote>
-<blockquote>
-<p>如果你要psd，就搜索 <a href="https://www.os-templates.com/free-psd-templates" target="_blank" rel="noopener">webpage free psd</a></p>
-</blockquote>
-<h4 id="初学HTML时写页面你可能会这样想"><a href="#初学HTML时写页面你可能会这样想" class="headerlink" title="初学HTML时写页面你可能会这样想"></a>初学HTML时写页面你可能会这样想</h4><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note008_01.png" alt="想着上面两个一左一右下面是一个盒子"></p>
-<blockquote>
-<p>实际上这样的布局是很难实现的因为目前<br>CSS只支持横向布局和纵向布局</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note008_02.png" alt="实际应该这样"></p>
-<blockquote>
-<p>实际上应该上面两个左右的盒子外面包一个div当做一个整体</p>
-</blockquote>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/前端知识点/">前端知识点</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/49/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/48/">48</a><a class="page-number" href="/page/49/">49</a><span class="page-number current">50</span><a class="page-number" href="/page/51/">51</a><a class="page-number" href="/page/52/">52</a><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/51/">Next<span></span></a>
@@ -1489,13 +1348,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

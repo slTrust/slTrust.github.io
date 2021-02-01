@@ -79,6 +79,433 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2017/03/15/ES6_007_ES6_Promise/" title="ES6_Promise(七)" itemprop="url">ES6_Promise(七)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-15T09:42:37.000Z" itemprop="datePublished"> Published 2017-03-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function myAsync(callback)&#123;</span><br><span class="line">    setTimeout(function()&#123;</span><br><span class="line">        console.log(&apos;执行完成&apos;);</span><br><span class="line">        callback(&apos;data&apos;);</span><br><span class="line">    &#125;, 2000);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">myAsync(function(data)&#123;</span><br><span class="line">    console.log(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="Promise-解决了什么痛点"><a href="#Promise-解决了什么痛点" class="headerlink" title="Promise 解决了什么痛点"></a>Promise 解决了什么痛点</h3><blockquote>
+<p>回调地狱   代码如下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">myAsync(function(data)&#123;</span><br><span class="line">    //第一个请求成功接收到数据  然后根据数据触发第二次请求</span><br><span class="line">    console.log(&apos;第一个请求完成！&apos;)</span><br><span class="line">    myAsync2(function(data)&#123;</span><br><span class="line">        console.log(&apos;第二个请求完成！&apos;)</span><br><span class="line">        myAsync3(function(data)&#123;</span><br><span class="line">            console.log(&apos;第三个请求完成！&apos;)</span><br><span class="line">             //一直一直的回调  排错是很困难的 代码也恶心</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="我的第一个Promise使用"><a href="#我的第一个Promise使用" class="headerlink" title="我的第一个Promise使用"></a>我的第一个Promise使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">let myPromise = new Promise(function(resolve, reject)&#123;</span><br><span class="line">    //当异步代码执行成功时，我们才会调用resolve(...),</span><br><span class="line">    // 当异步代码失败时就会调用reject(...)</span><br><span class="line">    //使用setTimeout(...)来模拟异步代码  实际可以是Ajax请求</span><br><span class="line">    console.log(&apos;异步请求中&apos;);</span><br><span class="line">    setTimeout(function()&#123;</span><br><span class="line">        resolve(&quot;成功!&quot;); //2秒后代码执行成功  调用resolve</span><br><span class="line">    &#125;, 2000);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">myPromise.then(function(successMessage)&#123;</span><br><span class="line">    //successMessage的值是上面调用resolve(...)方法传入的值.</span><br><span class="line">    console.log(&quot;success! &quot; + successMessage);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="解决回调地狱之链式操作"><a href="#解决回调地狱之链式操作" class="headerlink" title="解决回调地狱之链式操作"></a>解决回调地狱之链式操作</h3><blockquote>
+<p>Promise的优势在于:</p>
+<ul>
+<li>可以在then方法中继续写Promise对象并返回，然后继续调用then来进行回调操作。 是不是有种jquery的感觉！</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>链式操作的用法</p>
+</blockquote>
+<ul>
+<li>Promise只是能够简化层层回调的写法，比传递callback的方式简单</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">function myAsync1()&#123;</span><br><span class="line">    var p = new Promise(function(resolve, reject)&#123;</span><br><span class="line">        //做一些异步操作</span><br><span class="line">        setTimeout(function()&#123;</span><br><span class="line">            console.log(&apos;异步1完成&apos;);</span><br><span class="line">            resolve(&apos;data1&apos;);</span><br><span class="line">        &#125;, 1000);</span><br><span class="line">    &#125;);</span><br><span class="line">    return p;            </span><br><span class="line">&#125;</span><br><span class="line">function myAsync2()&#123;</span><br><span class="line">    var p = new Promise(function(resolve, reject)&#123;</span><br><span class="line">        //做一些异步操作</span><br><span class="line">        setTimeout(function()&#123;</span><br><span class="line">            console.log(&apos;异步2完成&apos;);</span><br><span class="line">            resolve(&apos;data2&apos;);</span><br><span class="line">        &#125;, 2000);</span><br><span class="line">    &#125;);</span><br><span class="line">    return p;            </span><br><span class="line">&#125;</span><br><span class="line">function myAsync3()&#123;</span><br><span class="line">    var p = new Promise(function(resolve, reject)&#123;</span><br><span class="line">        //做一些异步操作</span><br><span class="line">        setTimeout(function()&#123;</span><br><span class="line">            console.log(&apos;异步3完成&apos;);</span><br><span class="line">            resolve(&apos;data3&apos;);</span><br><span class="line">        &#125;, 2000);</span><br><span class="line">    &#125;);</span><br><span class="line">    return p;            </span><br><span class="line">&#125;</span><br><span class="line">//依次的异步操作</span><br><span class="line">myAsync1()</span><br><span class="line">    .then(function(data)&#123;</span><br><span class="line">        console.log(data);</span><br><span class="line">        return myAsync2();</span><br><span class="line">    &#125;)</span><br><span class="line">    .then(function(data)&#123;</span><br><span class="line">        console.log(data);</span><br><span class="line">        return myAsync3();</span><br><span class="line">    &#125;)</span><br><span class="line">    .then(function(data)&#123;</span><br><span class="line">        console.log(data);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="reject-是什么鬼？"><a href="#reject-是什么鬼？" class="headerlink" title="reject( )是什么鬼？"></a>reject( )是什么鬼？</h3><blockquote>
+<p>就是异步操作通常有两种结果一个是成功一个是失败</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">function myAsync()&#123;</span><br><span class="line">    var p = new Promise(function(resolve, reject)&#123;</span><br><span class="line">        //做一些异步操作</span><br><span class="line">        setTimeout(function()&#123;</span><br><span class="line">            console.log(&apos;异步1完成&apos;);</span><br><span class="line">            var num = Math.random()*100;</span><br><span class="line">            if(num&gt;60)&#123;</span><br><span class="line">                 resolve(&apos;运气不错通过啦！&apos;+num);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                 reject(&apos;太差了，分不够！&apos;+num)</span><br><span class="line">            &#125;</span><br><span class="line">           </span><br><span class="line">        &#125;, 1000);</span><br><span class="line">    &#125;);</span><br><span class="line">    return p;            </span><br><span class="line">&#125;</span><br><span class="line">myAsync()</span><br><span class="line">    .then(</span><br><span class="line">        function(data)&#123;</span><br><span class="line">            console.log(&apos;resolved&apos;);</span><br><span class="line">            console.log(data);//成功了  你手气不错！</span><br><span class="line">        &#125;, </span><br><span class="line">        function(reason, data)&#123;</span><br><span class="line">            console.log(&apos;rejected&apos;);</span><br><span class="line">            console.log(reason);//哎呦 挺倒霉啊！  再来一次吧！！</span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+<h3 id="catch-你肯定听过-try-…catch…"><a href="#catch-你肯定听过-try-…catch…" class="headerlink" title="catch( ) 你肯定听过 try …catch…"></a>catch( ) 你肯定听过 try …catch…</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">function myAsync()&#123;</span><br><span class="line">    var p = new Promise(function(resolve, reject)&#123;</span><br><span class="line">                //做一些异步操作</span><br><span class="line">                setTimeout(function()&#123;</span><br><span class="line">                    console.log(&apos;异步任务完成&apos;);</span><br><span class="line">                    resolve(&apos;data&apos;);</span><br><span class="line">                &#125;, 1000);</span><br><span class="line">            &#125;);</span><br><span class="line">    return p;    </span><br><span class="line">&#125;</span><br><span class="line">myAsync()</span><br><span class="line">    .then(function(data)&#123;</span><br><span class="line">        console.log(&apos;resolved&apos;);</span><br><span class="line">        console.log(data);</span><br><span class="line">        console.log(xxxx.xxxx); //此处的xxxx.xxxx未定义  报错</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(function(err)&#123;</span><br><span class="line">        console.log(&apos;rejected&apos;);</span><br><span class="line">        console.log(err);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="all"><a href="#all" class="headerlink" title="all( )"></a>all( )</h3><blockquote>
+<p>Promise的all方法提供了并行执行异步操作的能力，并且在所有异步操作执行完后才执行回调。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Promise</span><br><span class="line">.all([myAsync1(), myAsync2(), myAsync3()])</span><br><span class="line">.then(function(results)&#123;</span><br><span class="line">    console.log(results);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>用Promise.all来执行，all接收一个数组参数，里面的值最终都算返回Promise对象。</li>
+<li>这样，三个异步操作是并行执行的，等到它们都执行完后才会进到then里面。</li>
+<li>那么，三个异步操作返回的数据哪里去了呢？</li>
+<li>都在then里面呢，all会把所有异步操作的结果放进一个数组中传给then，就是上面的results。</li>
+</ul>
+<h3 id="race"><a href="#race" class="headerlink" title="race( )"></a>race( )</h3><blockquote>
+<p>all( ) 的效果实际上是 ==&gt;以”执行时间最慢的”为准执行回调</p>
+</blockquote>
+<blockquote>
+<p>race( ) 以最快的为准<br>race的用法与all一样，把上面myAsync3的延时改为0.5秒运行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Promise</span><br><span class="line">.race([myAsync1(), myAsync2(), myAsync3()])</span><br><span class="line">.then(function(results)&#123;</span><br><span class="line">    //返回三个异步请求最快的那个</span><br><span class="line">    console.log(results);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/14/ES6_006_ES6_模块化/" title="ES6_模块化(六)" itemprop="url">ES6_模块化(六)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-14T10:42:37.000Z" itemprop="datePublished"> Published 2017-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="ES6自带模块化-但是浏览器还不支持"><a href="#ES6自带模块化-但是浏览器还不支持" class="headerlink" title="ES6自带模块化  但是浏览器还不支持"></a>ES6自带模块化  但是浏览器还不支持</h3><ul>
+<li>使用webpack 前面已有文章总结了，这里就不说了</li>
+<li>还可以使用Google公司的Traceur转码器，也可以将ES6代码转为ES5代码。必须在网页头部加载Traceur库文件。</li>
+</ul>
+<blockquote>
+<p>注意！！注意！！ 要运行在服务器环境  </p>
+</blockquote>
+<blockquote>
+<p>服务器是什么？你不会我没法详细和你说 </p>
+</blockquote>
+<h4 id="两个工具"><a href="#两个工具" class="headerlink" title="两个工具"></a>两个工具</h4><ul>
+<li>wamp 搭建服务器 自行百度</li>
+<li>cnpm install http-server 前提是安装了node 同时设置了淘宝镜像</li>
+<li>然后在你当前目录打开命令行 输入 http-server -c-1<br>在显示的端口号访问就行了  你还要问细节怎么办？<br>那你就回答我 “回”字为什么有四种写法</li>
+</ul>
+<h4 id="新建mod-js"><a href="#新建mod-js" class="headerlink" title="新建mod.js"></a>新建mod.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">let a=12;</span><br><span class="line">let b=5;</span><br><span class="line">export default &#123;</span><br><span class="line">    a:a,</span><br><span class="line">    b:b</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="index-html文件"><a href="#index-html文件" class="headerlink" title="index.html文件"></a>index.html文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;https://google.github.io/traceur-compiler/bin/traceur.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;https://google.github.io/traceur-compiler/bin/BrowserSystem.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=&quot;https://google.github.io/traceur-compiler/src/bootstrap.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;script type=&quot;module&quot;&gt;</span><br><span class="line">    import mod from &apos;./mod.js&apos;;  </span><br><span class="line">    console.log(mod.a)    // 打印12</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/14/ES6_005_ES6_面向对象/" title="ES6_面向对象(五)" itemprop="url">ES6_面向对象(五)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-14T07:42:37.000Z" itemprop="datePublished"> Published 2017-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="ES6之前的面向对象使用函数模拟的-并非真正意义上的面向对象"><a href="#ES6之前的面向对象使用函数模拟的-并非真正意义上的面向对象" class="headerlink" title="ES6之前的面向对象使用函数模拟的 并非真正意义上的面向对象"></a>ES6之前的面向对象使用函数模拟的 并非真正意义上的面向对象</h3><blockquote>
+<p> 始终坚信一句话  系统提供的API永远是最好的</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>以前的面向对象<br>各种恶心复杂版本的实现我就不说了<br>我猜你肯定要问？（好奇害死猫）<br>自己看高三第六章</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">function Person(name,age)&#123;</span><br><span class="line">    this.name=name;</span><br><span class="line">    this.age=age;</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.showName=function()&#123;</span><br><span class="line">    return this.name;</span><br><span class="line">&#125;;</span><br><span class="line">Person.prototype.showAge=function()&#123;</span><br><span class="line">    return this.age;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//继承</span><br><span class="line">function Worker(name,age,job)&#123;</span><br><span class="line">    Person.apply(this,arguments);</span><br><span class="line">&#125;</span><br><span class="line">Worker.prototype=new Person();</span><br><span class="line">Worker.prototype.constructor=Worker;</span><br><span class="line"></span><br><span class="line">var p1=new Person(&apos;aaa&apos;,30);</span><br><span class="line">var w1=new Worker(&apos;bbb&apos;,10,&apos;上学&apos;);</span><br><span class="line"></span><br><span class="line">//alert(p1.showName());</span><br><span class="line">alert(w1.showName());</span><br></pre></td></tr></table></figure>
+<h3 id="真正意义上的面向对象"><a href="#真正意义上的面向对象" class="headerlink" title="真正意义上的面向对象"></a>真正意义上的面向对象</h3><blockquote>
+<p>简易版</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Person&#123;</span><br><span class="line">    constructor(name,age)&#123;  //构造函数</span><br><span class="line">        this.name=name;</span><br><span class="line">        this.age=age;</span><br><span class="line">    &#125;</span><br><span class="line">   showName()&#123;</span><br><span class="line">       return this.name;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1=new Person(&apos;bbb&apos;,40);</span><br><span class="line">alert(p1.showName());</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>继承</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class Person&#123;</span><br><span class="line">    constructor(name,age)&#123;  //构造函数</span><br><span class="line">        this.name=name;</span><br><span class="line">        this.age=age;</span><br><span class="line">    &#125;</span><br><span class="line">    showName()&#123;</span><br><span class="line">        return this.name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">        //继承</span><br><span class="line">class Worker extends Person&#123;</span><br><span class="line">    constructor(name,age,job)&#123;</span><br><span class="line">        super(name,age);</span><br><span class="line">        this.job=job;</span><br><span class="line">    &#125;</span><br><span class="line">    showJob()&#123;</span><br><span class="line">        return this.job;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1=new Person(&apos;bbb&apos;,40);</span><br><span class="line">var w1=new Worker(&apos;aaa&apos;,10,&apos;学生&apos;);</span><br><span class="line"></span><br><span class="line">alert(p1.showJob);</span><br><span class="line">//alert(w1.showJob());</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/14/ES6_004_ES6_扩展运算符/" title="ES6_扩展运算符(四)" itemprop="url">ES6_扩展运算符(四)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-14T06:42:37.000Z" itemprop="datePublished"> Published 2017-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="扩展运算符-gt-…"><a href="#扩展运算符-gt-…" class="headerlink" title="扩展运算符  =&gt; …"></a>扩展运算符  =&gt; …</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// var arr=[1,2,3,4,5];</span><br><span class="line">// var arr2=arr;</span><br><span class="line">// arr2.pop();</span><br><span class="line"></span><br><span class="line">// alert(arr);</span><br><span class="line"></span><br><span class="line">function show(...arr)&#123;</span><br><span class="line">    console.log(arr)</span><br><span class="line">&#125;</span><br><span class="line">show([1,2,3,4])  //  Array(1)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function show(...a)&#123; </span><br><span class="line">    console.log(a.length);  //4</span><br><span class="line">&#125;</span><br><span class="line"> show(1,2,3,4)</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="快速复制一个数组"><a href="#快速复制一个数组" class="headerlink" title="快速复制一个数组"></a>快速复制一个数组</h3><blockquote>
+<p>ES6以前<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var arr=[1,2,3,4,5];</span><br><span class="line">var arr2=[];</span><br><span class="line"></span><br><span class="line">for(var i=0; i&lt;arr.length; i++)&#123;</span><br><span class="line">    arr2.push(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>Array.from()  详细使用请点击<br> <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/from" target="_blank" rel="noopener">Array.from() MDN</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var arr=[1,2,3,4,5];</span><br><span class="line">        </span><br><span class="line">var arr2=Array.from(arr);</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>用扩展运算符复制数组<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var arr=[1,2,3,4,5];</span><br><span class="line">var arr2=[...arr];</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/14/ES6_003_ES6_对象简洁语法与解构赋值/" title="ES6_对象简洁语法与解构赋值(三)" itemprop="url">ES6_对象简洁语法与解构赋值(三)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-14T04:42:37.000Z" itemprop="datePublished"> Published 2017-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="对象简洁语法"><a href="#对象简洁语法" class="headerlink" title="对象简洁语法"></a>对象简洁语法</h3><blockquote>
+<p>赋值</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">var a=12;</span><br><span class="line">var b=5;</span><br><span class="line"></span><br><span class="line">/*var json=&#123;</span><br><span class="line">    a:a,</span><br><span class="line">    b:b</span><br><span class="line">&#125;;*/</span><br><span class="line">var json=&#123;</span><br><span class="line">    a,  //  a:a</span><br><span class="line">    b   //  b:b</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">alert(json.a);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>值是函数的形式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var a=12;</span><br><span class="line">/*var json=&#123;</span><br><span class="line">    a,</span><br><span class="line">    show:function()&#123;</span><br><span class="line">        alert(1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;*/</span><br><span class="line">var json=&#123;</span><br><span class="line">    a,</span><br><span class="line">    show()&#123;</span><br><span class="line">        alert(1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">json.show()</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="解构赋值"><a href="#解构赋值" class="headerlink" title="解构赋值"></a>解构赋值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">var [a,b,c]=[1,2,3];</span><br><span class="line">alert(a);</span><br><span class="line">*/</span><br><span class="line">var [a,b,[c,d]]=[1,2,[3,4]];</span><br><span class="line"></span><br><span class="line">alert(c);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var &#123;a,b&#125;=&#123;a:1,b:2&#125;;</span><br><span class="line">        </span><br><span class="line">alert(a);</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/03/14/ES6_002_ES6_箭头函数/" title="ES6_箭头函数（二）" itemprop="url">ES6_箭头函数（二）</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2017-03-14T02:30:37.000Z" itemprop="datePublished"> Published 2017-03-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="基本使用-函数名-gt-’返回值’"><a href="#基本使用-函数名-gt-’返回值’" class="headerlink" title="基本使用    函数名 = ( )=&gt;’返回值’"></a>基本使用    函数名 = ( )=&gt;’返回值’</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">function show()&#123;</span><br><span class="line">        return 1;</span><br><span class="line">&#125;</span><br><span class="line">alert(show());</span><br><span class="line">*/</span><br><span class="line">   </span><br><span class="line">var show=()=&gt;&apos;welcome&apos;;</span><br><span class="line">alert(show());</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">### 带参数的形式</span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line">/*</span><br><span class="line">function show(a)&#123;</span><br><span class="line">    return a;</span><br><span class="line">&#125;</span><br><span class="line">alert(show(12));</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">var show=(a,b)=&gt;a+b;</span><br><span class="line">alert(show(12,5));</span><br><span class="line">*/</span><br><span class="line">/*</span><br><span class="line">function rnd(n,m)&#123;</span><br><span class="line">    return Math.floor(Math.random()*(m-n))+n;</span><br><span class="line">&#125;</span><br><span class="line">alert(rnd(12,90));</span><br><span class="line">*/</span><br><span class="line">//箭头函数的形式</span><br><span class="line">let rnd=(n,m)=&gt;Math.floor(Math.random()*(m-n))+n;</span><br><span class="line"></span><br><span class="line">alert(rnd(10,40));</span><br></pre></td></tr></table></figure>
+<h3 id="内部有多个语句"><a href="#内部有多个语句" class="headerlink" title="内部有多个语句"></a>内部有多个语句</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var show=()=&gt;&#123;</span><br><span class="line">      alert(1);</span><br><span class="line">      alert(2);</span><br><span class="line">&#125;</span><br><span class="line">show();</span><br></pre></td></tr></table></figure>
+<h3 id="与之前的差异"><a href="#与之前的差异" class="headerlink" title="与之前的差异"></a>与之前的差异</h3><blockquote>
+<p>干掉了arguments</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> /*</span><br><span class="line">function show()&#123;</span><br><span class="line">    alert(arguments.length);</span><br><span class="line">&#125;</span><br><span class="line">show(1,2,3);</span><br><span class="line">*/</span><br><span class="line">//干掉了  arguments</span><br><span class="line">var show=()=&gt;&#123;</span><br><span class="line">    alert(arguments.length); //ReferenceError: arguments is not defined</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">show(1,2,3);</span><br></pre></td></tr></table></figure>
+<h3 id="在DOM事件上使用"><a href="#在DOM事件上使用" class="headerlink" title="在DOM事件上使用"></a>在DOM事件上使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">document.onclick=function()&#123;</span><br><span class="line">    alert(1);</span><br><span class="line">&#125;;</span><br><span class="line">*/</span><br><span class="line">document.onclick=()=&gt;&#123;</span><br><span class="line">    alert(1);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/ES6速学/">ES6速学</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2017/03/14/ES6_001_ES6_变量声明/" title="ES6变量声明（一）" itemprop="url">ES6变量声明（一）</a>
   </h1>
   <p class="article-author">By
@@ -307,13 +734,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

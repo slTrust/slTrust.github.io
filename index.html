@@ -79,6 +79,651 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2021/01/20/HTTP06密码学到https流程/" title="HTTP06密码学到https流程" itemprop="url">HTTP06密码学到https流程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-20T15:32:29.000Z" itemprop="datePublished"> Published 2021-01-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="密码学相关"><a href="#密码学相关" class="headerlink" title="密码学相关"></a>密码学相关</h2><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/003.png" alt></p>
+<ul>
+<li>窃听，服务器经过很多环节。每个环节都能看到报文内容</li>
+<li>篡改，插入广告。 运营商，路由器，或中间某个环节插入的</li>
+<li>伪装，用你的身份信息登录</li>
+<li>否认，做过了xx操作，死不承认</li>
+</ul>
+<h3 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h3><p>一个密钥加密解密，速度快</p>
+<ul>
+<li>DES</li>
+<li>AES </li>
+</ul>
+<h3 id="非对称"><a href="#非对称" class="headerlink" title="非对称"></a>非对称</h3><p>两个密钥。公钥加密，私钥解密；私钥加密，公钥解密； 速度慢</p>
+<ul>
+<li>RSA</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/004.png" alt></p>
+<h3 id="https加密流程"><a href="#https加密流程" class="headerlink" title="https加密流程"></a>https加密流程</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/005.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/006.png" alt></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/19/HTTP05缓存控制/" title="HTTP05缓存控制" itemprop="url">HTTP05缓存控制</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-19T15:32:01.000Z" itemprop="datePublished"> Published 2021-01-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="缓存控制"><a href="#缓存控制" class="headerlink" title="缓存控制"></a>缓存控制</h1><h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><ul>
+<li>设置过期时间 (http1.0的东西，现在用的少了)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Wed, 30 Dec 2020 18:05:17 GMT</span><br><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br></pre></td></tr></table></figure>
+<p>存在问题是 ： 服务器时间和你客户端时间不一致。</p>
+<h2 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h2><ul>
+<li>不要缓存，每次都重新拿</li>
+<li>优先级最高，一旦设置就不会走缓存</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<p>当 Pragma 和 Expires同时出现， Pragma优先级高</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><ul>
+<li>设置过期时间戳<ul>
+<li>解决了 Expires 时间不一致问题</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 10s后过期</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;max-age=10&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="Cache-Control-为啥不能缓存-html"><a href="#Cache-Control-为啥不能缓存-html" class="headerlink" title="Cache-Control 为啥不能缓存 html"></a>Cache-Control 为啥不能缓存 html</h3><ul>
+<li>访问 <a href="taobao.com">taobao</a></li>
+<li>你会发现 响应首页 的其他资源能被缓存，但是 这个首页html的响应头是</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cache-control: max-age=0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这是为了 解决网站改版的情况，浏览器自己设置的，如果缓存了，但是你走缓存就无法更新页面了</li>
+</ul>
+<h3 id="Cache-Control-其他值"><a href="#Cache-Control-其他值" class="headerlink" title="Cache-Control 其他值"></a>Cache-Control 其他值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 代表不走缓存,即使浏览器里有缓存</span><br><span class="line">cache-control: no-cache</span><br><span class="line"></span><br><span class="line">// 代表不走缓存</span><br><span class="line">// 资源可能中间有很多代理服务器(告诉代理服务器不要缓存)</span><br><span class="line">cache-control: no-store</span><br></pre></td></tr></table></figure>
+<h2 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，拿到——“修改时间”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个修改时间，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">if(!req.headers[&apos;if-modified-since&apos;])&#123;</span><br><span class="line">  // mtime 是修改时间</span><br><span class="line">  res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let oldMtime = Date.parse(req.headers[&apos;if-modified-since&apos;])</span><br><span class="line">  if(mtime&gt;oldMtime)&#123;</span><br><span class="line">    // 文件修改了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例1</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-cache 意思是 不要从本地缓存找 每次都找我要(每次都和服务器文件的mtime比对)</span><br><span class="line">// 第一次请求的时候响应里设置 Last-Modified 和时间，并把文件返回</span><br><span class="line">// 浏览器就会把这个时间缓存下来</span><br><span class="line">// 之后的每次请求 都会带上 if-modified-since 的时间</span><br><span class="line">// 但是发现 本地缓存信息里有 no-cache 就不会直接从本地读取，</span><br><span class="line">// 而是带上 if-modified-since 和服务器文件的 mtime 比对，如果变了就重新读取，没变就走缓存 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// no-cache 等价于 max-age=0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例2，设置了 no-store</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-store&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-store 意思是 </span><br><span class="line">// 你设置的 Last-Modified  响应报文不会被浏览器记录,每次都重新读取文件</span><br></pre></td></tr></table></figure>
+<h2 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h2><ul>
+<li>比如 a.css文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你修改了,修改时间变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你又修改了，修改时间又变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是文件内容没变。但是 Last-Modified 只看时间，ETag代表 看文件内容是否变化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，生成——“md5值”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个 md5值，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line"></span><br><span class="line">let md5 = crypto.createHash(&apos;md5&apos;);</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">let oldETag = req.headers[&apos;if-none-match&apos;];</span><br><span class="line">if(!oldETag)&#123;</span><br><span class="line">  // 第一次请求</span><br><span class="line">  res.setHeader(&apos;Etag&apos;,md5.update(data).digest(&apos;base64&apos;))</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let newETag = md5.update(data).digest(&apos;base64&apos;)</span><br><span class="line">  if(newETag !== oldETag)&#123;</span><br><span class="line">    // 文件内容变了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Etag&apos;,newETag)</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><ul>
+<li><a href="https://imweb.io/topic/5795dcb6fb312541492eda8c" target="_blank" rel="noopener">https://imweb.io/topic/5795dcb6fb312541492eda8c</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/23299600" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/23299600</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/18/HTTP04报文和http状态码/" title="HTTP04报文和http状态码" itemprop="url">HTTP04报文和http状态码</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-18T15:31:52.000Z" itemprop="datePublished"> Published 2021-01-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="报文的内容"><a href="#报文的内容" class="headerlink" title="报文的内容"></a>报文的内容</h3><h4 id="request-请求报文"><a href="#request-请求报文" class="headerlink" title="request 请求报文"></a>request 请求报文</h4><ul>
+<li>第一部分 请求行<code>method path  http版本号</code></li>
+<li>第二部分 K/V对的 请求首部</li>
+<li>第三部分 空行</li>
+<li>第四部分 请求体</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1 请求行</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;87&quot;, &quot; Not;A Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;87&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line"></span><br><span class="line">请求体</span><br></pre></td></tr></table></figure>
+<h4 id="response-响应报文"><a href="#response-响应报文" class="headerlink" title="response 响应报文"></a>response 响应报文</h4><ul>
+<li>第一部分 请求行<code>http版本号  状态码 状态码的解释</code></li>
+<li>第二部分 K/V对的 请求首部</li>
+<li>第三部分 空行</li>
+<li>第四部分 响应体</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 2</span><br><span class="line">Bdqid: 0xc2b78305000219a6</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line">Date: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Expires: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=116; path=/</span><br><span class="line">Set-Cookie: BD_HOME=1; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Traceid: 1609343343346522650614030827221594282406</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">空行</span><br><span class="line">响应体</span><br></pre></td></tr></table></figure>
+<h3 id="HTTP状态码"><a href="#HTTP状态码" class="headerlink" title="HTTP状态码"></a>HTTP状态码</h3><ul>
+<li>200 OK 成功</li>
+<li>204 No Content 请求成功了服务器做了处理了，但是不返回任何内容</li>
+<li>206 Partial Content 返回部分数据</li>
+<li>301 永久重定向, <ul>
+<li>比如 当你访问aa.com ，重定向到bb.com,此时浏览器就会记录缓存，下次你输入 aa.com 会直接 跳转到 bb.com</li>
+</ul>
+</li>
+<li>302 Found 临时重定向</li>
+<li>303 See Other</li>
+<li>304 Not Modified 缓存相关</li>
+<li>307 也是临时重定向</li>
+<li>400 bad request </li>
+<li>401 Unauthorized 未授权，没权限</li>
+<li>403 forbidden 被服务器拒绝了</li>
+<li>404 not found </li>
+<li>500 Internal Server Error </li>
+<li>503 Service Unavailable 服务器处理不过来了</li>
+</ul>
+<h4 id="重定向"><a href="#重定向" class="headerlink" title="重定向"></a>重定向</h4><h5 id="302情况-访问-aa-com重定向"><a href="#302情况-访问-aa-com重定向" class="headerlink" title="302情况 访问 aa.com重定向"></a>302情况 访问 aa.com重定向</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 服务器端</span><br><span class="line">statusCode = 302</span><br><span class="line">setHeader(&apos;location&apos;,&apos;www.baidu.com&apos;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>先发送 <a href="http://www.aa.com，响应" target="_blank" rel="noopener">http://www.aa.com，响应</a> 302</li>
+<li>然后再次 发送 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a> 请求</li>
+</ul>
+<h5 id="301情况-访问-aa-com重定向"><a href="#301情况-访问-aa-com重定向" class="headerlink" title="301情况 访问 aa.com重定向"></a>301情况 访问 aa.com重定向</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 服务器端设置响应</span><br><span class="line">statusCode = 301</span><br><span class="line">setHeader(&apos;location&apos;,&apos;www.baidu.com&apos;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>先发送 <a href="http://www.aa.com，响应" target="_blank" rel="noopener">http://www.aa.com，响应</a> 301</li>
+<li>然后再次 发送 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a> 请求</li>
+<li>此时如果关闭你的服务器 再次网址里输入 <a href="http://www.aa.com，会直接" target="_blank" rel="noopener">http://www.aa.com，会直接</a> 访问  <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a></li>
+</ul>
+<p><strong>注意！chrome调试的时候 不要勾选disable cache</strong></p>
+<h4 id="响应类型和请求类型"><a href="#响应类型和请求类型" class="headerlink" title="响应类型和请求类型"></a>响应类型和请求类型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 响应类型</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line"></span><br><span class="line">// 请求类型</span><br><span class="line">Content-Type: application/x-www-form-urlencoded;charset=utf-8</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/17/HTTP03http常用方法/" title="HTTP03http常用方法" itemprop="url">HTTP03http常用方法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-17T15:31:24.000Z" itemprop="datePublished"> Published 2021-01-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>1.常见HTTP方法有哪些？使用场景分别是什么？<br>2.GET与POST有什么区别？<br>3.什么是RESTful API？</p>
+<h3 id="常见Http方法"><a href="#常见Http方法" class="headerlink" title="常见Http方法"></a>常见Http方法</h3><ul>
+<li>GET</li>
+<li>POST</li>
+<li>PUT</li>
+<li>HEAD</li>
+<li>DELETE</li>
+<li>OPTIONS</li>
+<li>CONNECT</li>
+</ul>
+<h3 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h3><p>表现层状态转换（英语：Representational State Transfer，缩写：REST），API设计规范，HTTP方法与对应数据库增删改查对应</p>
+<ul>
+<li>GET：读取（Read）</li>
+<li>POST：新建（Create）</li>
+<li>PUT：更新（Update）</li>
+<li>PATCH：更新（Update），通常是部分更新</li>
+<li>DELETE：删除（Delete）</li>
+</ul>
+<blockquote>
+<p>范例</p>
+</blockquote>
+<ul>
+<li>GET /books , 列出所有的图书</li>
+<li>POST /books , 创建一本图书</li>
+<li>PUT /books, 批量更新图书信息</li>
+<li>DELETE /books, 删除所有图书</li>
+<li>GET /books/10， 获取10号图书详细信息</li>
+<li>PUT /books/10， 更新10号图书</li>
+<li>PATCH /books/10， 更新10号图书</li>
+<li>DELETE /books/10, 删除10号图书</li>
+</ul>
+<h5 id="PUT和PATCH有什么差别？"><a href="#PUT和PATCH有什么差别？" class="headerlink" title="PUT和PATCH有什么差别？"></a>PUT和PATCH有什么差别？</h5><p>对于</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;username&quot;: &quot;xxx&quot;</span><br><span class="line">    &quot;email&quot;: &quot;xxx@xxxx.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PUT修改传参，需包含全部参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;username&quot;: &quot;xxx&quot;</span><br><span class="line">    &quot;email&quot;: &quot;xxx@vip.qq.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>PATCH修改传参，只需要传递需要修改的参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;email&quot;: &quot;hunger@vip.qq.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外推荐在URL中强制加入版本号，如</p>
+<p>GET /v1/books</p>
+<h4 id="Form表单支持哪些方法"><a href="#Form表单支持哪些方法" class="headerlink" title="Form表单支持哪些方法"></a>Form表单支持哪些方法</h4><p>form表单只支持 post 和get。但是可以通过变通的方法，让服务器知道你本意是想做什么。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;/books&quot; method=&quot;POST&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;PUT&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="HTTP-持久连接"><a href="#HTTP-持久连接" class="headerlink" title="HTTP-持久连接"></a>HTTP-持久连接</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一个请求的过程是</p>
+</blockquote>
+<ul>
+<li>step01 三次握手 建立连接</li>
+<li>step02 HTTP request / response</li>
+<li>step03 四度挥手 断开连接</li>
+</ul>
+<p>每次请求都经历这些过程，握手很频繁。损耗时间</p>
+<p>通过添加 <code>Connection: keep-alive</code> 代表建立连接后，你们以后别再次握手挥手了，直接发请求就行了，等都ok了 在挥手停下来</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/16/HTTP02三次握手四度挥手/" title="HTTP02三次握手四度挥手" itemprop="url">HTTP02三次握手四度挥手</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-16T15:30:55.000Z" itemprop="datePublished"> Published 2021-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><p>A：我准备好了你准备好了吗，收到请回答。<br>B：收到收到，我也准备好了，收到请回答。<br>A：收到收到</p>
+<blockquote>
+<p>粗略理解</p>
+</blockquote>
+<ul>
+<li>step01 A询问B服务器,并带着序号seq=x的问题<ul>
+<li>SYN=1,seq=x  </li>
+</ul>
+</li>
+<li>step02 B用 <code>ack=x+1</code>响应seq=x的问题，同时问了A一个问题 SYN=1,seq=y<ul>
+<li>ACK=1,ack=x+1,SYN=1,seq=y</li>
+</ul>
+</li>
+<li>step03 A回答B的问题,同时当前问题的序号加1<ul>
+<li>ACK=1,ack=y+1,seq=x+1</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/001.png" alt></p>
+<blockquote>
+<p>SYN 是啥？</p>
+</blockquote>
+<ul>
+<li>就是一个确认报文</li>
+<li>SYN=1 代表向对方询问。 我已经OK了，我要去问你了，同时要加一个序号  seq = x，</li>
+</ul>
+<blockquote>
+<p>序号 seq</p>
+</blockquote>
+<p>保证 每次询问的问题都会有一个seq，这样即使 对方没有反应，下次询问的时候又有新的序号，不会发生错乱</p>
+<blockquote>
+<p>ACK=1 代表回答</p>
+</blockquote>
+<p>ack=x+1 代表 回答你刚刚seq=x的问题</p>
+<p>TCP规定SYN=1时不能携带数据，但要消耗一个序号,因此声明自己的序号是 seq=x</p>
+<h3 id="四步挥手"><a href="#四步挥手" class="headerlink" title="四步挥手"></a>四步挥手</h3><p>1.客户端发送一个 FIN ，告诉服务器想关闭连接。<br>2.服务器收到这个 FIN ，发回一个 ACK。（关闭需要时间，此时只是回应知道这个事了）<br>3.服务器通知应用程序关闭网络连接，应用程序关闭后通知服务器。服务器发送一个 FIN 给客户端 。 (真的关闭后，再次发送FIN给客户端，同时告诉你也关闭吧，我已经关了)<br>4.客户端发回 ACK 报文确认。</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/002.png" alt></p>
+<h4 id="为什么挥手要四步"><a href="#为什么挥手要四步" class="headerlink" title="为什么挥手要四步"></a>为什么挥手要四步</h4><p>这是因为服务端的 LISTEN 状态下的 SOCKET 当收到客户端建立连接请求的SYN 报文后，它可以把 ACK 和 SYN （ ACK 起应答作用，而 SYN 起同步作用）放在一个报文里来发送。但关闭连接时，当服务器收到客户端的 FIN 报文通知时，服务器只能发一个回应报文ACK：“哦，我知道了”，然后通知应用程序。应用程序完成全部数据发送并确定可以终止了，服务器才能发送FIN告诉客户端可以真正断开连接了。所以这一步ACK报文和FIN报文需要分开发送，因此多了一个步骤。</p>
+<h4 id="TCP报文格式"><a href="#TCP报文格式" class="headerlink" title="TCP报文格式"></a>TCP报文格式</h4><ul>
+<li>ACK ： TCP协议规定，只有ACK=1时有效，也规定连接建立后所有发送的报文的ACK必须为1。</li>
+<li>SYN(SYNchronization) ： 在连接建立时用来同步序号。当SYN=1而ACK=0时，表明这是一个连接请求报文。对方若同意建立连接，则应在响应报文中使SYN=1和ACK=1. 因此, SYN置1就表示这是一个连接请求或连接接受报文。</li>
+<li>FIN （finis）即完，终结的意思， 用来释放一个连接。当 FIN = 1 时，表明此报文段的发送方的数据已经发送完毕，并要求释放连接。</li>
+</ul>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><ul>
+<li><a href="https://blog.csdn.net/daocaoren1543169565/article/details/80535949" target="_blank" rel="noopener">CSDN-TCP报文详解</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2021/01/15/HTTP01网络各种层/" title="HTTP01网络各种层" itemprop="url">HTTP01网络各种层</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2021-01-15T15:30:20.000Z" itemprop="datePublished"> Published 2021-01-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="网络基础"><a href="#网络基础" class="headerlink" title="网络基础"></a>网络基础</h1><h3 id="使用HTTP协议-访问Web"><a href="#使用HTTP协议-访问Web" class="headerlink" title="使用HTTP协议 访问Web"></a>使用HTTP协议 访问Web</h3><ul>
+<li>打开浏览器输入 taobao.com</li>
+<li>套壳应用里内嵌网址</li>
+<li>命令行里 访问 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></li>
+</ul>
+<h3 id="HTTP的版本"><a href="#HTTP的版本" class="headerlink" title="HTTP的版本"></a>HTTP的版本</h3><ul>
+<li>HTTP/1.0 最早的 </li>
+<li>HTTP/1.1 <strong>主流的</strong></li>
+<li>后续还有 HTTP/2.0</li>
+</ul>
+<h2 id="URI-和-URL区别"><a href="#URI-和-URL区别" class="headerlink" title="URI 和 URL区别"></a>URI 和 URL区别</h2><ul>
+<li>URI 统一资源标识符<ul>
+<li>某一互联网资源，宽泛的范围<ul>
+<li>ftp上的某个资源</li>
+<li>http服务器上的一个 txt文件</li>
+<li>等等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>URL 统一资源定位符 （网址）</li>
+</ul>
+<h2 id="OSI7层模型和TCP-IP4层模型"><a href="#OSI7层模型和TCP-IP4层模型" class="headerlink" title="OSI7层模型和TCP/IP4层模型"></a>OSI7层模型和TCP/IP4层模型</h2><h3 id="OSI模型-7层模型"><a href="#OSI模型-7层模型" class="headerlink" title="OSI模型 (7层模型)"></a>OSI模型 (7层模型)</h3><p>记忆口诀—— <strong>应表会传网数物</strong></p>
+<ul>
+<li>应用层</li>
+<li>表示层</li>
+<li>会话层</li>
+<li>传输层</li>
+<li>网络层</li>
+<li>数据链路层</li>
+<li>物理层</li>
+</ul>
+<p>记忆一下即可，已被 TCP/IP四层模型取代</p>
+<h3 id="TCP-IP四层模型-（应传网数）"><a href="#TCP-IP四层模型-（应传网数）" class="headerlink" title="TCP/IP四层模型 （应传网数）"></a>TCP/IP四层模型 （应传网数）</h3><h4 id="来个例子-豪门之间的通信"><a href="#来个例子-豪门之间的通信" class="headerlink" title="来个例子 豪门之间的通信"></a>来个例子 豪门之间的通信</h4><ul>
+<li><p>豪门望族，规矩多，还得有礼仪</p>
+</li>
+<li><p>step01 写信的规则 <strong>(应用层)</strong></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">尊敬的xxx:</span><br><span class="line">  代表我和我家和您进行问候！</span><br><span class="line">  邀请xxx时来一起 high</span><br><span class="line"></span><br><span class="line">  您的朋友：</span><br><span class="line">    yyy</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step002 把信给管家 <strong>(传输层)</strong> ，这种小事交给管家去做<ul>
+<li>豪门a的管家给豪门b的管家通通信<ul>
+<li>A我们家要给你们家发信了</li>
+<li>B收到，你发吧</li>
+<li>A收到，我发了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>step003 邮差 <strong>(网络层)</strong><ul>
+<li>B家族的地址和小区名称</li>
+</ul>
+</li>
+<li>step004 邮筒 <strong>(数据链路层)</strong><ul>
+<li>信的大小不能超过 xx寸，太大了邮筒放不进去，还要贴邮票</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>应用层</p>
+</blockquote>
+<p>  应用层是大多数普通与网络相关的程序为了通过网络与其他程序通信所使用的层。这个层的处理过程是应用特有的；数据从网络相关的程序以这种应用内部使用的格式进行传送，然后被编码成标准协议的格式。每一个应用层协议一般都会使用到传输层协议TCP和UDP协议之一：</p>
+<p>运行在TCP协议上的协议：</p>
+<ul>
+<li>HTTP（80端口），主要用于普通浏览。</li>
+<li>HTTPS（443端口）,HTTP协议的安全版本。</li>
+<li>FTP（20和21端口），由名知义，用于文件传输。</li>
+<li>POP3（110端口），收邮件用。</li>
+<li>SMTP（25端口），用来发送电子邮件。</li>
+<li>SSH（22端口），用于加密安全登陆用。</li>
+</ul>
+<p>运行在UDP协议上的协议：</p>
+<ul>
+<li>DHCP（67端口，动态主机配置协议），动态配置IP地址。</li>
+</ul>
+<p>其他：</p>
+<ul>
+<li>DNS（Domain Name Service，域名服务），用于完成地址查找，邮件转发等工作（运行在TCP和UDP协议上）。</li>
+<li>SNMP（Simple Network Management Protocol，简单网络管理协议），用于网络信息的收集和网络管理。</li>
+<li>ARP（Address Resolution Protocol，地址解析协议），用于动态解析以太网硬件的地址。</li>
+</ul>
+<blockquote>
+<p>传输层</p>
+</blockquote>
+<p>解决诸如端到端可靠性（数据是否已经到达目的地？）和保证数据按照正确的顺序到达这样的问题。TCP、UDP都是传输层协议。</p>
+<blockquote>
+<p>网络层</p>
+</blockquote>
+<p>解决在一个单一网络上传输数据包的问题。IP协议是网络层协议。</p>
+<blockquote>
+<p>数据链路层</p>
+</blockquote>
+<p>它是数据包从一个设备的网络层传输到另外一个设备的网络层的方法。这个过程能够在网卡的软件驱动程序中控制或者专用芯片中控制。这将完成如添加报头准备发送、通过实体介质实际发送这样一些数据链路功能。另一端，链路层将完成数据帧接收、去除报头并且将接收到的包传到网络层。</p>
+<h3 id="粗略理解-http协议"><a href="#粗略理解-http协议" class="headerlink" title="粗略理解 http协议"></a>粗略理解 http协议</h3><ul>
+<li>打开 chrome 输入 baidu.com </li>
+<li>调试模式 network 选项</li>
+<li>选择一个http请求 右键 copy request headers/ response headers</li>
+</ul>
+<p>request</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;87&quot;, &quot; Not;A Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;87&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cookie: PSTM=1587438853; BIDUPSID=1E44DAEF1B34E707E2BCE796151A30D5; BAIDUID=212F1EB08E8B84AD626014F0EED3983F:SL=0:NR=10:FG=1; BD_UPN=123253; MCITY=-131%3A; BDUSS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDUSS_BFESS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; __yjs_duid=1_0f057bc5e273f735bb3b90c9f7fb3bf91608867444564; BDSFRCVID_BFESS=4iDOJeC62xkxsV7rg5g6KwgregKaGx6TH6aokUReTbdIYJeK4QwiEG0PDf8g0Ku-yxYDogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; BDSFRCVID=u_-OJeC62CWHCSOrgOLXKwgreU1oMPQTH6aoFxh6Z3kqjmbLtEppEG0P8M8g0Ku-8Uu8ogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; H_BDCLCKID_SF=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; H_BDCLCKID_SF_BFESS=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; delPer=0; BD_CK_SAM=1; PSINO=2; BAIDUID_BFESS=8A88B5E71009B0079D8E6B45E8F33721:FG=1; BD_HOME=1; BDRCVFR[feWj1Vr5u3D]=I67x6TjHwwYf0; Hm_lvt_aec699bb6442ba076c8981c6dc490771=1607495989,1607755061,1608720675,1609259205; Hm_lpvt_aec699bb6442ba076c8981c6dc490771=1609259205; COOKIE_SESSION=30608_8_9_5_53_38_0_2_9_6_1_1_0_0_2_4_1609228598_1609144332_1609259204%7C9%2398408_356_1609144328%7C9; H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; H_PS_645EC=fc05%2B%2BlWgGb0cU%2B%2BbxUlUMSOqIsEiSUpRrm1pdbAFhR7A8t6VjcWGqbPXM8TdxnFox3C; sug=0; sugstore=0; ORIGIN=0; bdime=0; BA_HECTOR=ak2la1048h81a4a02c1fup8b50q</span><br></pre></td></tr></table></figure>
+<p>response</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 2</span><br><span class="line">Bdqid: 0xc2b78305000219a6</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line">Date: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Expires: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=116; path=/</span><br><span class="line">Set-Cookie: BD_HOME=1; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Traceid: 1609343343346522650614030827221594282406</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br></pre></td></tr></table></figure>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/http/">http</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2020/10/12/移动端-004-移动端常见问题/" title="移动端-004-移动端常见问题" itemprop="url">移动端-004-移动端常见问题</a>
   </h1>
   <p class="article-author">By
@@ -458,590 +1103,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/12/CSS-010-动态REM/" title="CSS-010-动态REM" itemprop="url">CSS-010-动态REM</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-12T06:32:17.000Z" itemprop="datePublished"> Published 2020-10-12</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="动态REM"><a href="#动态REM" class="headerlink" title="动态REM"></a>动态REM</h1><p>手机专用的自适应方案</p>
-<h2 id="REM是什么"><a href="#REM是什么" class="headerlink" title="REM是什么"></a>REM是什么</h2><blockquote>
-<p>常见单位</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">px 像素</span><br><span class="line">em 一个字母的宽度 、一个汉子的宽度？</span><br><span class="line">rem root em 根元素的 font-size</span><br><span class="line">vh viewport height 100vh = 视口高度</span><br><span class="line">vw viewport width 100vw = 视口宽度</span><br></pre></td></tr></table></figure>
-<p><strong>网页的默认font-size是 16px</strong></p>
-<p>chrome有设置最小字号是12px，此时你就算写出 font-size:6px 也会变成 12px</p>
-<blockquote>
-<p>问题1: font-size:1rem 是多少像素</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16</span><br><span class="line"></span><br><span class="line">body&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16, html才是根元素</span><br><span class="line"></span><br><span class="line">html&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 20px,因为根元素font-size是20</span><br></pre></td></tr></table></figure>
-<h2 id="REM和-EM区别"><a href="#REM和-EM区别" class="headerlink" title="REM和 EM区别"></a>REM和 EM区别</h2><blockquote>
-<p>p 的高度是多少</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>经过浏览器检查发现是 32px</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">      font-size:30px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>经过浏览器检查发现是 60px,结论：<strong>1em就是自身元素 font-size的像素值</strong></p>
-<p><strong>REM是根元素的font-size,em是自身元素的font-size</strong></p>
-<h2 id="动态REM-1"><a href="#动态REM-1" class="headerlink" title="动态REM"></a>动态REM</h2><blockquote>
-<p>移动端写页面的演进</p>
-</blockquote>
-<ul>
-<li>百分比布局，只能保证水平方向没问题，但是高度呢？<ul>
-<li>要求高度是宽度的1半，就很难做到，因为 height是不会按照父容器的宽度来定的</li>
-</ul>
-</li>
-<li><p>动态REM</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">当屏幕 640px的时候 banner为 320*320</span><br><span class="line"></span><br><span class="line">当屏幕 320px的时候 banner为 160*160</span><br><span class="line"></span><br><span class="line">当屏幕 414px的时候 banner为 212*212</span><br></pre></td></tr></table></figure>
-<ul>
-<li>一切单位以“宽度”为基准，等比例缩放</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height: 0.2rem;</span><br><span class="line">      width: 0.4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.05rem 0.05rem;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="对REM进行微调"><a href="#对REM进行微调" class="headerlink" title="对REM进行微调"></a>对REM进行微调</h2><ul>
-<li>border:1px问题，无法在小的情况</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    *&#123;box-sizing:border-box;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height:2rem;</span><br><span class="line">      width: 4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.5rem 0.5rem;</span><br><span class="line">      /* 当像素特别小的时候就用1px因为网页最小1px */</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth/10+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/11/CSS-009-BFC/" title="CSS-009-BFC" itemprop="url">CSS-009-BFC</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-11T15:56:55.000Z" itemprop="datePublished"> Published 2020-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="BFC"><a href="#BFC" class="headerlink" title="BFC"></a>BFC</h1><blockquote>
-<p>Block Formatting Context</p>
-</blockquote>
-<p>块格式化上下文</p>
-<h3 id="CSS规范中对-BFC-的描述"><a href="#CSS规范中对-BFC-的描述" class="headerlink" title="CSS规范中对 BFC 的描述"></a>CSS规范中对 BFC 的描述</h3><blockquote>
-<p>9.4.1 块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>浮动，绝对定位元素，非块盒的块容器（例如，inline-blocks，table-cells和table-captions）和’overflow’不为’visible’的块盒会为它们的内容建立一个新的块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，盒在竖直方向一个接一个地放置，从包含块的顶部开始。两个兄弟盒之间的竖直距离由’margin’属性决定。同一个块格式化上下文中的相邻块级盒之间的竖直margin会合并</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，每个盒的left外边（left outer edge）挨着包含块的left边（对于从右向左的格式化，right边挨着）。即使存在浮动（尽管一个盒的行盒可能会因为浮动收缩），这也成立。除非该盒建立了一个新的块格式化上下文（这种情况下，该盒自身可能会因为浮动变窄）</p>
-</blockquote>
-<h3 id="MDN-对-BFC-的描述"><a href="#MDN-对-BFC-的描述" class="headerlink" title="MDN 对 BFC 的描述"></a>MDN 对 BFC 的描述</h3><blockquote>
-<p>一个块格式化上下文（block formatting context） 是Web页面的可视化CSS渲染出的一部分。它是块级盒布局出现的区域，也是浮动层元素进行交互的区域。</p>
-</blockquote>
-<blockquote>
-<p>一个块格式化上下文由以下之一创建：</p>
-</blockquote>
-<ul>
-<li>根元素或其它包含它的元素</li>
-<li>浮动元素 (元素的 float 不是 none)</li>
-<li>绝对定位元素 (元素具有 position 为 absolute 或 fixed)</li>
-<li>内联块 (元素具有 display: inline-block)</li>
-<li>表格单元格 (元素具有 display: table-cell，HTML表格单元格默认属性)</li>
-<li>表格标题 (元素具有 display: table-caption, HTML表格标题默认属性)</li>
-<li>具有overflow 且值不是 visible 的块元素，</li>
-<li>display: flow-root <strong>触发BFC</strong></li>
-<li>column-span: all 应当总是会创建一个新的格式化上下文，即便具有 column-span: all 的元素并不被包裹在一个多列容器中。</li>
-</ul>
-<blockquote>
-<p>一个块格式化上下文包括创建它的元素内部所有内容，除了被包含于创建新的块级格式化上下文的后代元素内的元素。</p>
-</blockquote>
-<blockquote>
-<p>块格式化上下文对于定位 (参见 float) 与清除浮动 (参见 clear) 很重要。定位和清除浮动的样式规则只适用于处于同一块格式化上下文内的元素。浮动不会影响其它块格式化上下文中元素的布局，并且清除浮动只能清除同一块格式化上下文中在它前面的元素的浮动。</p>
-</blockquote>
-<h3 id="张鑫旭对-BFC-的描述"><a href="#张鑫旭对-BFC-的描述" class="headerlink" title="张鑫旭对 BFC 的描述"></a>张鑫旭对 BFC 的描述</h3><p><a href="http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/" target="_blank" rel="noopener">http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/</a></p>
-<blockquote>
-<p>BFC全称”Block Formatting Context”, 中文为“块级格式化上下文”。啪啦啪啦特性什么的，一言难尽，大家可以自行去查找，我这里不详述，免得乱了主次，总之，记住这么一句话：BFC元素特性表现原则就是，内部子元素再怎么翻江倒海，翻云覆雨都不会影响外部的元素。所以，避免margin穿透啊，清除浮动什么的也好理解了。</p>
-</blockquote>
-<h3 id="BFC-到底是什么？"><a href="#BFC-到底是什么？" class="headerlink" title="BFC 到底是什么？"></a>BFC 到底是什么？</h3><p>先思考一个问题：</p>
-<p>请问：什么是色情？</p>
-<p>联邦最高法院大法官斯图尔特更有一句名言</p>
-<blockquote>
-<p>我不知道什么是色情，不过，我看了之后，就能知道</p>
-</blockquote>
-<p><code>I know it when I see it</code></p>
-<p>类似地：</p>
-<p>1、我不知道什么是 BFC<br>2、但是你写出样式，我就知道这是不是 BFC</p>
-<p>BFC 就是这样的东西（堆叠上下文也是）</p>
-<p>1、它没有定义<br>2、它只有特性/功能</p>
-<h3 id="功能1：爸爸管儿子"><a href="#功能1：爸爸管儿子" class="headerlink" title="功能1：爸爸管儿子"></a>功能1：爸爸管儿子</h3><p>用 BFC 包住浮动元素。(这不是清除浮动，.clearfix 才是清除浮动）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      float:left; /* 浮动就会脱离文档流 ，导致 baba 的高度塌陷 */</span><br><span class="line">      width: 300px;</span><br><span class="line">      height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如何触发BFC</p>
-</blockquote>
-<ul>
-<li>父级 浮动、定位、或者 <code>display = inline-block\table-cell\table-caption</code> 或者 display不是block的值的容器、 overflow 不为 visible的<ul>
-<li>overflow:auto</li>
-<li>overflow:hidden 会引发副作用，如果内部元素，超出内容不会显示</li>
-<li>display:inline-block</li>
-<li>display:table-cell</li>
-<li>display:flow-root <strong>让当前元素触发BFC，CSS3新出的属性，兼容性不太好</strong></li>
-</ul>
-</li>
-</ul>
-<h3 id="解释BFC内部元素-margin融合问题"><a href="#解释BFC内部元素-margin融合问题" class="headerlink" title="解释BFC内部元素 margin融合问题"></a>解释BFC内部元素 margin融合问题</h3><ul>
-<li>如果两个div没有浮动，它们在一个div中，它们的竖直margin会合并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"><a href="#一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的" class="headerlink" title="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"></a>一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的</h3><blockquote>
-<p>通俗理解</p>
-</blockquote>
-<ul>
-<li>baba是BFC</li>
-<li>erzi是 baba的子元素，同时也是BFC</li>
-<li>sunzi 是 erzi的子元素，它的内容就不会被 baba包含</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      width:500px;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display:flow-root;</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">      float:left; /* 触发BFC */</span><br><span class="line">      margin-top:100px; /* 由于父级 触发BFC所以 这个距离会被包含进 baba里*/</span><br><span class="line">    &#125;</span><br><span class="line">    .sunzi&#123;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 400px;</span><br><span class="line">      margin-top:200px; /* 由于 sunzi被 BFC元素 erzi罩着， 所以无法被包含进 baba内 */</span><br><span class="line">      background:blue; </span><br><span class="line">      /* 由于 erzi在带sunzi，所以baba 就不管这个sunzi了 */</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;sunzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="功能2：兄弟之间划清界限"><a href="#功能2：兄弟之间划清界限" class="headerlink" title="功能2：兄弟之间划清界限"></a>功能2：兄弟之间划清界限</h3><p>用 float + div 做左右自适应布局</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .gege&#123;</span><br><span class="line">  width: 100px;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 3px solid red;</span><br><span class="line">  float: left;</span><br><span class="line">  margin-right: 20px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.didi&#123;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 5px solid green;</span><br><span class="line">  overflow:auto; </span><br><span class="line">  /* display:flow-root; */</span><br><span class="line">&#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;gege&quot;&gt;gege&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;didi&quot;&gt;1234&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>第一个方式就是 overflow:auto</li>
-<li>第二个方式就是 display:flow-root;</li>
-</ul>
-<h3 id="如何回答面试官"><a href="#如何回答面试官" class="headerlink" title="如何回答面试官"></a>如何回答面试官</h3><p>千万别解释什么是 BFC，一解释就错<br>用上面的例子回答什么是 BFC</p>
-<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><blockquote>
-<p>BFC和文档流有什么关系</p>
-</blockquote>
-<ul>
-<li>BFC说的是一个div有一些属性后(float:left 或position:absolute)它自己就是BFC。BFC说的是这个 div 的特性，说的是这个div会包住它里面，它里面的内容是不会变得</li>
-<li>文档流是 内联元素从左到右，块级元素从上到下排列</li>
-<li>BFC影响一个元素的宽高，文档流影响是排列顺序</li>
-</ul>
-<blockquote>
-<p>BFC使用场景</p>
-</blockquote>
-<ul>
-<li>爸爸管儿子(参考上面的功能1)，注意这不是清除浮动，这是BFC让爸爸管儿子<ul>
-<li>BFC可以模拟清除浮动的效果，但是我可以直接 clearfix，那么BFC就没意义了，BFC会导致副作用 如 overflow:hidden;的时候，但是clearfix不会有副作用，除非所有浏览器都支持<code>display:flow-root</code></li>
-<li><strong>不要用BFC清除浮动</strong></li>
-</ul>
-</li>
-<li>兄弟之间划清界限(参考上面的功能2)<ul>
-<li>也就是以前的左右布局</li>
-<li>同样也可以不用它，用flex解决这些问题</li>
-<li>BFC是时代的产物</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>margin穿透</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .baba&#123;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .erzi&#123;</span><br><span class="line">    height: 100px;</span><br><span class="line">    margin-top:100px;</span><br><span class="line">    background:green;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>现在 erzi 的 margin会穿过 baba </li>
-<li>给 baba 添加 <code>overflow:hidden</code> 就能触发BFC,不让 erzi穿出来，但是有副作用就是 erzi内如果有定位元素超出容易会被隐藏</li>
-<li>所以 你只能给 baba 加 <code>display:flow-root</code> 或者 <code>borer</code></li>
-</ul>
-<blockquote>
-<p>什么情况下一定要BFC呢？</p>
-</blockquote>
-<p>没有任何情况一定要BFC，所有的场景都可以不用BFC实现</p>
-<p><strong>面试一定要搞懂BFC</strong></p>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/11/CSS-008-布局套路/" title="CSS-008-布局套路" itemprop="url">CSS-008-布局套路</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-11T14:32:46.000Z" itemprop="datePublished"> Published 2020-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h2 id="布局套路"><a href="#布局套路" class="headerlink" title="布局套路"></a>布局套路</h2><h3 id="左右布局"><a href="#左右布局" class="headerlink" title="左右布局"></a>左右布局</h3><blockquote>
-<p>float + clearfix</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      height: 30px;</span><br><span class="line">      float:left;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .child:nth-child(1)&#123;</span><br><span class="line">      width:30%;</span><br><span class="line">      background:blue;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .child:nth-child(2)&#123;</span><br><span class="line">      width:70%;</span><br><span class="line">      background:red</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">  &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="实战PC页面的套路"><a href="#实战PC页面的套路" class="headerlink" title="实战PC页面的套路"></a>实战PC页面的套路</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;box-sizing:border-box;&#125;</span><br><span class="line">    .main-center&#123;margin:0 auto;&#125;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      min-width:600px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      float:left;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .child:nth-child(1)&#123;</span><br><span class="line">      width:100px;</span><br><span class="line">      background:#333;</span><br><span class="line">      color:white;</span><br><span class="line">      text-align:center;</span><br><span class="line">      height:36px;</span><br><span class="line">      line-height:36px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .child:nth-child(2)&#123;</span><br><span class="line">      float:right;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .content&#123;</span><br><span class="line">      border:1px solid black;</span><br><span class="line">      margin-right:10px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .nav&#123;</span><br><span class="line">      line-height:24px;</span><br><span class="line">      padding:6px 0;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .navItem&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      margin-left:20px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">    .clearfix&#123;</span><br><span class="line">      zoom:1; /* 兼容IE6 */</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .banner&#123;</span><br><span class="line">      width: 800px;</span><br><span class="line">      height: 300px;</span><br><span class="line">      background:#888;</span><br><span class="line">      margin-top: 10px;</span><br><span class="line">      margin-left:auto;</span><br><span class="line">      margin-right:auto;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures&#123;</span><br><span class="line">      width: 800px;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures .xxx&#123;</span><br><span class="line">      margin-left:-4px;</span><br><span class="line">      margin-right:-4px;</span><br><span class="line">    &#125;</span><br><span class="line">    .picture&#123;</span><br><span class="line">      height: 194px;</span><br><span class="line">      width: 194px;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:4px;</span><br><span class="line">      background:#ddd</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures2&#123;</span><br><span class="line">      width: 800px;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">      background:green;</span><br><span class="line">      display:flex;</span><br><span class="line">      flex-wrap:wrap;</span><br><span class="line">      justify-content:space-between;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .picture2&#123;</span><br><span class="line">      height: 194px;</span><br><span class="line">      width: 194px;</span><br><span class="line">      margin-top:4px;</span><br><span class="line">      margin-bottom:4px;</span><br><span class="line">      background:#ddd</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures3&#123;</span><br><span class="line">      width: 800px;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures3 .xxx&#123;</span><br><span class="line">      display:flex;</span><br><span class="line">      flex-wrap:wrap;</span><br><span class="line">      margin:0 -4px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .picture3&#123;</span><br><span class="line">      height: 194px;</span><br><span class="line">      width: 194px;</span><br><span class="line">      margin:4px;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures4&#123;</span><br><span class="line">      width: 800px;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .pictures4 .xxx&#123;</span><br><span class="line">      display:flex;</span><br><span class="line">      flex-wrap:wrap;</span><br><span class="line">      margin:0 -4px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .picture4&#123;</span><br><span class="line">      height: 194px;</span><br><span class="line">      width: calc(25% - 8px);</span><br><span class="line">      margin:4px;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .art&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height: 300px;</span><br><span class="line">      width: 800px;</span><br><span class="line">      margin:0 auto;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .art .sider&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      width: calc(33.333333% - 20px);</span><br><span class="line">      margin-right:20px;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .art .sider .child-ad&#123;</span><br><span class="line">      height: 300px;</span><br><span class="line">      border:1px solid black;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .art .main&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      height: 300px;</span><br><span class="line">      border:1px solid black;</span><br><span class="line">      width:66.66666%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;logo&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;nav clearfix&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;navItem&quot;&gt;导航1&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;navItem&quot;&gt;导航2&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;navItem&quot;&gt;导航3&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;navItem&quot;&gt;导航4&lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;navItem&quot;&gt;导航5&lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;div class=&quot;banner&quot;&gt;&lt;/div&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;h3 style=&quot;margin:0 auto;width:800px;&quot;&gt;float+margin负边距 样品展示区&lt;/h3&gt;</span><br><span class="line">    &lt;div class=&quot;pictures&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;xxx clearfix&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt; </span><br><span class="line">  </span><br><span class="line">  &lt;h3 style=&quot;margin:0 auto;width:800px;&quot;&gt;flex 样品展示区&lt;/h3&gt;</span><br><span class="line">  &lt;p style=&quot;margin:0 auto;width:800px;&quot;&gt;隐藏了bug 如果是7个 第二行就会很难看&lt;/p&gt;</span><br><span class="line">  &lt;div class=&quot;pictures2&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;picture2&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt; </span><br><span class="line">  </span><br><span class="line">  &lt;h3 style=&quot;margin:0 auto;width:800px;&quot;&gt;flex 样品展示区:修复bug&lt;/h3&gt;</span><br><span class="line">  &lt;div class=&quot;pictures3&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;xxx&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture3&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt; </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  &lt;h3 style=&quot;margin:0 auto;width:800px;&quot;&gt;flex 样品展示区:使用 calc&lt;/h3&gt;</span><br><span class="line">  &lt;div class=&quot;pictures4&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;xxx&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;picture4&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  </span><br><span class="line">  &lt;div class=&quot;art&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;sider&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;child-ad&quot;&gt;广告1&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;main&quot;&gt;广告2&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="手机端"><a href="#手机端" class="headerlink" title="手机端"></a>手机端</h4><ul>
-<li>直接将上面的样式 媒体查询 + flex即可</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/11/CSS-007-grid布局/" title="CSS-007-grid布局" itemprop="url">CSS-007-grid布局</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-11T12:51:58.000Z" itemprop="datePublished"> Published 2020-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Grid-布局"><a href="#Grid-布局" class="headerlink" title="Grid 布局"></a>Grid 布局</h1><h2 id="先画一个网格"><a href="#先画一个网格" class="headerlink" title="先画一个网格"></a>先画一个网格</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .container&#123;</span><br><span class="line">      display:grid;</span><br><span class="line">      /* 列方向： 左右 50px 中间自适应 */</span><br><span class="line">      grid-template-columns:50px auto 50px;</span><br><span class="line">      /* 行方向： 上下 50px 中间自适应 */</span><br><span class="line">      grid-template-rows:50px auto 50px;</span><br><span class="line">      height:100vh;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="gird布局实现-PC页面布局"><a href="#gird布局实现-PC页面布局" class="headerlink" title="gird布局实现 PC页面布局"></a>gird布局实现 PC页面布局</h3><ul>
-<li>两栏布局</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .container &#123;</span><br><span class="line">    height: 100vh;</span><br><span class="line">    border:1px solid red;</span><br><span class="line">    </span><br><span class="line">    display:grid;</span><br><span class="line">    grid-template-columns: 10% auto 10%;</span><br><span class="line">    grid-template-rows: 50px auto 50px;</span><br><span class="line">    grid-template-areas: </span><br><span class="line">      &quot;header header header&quot;</span><br><span class="line">      &quot;. main aside&quot;</span><br><span class="line">      &quot;footer footer footer&quot;;</span><br><span class="line">    background:pink;</span><br><span class="line">  &#125;</span><br><span class="line">  .header &#123;</span><br><span class="line">    grid-area: header;</span><br><span class="line">    background:#ddd;</span><br><span class="line">  &#125;</span><br><span class="line">  .main &#123;</span><br><span class="line">    grid-area: main;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .aside &#123;</span><br><span class="line">    grid-area: aside;</span><br><span class="line">    background:yellow;</span><br><span class="line">  &#125;</span><br><span class="line">  .footer&#123;</span><br><span class="line">    grid-area: footer;</span><br><span class="line">    background:blue;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">  &lt;div class=&quot;header&quot;&gt;header&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;aside&quot;&gt;aside&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;footer&quot;&gt;footer&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>使用 grid-template 实现上面的需求</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">.container &#123;</span><br><span class="line">    height: 100vh;</span><br><span class="line">    border:1px solid red;</span><br><span class="line">    background:pink;</span><br><span class="line">    </span><br><span class="line">    display:grid;</span><br><span class="line">    /*</span><br><span class="line">    grid-template-columns: 10% auto 10%;</span><br><span class="line">    grid-template-rows: 50px auto 50px;</span><br><span class="line">    grid-template-areas: </span><br><span class="line">      &quot;header header header&quot;</span><br><span class="line">      &quot;. main aside&quot;</span><br><span class="line">      &quot;footer footer footer&quot;;</span><br><span class="line">    */</span><br><span class="line">    grid-template:</span><br><span class="line">      /* 定义header 高度 */</span><br><span class="line">      &quot;header header header&quot; 50px </span><br><span class="line">      /* 定义 main aside 高度自适应 */</span><br><span class="line">      &quot;. main aside&quot; auto</span><br><span class="line">      /* 定义 footer高度 */</span><br><span class="line">      &quot;footer footer footer&quot; 50px</span><br><span class="line">      /* 定义列的宽度比例 */</span><br><span class="line">      / 10% auto 10%</span><br><span class="line">      ;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="横列之间的缝隙"><a href="#横列之间的缝隙" class="headerlink" title="横列之间的缝隙"></a>横列之间的缝隙</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/* 列缝隙的大小 */</span><br><span class="line">grid-column-gap: 10px;</span><br><span class="line">grid-row-gap: 15px;</span><br></pre></td></tr></table></figure>
-<h4 id="grid代替上面的代码"><a href="#grid代替上面的代码" class="headerlink" title="grid代替上面的代码"></a>grid代替上面的代码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .container &#123;</span><br><span class="line">    height: 100vh;</span><br><span class="line">    border:1px solid red;</span><br><span class="line">    </span><br><span class="line">    display:grid;</span><br><span class="line">    /* 定义行 在定义列*/</span><br><span class="line">    grid: 50px auto 50px / 10% auto 10%;</span><br><span class="line">    background:pink;</span><br><span class="line">  &#125;</span><br><span class="line">  .header &#123;</span><br><span class="line">    /*  跨三根线 */</span><br><span class="line">    grid-column: 1 / span 3;</span><br><span class="line">    grid-row:1;</span><br><span class="line">    background:#ddd;</span><br><span class="line">  &#125;</span><br><span class="line">  .main &#123;</span><br><span class="line">    grid-column: 2;</span><br><span class="line">    grid-row:2;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .aside &#123;</span><br><span class="line">    grid-column: 3;</span><br><span class="line">    grid-row:2;</span><br><span class="line">    background:yellow;</span><br><span class="line">  &#125;</span><br><span class="line">  .footer&#123;</span><br><span class="line">    grid-column: 1 / 4;</span><br><span class="line">    grid-row:3;</span><br><span class="line">    background:blue;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">  &lt;div class=&quot;header&quot;&gt;header&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;main&quot;&gt;main&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;aside&quot;&gt;aside&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;footer&quot;&gt;footer&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="https://zhuanlan.zhihu.com/p/33030746" target="_blank" rel="noopener">grid知乎专栏</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/11/CSS-006-flex布局/" title="CSS-006-flex布局" itemprop="url">CSS-006-flex布局</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-11T08:44:25.000Z" itemprop="datePublished"> Published 2020-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="flex"><a href="#flex" class="headerlink" title="flex"></a>flex</h1><ul>
-<li>参考 <a href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" target="_blank" rel="noopener">阮一峰 flex</a></li>
-</ul>
-<h3 id="flex-出现之前如何布局"><a href="#flex-出现之前如何布局" class="headerlink" title="flex 出现之前如何布局"></a>flex 出现之前如何布局</h3><ul>
-<li>normal flow 正常流，文档流</li>
-<li>float + clear </li>
-<li>position relative + absolute</li>
-<li>display:inline-block</li>
-<li>margin 负值</li>
-</ul>
-<h3 id="flex基本概念"><a href="#flex基本概念" class="headerlink" title="flex基本概念"></a>flex基本概念</h3><ul>
-<li>水平方向叫做 main axis<ul>
-<li>从左往右 <code>main start -&gt; main end</code></li>
-</ul>
-</li>
-<li>垂直方向叫做 cross axis<ul>
-<li>从上到下 <code>cross start -&gt; cross end</code></li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>flex container 的属性</p>
-</blockquote>
-<ul>
-<li>flex-direction 方向<ul>
-<li>row</li>
-<li>row-reverse 水平方向反转</li>
-<li>column 纵向排列</li>
-<li>column-reverse 垂直方向反转</li>
-</ul>
-</li>
-<li>flex-wrap 换行<ul>
-<li>子元素设置了宽度 200px但还是收缩的挤在一起， 父元素设置这个属性  flex-wrap:wrap 就会折行</li>
-</ul>
-</li>
-<li>flex-flow 上面两个的简写</li>
-<li>justify-content 主轴方向对齐方式<ul>
-<li>space-between 两端对齐</li>
-<li>space-around 拉手现象</li>
-<li>flex-start</li>
-<li>flex-end</li>
-<li>center 缩在中间</li>
-</ul>
-</li>
-<li>align-items 侧轴对齐方式<ul>
-<li>stretch 把元素伸开，伸到最大元素的高度</li>
-<li>flex-start 自身高度往上靠(收缩)</li>
-<li>flex-end 自身高度往下靠(收缩)</li>
-<li>baseline 文字基线对齐</li>
-<li>center 垂直居中</li>
-</ul>
-</li>
-<li>align-content 多行/列内容对齐方式(用的少)</li>
-</ul>
-<h4 id="flex-item-属性"><a href="#flex-item-属性" class="headerlink" title="flex-item 属性"></a>flex-item 属性</h4><ul>
-<li>flex-grow 增长比例(空间过多时)</li>
-<li>flex-shrink 收缩比例(空间不够时)</li>
-<li>flex-basis 默认大小(一般不用)</li>
-<li>flex 上面三个的缩写<ul>
-<li><code>flex: 1 2 100px;</code> 增长的时候 1份，缩的时候 2份，原始占 100px</li>
-</ul>
-</li>
-<li>order 顺序(代替双飞翼)</li>
-<li>align-self 自身的对齐方式<ul>
-<li>比如 父元素设置了 <code>align-items:flex-start</code> 贴着顶部,你可以在某个子元素设置自己的对齐方式 <code>align-self:center</code></li>
-</ul>
-</li>
-</ul>
-<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="手机页面布局-topbar-main-tabs"><a href="#手机页面布局-topbar-main-tabs" class="headerlink" title="手机页面布局 (topbar + main + tabs)"></a>手机页面布局 (topbar + main + tabs)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    * &#123;margin:0;padding:0;box-sizing:border-box;&#125;</span><br><span class="line">    ul &#123;list-style: none;&#125;</span><br><span class="line">    /*header和footer的高度都是100px，为什么不一样高？*/</span><br><span class="line">    header &#123;</span><br><span class="line">        background: #ddd;</span><br><span class="line">        border: 1px solid;</span><br><span class="line">        height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">    footer ul&#123;</span><br><span class="line">        background: #ddd;</span><br><span class="line">        display: flex;</span><br><span class="line">        height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">    main &#123;</span><br><span class="line">        overflow: auto;</span><br><span class="line">    &#125;</span><br><span class="line">    .container &#123;</span><br><span class="line">        display: flex;</span><br><span class="line">        flex-direction: column;</span><br><span class="line">        height: 100vh;</span><br><span class="line">    &#125;</span><br><span class="line">    footer ul&gt;li &#123;</span><br><span class="line">        height: 100%;</span><br><span class="line">        width:25%;</span><br><span class="line">        background: red;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;container&quot;&gt;</span><br><span class="line">    &lt;header&gt;</span><br><span class="line">      header</span><br><span class="line">    &lt;/header&gt;</span><br><span class="line">    &lt;main&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">      &lt;p&gt;main&lt;/p&gt;</span><br><span class="line">    &lt;/main&gt;</span><br><span class="line">    &lt;footer&gt;</span><br><span class="line">      &lt;ul&gt;</span><br><span class="line">        &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">      &lt;/ul&gt;</span><br><span class="line">    &lt;/footer&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="产品列表-ul-gt-li-9"><a href="#产品列表-ul-gt-li-9" class="headerlink" title="产品列表 (ul&gt;li*9)"></a>产品列表 (ul&gt;li*9)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;border-box:box-sizing;&#125;</span><br><span class="line">    ul&#123;list-style:none;&#125;</span><br><span class="line">    ul&#123;</span><br><span class="line">      display:flex;</span><br><span class="line">      flex-wrap:wrap;</span><br><span class="line">      margin:auto;</span><br><span class="line">      border:1px solid black;</span><br><span class="line">      width: 350px;</span><br><span class="line">      justify-content:space-between;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    li&#123;</span><br><span class="line">      height: 100px;</span><br><span class="line">      width: 100px;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">      margin:10px 0;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="PC布局"><a href="#PC布局" class="headerlink" title="PC布局"></a>PC布局</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;border-box:box-sizing;&#125;</span><br><span class="line">    .content&#123;</span><br><span class="line">      display:flex;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .content&gt;main&#123;</span><br><span class="line">      height: 400px;</span><br><span class="line">      flex:1;</span><br><span class="line">      background:red;</span><br><span class="line">    &#125;</span><br><span class="line">    .content&gt;aside&#123;</span><br><span class="line">      width:120px;</span><br><span class="line">      background:blue;</span><br><span class="line">    &#125;</span><br><span class="line">    .content&gt;nav&#123;</span><br><span class="line">      width:100px;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    header&#123;background:grey;height:100px;&#125;</span><br><span class="line">    footer&#123;background:grey;height:100px;&#125;</span><br><span class="line">    </span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;header&gt;&lt;/header&gt;</span><br><span class="line">  &lt;div class=&quot;content&quot;&gt;</span><br><span class="line">    &lt;aside&gt;&lt;/aside&gt;</span><br><span class="line">    &lt;main&gt;&lt;/main&gt;</span><br><span class="line">    &lt;nav&gt;&lt;/nav&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  &lt;footer&gt;&lt;/footer&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="完美居中"><a href="#完美居中" class="headerlink" title="完美居中"></a>完美居中</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;border-box:box-sizing;&#125;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">      height:400px;</span><br><span class="line">      display:flex;</span><br><span class="line">      justify-content:center;</span><br><span class="line">      align-items:center;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;</span><br><span class="line">      hahahaha </span><br><span class="line">      &lt;br&gt;</span><br><span class="line">      hhh</span><br><span class="line">      &lt;br&gt;</span><br><span class="line">      hhh</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/10/11/CSS-004-icon/" title="CSS-004-icon" itemprop="url">CSS-004-icon</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-10-11T08:15:48.000Z" itemprop="datePublished"> Published 2020-10-11</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="待更新"><a href="#待更新" class="headerlink" title="待更新"></a>待更新</h3>
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/CSS/">CSS</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
@@ -1154,13 +1215,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         

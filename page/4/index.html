@@ -79,6 +79,744 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
+      <a href="/2020/03/12/Node全解07-01docker-mysql/" title="Node全解07_01docker_mysql" itemprop="url">Node全解07_01docker_mysql</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-12T00:03:29.000Z" itemprop="datePublished"> Published 2020-03-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="docker-启动-mysql"><a href="#docker-启动-mysql" class="headerlink" title="docker 启动 mysql"></a>docker 启动 mysql</h3><ul>
+<li>docker 安装 不说了 自行解决</li>
+<li>进入 Docker 上面的 mysql 主页</li>
+<li>选择版本 如 5.7.27 或者 8.0.18</li>
+<li>使用docker run 容器的名字</li>
+<li>name 是容器的名字</li>
+<li>MYSQL_ROOT_PASSWORD 是密码</li>
+<li>tag是 版本号，我们选 5.7.27</li>
+<li>再加一个端口映射 -p 3306:3306</li>
+<li>最终命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql01 -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:5.7.27</span><br><span class="line"></span><br><span class="line"># 查看容器</span><br><span class="line">docker ps -a</span><br><span class="line"># 删除容器</span><br><span class="line">docker rm -f id</span><br><span class="line"># 删除镜像</span><br><span class="line">docker rmi -f id</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong></p>
+<ul>
+<li>docker启动的容器默认不会持久化</li>
+<li>容器删掉了，数据就没了</li>
+<li>如果需要持久化，自行搜索 [docker mysql 数据目录]</li>
+<li>目前我们不需要持久化</li>
+</ul>
+<h4 id="连接-docker-mysql"><a href="#连接-docker-mysql" class="headerlink" title="连接 docker mysql"></a>连接 docker mysql</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 镜像名称 bash</span><br><span class="line">这句话就是进入容器内部，容器内是一个 linux系统</span><br><span class="line">然后你就可以在这个系统里运行 mysql</span><br></pre></td></tr></table></figure>
+<h4 id="mysql-命令"><a href="#mysql-命令" class="headerlink" title="mysql 命令"></a>mysql 命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql -u root -p 回车 输入密码 123456</span><br><span class="line">命令 show databases; 可以查看所有的数据库</span><br><span class="line">如果你手抖就 ctrl + c 重新来</span><br><span class="line">命令 use xxx; 选择使用的数据库</span><br><span class="line">show tables; 查看对应库下的所有表</span><br><span class="line"></span><br><span class="line">select * from user; 查看表内容</span><br></pre></td></tr></table></figure>
+<h3 id="什么是数据库"><a href="#什么是数据库" class="headerlink" title="什么是数据库"></a>什么是数据库</h3><p><strong>数据库Database</strong></p>
+<ul>
+<li>将大量数据保存起来，通过计算机加工而成的可以运行高效访问的数据集合称为数据库</li>
+<li>根据保存格式不同，数据库一般分为<ul>
+<li>关系型数据库 使用最广泛</li>
+<li>面向对象数据库、xml数据库、键值对数据库、层次数据库</li>
+</ul>
+</li>
+</ul>
+<p><strong>数据库管理系统 DBMS</strong></p>
+<ul>
+<li>用来管理数据库的系统称之为数据库管理系统</li>
+<li>如 MySQL 、PostgreSQL、SQL Server、DB2、Oracle</li>
+</ul>
+<h4 id="mysql-一个bug"><a href="#mysql-一个bug" class="headerlink" title="mysql 一个bug"></a>mysql 一个bug</h4><ul>
+<li>mysql不要使用 utf-8 记住永远不要再 mysql里使用 utf-8 而是用 <strong>utf-8mb4</strong></li>
+</ul>
+<h3 id="Node-js-访问数据库"><a href="#Node-js-访问数据库" class="headerlink" title="Node.js 访问数据库"></a>Node.js 访问数据库</h3><ul>
+<li><a href="https://github.com/mysqljs/mysql" target="_blank" rel="noopener">mysqljs</a> 里面是例子代码</li>
+<li>新建目录 node-mysql</li>
+<li>yarn init -y</li>
+<li>抄文档 yarn add mysql</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">var mysql = require(&apos;mysql&apos;);</span><br><span class="line">var connection = mysql.createConnection(&#123;</span><br><span class="line">    host: &apos;localhost&apos;,</span><br><span class="line">    user: &apos;root&apos;,</span><br><span class="line">    password: &apos;123456&apos;,</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">connection.connect();</span><br><span class="line">/*</span><br><span class="line">CREATE DATABASE IF NOT EXISTS fang </span><br><span class="line">    CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci</span><br><span class="line">*/</span><br><span class="line">// 创建库</span><br><span class="line">connection.query(&apos;CREATE DATABASE IF NOT EXISTS fang CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;&apos;, function (error, results, fields) &#123;</span><br><span class="line">    if (error) throw error;</span><br><span class="line">    console.log(results);</span><br><span class="line">&#125;);</span><br><span class="line">connection.query(&apos;use fang;&apos;);</span><br><span class="line">// 创建表</span><br><span class="line">connection.query(`CREATE TABLE IF NOT EXISTS user(</span><br><span class="line">    name text,</span><br><span class="line">    age int</span><br><span class="line">)`, function (error, results, fields) &#123;</span><br><span class="line">    if (error) throw error;</span><br><span class="line">    console.log(results);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">connection.end();</span><br></pre></td></tr></table></figure>
+<h3 id="CRM学习法-搞定mysql"><a href="#CRM学习法-搞定mysql" class="headerlink" title="CRM学习法 搞定mysql"></a>CRM学习法 搞定mysql</h3><ul>
+<li>了解如何连接 mysql</li>
+<li>如何创建 数据库</li>
+<li>如何创建表</li>
+<li>对表 CRUD</li>
+</ul>
+<p><strong>如果你是新手千万不要写update 和 delete语句</strong></p>
+<blockquote>
+<h3 id="推荐你用这个解决sql语法"><a href="#推荐你用这个解决sql语法" class="headerlink" title="推荐你用这个解决sql语法"></a>推荐你用这个解决sql语法</h3></blockquote>
+<ul>
+<li>devdocs.io 开启 postgresql 文档</li>
+<li>菜鸟教程</li>
+</ul>
+<h3 id="mysql-数据类型"><a href="#mysql-数据类型" class="headerlink" title="mysql 数据类型"></a>mysql 数据类型</h3><p><strong>五大类</strong></p>
+<ul>
+<li>数字<ul>
+<li>太多了</li>
+</ul>
+</li>
+<li>字符串<ul>
+<li>char(100) 固定占用100字符，即使你存一个 字符串1</li>
+<li>varchar(100) 变长存储 省空间</li>
+<li>binary(1024)</li>
+<li>varbinary(1024)</li>
+<li>blob</li>
+<li>text 存博客这种</li>
+<li>enum(‘v1’,’v2’)</li>
+<li>set(‘v1’,’v2’)</li>
+<li>具体看文档</li>
+</ul>
+</li>
+<li>时间和日期类型<ul>
+<li>date 年月日</li>
+<li>time 某事某分某秒</li>
+<li>datetime 年月日 时分秒</li>
+<li>timestamp 时间戳</li>
+<li>year 只存年</li>
+<li>关注一下 ISO 8601<ul>
+<li>很多程序员处理不好日期数据，就是因为不了解它</li>
+<li>如何把日期处理为 ISO 8601格式</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>JSON类型 5.7.8以上</li>
+<li>其他特殊类型</li>
+</ul>
+<blockquote>
+<p>参考文档</p>
+</blockquote>
+<ul>
+<li>dev.mysql.com</li>
+<li>菜鸟教程</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/11/Node全解06-01翻译工具/" title="Node全解06_01翻译工具" itemprop="url">Node全解06_01翻译工具</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-10T23:02:33.000Z" itemprop="datePublished"> Published 2020-03-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <blockquote>
+<p>待更新</p>
+</blockquote>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/10/Node全解05静态服务器/" title="Node全解05静态服务器" itemprop="url">Node全解05静态服务器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-10T03:01:23.000Z" itemprop="datePublished"> Published 2020-03-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="HTTP模块"><a href="#HTTP模块" class="headerlink" title="HTTP模块"></a>HTTP模块</h1><blockquote>
+<h4 id="一些有用的工具"><a href="#一些有用的工具" class="headerlink" title="一些有用的工具"></a>一些有用的工具</h4></blockquote>
+<p><strong>node-dev</strong></p>
+<ul>
+<li>当文件更新时自动重启 node</li>
+<li>避免每次改完代码都要重新运行的麻烦</li>
+<li>不宜在生产环境使用</li>
+</ul>
+<p><strong>ts-node</strong></p>
+<ul>
+<li>让 node 支持直接运行 TS代码</li>
+<li>不宜在生产环境使用</li>
+</ul>
+<p><strong>ts-node-dev</strong></p>
+<ul>
+<li>这个工具结合了上面两个工具</li>
+<li>可以用 TS 开发 Node.js 程序，且会自动重启</li>
+<li>不宜在生产环境使用，非常适合用来学习</li>
+</ul>
+<p>你可以这样安装 <code>yarn global add ts-node-dev</code></p>
+<blockquote>
+<h4 id="一些有用的工具2"><a href="#一些有用的工具2" class="headerlink" title="一些有用的工具2"></a>一些有用的工具2</h4></blockquote>
+<p><strong>WebStorm自动格式化</strong></p>
+<ul>
+<li>ReformatCode 设置为 Ctrl + L 或者其他键位</li>
+<li>可以快速帮你格式化 TS / JS 代码</li>
+</ul>
+<p><strong>WebStorm自动写代码</strong></p>
+<ul>
+<li>Complete Current Statement 设置为 Ctrl + Enter 或者其他键位</li>
+<li>Show Context Actions 设置为 Alt + Enter 或者其他键位</li>
+</ul>
+<p><strong>VSCode配置</strong></p>
+<ul>
+<li>开启自动保存 autosave </li>
+<li>format on save</li>
+<li>format</li>
+</ul>
+<blockquote>
+<h4 id="一些有用的工具3"><a href="#一些有用的工具3" class="headerlink" title="一些有用的工具3"></a>一些有用的工具3</h4></blockquote>
+<p><strong>WebStorm Git配置</strong></p>
+<ul>
+<li>选择设置 =》 搜索 git =&gt; path选中你安装的git路径</li>
+</ul>
+<p><strong>VSCode配置</strong></p>
+<ul>
+<li>设置 搜索 settings 打开设置 json</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;git.enabled&quot;: true,</span><br><span class="line">    &quot;git.path&quot;: &quot;/usr/bin/git&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Curl命令</strong></p>
+<ul>
+<li>get: <code>curl -v url</code></li>
+<li>post: <code>curl -v -d &quot;name=xxx&quot; url</code></li>
+<li>设置请求头： <code>-H &#39;Content-Type:application/json&#39;</code></li>
+<li>设置动词： <code>-X PUT</code></li>
+<li>JSON请求： <code>curl -d &#39;{&quot;name&quot;:&quot;bob&quot;}&#39; -H &#39;Content-Type:pplication/json&#39; url</code></li>
+</ul>
+<h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><ul>
+<li>项目目录 node-server-demo</li>
+<li>由于我们写 ts 别忘了安装 <code>yarn global add ts-node-dev</code></li>
+<li>yarn init -y</li>
+<li>yarn add –dev @types/node 安装 node 声明文件</li>
+<li><p>新建 index.ts</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import * as http from &apos;http&apos;;</span><br><span class="line"></span><br><span class="line">const server = http.createServer();</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request, response) =&gt; &#123;</span><br><span class="line">    console.log(&apos;有人请求了&apos;)</span><br><span class="line">    response.end(&quot;hi&quot;);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8888);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动服务ts-node-dev index.ts</p>
+</li>
+<li>发请求<code>curl http://localhost:8888</code></li>
+</ul>
+<h3 id="server-是什么东西"><a href="#server-是什么东西" class="headerlink" title="server 是什么东西"></a>server 是什么东西</h3><p><strong>http.Server 类的实例</strong></p>
+<ul>
+<li>根据文档能知道 http.createServer 的返回值类型</li>
+<li>根据文档知道 server 拥有几个事件和方法</li>
+<li>其中目前能用上的 只有 request事件 和 listen()</li>
+</ul>
+<p><strong>继承自net.Server</strong></p>
+<ul>
+<li>根据文档知道继承关系</li>
+<li>看到 net.Server 又有几个方法</li>
+<li>其中也就 error事件 和 address() 能用上</li>
+</ul>
+<blockquote>
+<h4 id="一些技巧"><a href="#一些技巧" class="headerlink" title="一些技巧"></a>一些技巧</h4></blockquote>
+<ul>
+<li>有的时候 <strong>点不出来东西</strong>，那是因为 类型声明文件不够匹配可能写的是 any</li>
+<li>所以你可以通过 加类型声明 来达到 “点出来提示”</li>
+<li>如果你用的是 vscode 请安装 auto import</li>
+</ul>
+<p>index.ts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import * as http from &apos;http&apos;;</span><br><span class="line">import &#123; IncomingMessage, ServerResponse &#125; from &apos;http&apos;;</span><br><span class="line"></span><br><span class="line">const server = http.createServer();</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request: IncomingMessage, response: ServerResponse) =&gt; &#123;</span><br><span class="line">    console.log(request.constructor);</span><br><span class="line">    console.log(response.constructor);</span><br><span class="line">    // 得知它是什么 然后声明它的类型 , 这样你在 request. 的时候才会有提示</span><br><span class="line">    console.log(request.httpVersion);</span><br><span class="line">    console.log(request.url);</span><br><span class="line">    response.end(&quot;hi&quot;);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8888);</span><br></pre></td></tr></table></figure>
+<h3 id="如何获取请求体的内容"><a href="#如何获取请求体的内容" class="headerlink" title="如何获取请求体的内容"></a>如何获取请求体的内容</h3><ul>
+<li><code>request.on(&#39;data&#39;, fn)</code></li>
+<li><code>request.on(&#39;end&#39;, fn)</code></li>
+<li><code>curl -v  -d &quot;name=aaa&quot; http://localhost:8888</code></li>
+</ul>
+<p><strong>有个问题：这个上传方式就算用户上传1G的东西都可以拿到，因为你是一小段一小段拿到然后拼起来，只要服务器内存够。就可以处理上传的内容</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import * as http from &apos;http&apos;;</span><br><span class="line">import &#123; IncomingMessage, ServerResponse &#125; from &apos;http&apos;;</span><br><span class="line"></span><br><span class="line">const server = http.createServer();</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request: IncomingMessage, response: ServerResponse) =&gt; &#123;</span><br><span class="line">    console.log(request.constructor);</span><br><span class="line">    console.log(response.constructor);</span><br><span class="line">    // 得知它是什么 然后声明它的类型 , 这样你在 request. 的时候才会有提示</span><br><span class="line">    console.log(&apos;request.httpVersion&apos;)</span><br><span class="line">    console.log(request.httpVersion);</span><br><span class="line">    console.log(&apos;request.url&apos;);</span><br><span class="line">    console.log(request.url);</span><br><span class="line">    console.log(&apos;request.headers&apos;);</span><br><span class="line">    console.log(request.headers);</span><br><span class="line">    console.log(&apos;request.method&apos;);</span><br><span class="line">    console.log(request.method);</span><br><span class="line"></span><br><span class="line">    // 获取请求体</span><br><span class="line">    const array = [];</span><br><span class="line">    request.on(&apos;data&apos;, (chunk) =&gt; &#123;</span><br><span class="line">        array.push(chunk)</span><br><span class="line">    &#125;)</span><br><span class="line">    request.on(&apos;end&apos;, () =&gt; &#123;</span><br><span class="line">        const body = Buffer.concat(array).toString();</span><br><span class="line">        console.log(body)</span><br><span class="line">        response.end(&quot;hi&quot;);</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8888);</span><br></pre></td></tr></table></figure>
+<h4 id="request-response-是啥"><a href="#request-response-是啥" class="headerlink" title="request,response 是啥"></a>request,response 是啥</h4><blockquote>
+<p>找类</p>
+</blockquote>
+<ul>
+<li>根据文档， request 是 http. IncomingMessage 的实例</li>
+<li>根据文档， response 是 http. ServerResponse 的实例</li>
+</ul>
+<blockquote>
+<p>Request</p>
+</blockquote>
+<ul>
+<li>拥有 headers, method , url 等属性</li>
+<li>从 stream.Readable 类继承了 data/end/error 事件</li>
+<li>为什么不直接拿到请求的消息体呢？ 根TCP相关</li>
+</ul>
+<blockquote>
+<p>Response</p>
+</blockquote>
+<ul>
+<li>拥有 getHeader/setHeader/end/write 等方法</li>
+<li><p>拥有 statusCode 属性，可读可写</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">response.statusCode = 404;</span><br><span class="line">// 设置响应头</span><br><span class="line">response.setHeader(&apos;x-frank&apos;, &apos;I am frank&apos;)</span><br><span class="line">response.write(&apos;1\n&apos;);</span><br><span class="line">response.write(&apos;2\n&apos;);</span><br><span class="line">response.write(&apos;3\n&apos;);</span><br><span class="line">response.write(&apos;4\n&apos;);</span><br><span class="line">response.end(); // 如果你设置了 404 就 end里不传任何东西</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你也可以写回一个 image 但是要设置文件头标示它是一个 image</li>
+</ul>
+</li>
+<li>继承了 Stream,目前用不上</li>
+</ul>
+<h3 id="项目1-根据url返回不同类型文件"><a href="#项目1-根据url返回不同类型文件" class="headerlink" title="项目1 根据url返回不同类型文件"></a>项目1 根据url返回不同类型文件</h3><ul>
+<li><a href="http://localhost:8888/index.html" target="_blank" rel="noopener">http://localhost:8888/index.html</a></li>
+<li><a href="http://localhost:8888/main.js" target="_blank" rel="noopener">http://localhost:8888/main.js</a></li>
+<li><a href="http://localhost:8888/style.css" target="_blank" rel="noopener">http://localhost:8888/style.css</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import * as http from &apos;http&apos;;</span><br><span class="line">import &#123; IncomingMessage, ServerResponse &#125; from &apos;http&apos;;</span><br><span class="line">import * as fs from &apos;fs&apos;;</span><br><span class="line">import * as p from &apos;path&apos;;</span><br><span class="line"></span><br><span class="line">const server = http.createServer();</span><br><span class="line">const publicDir = p.relative(__dirname, &apos;public&apos;);</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request: IncomingMessage, response: ServerResponse) =&gt; &#123;</span><br><span class="line">    const &#123; method, url, headers &#125; = request;</span><br><span class="line">    switch (url) &#123;</span><br><span class="line">        case &apos;/index.html&apos;:</span><br><span class="line">            response.setHeader(&apos;Content-Type&apos;, &apos;text/html;charset=utf-8&apos;);</span><br><span class="line">            fs.readFile(p.resolve(publicDir, &apos;index.html&apos;), (error, data) =&gt; &#123;</span><br><span class="line">                if (error) throw error;</span><br><span class="line">                response.end(data.toString());</span><br><span class="line">            &#125;)</span><br><span class="line">            break;</span><br><span class="line">        case &apos;/style.css&apos;:</span><br><span class="line">            response.setHeader(&apos;Content-Type&apos;, &apos;text/css;charset=utf-8&apos;);</span><br><span class="line">            fs.readFile(p.resolve(publicDir, &apos;style.css&apos;), (error, data) =&gt; &#123;</span><br><span class="line">                if (error) throw error;</span><br><span class="line">                response.end(data.toString());</span><br><span class="line">            &#125;)</span><br><span class="line">            break;</span><br><span class="line">        case &apos;/main.js&apos;:</span><br><span class="line">            response.setHeader(&apos;Content-Type&apos;, &apos;text/javascript;charset=utf-8&apos;);</span><br><span class="line">            fs.readFile(p.resolve(publicDir, &apos;main.js&apos;), (error, data) =&gt; &#123;</span><br><span class="line">                if (error) throw error;</span><br><span class="line">                response.end(data.toString());</span><br><span class="line">            &#125;)</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8888);</span><br></pre></td></tr></table></figure>
+<h3 id="项目2-处理查询参数"><a href="#项目2-处理查询参数" class="headerlink" title="项目2 处理查询参数"></a>项目2 处理查询参数</h3><ul>
+<li>使用 url模块 <code>url.path()</code></li>
+<li><a href="http://localhost:8888/index.html?q=aa" target="_blank" rel="noopener">http://localhost:8888/index.html?q=aa</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import * as url from &apos;url&apos;;</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request: IncomingMessage, response: ServerResponse) =&gt; &#123;</span><br><span class="line">    const &#123; method, url: path, headers &#125; = request;</span><br><span class="line">    const &#123; pathname, search &#125; = url.parse(path);</span><br><span class="line">    switch (pathname) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="项目3-匹配任意文件"><a href="#项目3-匹配任意文件" class="headerlink" title="项目3 匹配任意文件"></a>项目3 匹配任意文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">// 匹配任意文件</span><br><span class="line">import * as http from &apos;http&apos;;</span><br><span class="line">import &#123; IncomingMessage, ServerResponse &#125; from &apos;http&apos;;</span><br><span class="line">import * as fs from &apos;fs&apos;;</span><br><span class="line">import * as p from &apos;path&apos;;</span><br><span class="line">import * as url from &apos;url&apos;;</span><br><span class="line"></span><br><span class="line">const server = http.createServer();</span><br><span class="line">const publicDir = p.relative(__dirname, &apos;public&apos;);</span><br><span class="line"></span><br><span class="line">server.on(&apos;request&apos;, (request: IncomingMessage, response: ServerResponse) =&gt; &#123;</span><br><span class="line">    const &#123; method, url: path, headers &#125; = request;</span><br><span class="line">    const &#123; pathname, search &#125; = url.parse(path);</span><br><span class="line"></span><br><span class="line">    // /index.html ==&gt; index.html</span><br><span class="line">    let filename = pathname.substr(1);</span><br><span class="line">    if (filename === &apos;&apos;) &#123;</span><br><span class="line">        filename = &apos;index.html&apos;</span><br><span class="line">    &#125;</span><br><span class="line">    response.setHeader(&apos;Content-Type&apos;, &apos;text/html;charset=utf-8&apos;);</span><br><span class="line">    fs.readFile(p.resolve(publicDir, filename), (error, data) =&gt; &#123;</span><br><span class="line">        if (error) &#123;</span><br><span class="line">            if (error.errno === -4058) &#123;</span><br><span class="line">                response.statusCode = 404;</span><br><span class="line">                response.end(&apos;你要的文件不存在啊！！！&apos;);</span><br><span class="line">            &#125; else if (error.errno === -4068) &#123;</span><br><span class="line">                // http://localhost:8888/xxx</span><br><span class="line">                response.statusCode = 403;</span><br><span class="line">                response.end(&apos;无权限查看目录内容&apos;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                response.statusCode = 500;</span><br><span class="line">                response.end(&apos;服务器繁忙，请稍后再试&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            response.end(data.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.listen(8888);</span><br></pre></td></tr></table></figure>
+<h3 id="项目4-处理非get请求-添加缓存文件时间"><a href="#项目4-处理非get请求-添加缓存文件时间" class="headerlink" title="项目4 处理非get请求 添加缓存文件时间"></a>项目4 处理非get请求 添加缓存文件时间</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">if (method !== &apos;GET&apos;) &#123;</span><br><span class="line">    response.statusCode = 200;</span><br><span class="line">    response.setHeader(&apos;Content-Type&apos;, &apos;text/html;charset=utf-8&apos;);</span><br><span class="line">    response.end(&quot;这是一个假的响应&quot;);</span><br><span class="line">    return;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">response.setHeader(&apos;Cache-Control&apos;, `public,max-age=$&#123;cacheAge&#125;`);</span><br></pre></td></tr></table></figure>
+<h3 id="免费用-WebStorm的途径"><a href="#免费用-WebStorm的途径" class="headerlink" title="免费用 WebStorm的途径"></a>免费用 WebStorm的途径</h3><p><strong>申请条件</strong></p>
+<ul>
+<li>开源项目的贡献者</li>
+<li>你的项目是开源的 如MIT</li>
+<li>你的项目是不盈利的</li>
+<li>你的项目至少活跃3个月</li>
+<li>你定期发布更新的版本</li>
+<li>满足条件就 点击申请按钮</li>
+</ul>
+<p><strong>填写材料</strong></p>
+<ul>
+<li>邮箱地址一定不要错</li>
+<li>No. of required licenses 填 1</li>
+<li>项目描述用 google 翻译即可</li>
+<li>正版 JetBrains 全家桶唾手可得，价值$649/年</li>
+</ul>
+<h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><p><a href="https://github.com/slTrust/node-server-demo" target="_blank" rel="noopener">https://github.com/slTrust/node-server-demo</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/09/Node全解04调试工具/" title="Node全解04调试工具" itemprop="url">Node全解04调试工具</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-09T06:00:19.000Z" itemprop="datePublished"> Published 2020-03-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="调试工具"><a href="#调试工具" class="headerlink" title="调试工具"></a>调试工具</h1><h3 id="WebStorm"><a href="#WebStorm" class="headerlink" title="WebStorm"></a>WebStorm</h3><ul>
+<li>打开一个项目目录</li>
+<li>点击工具栏 Run</li>
+<li>Edit Configurations</li>
+<li>点击 “+”</li>
+<li>然后配置你的测试配置<ul>
+<li>Name 你这个配置的名称</li>
+<li>Node interpreter node环境</li>
+<li>Wroking directory: 工作目录</li>
+<li>JavaScript file: 测试的文件 xxx.js</li>
+<li>Application parameters: 输入的参数</li>
+</ul>
+</li>
+<li>点击OK</li>
+<li>再次点击 Run 子菜单里会多了一个 你刚刚的配置<ul>
+<li>Run xxx 直接运行</li>
+<li>debug xxx 设置断点运行</li>
+</ul>
+</li>
+</ul>
+<h3 id="VS-Code"><a href="#VS-Code" class="headerlink" title="VS Code"></a>VS Code</h3><ul>
+<li>侧边栏点击 小虫子那个按钮</li>
+<li>点击 启动程序 ， 如果没反应 点击它右边有个 控制台的按钮</li>
+<li><p>会让你配置一个 json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    // Use IntelliSense to learn about possible attributes.</span><br><span class="line">    // Hover to view descriptions of existing attributes.</span><br><span class="line">    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387</span><br><span class="line">    &quot;version&quot;: &quot;0.2.0&quot;,</span><br><span class="line">    &quot;configurations&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;type&quot;: &quot;node&quot;,</span><br><span class="line">            &quot;request&quot;: &quot;launch&quot;,</span><br><span class="line">            // 启动程序</span><br><span class="line">            &quot;name&quot;: &quot;Launch Program&quot;,</span><br><span class="line">            &quot;skipFiles&quot;: [</span><br><span class="line">                &quot;&lt;node_internals&gt;/**&quot;</span><br><span class="line">            ],</span><br><span class="line">            // 入口文件</span><br><span class="line">            &quot;program&quot;: &quot;$&#123;workspaceFolder&#125;/cli.js&quot;,</span><br><span class="line">            &quot;args&quot;: [&quot;add&quot;, &quot;task&quot;, &quot;100&quot;]</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再次点击运行按钮</p>
+</li>
+</ul>
+<h3 id="命令行-Chrome-断点"><a href="#命令行-Chrome-断点" class="headerlink" title="命令行 + Chrome 断点"></a>命令行 + Chrome 断点</h3><blockquote>
+<p>第一种方式： 你可以在 js文件 添加 debugger 运行时就会停在当前行</p>
+</blockquote>
+<blockquote>
+<p>第二种方式： 终端添加参数 <code>--inspect-brk</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 你原来是这样</span><br><span class="line">node cli.js add abc</span><br><span class="line"></span><br><span class="line">// 现在你这样,它就会停下来等你</span><br><span class="line">node --inspect-brk cli.js add abc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>运行上述命令后，打开 Chrome 右键调试</li>
+<li>你会看到弹出的工具栏 左上角 多了一个绿色 的 Node.js 图标 点击即可</li>
+<li>注意！ 如果你直接添加的命令是 <code>--inspect</code> 它会直接执行 不停下来 ，所以要加 <code>-brk</code> 它就会等你连接</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/09/Node全解03-01jest/" title="Node全解03_01jest" itemprop="url">Node全解03_01jest</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-09T01:59:42.000Z" itemprop="datePublished"> Published 2020-03-09</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="单元测试-JEST使用"><a href="#单元测试-JEST使用" class="headerlink" title="单元测试 JEST使用"></a>单元测试 JEST使用</h1><ul>
+<li><a href="https://jestjs.io/" target="_blank" rel="noopener">jest</a></li>
+</ul>
+<p>代码使用我们上次写的<a href="https://github.com/slTrust/node-todo-1/tree/867474eb4f246258b847364f8a46bd6836ef7e4c" target="_blank" rel="noopener">Node命令行工具</a> </p>
+<h3 id="如何测试"><a href="#如何测试" class="headerlink" title="如何测试"></a>如何测试</h3><blockquote>
+<p>步骤</p>
+</blockquote>
+<ul>
+<li>选择测试工具： jest</li>
+<li>设计测试用例</li>
+<li>写测试，运行测试，改代码</li>
+<li>单元测试、功能测试、集成测试</li>
+</ul>
+<blockquote>
+<p>重点</p>
+</blockquote>
+<ul>
+<li>单元测试不应该和外界打交道(那是集成测试做的) 应该 mock<ul>
+<li>不能操作硬盘</li>
+<li>不能操作网络</li>
+<li>不能操作任何东西，只能操作你自己</li>
+</ul>
+</li>
+<li>单元测试的对象是函数</li>
+<li>功能测试的对象是模块</li>
+<li>集成测试的对象是系统</li>
+<li>我们先搞定单元测试</li>
+</ul>
+<h3 id="直接-CRM学习法"><a href="#直接-CRM学习法" class="headerlink" title="直接 CRM学习法"></a>直接 CRM学习法</h3><ul>
+<li><a href="https://jestjs.io/docs/en/getting-started" target="_blank" rel="noopener">Jest官网 Docs</a></li>
+<li><code>yarn add --dev jest</code></li>
+<li><p>修改package.json</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;test&quot;: &quot;jest&quot;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建 <code>__test__</code> 目录 并在它下面创建 <code>db.spec.js</code></p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const db = require(&quot;../db.js&quot;)</span><br><span class="line">describe(&quot;db&quot;,()=&gt;&#123;</span><br><span class="line">    it(&quot;can read&quot;,()=&gt;&#123;</span><br><span class="line">        expect(db.read instanceof Function).toBe(true)</span><br><span class="line">    &#125;)  </span><br><span class="line"></span><br><span class="line">    it(&quot;can write&quot;,()=&gt;&#123;</span><br><span class="line">        expect(db.write instanceof Function).toBe(true)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行 npm run test</p>
+</li>
+</ul>
+<h4 id="如何测试读文件呢？"><a href="#如何测试读文件呢？" class="headerlink" title="如何测试读文件呢？"></a>如何测试读文件呢？</h4><blockquote>
+<h4 id="如果你想这样测试！！！-请放弃"><a href="#如果你想这样测试！！！-请放弃" class="headerlink" title="如果你想这样测试！！！ 请放弃"></a>如果你想这样测试！！！ 请放弃</h4></blockquote>
+<ul>
+<li>不该和外界打交道，万一你的文件已经存在了呢？这样就会有干扰</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fs.writeFileSync(&apos;/xxx.json&apos;,`[&#123;&quot;title&quot;:&quot;hi&quot;,&quot;done&quot;:true&#125;]`)</span><br><span class="line">db.read(&apos;/xxx.json&apos;)</span><br></pre></td></tr></table></figure>
+<p><strong>请搜索 jest mock fs</strong> <a href="https://jestjs.io/docs/en/manual-mocks" target="_blank" rel="noopener">jest doc 的 Manual Mocks章节</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jest.mock(&apos;fs&apos;) // 意思是 jest 接管 fs模块</span><br></pre></td></tr></table></figure>
+<h4 id="Mock-fs-模块"><a href="#Mock-fs-模块" class="headerlink" title="Mock fs 模块"></a>Mock fs 模块</h4><ul>
+<li><p>新建 <code>__mocks__/fs.js</code> 代表 mock 一个假的 fs模块</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 声明是 fs的 jest 的假模块</span><br><span class="line">const fs = jest.genMockFromModule(&apos;fs&apos;);</span><br><span class="line"></span><br><span class="line">fs.x = ()=&gt;&#123;</span><br><span class="line">    console.log(&apos;hi&apos;)</span><br><span class="line">    return &apos;xxx&apos;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = fs;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>db.spec.js</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">const db = require(&quot;../db.js&quot;)</span><br><span class="line">const fs = require(&apos;fs&apos;); </span><br><span class="line">jest.mock(&apos;fs&apos;); </span><br><span class="line"></span><br><span class="line">describe(&quot;db&quot;,()=&gt;&#123;</span><br><span class="line">    it(&quot;can read&quot;,()=&gt;&#123;</span><br><span class="line">        expect(fs.x()).toBe(&apos;xxx&apos;)</span><br><span class="line">    &#125;)  </span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行 npm run test 成功</p>
+</li>
+</ul>
+<h3 id="完整版-mock-fs"><a href="#完整版-mock-fs" class="headerlink" title="完整版 mock fs"></a>完整版 mock fs</h3><p><code>__mocks__/fs.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">// 声明是 fs的 jest 的假模块</span><br><span class="line">const fs = jest.genMockFromModule(&apos;fs&apos;);</span><br><span class="line">const _fs = jest.requireActual(&apos;fs&apos;);</span><br><span class="line"></span><br><span class="line">Object.assign(fs,_fs);</span><br><span class="line"></span><br><span class="line">let readMocks = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">fs.setReadFileMock = (path, error, data)=&gt;&#123;</span><br><span class="line">    readMocks[path] = [error,data];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 覆盖 fs的 readFile()</span><br><span class="line">fs.readFile = (path, options, callBack) =&gt; &#123;</span><br><span class="line">    // 如果你 fs.readFile(&apos;xxx&apos;,fn) 代表第二个参数是 callBack</span><br><span class="line">    if(callBack === undefined)&#123;</span><br><span class="line">        callBack = options</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if(path in readMocks)&#123;</span><br><span class="line">        callBack(...readMocks[path])</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        _fs.readFile(path, options, callBack)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let writeMocks = &#123;&#125;</span><br><span class="line"></span><br><span class="line">fs.setWriteFileMock = (path, fn)=&gt;&#123;</span><br><span class="line">    writeMocks[path] = fn;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fs.writeFile = (path,data,options, callBack) =&gt; &#123;</span><br><span class="line">    if(callBack === undefined)&#123;</span><br><span class="line">        callBack = options;</span><br><span class="line">    &#125;</span><br><span class="line">    if(path in writeMocks)&#123;</span><br><span class="line">        writeMocks[path](path, data, options, callBack)</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        _fs.writeFile(path, data, options, callBack)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fs.clearMocks = ()=&gt;&#123;</span><br><span class="line">    readMocks = &#123;&#125;;</span><br><span class="line">    writeMocks = &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = fs;</span><br></pre></td></tr></table></figure>
+<p><code>__tests__/db.spec.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">const db = require(&quot;../db.js&quot;)</span><br><span class="line">const fs = require(&apos;fs&apos;); </span><br><span class="line">jest.mock(&apos;fs&apos;); </span><br><span class="line"></span><br><span class="line">describe(&quot;db&quot;,()=&gt;&#123;</span><br><span class="line">    afterEach(()=&gt;&#123;</span><br><span class="line">        // 每个it 执行之后</span><br><span class="line">        fs.clearMocks();</span><br><span class="line">    &#125;)</span><br><span class="line">    it(&quot;can read&quot;, async () =&gt;&#123;</span><br><span class="line">        const data = [&#123;title:&quot;hi&quot;,done:true&#125;]</span><br><span class="line">        fs.setReadFileMock(&apos;/xxx&apos;,null,JSON.stringify(data));</span><br><span class="line">        const list = await db.read(&apos;/xxx&apos;);</span><br><span class="line">        expect(list).toStrictEqual(data)</span><br><span class="line">    &#125;)  </span><br><span class="line"></span><br><span class="line">    it(&quot;can wriete&quot;, async () =&gt;&#123;</span><br><span class="line">        let fakeFile;</span><br><span class="line">        fs.setWriteFileMock(&apos;/yyy&apos;,(path, data, options, callBack)=&gt;&#123;</span><br><span class="line">            fakeFile = data;</span><br><span class="line">            callBack(null)</span><br><span class="line">        &#125;)</span><br><span class="line">        const list = [&#123;title:&quot;见欧阳娜娜&quot;,done:true&#125;, &#123;title:&quot;见迪丽热巴&quot;,done:true&#125;]</span><br><span class="line">        await db.write(list,&apos;/yyy&apos;);</span><br><span class="line">        expect(fakeFile).toBe(JSON.stringify(list) + &quot;\n&quot;);</span><br><span class="line">    &#125;)  </span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="代码仓库"><a href="#代码仓库" class="headerlink" title="代码仓库"></a>代码仓库</h3><ul>
+<li><a href="https://github.com/slTrust/node-todo-1" target="_blank" rel="noopener">https://github.com/slTrust/node-todo-1</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/03/08/Node全解02-02node命令行程序/" title="Node全解02_02node命令行程序" itemprop="url">Node全解02_02node命令行程序</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
+		
+  <p class="article-time">
+    <time datetime="2020-03-08T15:58:45.000Z" itemprop="datePublished"> Published 2020-03-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h3 id="继续完善代码"><a href="#继续完善代码" class="headerlink" title="继续完善代码"></a>继续完善代码</h3><blockquote>
+<h3 id="001-如果用户输入-node-cli-js-就显示所有任务"><a href="#001-如果用户输入-node-cli-js-就显示所有任务" class="headerlink" title="001 如果用户输入 node cli.js 就显示所有任务"></a>001 如果用户输入 <code>node cli.js</code> 就显示所有任务</h3></blockquote>
+<p>cli.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 用户实际输入的 命令参数</span><br><span class="line">// console.log(process.argv)</span><br><span class="line"></span><br><span class="line">if(process.argv.length === 2)&#123;</span><br><span class="line">  // 说明用户直接运行 node cli.js</span><br><span class="line">  api.showAll()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">module.exports.showAll = async (title) =&gt;&#123;</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    list.forEach((task, index)=&gt;&#123;</span><br><span class="line">        console.log(`$&#123;task.done ? &apos;[x]&apos; : &apos;[_]&apos;&#125;$&#123;index&#125; - $&#123;task.title&#125;`)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="002-在用户输入-node-cli-js-时候-假如有很多任务-如何通过上下按钮-切换呢？"><a href="#002-在用户输入-node-cli-js-时候-假如有很多任务-如何通过上下按钮-切换呢？" class="headerlink" title="002 在用户输入 node cli.js 时候 假如有很多任务 如何通过上下按钮 切换呢？"></a>002 在用户输入 <code>node cli.js</code> 时候 假如有很多任务 如何通过上下按钮 切换呢？</h3></blockquote>
+<ul>
+<li><a href="https://github.com/SBoudrias/Inquirer.js" target="_blank" rel="noopener">inquirer.js</a></li>
+<li><a href="https://github.com/SBoudrias/Inquirer.js/tree/master/packages/inquirer/examples" target="_blank" rel="noopener">example </a></li>
+<li><a href="https://github.com/SBoudrias/Inquirer.js/blob/master/packages/inquirer/examples/list.js" target="_blank" rel="noopener">参考 example 提供的 list.js</a></li>
+</ul>
+<blockquote>
+<h3 id="003-完成所有功能"><a href="#003-完成所有功能" class="headerlink" title="003 完成所有功能"></a>003 完成所有功能</h3></blockquote>
+<p>index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">const inquirer = require(&apos;inquirer&apos;);</span><br><span class="line">const db = require(&apos;./db.js&apos;);</span><br><span class="line"></span><br><span class="line">module.exports.add = async (title) =&gt;&#123;</span><br><span class="line">    // 读取之前的任务</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    // 往里面添加一个任务</span><br><span class="line">    list.push(&#123;title,done:false&#125;);</span><br><span class="line">    // 存储任务到文件</span><br><span class="line">    console.log(&apos;read~~~~&apos;)</span><br><span class="line">    console.log(list)</span><br><span class="line">    await db.write(list);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports.clear = async (title) =&gt;&#123;</span><br><span class="line">    await db.write([]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports.showAll = async (title) =&gt;&#123;</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    inquirer</span><br><span class="line">        .prompt([</span><br><span class="line">            &#123;</span><br><span class="line">                type: &apos;list&apos;,</span><br><span class="line">                name: &apos;index&apos;,</span><br><span class="line">                message: &apos;请选择你想操作的任务&apos;,</span><br><span class="line">                choices: [ </span><br><span class="line">                    &#123;name:&apos;退出&apos;,value:&apos;-1&apos;&#125;,</span><br><span class="line">                  </span><br><span class="line">                    ...list.map((task, index)=&gt;&#123;</span><br><span class="line">                    return &#123;name: `$&#123;task.done ? &apos;[x]&apos; : &apos;[_]&apos;&#125;$&#123;index&#125; - $&#123;task.title&#125;`, value: index.toString()&#125;</span><br><span class="line">                &#125;),</span><br><span class="line">                &#123;name:&apos;创建任务&apos;,value:&apos;-2&apos;&#125;</span><br><span class="line">            ]</span><br><span class="line">            &#125;,</span><br><span class="line">        ])</span><br><span class="line">        .then(answers =&gt; &#123;</span><br><span class="line">            const index = parseInt(answers.index);</span><br><span class="line">            if(index &gt;= 0)&#123;</span><br><span class="line">                inquirer</span><br><span class="line">                .prompt([</span><br><span class="line">                    &#123;</span><br><span class="line">                        type: &apos;list&apos;,</span><br><span class="line">                        name: &apos;action&apos;,</span><br><span class="line">                        message: &apos;请选择操作&apos;,</span><br><span class="line">                        choices: [ </span><br><span class="line">                            &#123;name:&apos;退出&apos;,value:&apos;quit&apos;&#125;,</span><br><span class="line">                            &#123;name:&apos;已完成&apos;,value:&apos;makeAsDone&apos;&#125;,</span><br><span class="line">                            &#123;name:&apos;未完成&apos;,value:&apos;maksAsUndone&apos;&#125;,</span><br><span class="line">                            &#123;name:&apos;改标题&apos;,value:&apos;updateTitle&apos;&#125;,</span><br><span class="line">                            &#123;name:&apos;删除&apos;,value:&apos;remove&apos;&#125;,</span><br><span class="line">                        ]</span><br><span class="line">                    &#125;,</span><br><span class="line">                ])</span><br><span class="line">                .then(answers2 =&gt; &#123;</span><br><span class="line">                    switch(answers2.action)&#123;</span><br><span class="line">                        case &apos;makeAsDone&apos;:</span><br><span class="line">                            list[index].done = true;</span><br><span class="line">                            db.write(list);</span><br><span class="line">                            break;</span><br><span class="line">                        case &apos;maksAsUndone&apos;:</span><br><span class="line">                            list[index].done = false;</span><br><span class="line">                            db.write(list);</span><br><span class="line">                            break;</span><br><span class="line">                        case &apos;updateTitle&apos;:</span><br><span class="line">                            inquirer.prompt([</span><br><span class="line">                                &#123;type: &apos;input&apos;,</span><br><span class="line">                                name: &apos;title&apos;,</span><br><span class="line">                                message:&apos;新的标题&apos;,</span><br><span class="line">                                default: list[index].title</span><br><span class="line">                            &#125;]).then(answer =&gt; &#123;</span><br><span class="line">                                list[index].title = answer.title</span><br><span class="line">                                db.write(list)</span><br><span class="line">                              &#125;);</span><br><span class="line">                            break;</span><br><span class="line">                        case &apos;remove&apos;:</span><br><span class="line">                            list.splice(index,1);</span><br><span class="line">                            db.write(list);</span><br><span class="line">                            break;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;else if( index === -2)&#123;</span><br><span class="line">                // 创建任务</span><br><span class="line">                inquirer.prompt([</span><br><span class="line">                    &#123;type: &apos;input&apos;,</span><br><span class="line">                    name: &apos;title&apos;,</span><br><span class="line">                    message:&apos;输入任务标题&apos;</span><br><span class="line">                &#125;]).then(answer =&gt; &#123;</span><br><span class="line">                    list.push(&#123;</span><br><span class="line">                        title: answer.title,</span><br><span class="line">                        done: false</span><br><span class="line">                    &#125;)</span><br><span class="line">                    db.write(list);</span><br><span class="line">                  &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="004-优化代码"><a href="#004-优化代码" class="headerlink" title="004 优化代码"></a>004 优化代码</h3></blockquote>
+<p>index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line">const inquirer = require(&apos;inquirer&apos;);</span><br><span class="line">const db = require(&apos;./db.js&apos;);</span><br><span class="line"></span><br><span class="line">module.exports.add = async (title) =&gt;&#123;</span><br><span class="line">    // 读取之前的任务</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    // 往里面添加一个任务</span><br><span class="line">    list.push(&#123;title,done:false&#125;);</span><br><span class="line">    // 存储任务到文件</span><br><span class="line">    console.log(&apos;read~~~~&apos;)</span><br><span class="line">    console.log(list)</span><br><span class="line">    await db.write(list);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports.clear = async () =&gt;&#123;</span><br><span class="line">    await db.write([]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function askForCreateTask(list)&#123;</span><br><span class="line">    inquirer.prompt([</span><br><span class="line">        &#123;type: &apos;input&apos;,</span><br><span class="line">        name: &apos;title&apos;,</span><br><span class="line">        message:&apos;输入任务标题&apos;</span><br><span class="line">    &#125;]).then(answer =&gt; &#123;</span><br><span class="line">        list.push(&#123;</span><br><span class="line">            title: answer.title,</span><br><span class="line">            done: false</span><br><span class="line">        &#125;)</span><br><span class="line">        db.write(list);</span><br><span class="line">      &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function makeAsDone(list,index)&#123;</span><br><span class="line">    list[index].done = true;</span><br><span class="line">    db.write(list);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function maksAsUndone(list,index)&#123;</span><br><span class="line">    list[index].done = false;</span><br><span class="line">    db.write(list);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function updateTitle(list,index)&#123;</span><br><span class="line">    inquirer.prompt([</span><br><span class="line">        &#123;type: &apos;input&apos;,</span><br><span class="line">        name: &apos;title&apos;,</span><br><span class="line">        message:&apos;新的标题&apos;,</span><br><span class="line">        default: list[index].title</span><br><span class="line">    &#125;]).then(answer =&gt; &#123;</span><br><span class="line">        list[index].title = answer.title</span><br><span class="line">        db.write(list)</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function remove(list,index)&#123;</span><br><span class="line">    list.splice(index,1);</span><br><span class="line">    db.write(list);</span><br><span class="line">&#125;</span><br><span class="line">                </span><br><span class="line">function askForAction(list, index)&#123;</span><br><span class="line">    const actions = &#123;</span><br><span class="line">        makeAsDone,</span><br><span class="line">        maksAsUndone,</span><br><span class="line">        updateTitle,</span><br><span class="line">        remove</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    inquirer</span><br><span class="line">    .prompt([</span><br><span class="line">        &#123;</span><br><span class="line">            type: &apos;list&apos;,</span><br><span class="line">            name: &apos;action&apos;,</span><br><span class="line">            message: &apos;请选择操作&apos;,</span><br><span class="line">            choices: [ </span><br><span class="line">                &#123;name:&apos;退出&apos;,value:&apos;quit&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;已完成&apos;,value:&apos;makeAsDone&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;未完成&apos;,value:&apos;maksAsUndone&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;改标题&apos;,value:&apos;updateTitle&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;删除&apos;,value:&apos;remove&apos;&#125;,</span><br><span class="line">            ]</span><br><span class="line">        &#125;,</span><br><span class="line">    ])</span><br><span class="line">    .then(answers2 =&gt; &#123;</span><br><span class="line">        const action = actions[answers2.action];</span><br><span class="line">        console.log(action);</span><br><span class="line">        action &amp;&amp; action(list, index);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function printTasks(list)&#123;</span><br><span class="line">    inquirer</span><br><span class="line">    .prompt([</span><br><span class="line">        &#123;</span><br><span class="line">            type: &apos;list&apos;,</span><br><span class="line">            name: &apos;index&apos;,</span><br><span class="line">            message: &apos;请选择你想操作的任务&apos;,</span><br><span class="line">            choices: [ </span><br><span class="line">                &#123;name:&apos;退出&apos;,value:&apos;-1&apos;&#125;,</span><br><span class="line">              </span><br><span class="line">                ...list.map((task, index)=&gt;&#123;</span><br><span class="line">                return &#123;name: `$&#123;task.done ? &apos;[x]&apos; : &apos;[_]&apos;&#125;$&#123;index&#125; - $&#123;task.title&#125;`, value: index.toString()&#125;</span><br><span class="line">            &#125;),</span><br><span class="line">            &#123;name:&apos;创建任务&apos;,value:&apos;-2&apos;&#125;</span><br><span class="line">        ]</span><br><span class="line">        &#125;,</span><br><span class="line">    ])</span><br><span class="line">    .then(answers =&gt; &#123;</span><br><span class="line">        const index = parseInt(answers.index);</span><br><span class="line">        if(index &gt;= 0)&#123;</span><br><span class="line">            askForAction(list,index);</span><br><span class="line">        &#125;else if( index === -2)&#123;</span><br><span class="line">            // 创建任务</span><br><span class="line">            askForCreateTask(list);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports.showAll = async (title) =&gt;&#123;</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    printTasks(list);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>优化技巧，给一坨代码起个名字法</strong></p>
+<blockquote>
+<h3 id="005-发布代码"><a href="#005-发布代码" class="headerlink" title="005 发布代码"></a>005 发布代码</h3></blockquote>
+<ul>
+<li>修改 package.json</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;bin&quot;:&#123;</span><br><span class="line">    &quot;t&quot;: &quot;cli.js&quot;</span><br><span class="line">&#125;,</span><br><span class="line">&quot;files&quot;:[&quot;*.js&quot;]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>添加 node shebang 在 cli.js 第一行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env node</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果你是 mac 添加文件可执行权限<ul>
+<li><code>chmod +x cli.js</code></li>
+</ul>
+</li>
+<li><p>nrm 安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g nrm</span><br><span class="line"></span><br><span class="line">// 如果你是别的源 你就 nrm use npm</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>发布你的代码</p>
+<ul>
+<li>如果是 yarn 你就<code>yarn login 和 yarn publish</code></li>
+<li>如果是npm 你就<code>npm adduser 和 npm puhlish</code></li>
+<li>注意把淘宝源切换为原始源</li>
+</ul>
+</li>
+</ul>
+<h4 id="代码仓库"><a href="#代码仓库" class="headerlink" title="代码仓库"></a>代码仓库</h4><ul>
+<li><a href="https://github.com/slTrust/node-todo-1/" target="_blank" rel="noopener">https://github.com/slTrust/node-todo-1/</a></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Node后端/">Node后端</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
       <a href="/2020/03/08/Node全解02-01node命令行程序/" title="Node全解02_01node命令行程序" itemprop="url">Node全解02_01node命令行程序</a>
   </h1>
   <p class="article-author">By
@@ -727,816 +1465,6 @@
 
 
 
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/06/Node-JS专精13-01类/" title="Node-JS专精13_01类" itemprop="url">Node-JS专精13_01类</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-06T05:24:53.000Z" itemprop="datePublished"> Published 2020-03-06</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="类知识简介"><a href="#类知识简介" class="headerlink" title="类知识简介"></a>类知识简介</h1><blockquote>
-<p>为什么有类</p>
-</blockquote>
-<ul>
-<li>不同对象的属性重复了，就有类</li>
-</ul>
-<blockquote>
-<p>为什么有继承</p>
-</blockquote>
-<ul>
-<li>不同的类的属性重复类，就有继承</li>
-</ul>
-<p><strong>大部分编程技巧，都是为了解决重复</strong></p>
-<h3 id="对象的属性重复了"><a href="#对象的属性重复了" class="headerlink" title="对象的属性重复了"></a>对象的属性重复了</h3><ul>
-<li>两个对象的属性重复</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let p1 = &#123;name:&apos;aa&apos;,age:18,sayHi()&#123;&#125;&#125;</span><br><span class="line">let p2 = &#123;name:&apos;bb&apos;,age:18,sayHi()&#123;&#125;&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>于是有了类和构造函数</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Pserson &#123;</span><br><span class="line">    name</span><br><span class="line">    age</span><br><span class="line">    sayHi()&#123;&#125;</span><br><span class="line">    constructor(name,age)&#123;</span><br><span class="line">        this.name = name</span><br><span class="line">        this.age = age</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let p1 = new Person(&apos;aa&apos;,18)</span><br><span class="line">let p2 = new Person(&apos;bb&apos;,18)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>改写成TS</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class Person&#123;</span><br><span class="line">    sayHi(): void &#123;&#125;</span><br><span class="line">    constructor(public name: string, public age: number)&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let p1 = new Person(&apos;aa&apos;,18)</span><br><span class="line">let p2 = new Person(&apos;bb&apos;,18)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4></blockquote>
-<p><strong>类</strong></p>
-<ul>
-<li>类就是把对象的属性提前写好，避免重复</li>
-<li>类里面的字段会变成对象的属性</li>
-<li>为了节约内存，所有函数都是 共用的</li>
-<li>而非函数属性是各个对象自有的</li>
-<li>使用 console.dir 可以看出来</li>
-</ul>
-<p><strong>构造函数</strong></p>
-<ul>
-<li>属性名虽然可以提前写好，但是属性值不行</li>
-<li>所以需要构造函数接受参数，初始化属性值</li>
-<li>构造函数不需要写 return , 默认会 return 新对象</li>
-</ul>
-<p><strong>语法</strong></p>
-<ul>
-<li>JS的所有 class 语法可以在 MDN上看</li>
-<li>TS的所有 class 语法可以在 TS英文/中文 官网看</li>
-</ul>
-<blockquote>
-<h4 id="不想所有函数都是共用的"><a href="#不想所有函数都是共用的" class="headerlink" title="不想所有函数都是共用的"></a>不想所有函数都是共用的</h4></blockquote>
-<ul>
-<li>写成箭头函数</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">class Pserson &#123;</span><br><span class="line">    sayHi()&#123;&#125; // 共用</span><br><span class="line">    myFn = () =&gt; &#123;&#125; // 自用</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>这玩意除了浪费内存还有啥用？</strong></p>
-<ul>
-<li>你必须<code>onclick 那里bind(this)</code>否则报错</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import React from &quot;react&quot;;</span><br><span class="line">import ReactDOM from &quot;react-dom&quot;;</span><br><span class="line"></span><br><span class="line">class App extends React.Component &#123;</span><br><span class="line">  name = &quot;Frank&quot;;</span><br><span class="line">  sayHi()&#123;</span><br><span class="line">    console.log(this);</span><br><span class="line">    console.log(`Hi, I&apos;m $&#123;this.name&#125;`);</span><br><span class="line">  &#125;;</span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.sayHi.bind(this)&#125;&gt;say hi&lt;/button&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const rootElement = document.getElementById(&quot;root&quot;);</span><br><span class="line">ReactDOM.render(&lt;App /&gt;, rootElement);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>而如果是各自的函数，就可以直接调用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import React from &quot;react&quot;;</span><br><span class="line">import ReactDOM from &quot;react-dom&quot;;</span><br><span class="line"></span><br><span class="line">class App extends React.Component &#123;</span><br><span class="line">  name = &quot;Frank&quot;;</span><br><span class="line">  sayHi = () =&gt; &#123;</span><br><span class="line">    console.log(this);</span><br><span class="line">    console.log(`Hi, I&apos;m $&#123;this.name&#125;`);</span><br><span class="line">  &#125;;</span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.sayHi&#125;&gt;say hi&lt;/button&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const rootElement = document.getElementById(&quot;root&quot;);</span><br><span class="line">ReactDOM.render(&lt;App /&gt;, rootElement);</span><br></pre></td></tr></table></figure>
-<ul>
-<li><a href="https://codesandbox.io/s/muddy-snowflake-1ezyg" target="_blank" rel="noopener">代码地址</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/05/Node-JS专精12-01Eventloop/" title="Node-JS专精12_01Eventloop" itemprop="url">Node-JS专精12_01Eventloop</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-05T02:46:11.000Z" itemprop="datePublished"> Published 2020-03-05</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><ul>
-<li><a href="https://juejin.im/post/5ab7677f6fb9a028d56711d0" target="_blank" rel="noopener">Event Loop、计时器、nextTick</a></li>
-</ul>
-<h3 id="Eventloop-之前的前置内容"><a href="#Eventloop-之前的前置内容" class="headerlink" title="Eventloop 之前的前置内容"></a>Eventloop 之前的前置内容</h3><blockquote>
-<p>操作系统相关</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">网页上有个输入框，当你按下键盘的 “J” 之后发生了什么</span><br><span class="line"></span><br><span class="line">实际 “J” 下面有一个非常复杂的电路</span><br><span class="line">当你按下 之后，会触发一个电流</span><br><span class="line">这个电流会触发一个你按键的信息 如 101</span><br><span class="line">然后把这个 信息 101 传递给 操作系统</span><br><span class="line">操作系统知道这个 按键信息之后，它就会通知给你的浏览器</span><br><span class="line">浏览器得到 “J” 按键信息之后，就会把这个 “J” 显示在你的输入框上</span><br></pre></td></tr></table></figure>
-<p>为什么讲这个：<strong>浏览器它会接受到系统给它的一个事件</strong>用户不停的触发事件，浏览器就不停的把用户输入渲染到输入框里</p>
-<p>这个东西呢就叫做 <strong>“事件”</strong></p>
-<blockquote>
-<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4></blockquote>
-<p>接受各种外部设备发出的信号</p>
-<ul>
-<li>蓝牙事件</li>
-<li>鼠标事件</li>
-<li>键盘事件</li>
-<li>USB事件</li>
-</ul>
-<blockquote>
-<p>疑问？为什么你一插 USB操作系统马上就知道呢？有没有延迟呢？它是非常的快呢？还是一段时间一段时间的查呢？</p>
-</blockquote>
-<ul>
-<li>非常遗憾的是，操作系统并没有你想想的那么聪明</li>
-<li>它是如何知道 用户按下了 “J” 呢？</li>
-</ul>
-<p>它实际上是 <strong>不停的等键盘，可能每隔5毫秒查看一下有没有按下这个键</strong> 这个过程 叫做 <strong>“轮询”</strong></p>
-<h3 id="接下来我们看一下-浏览器的内容"><a href="#接下来我们看一下-浏览器的内容" class="headerlink" title="接下来我们看一下 浏览器的内容"></a>接下来我们看一下 浏览器的内容</h3><ul>
-<li>浏览器除了运行 JS 之外，还有些网络请求<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 假设你做了这样的事情</span><br><span class="line">console.log(1)</span><br><span class="line">console.log(2)</span><br><span class="line">console.log(3)</span><br><span class="line">...</span><br><span class="line">console.log(10)</span><br><span class="line">ajax(); </span><br><span class="line">console.log(11)</span><br><span class="line">console.log(12)</span><br><span class="line">...</span><br><span class="line">console.log(20)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们发送了请求之后，请求大概需要0.2秒得到结果，</span><br><span class="line">首先JS是单线程，那么在这请求 0.2 秒的时间内， ajax() 后面的代码有么有执行？</span><br><span class="line"></span><br><span class="line">有！！！ 执行了</span><br><span class="line"></span><br><span class="line">那么此时 ajax 请求的 0.2秒 是谁在等？</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p>或者说 等待请求结果是谁在处理 / 谁在轮询</p>
-</blockquote>
-<ul>
-<li>答案是：<strong>“C++”</strong>， 浏览器有一个轮询机制，每隔一段时间假设5毫秒就问 结果来了没？</li>
-<li>反正始终有一个东西在轮询 ，我们不管到底是 浏览器还是 操作系统这些细节。 反正不是JS在等就好了</li>
-</ul>
-<p><strong>所有的事件 应该如何通知给 JS</strong></p>
-<h3 id="这个轮询的规则是什么？"><a href="#这个轮询的规则是什么？" class="headerlink" title="这个轮询的规则是什么？"></a>这个轮询的规则是什么？</h3><p>搞清楚这些规则，你就明白什么是 <strong>Eventloop</strong></p>
-<ul>
-<li>刚刚的内容讲的是浏览器，我们必须要回到 Node.js 和浏览器是差不多的东西</li>
-<li>Node.js 可以执行js代码，浏览器也可以执行 js代码，Eventloop 是 Node.js的概念而不是 浏览器。 所以我们来看 Node.js</li>
-</ul>
-<h4 id="回到-Node-js"><a href="#回到-Node-js" class="headerlink" title="回到 Node.js"></a>回到 Node.js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">同样执行10行代码</span><br><span class="line">然后发起一个异步任务 耗时2秒 setTimeout(fn,2000)</span><br><span class="line">下面又执行20行代码</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">那么这个  setTimeout 到底是谁在做呢？</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>引入 Eventloop</p>
-</blockquote>
-<ul>
-<li>首先这个 Eventloop 会去监听这个 setTimeout，它会保证 一段时间后执行这个 fn</li>
-</ul>
-<blockquote>
-<h4 id="Eventloop-之前的铺垫"><a href="#Eventloop-之前的铺垫" class="headerlink" title="Eventloop 之前的铺垫"></a>Eventloop 之前的铺垫</h4></blockquote>
-<ul>
-<li>Eventloop 到底是真实存在的对象，还是一个虚拟的概念？</li>
-</ul>
-<p>来个例子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">假设人是有轮回的？ 我们叫它 人生循环</span><br><span class="line">那么人生循环有那些阶段呢？</span><br><span class="line"></span><br><span class="line">生老病死 ==》 投胎 ==》 生老病死 ==》 投胎 。。。</span><br><span class="line">什么时候是尽头，除非宇宙毁灭，什么时候开始，也不要太关心。</span><br><span class="line"></span><br><span class="line">请问人生循环 是什么？</span><br><span class="line"></span><br><span class="line">人在一生中处于不同阶段的过程</span><br></pre></td></tr></table></figure>
-<p><strong>事件循环不是循环，它是状态变化的过程</strong></p>
-<h4 id="Eventloop-事件循环的阶段"><a href="#Eventloop-事件循环的阶段" class="headerlink" title="Eventloop 事件循环的阶段"></a>Eventloop 事件循环的阶段</h4><ul>
-<li>times (前端需要知道)</li>
-<li>I/O callbacks </li>
-<li>idle , prepare</li>
-<li>poll (前端需要知道)</li>
-<li>check (前端需要知道)</li>
-<li>close callbacks</li>
-</ul>
-<blockquote>
-<p>我们只需要清楚 times / poll / check 就够了</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1 times</span><br><span class="line">2 poll</span><br><span class="line">3 check </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">times =&gt; poll 会停留一段事件</span><br><span class="line">poll =&gt; check</span><br><span class="line">check =&gt; times</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">当我们执行 setTimeout(fn,2000) 时， 会把 fn 放入 times 的一个 数组里 (队列)同时记录 要在 2秒后执行 fn ,于是 js 就去做自己的事去了</span><br><span class="line"></span><br><span class="line">setTimeout(fn,2000) 之后就会进入 poll 阶段 等待的过程中 他会去看时间， </span><br><span class="line">刚才 js 说要在 2秒后执行 fn , 比如此时等了 500毫秒，发现不需要执行， 继续等 1000毫秒再去看， 继续等， 等到 2秒的时候 发现时间到了， </span><br><span class="line">赶紧进入 times 阶段执行 fn， 虽然 poll之后要经过 check 阶段 ，但稍后再说</span><br><span class="line">执行完 fn 之后 又回到 poll 阶段 继续等。 一般来说有最长等待时间 假设3秒 后就会进入 check 然后进入 times 然后继续进入 poll</span><br><span class="line">所以 大部分时间都是在 poll 阶段 用来等</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="check-阶段是什么？"><a href="#check-阶段是什么？" class="headerlink" title="check 阶段是什么？"></a>check 阶段是什么？</h4></blockquote>
-<ul>
-<li>Node.js 除了 setTimeout 还有 setImmediate(fn2) </li>
-<li>当你调用 <code>setImmediate(fn2)</code> 的时候 你的 fn2 不会进入 times 阶段，会进入 check阶段</li>
-<li>check 阶段也是有 一个队列的 主要是用来存 <code>setImmediate</code> 执行的函数的</li>
-</ul>
-<blockquote>
-<p>来个考题, 先执行 fn 还是先执行 fn2</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(fn,0)</span><br><span class="line">setImmediate(fn2)</span><br><span class="line">// 答案是 fn2</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">setTimeout(fn,0) 执行后 会进入 times 阶段 把 fn 放入 times 的队列里 </span><br><span class="line">然后看到下一句代码</span><br><span class="line">setImmediate(fn2)  会把 fn2 放入 check 阶段的队列里 ， 并立即执行队列里的fn2。 </span><br><span class="line">于是JS开始做事了， 它看到 check 队列里有个需要立即执行的 于是就不停了 ，直接 fn2执行掉</span><br><span class="line">然后到 times 阶段 刚好发现 times 队列里 有个 0秒后执行，于是 执行 fn</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="一个坑-开启-Eventloop-这是需要消耗时间的"><a href="#一个坑-开启-Eventloop-这是需要消耗时间的" class="headerlink" title="一个坑 开启 Eventloop() 这是需要消耗时间的"></a>一个坑 开启 Eventloop() 这是需要消耗时间的</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 在 node环境下 运行这两句</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line"></span><br><span class="line">// 你会惊讶的发现 有的时候 fn fn2 有的时候 fn2 fn</span><br><span class="line"></span><br><span class="line">// 为什么？</span><br><span class="line">如果说 开启 Eventloop 很快 那么就是你分析的顺序 fn2 fn</span><br><span class="line">如果 Eventloop 开启很慢 我们在执行js的时候 可能还没进入 times 实际上是先把 fn 加到 times 队列里 然后在开始第一阶段</span><br><span class="line"></span><br><span class="line">这就刚好解释了 为什么顺序是不确定的？</span><br><span class="line">就是看 进入 times 阶段的时候 fn 就存在 还是 进入 times 阶段的时候 fn 不存在</span><br></pre></td></tr></table></figure>
-<p>如何解决这种情况</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">    setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line">&#125;,1000)</span><br><span class="line"></span><br><span class="line">// 这样每次都是  fn2 fn</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="process-nextTick-是放到什么阶段"><a href="#process-nextTick-是放到什么阶段" class="headerlink" title="process.nextTick 是放到什么阶段"></a>process.nextTick 是放到什么阶段</h4></blockquote>
-<ul>
-<li>首先它不属于 Eventloop 的任何一个阶段，官网说的，其他都是瞎扯的</li>
-<li>process.nextTick 意思就是 当前阶段结束后马上执行</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(()=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&apos;fn&apos;)&#125;,0)</span><br><span class="line">    setImmediate(()=&gt;&#123;console.log(&apos;fn2&apos;)&#125;)</span><br><span class="line">    process.nextTick(()=&gt;&#123;console.log(&apos;fn3&apos;)&#125;)</span><br><span class="line">&#125;,1000)</span><br><span class="line"></span><br><span class="line">// 注意！！！ nextTick 不属于 Eventloop 任何阶段 ， 它的意思是当前阶段马上执行</span><br><span class="line">//  setImmediate 会在 setTimeout之前</span><br><span class="line">// setImmediate 是从 poll 阶段 进入 check 才执行</span><br><span class="line">// nextTick 是当前阶段 poll 所以先 nextTick 在 check 阶段里的 然后 times 里的</span><br><span class="line">/*</span><br><span class="line">fn3</span><br><span class="line">fn2</span><br><span class="line">fn</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<h4 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setImmediate(()=&#123;</span><br><span class="line">    console.log(&quot;setImmediate1&quot;)</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">        console.log(&quot;setTimeout1&quot;)</span><br><span class="line">        </span><br><span class="line">    &#125;,0)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setTimeout(()=&#123;</span><br><span class="line">    console.log(&quot;setTimeout2&quot;)</span><br><span class="line">    setImmediate(()=&gt;&#123;</span><br><span class="line">        console.log(&quot;setImmediate2&quot;)</span><br><span class="line">        </span><br><span class="line">    &#125;,0)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案是：</span><br><span class="line">setImmediate1</span><br><span class="line">setTimeout2</span><br><span class="line">setTimeout1</span><br><span class="line">setImmediate2</span><br><span class="line"></span><br><span class="line">// 务必画图分析</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>Eventloop 状态转移</p>
-</blockquote>
-<ul>
-<li>Node.js 有六个阶段 简化为三个 <ul>
-<li>times</li>
-<li>poll</li>
-<li>check</li>
-</ul>
-</li>
-<li>Chrome （一会，马上）(宏任务，微任务)</li>
-</ul>
-<blockquote>
-<p>Node.js</p>
-</blockquote>
-<ul>
-<li>setTimeout =&gt; times</li>
-<li>setImmediate =&gt; check</li>
-<li>nextTick =&gt; 当前阶段结束后执行</li>
-</ul>
-<blockquote>
-<p>Chrome</p>
-</blockquote>
-<ul>
-<li>setTimeout =&gt; 宏任务</li>
-<li>promise.then =&gt; 微任务<ul>
-<li>注意！ 面试喜欢问 await <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">await 转换成 promise</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>面试题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">async function async1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">    await async2()</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function async2()&#123;</span><br><span class="line">    console.log(3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line">new Promise(function(resolve)&#123;</span><br><span class="line">    console.log(4)</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(function()&#123;</span><br><span class="line">    console.log(5)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">1</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">2</span><br><span class="line">5</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<p><strong>首先改写所有的 await</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">async function async1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">    async2().then(f1)</span><br><span class="line">    function f1()&#123;</span><br><span class="line">        console.log(2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function async2()&#123;</span><br><span class="line">    console.log(3)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async1();</span><br><span class="line"></span><br><span class="line">new Promise(function(resolve)&#123;</span><br><span class="line">    console.log(4)</span><br><span class="line">    resolve();</span><br><span class="line">&#125;).then(f2)</span><br><span class="line"></span><br><span class="line">function f2()&#123;</span><br><span class="line">    console.log(5)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line">在看 首先 async1()执行 打印1</span><br><span class="line">async2() 执行 打印3</span><br><span class="line">async2().then() 把 f1 存入 微任务 </span><br><span class="line">new Promsie 开始 打印4</span><br><span class="line">把 new Promise().then(f2) 的 f2 存入 微任务</span><br><span class="line">开始执行微任务队列里的内容</span><br><span class="line">f1 执行 打印 2</span><br><span class="line">f2 执行 打印 5</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>面试</p>
-</blockquote>
-<ul>
-<li>一定要画图</li>
-<li>一定要画图</li>
-<li>一定要画图</li>
-</ul>
-<h4 id="个性化题目的面试如何处理"><a href="#个性化题目的面试如何处理" class="headerlink" title="个性化题目的面试如何处理"></a>个性化题目的面试如何处理</h4><p>只有某些公司会问，80%的公司不会问的题</p>
-<ul>
-<li>PWA</li>
-<li>echarts / d3.js</li>
-<li>three.js</li>
-<li>flutter</li>
-<li>SSR</li>
-</ul>
-<blockquote>
-<h4 id="如何准备"><a href="#如何准备" class="headerlink" title="如何准备"></a>如何准备</h4></blockquote>
-<p><strong>平时用不到，公司太小众了， 但是面试问？</strong></p>
-<ul>
-<li>先看公司招聘启事，如果明确说了，用到某某技术，你就去看文档，搞出一个 hello world</li>
-<li>因为大部分跟你一起面试的人根本就不会对这些东西做任何准备，你只要比他们多准备一点点，就可以了</li>
-<li>你不在乎你比别人多厉害，而在乎只要比别人厉害一点</li>
-<li>如果你没做，被问到，你连接话的地方都没有那岂不是很尴尬。所以你做个Hello World 都能改善局面</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/04/Node-JS专精11-04async-await问题/" title="Node-JS专精11_04async_await问题" itemprop="url">Node-JS专精11_04async_await问题</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-04T09:53:22.000Z" itemprop="datePublished"> Published 2020-03-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="问题整理"><a href="#问题整理" class="headerlink" title="问题整理"></a>问题整理</h3><blockquote>
-<h4 id="async-await-是-promise-的语法糖如何用-promise-实现-async-await"><a href="#async-await-是-promise-的语法糖如何用-promise-实现-async-await" class="headerlink" title="async / await 是 promise 的语法糖如何用 promise 实现 async/await"></a>async / await 是 promise 的语法糖如何用 promise 实现 async/await</h4></blockquote>
-<ul>
-<li>答：有的语法糖好改写，有的语法糖不好改写。这个语法糖就不好改写，因为这是语言层面的改动，而不是API层面的。可以举例说明</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// API层面语法糖</span><br><span class="line">如 promise 的 catch 改写成  promise.then(null,fn)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// await 改写</span><br><span class="line">async function fn()&#123;</span><br><span class="line">    const res = await ajax();</span><br><span class="line">    console.log(res)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function fn2()&#123;</span><br><span class="line">    ajax().then((res)=&gt;&#123;</span><br><span class="line">        console.log(res)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="有些-await-需要等待上一个-await-的结果，有些不用，如何让不用同步的-await-异步执行"><a href="#有些-await-需要等待上一个-await-的结果，有些不用，如何让不用同步的-await-异步执行" class="headerlink" title="有些 await 需要等待上一个 await 的结果，有些不用，如何让不用同步的 await 异步执行"></a>有些 await 需要等待上一个 await 的结果，有些不用，如何让不用同步的 await 异步执行</h4></blockquote>
-<ul>
-<li>答：其实非常简单</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">async function fn()&#123;</span><br><span class="line">    await getUser()</span><br><span class="line">    await getProducts();</span><br><span class="line">    // 你想要 getOthers 不等前两个同步结果，非常简单 把它放到 前面就行了</span><br><span class="line">    getOthers();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 处理方式</span><br><span class="line">async function fn2()&#123;</span><br><span class="line">    getOthers();</span><br><span class="line">    await getUser()</span><br><span class="line">    await getProducts();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调"><a href="#如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调" class="headerlink" title="如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调"></a>如何实现一个监控，调用异步请求一直等待，监控某个值变了就执行回调</h4></blockquote>
-<ul>
-<li>答：不太清楚你的场景，不过 Vue2 已经做到了这一点，用 Object.defineProperty ,也可以用Proxy方案</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ajax = function()&#123;</span><br><span class="line">    return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">        resolve(&#123;</span><br><span class="line">            data:&#123;name:&apos;a&apos;&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var data =&#123;</span><br><span class="line">  name:&apos;sss&apos;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var vm = &#123;&#125;</span><br><span class="line"></span><br><span class="line">Object.defineProperty(vm,&apos;name&apos;,&#123;</span><br><span class="line">  set(newValue)&#123;</span><br><span class="line">    data.name = newValue</span><br><span class="line">  &#125;,</span><br><span class="line">  get()&#123;</span><br><span class="line">      return data.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">ajax().then(res=&gt;&#123;</span><br><span class="line">   console.log(res.data);</span><br><span class="line">   vm.name = res.data.name</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="代码题"><a href="#代码题" class="headerlink" title="代码题"></a>代码题</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">let a = 0;</span><br><span class="line">let test = async()=&gt;&#123;</span><br><span class="line">    a = a + await 10;</span><br><span class="line">    console.log(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(); </span><br><span class="line">console.log(++a);</span><br><span class="line"></span><br><span class="line">// test 是个异步的 所以不会执行 先去打印</span><br></pre></td></tr></table></figure>
-<ul>
-<li>答：倒数第二行有坑</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">答案是 </span><br><span class="line">1</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">为什么？是10 你一定认为是 11</span><br><span class="line"></span><br><span class="line">// 改写下代码继续运行 打印 test时 a + </span><br><span class="line">let a = 0;</span><br><span class="line">let test = async()=&gt;&#123;</span><br><span class="line">    a = (console.log(&apos;a:&apos;+ a),a) + await 10;</span><br><span class="line">    console.log(a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(); </span><br><span class="line">console.log(++a);</span><br><span class="line"></span><br><span class="line">// 原因就是 我们一直认为 await 的右边会立刻执行 await 是等一会执行的</span><br><span class="line">但是如果他用 加号的时候 就不能这样算 因为你不是 `a + await 10` 而是先确定 a的值</span><br></pre></td></tr></table></figure>
-<h4 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h4><ul>
-<li><a href="https://juejin.im/post/5cd8e7e251882568b664f459" target="_blank" rel="noopener">async/await 之于 Promise，正如 do 之于 monad（译文）</a></li>
-<li>结论就是 Promise 是JS里非常重要的概念，所以我们更应该理解 Promise 而不是 await async</li>
-</ul>
-<blockquote>
-<p>只有在一行代码的情况下</p>
-</blockquote>
-<ul>
-<li>用 await 最好的</li>
-<li>如果情况变复杂了，还是要 Promise</li>
-<li>并行的情况，也要用 Promise.all</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/04/Node-JS专精11-03async-await/" title="Node-JS专精11_03async_await" itemprop="url">Node-JS专精11_03async_await</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-04T06:15:12.000Z" itemprop="datePublished"> Published 2020-03-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="async-await"><a href="#async-await" class="headerlink" title="async / await"></a>async / await</h3><blockquote>
-<p>常用用法</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">const fn = async () =&gt; &#123;</span><br><span class="line">    // makePromise 返回 promise的函数</span><br><span class="line">    const temp = await makePromise()</span><br><span class="line">    return temp + 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这个 makePromise 如果成功了就会返回一个值</span><br><span class="line">// 如果失败了，就会报错，你就必须用 try / catch 才能拿到那个值，但是也不一定后面会说</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>优点</p>
-</blockquote>
-<ul>
-<li>完全没有缩进，就像是写同步代码</li>
-</ul>
-<h4 id="封装一个-async-函数"><a href="#封装一个-async-函数" class="headerlink" title="封装一个 async 函数"></a>封装一个 async 函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">async function 摇骰子()&#123;</span><br><span class="line">  return Math.floor(Math.random()*6)+1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果需要 reject , 直接 throw Error(&apos;xxx&apos;)</span><br><span class="line"></span><br><span class="line">// 使用</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">  const result = await 摇骰子();</span><br><span class="line">  console.log(result)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 如果需要处理错误，可以 try catch</span><br><span class="line"></span><br><span class="line">fn(); // 直接打印摇骰子结果</span><br></pre></td></tr></table></figure>
-<p><strong>但是如果想要 3秒后得到摇骰子的结果 就就没法直接写，必须有一个 Promise</strong></p>
-<blockquote>
-<p>实现3秒后摇骰子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子3秒后()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">      setTimeout(()=&gt;&#123;</span><br><span class="line">          resolve(Math.floor(Math.random()*6)+1)</span><br><span class="line">      &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn2()&#123;</span><br><span class="line">  const result = await 摇骰子3秒后();</span><br><span class="line">  console.log(result)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn2()</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="抛出错误-解惑错误"><a href="#抛出错误-解惑错误" class="headerlink" title="抛出错误 / 解惑错误"></a>抛出错误 / 解惑错误</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">async function 摇骰子()&#123;</span><br><span class="line">    throw new Error(&apos;骰子坏了&apos;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await 摇骰子()</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br></pre></td></tr></table></figure>
-<h4 id="为什么需要-async"><a href="#为什么需要-async" class="headerlink" title="为什么需要 async"></a>为什么需要 async</h4><ul>
-<li>await 所在的函数不就是 async 函数吗？ 但是为什么还是要加上 async声明</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    throw new Error(&apos;骰子坏了&apos;)</span><br><span class="line">&#125;</span><br><span class="line">// 删掉 async</span><br><span class="line">function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await 摇骰子()</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
-<ul>
-<li>原因是在 await出现之前，有些人自己写了 await</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 旧代码，自己实现的 await</span><br><span class="line">function fn()&#123;</span><br><span class="line">    var res = await(摇骰子())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>为什么加了 async</p>
-</blockquote>
-<ul>
-<li>由于那些自己实现 await 的人来说 ，如果 await 不配合 async 直接发布它的代码就不能用，<strong>不兼容</strong></li>
-<li>如何兼容呢？ 于是JS设计者想到的是 在外面包一层 来加以区别</li>
-<li>最终原因只有一个：<strong>兼容旧代码里，普通函数里的 await(xxx)</strong> 所以在所有出现 await 的地方外面加了一个 async</li>
-</ul>
-<h4 id="await的错误处理"><a href="#await的错误处理" class="headerlink" title="await的错误处理"></a>await的错误处理</h4><blockquote>
-<p>常见方式</p>
-</blockquote>
-<ul>
-<li>一个字：丑</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function fn()&#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        var result = await axios.get(&apos;/xxx&apos;)</span><br><span class="line">        console.log(result);</span><br><span class="line">    &#125; catch(e)&#123;</span><br><span class="line">        console.log(e)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="正确姿势"><a href="#正确姿势" class="headerlink" title="正确姿势"></a>正确姿势</h4></blockquote>
-<ul>
-<li>then 和 await 结合使用，在 then 里处理异步错误， await只接受成功的结果</li>
-<li>能处理90%的情况</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const result = await axios.get(&apos;/xxx&apos;).then(null,errorHandler)</span><br><span class="line">console.log(result)</span><br><span class="line">// 错误处理放在 then里面</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>细节</p>
-</blockquote>
-<ul>
-<li>可以把 4xx/5xx等常见错误用拦截器全局处理</li>
-<li>await只关心成功，失败全部交给 errorHandler</li>
-<li>errorHandler 也可以放在拦截器里</li>
-</ul>
-<p><strong>示例代码</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ajax = function()&#123;</span><br><span class="line">    return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">        /*</span><br><span class="line">        // 成功处理</span><br><span class="line">        resolve(&#123;</span><br><span class="line">            data:&#123;name:&apos;a&apos;&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">        */</span><br><span class="line">        reject(&#123;</span><br><span class="line">            response:&#123;status:403&#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var error = (e)=&gt;&#123;</span><br><span class="line">    console.log(e)</span><br><span class="line">    console.log(&apos;提示用户没有权限&apos;)</span><br><span class="line">    throw e</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">async function fn()&#123;</span><br><span class="line">    const response = await ajax().then(null,error)</span><br><span class="line">    console.log(response) </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
-<h4 id="await-的传染性"><a href="#await-的传染性" class="headerlink" title="await 的传染性"></a>await 的传染性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">console.log(1)</span><br><span class="line">await console.log(2)</span><br><span class="line">console.log(3)</span><br><span class="line"></span><br><span class="line">导致 3 要等一会才被打印，因为有 await, 导致它下面的代码变成异步任务</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>分析</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">console.log(3) 变成异步任务了</span><br><span class="line">Promise 同样具有传染性 (同步变异步)</span><br><span class="line">谁没有传染性 ： 回调</span><br></pre></td></tr></table></figure>
-<h4 id="await-应用场景"><a href="#await-应用场景" class="headerlink" title="await 应用场景"></a>await 应用场景</h4><blockquote>
-<p>多次处理一个结果</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const s1 = await makePromise();</span><br><span class="line">const s2 = handlerR1(r1)</span><br><span class="line">const s3 = handlerR2(r2)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>串行</p>
-</blockquote>
-<ul>
-<li><p>天生串行</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">async function fn()&#123;</span><br><span class="line">    await ajax1();</span><br><span class="line">    await ajax2();</span><br><span class="line">    await ajax3();</span><br><span class="line">    await ajax4();</span><br><span class="line">    await ajax5();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>循环的时候有 bug </p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 实际上它是并行的</span><br><span class="line">async function fn()&#123;</span><br><span class="line">    var array = [ajax1, ajax2, ajax3]</span><br><span class="line">    for(let i=0;i&lt;array.length;i++)&#123;</span><br><span class="line">        await array[i]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">跟你直接这样 不一样</span><br><span class="line">await ajax1();</span><br><span class="line">await ajax2();</span><br><span class="line">await ajax3();</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 用 await 循环</span><br><span class="line">搜索关键字 for-await-of</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p>并行</p>
-</blockquote>
-<ul>
-<li>await Promise.all() 就是并行了</li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/04/Node-JS专精11-02Promise使用场景/" title="Node-JS专精11_02Promise使用场景" itemprop="url">Node-JS专精11_02Promise使用场景</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-04T03:23:03.000Z" itemprop="datePublished"> Published 2020-03-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h3 id="Promise使用场景"><a href="#Promise使用场景" class="headerlink" title="Promise使用场景"></a>Promise使用场景</h3><h4 id="多次处理一个结果"><a href="#多次处理一个结果" class="headerlink" title="多次处理一个结果"></a>多次处理一个结果</h4><ul>
-<li><code>摇骰子.then(v =&gt; v1).then(v1 =&gt; v2)</code><ul>
-<li>1 2 3 返回小 / 4 5 6 返回大</li>
-</ul>
-</li>
-<li>在BOSS直聘上投递阿里简历流程： <ul>
-<li>必须先有网</li>
-<li>有网才能使用 BOSS直聘app或 pc</li>
-<li>登录</li>
-<li>从众多公司里搜索 阿里的 岗位</li>
-<li>投递简历</li>
-</ul>
-</li>
-</ul>
-<h4 id="串行"><a href="#串行" class="headerlink" title="串行"></a>串行</h4><blockquote>
-<p>一道网传面试题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">页面有两个按A和B,以及一个输入框，</span><br><span class="line">A按钮点击后发送一个请求，返回一个字符串A</span><br><span class="line">B按钮点击后也发送一个请求，返回一个字符串B</span><br><span class="line">返回后会把返回的字符串赋值给输入框，但是 A 和 B发送的请求时间点不同，</span><br><span class="line">点击按钮的顺序也不一定，B要比A先返回，而最终效果要求是 输入框字符的顺序是 AB</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>这道题实际就是日常你做的如下需求</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">你打开了  百度搜索，先输入 vue,(此时已经发送了 请求a ) ,然后输入 react (此时已经发送了 请求b)</span><br><span class="line"></span><br><span class="line">好巧不巧的是  请求a 10秒返回结果  请求b 1秒返回结果</span><br><span class="line">此时 你如果按照正常的展示逻辑</span><br><span class="line"></span><br><span class="line">你肯定先展示 react的结果 ， 然后在展示 vue的结果</span><br><span class="line">此时用户觉得你神经病 ， 我明明搜的 react 你给我展示 vue的结果</span><br><span class="line"></span><br><span class="line">此时你就要保证就算 react的结果先回来，我也要等到 vue的结果展示了之后在展示</span><br></pre></td></tr></table></figure>
-<p>正确处理的姿势：只要有一个结果返回了 就把之前的请求取消掉 ajax.cancel</p>
-<blockquote>
-<p>生活中的高铁进站例子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a 和 b 两个人，分别去高铁app上买了去 北京的票 如C2212</span><br><span class="line">b 比 a先买到票，但是检票的时候，a站在 b前面。</span><br><span class="line">所以 无论如何，b都要在 a之后进入车厢</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>代码实例</p>
-</blockquote>
-<ul>
-<li>点击 a 按钮后立刻点击 b按钮</li>
-<li>3秒后 输入框显示 “bbb”  </li>
-<li>5秒后显示 “aaa”</li>
-</ul>
-<p><strong>我们想要的结果是，不管那个结果回来，都最后显示”bbb”</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    input.value = s</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;  </span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>生活中的点餐取餐例子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">餐厅有两个窗口 点餐 / 取餐</span><br><span class="line">a 和 b 两个人 先后进入餐厅的点餐队列进行点餐 a 在 b 之前点餐了</span><br><span class="line">a 点餐制作耗时 15分钟</span><br><span class="line">b 点餐制作耗时 10分钟</span><br><span class="line"></span><br><span class="line">a 和 b 点餐完成后， 又依次站在 取餐队列里 a在 b之前</span><br><span class="line">10分钟后 b的餐好了，</span><br><span class="line">但是 a 在 b之前， b 无法取餐</span><br><span class="line">15分钟 a 的餐好了</span><br><span class="line">a 取餐成功</span><br><span class="line">于是轮到 b ， b取餐成功</span><br></pre></td></tr></table></figure>
-<p>代码示例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;a&quot;&gt;a&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;b&quot;&gt;b&lt;/button&gt;</span><br><span class="line">&lt;input id=&quot;input&quot; type=&quot;text&quot;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">let ajax1 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;aaa&quot;)</span><br><span class="line">    &#125;,5000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">let ajax2 = function()&#123;</span><br><span class="line">  return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;</span><br><span class="line">      resolve(&quot;bbbb&quot;)</span><br><span class="line">    &#125;,3000)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var 取餐队伍 = [];</span><br><span class="line">var 吧台 = [];</span><br><span class="line">var 问 = ()=&gt;&#123;</span><br><span class="line">  var lastN = 吧台[吧台.length -1][0];</span><br><span class="line">  var lastS = 吧台[吧台.length -1][1];</span><br><span class="line">  if(取餐队伍[0][0] === lastN)&#123;</span><br><span class="line">    取餐队伍[0][1](lastS);</span><br><span class="line">    取餐队伍.shift();</span><br><span class="line">    吧台.pop();</span><br><span class="line">    问();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax1().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">b.onclick = ()=&gt;&#123;</span><br><span class="line">  let n = Math.random();</span><br><span class="line">  ajax2().then((s)=&gt;&#123;</span><br><span class="line">    吧台.push([n,s])</span><br><span class="line">    问();</span><br><span class="line">  &#125;)</span><br><span class="line">  取餐队伍.push([n,(s)=&gt;&#123;</span><br><span class="line">    input.value = s;</span><br><span class="line">  &#125;])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="并行"><a href="#并行" class="headerlink" title="并行"></a>并行</h4><ul>
-<li>Promise.all([task1,task2]) 不好用(可以自己写一个，参考上一篇文章)</li>
-<li>Promise.allSettled 又太新</li>
-</ul>
-<h3 id="Promise的错误处理"><a href="#Promise的错误处理" class="headerlink" title="Promise的错误处理"></a>Promise的错误处理</h3><blockquote>
-<p>其实挺好用的</p>
-</blockquote>
-<ul>
-<li>promise.then(s1,f1) 即可</li>
-<li>如果我想全局处理(以 axios 为例 参考它的拦截器)<ul>
-<li><a href="https://juejin.im/post/5a9cddb46fb9a028bc2d3c2f" target="_blank" rel="noopener">axios 作弊表</a> 拦截器章节<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.response.use(function (response) &#123;</span><br><span class="line">    // Do something with response data</span><br><span class="line">    return response;</span><br><span class="line">&#125;, function (error) &#123;</span><br><span class="line">    // Do something with response error</span><br><span class="line">    return Promise.reject(error);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>语法糖</p>
-</blockquote>
-<ul>
-<li><code>promise.then(s1).catch(f1)</code></li>
-</ul>
-<blockquote>
-<p>错误处理之后</p>
-</blockquote>
-<ul>
-<li>如果你没有继续抛错，那么错误不再出现</li>
-<li>如果你继续抛出错误， 那么后续回调就继续处理错误</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// </span><br><span class="line">Promise.resolve(`&#123;&apos;name&apos;:&apos;frank&apos;&#125;`)</span><br><span class="line">    .then( s =&gt; JSON.parse(s)) // parse 失败 json 的 key必须是双引号</span><br><span class="line">    .then( null, (reason) =&gt; console.log(&quot;err:&quot; + reason)) // 继续 promise 里处理</span><br></pre></td></tr></table></figure>
-<h4 id="但是有人对-Promise-不满意"><a href="#但是有人对-Promise-不满意" class="headerlink" title="但是有人对 Promise 不满意"></a>但是有人对 Promise 不满意</h4><ul>
-<li><a href="https://blog.fundebug.com/2017/04/04/nodejs-async-await/" target="_blank" rel="noopener">Async/Await替代Promise的6个理由</a></li>
-</ul>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
-   
-    
-    <article class="post-expand post" itemprop="articleBody"> 
-        <header class="article-info clearfix">
-  <h1 itemprop="name">
-    
-      <a href="/2020/03/04/Node-JS专精11-01Promise精讲/" title="Node-JS专精11_01Promise精讲" itemprop="url">Node-JS专精11_01Promise精讲</a>
-  </h1>
-  <p class="article-author">By
-       
-		<a href="/about" title="Stevin" target="_blank" itemprop="author">Stevin</a>
-		
-  <p class="article-time">
-    <time datetime="2020-03-04T01:33:52.000Z" itemprop="datePublished"> Published 2020-03-04</time>
-    
-  </p>
-</header>
-    <div class="article-content">
-        
-        <h1 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h1><blockquote>
-<p>先看代码</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        setTimeout(() =&gt; &#123;</span><br><span class="line">            const result = Math.floor(Math.random()*6+1)</span><br><span class="line">            resolve(result)</span><br><span class="line">        &#125;, 3000);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇骰子() // 此时返回的是一个 promise</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;) // 3秒后返回摇骰子的结果</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="这是一个异步任务，那么问题来了-异步任务什么时候执行？"><a href="#这是一个异步任务，那么问题来了-异步任务什么时候执行？" class="headerlink" title="这是一个异步任务，那么问题来了 异步任务什么时候执行？"></a>这是一个异步任务，那么问题来了 异步任务什么时候执行？</h3></blockquote>
-<ul>
-<li>改写了一下</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        const result = Math.floor(Math.random()*6+1)</span><br><span class="line">        resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)  // 会立刻返回 摇骰子的结果，但是它是什么时候开始呢？</span><br></pre></td></tr></table></figure>
-<h3 id="面试中的-微任务-宏任务"><a href="#面试中的-微任务-宏任务" class="headerlink" title="面试中的 微任务/宏任务"></a>面试中的 微任务/宏任务</h3><p>看这样一段代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;button id=&quot;btn1&quot;&gt;btn1&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;btn2&quot;&gt;btn2&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">// Promise</span><br><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn1.onclick=()=&gt;&#123;</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  console.log(&quot;end&quot;);</span><br><span class="line">  // 执行结果：很明显 我们知道  摇骰子 是异步任务 所以会晚于 同步代码 console.log</span><br><span class="line">  /*</span><br><span class="line">  &quot;end&quot;</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">btn2.onclick=()=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;),0&#125;)</span><br><span class="line">  摇骰子().then(n=&gt;console.log(`摇到了$&#123;n&#125;`))</span><br><span class="line">  setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;),0&#125;)</span><br><span class="line">  // 执行结果</span><br><span class="line">  // 如果我们还有其他的异步任务 比如 setTimeout 那么谁会优先呢？</span><br><span class="line">  // 答案是 先打出骰子的点数</span><br><span class="line">  /*</span><br><span class="line">  &quot;摇到了1&quot;</span><br><span class="line">  &quot;timeout1&quot;</span><br><span class="line">  &quot;timeout2&quot;</span><br><span class="line">  */</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="微任务-宏任务这些前端名词的前因后果"><a href="#微任务-宏任务这些前端名词的前因后果" class="headerlink" title="微任务/宏任务这些前端名词的前因后果"></a>微任务/宏任务这些前端名词的前因后果</h4><ul>
-<li>本来是没有 Promise的 在 ES6之前，ES6之后才有了 Promise这种异步</li>
-<li>以前的JS非常单纯只有两个东西<ul>
-<li>当前任务 执行的代码(同步代码) </li>
-<li>延时任务 setTimeout / setInterval</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<h4 id="ES6以前"><a href="#ES6以前" class="headerlink" title="ES6以前"></a>ES6以前</h4></blockquote>
-<ul>
-<li>当前代码 如<code>console.log(1)</code></li>
-<li>异步队列 setTimeout </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">console.log(1)</span><br><span class="line">console.log(2)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 1&quot;)&#125;,0)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout 2&quot;)&#125;,0)</span><br><span class="line">console.log(3)</span><br><span class="line">console.log(4)</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">timeout 1</span><br><span class="line">timeout 2</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">两次 setTimeout 不会立刻执行，而是放入异步队列里</span><br><span class="line">当前代码执行完了 就去看异步队列了</span><br></pre></td></tr></table></figure>
-<p><strong>所以以前的js非常好理解，就是我有个当前要执行的任务，和有个等待执行的任务</strong></p>
-<blockquote>
-<h4 id="ES6之后"><a href="#ES6之后" class="headerlink" title="ES6之后"></a>ES6之后</h4></blockquote>
-<p>前端觉得回调太蛋疼了，于是加了个 Promise</p>
-<ul>
-<li>宏任务 – 异步队列1（原来的异步队列 setTimeout）</li>
-<li>微任务 – 异步队列2 (Promise 使用)</li>
-<li>同步代码 </li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">// 伪代码</span><br><span class="line">ajax.then(s1)</span><br><span class="line">setTimeout(()=&gt;&#123;console.log(&quot;timeout&quot;)&#125;,0)</span><br><span class="line">console.log(1);</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">依然  console.log 放入同步任务</span><br><span class="line">setTimeout 放入异步任务</span><br><span class="line"></span><br><span class="line">此时 ，如果不引入其他东西 ajax.then(s1) 就显得特别智障</span><br><span class="line">    假设只有一个异步任务 那么实际就是 把 s1 加入异步队列1 ， 然后把第二行的 setTimeout 加入异步队列1 s1之后</span><br><span class="line"></span><br><span class="line">    于是你惊讶的发现，那我要 then 干什么，有病吧？ 直接 setTimeout(s1,0) 不就完了</span><br><span class="line"></span><br><span class="line">所以他们就想了一个 让我们的 then 更有用的办法 ，在加一个 异步队列2</span><br><span class="line"></span><br><span class="line">于是乎上面的代码</span><br><span class="line">s1 放入 异步队列2</span><br><span class="line">setTimeout 放入 异步队列1</span><br><span class="line"></span><br><span class="line">当 同步代码执行完</span><br><span class="line">先去读取 异步队列2 里的任务 去执行</span><br><span class="line">等 异步队列2 里的任务执行完了， 再去读取 异步队列1 里的任务 去执行</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<p><strong>于是分别给 异步队列1 / 异步队列2 取了个名字叫做 宏任务 / 微任务</strong></p>
-<p><strong>如果队列里有任务，先把 微任务 做完，再去做 宏任务</strong></p>
-<h3 id="Promise-其他API"><a href="#Promise-其他API" class="headerlink" title="Promise 其他API"></a>Promise 其他API</h3><blockquote>
-<p>继续以摇骰子为例</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">function 摇骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      const result = Math.floor(Math.random()*6+1)</span><br><span class="line">      resolve(result)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line">// 随机的</span><br><span class="line">摇骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>Promise.resolve(result) 制造一个成功(或失败)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 制造成功</span><br><span class="line">// 你想造假一直 摇6</span><br><span class="line"></span><br><span class="line">function 摇6的骰子()&#123;</span><br><span class="line">  return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">      resolve(6)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇6的骰子2()&#123;</span><br><span class="line">  return  Promise.resolve(6)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 摇6的骰子</span><br><span class="line">// 摇6的骰子().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 摇6的骰子2().then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 制造失败</span><br><span class="line">function 摇骰子返回失败()&#123;</span><br><span class="line">  return  Promise.resolve(</span><br><span class="line">              new Promise((resolve,reject)=&gt;reject())</span><br><span class="line">          )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">摇骰子返回失败().then((res)=&gt;&#123;console.log(res)&#125;)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Promise.reject(reason) 制造一个失败</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function 摇坏的骰子()&#123;</span><br><span class="line">    return new Promise((resolve, reject)=&gt;&#123;</span><br><span class="line">        reject(&apos;坏了&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function 摇坏的骰子2()&#123;</span><br><span class="line">    return Promise.reject(&apos;坏了&apos;)</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">摇坏的骰子().then(null,(reason)=&gt;console.log(reason))</span><br><span class="line">摇坏的骰子2().then(null,(reason)=&gt;console.log(reason))</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Promise.all(数组) 等待全部成功，或有一个失败</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 所有人都成功了，才叫成功 返回所有成功的结果</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;)</span><br><span class="line">// 打印 [1,2,3]</span><br><span class="line"></span><br><span class="line">// 某个失败 返回失败</span><br><span class="line">Promise.all([Promise.resolve(1),Promise.resolve(2),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了3&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.resolve(1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了2&quot;</span><br><span class="line"></span><br><span class="line">Promise.all([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// 打印 &quot;错了1&quot;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>所以 Promise.all 非常没用,因为有一个失败就返回了不等所有的结果</li>
-<li>请使用 <code>Promise.allSettled</code></li>
-</ul>
-</li>
-<li><p>Promise.race(数组) 等待第一个状态改变</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同时发很多请求，只要又一个成功了，就成功，或者一个失败了就失败</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Promise.allSettled(数组) 等待全部状态改变,目前处于 Stage-4(板上钉钉的实现)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">Promise.allSettled([Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// resolve 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 2&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.resolve(1),Promise.reject(&apos;错了2&apos;),Promise.resolve(3)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 1&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;fulfilled&quot;, value: 3&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">Promise.allSettled([Promise.reject(&quot;错了1&quot;),Promise.reject(&apos;错了2&apos;),Promise.reject(&apos;错了3&apos;)]).then((res)=&gt;&#123;console.log(res)&#125;,(err)=&gt;&#123;console.log(err)&#125;)</span><br><span class="line"></span><br><span class="line">// reject 打印</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了1&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了2&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;rejected&quot;, reason: &quot;错了3&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p>由于<code>Promise.allSettled</code>很多浏览器不支持，我们依旧无法使用</p>
-</blockquote>
-<p>所以用 Promise.all 实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">// 假设还是三个 promise 任务  第一个和第二个会失败</span><br><span class="line">task1 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第一扇门关了&quot;)</span><br><span class="line">  &#125;,3000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task2 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    reject(&quot;第二扇门关了&quot;)</span><br><span class="line">  &#125;,4000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">task3 = () =&gt; new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">  setTimeout(()=&gt;&#123;</span><br><span class="line">    resolve(&quot;第三扇门开了&quot;)</span><br><span class="line">  &#125;,5000)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 如果这样</span><br><span class="line">// 发现第一个失败就 结束了</span><br><span class="line">Promise.all([task1(),task2(),task3()])</span><br><span class="line">  .then(null,(reason)=&gt;console.log(reason))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 正确姿势 把每个任务都 then一下 因为 Promise.then 会返回新的 promise</span><br><span class="line">Promise.all([</span><br><span class="line">          task1().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task2().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          task3().then(()=&gt;(&#123;&quot;status&quot;:&quot;ok&quot;&#125;),()=&gt;(&#123;status:&quot;not ok&quot;&#125;)),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;not ok&quot;&#125;,</span><br><span class="line">  &#123;status: &quot;ok&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 优化代码 因为写的太重复了  </span><br><span class="line">setSuccessResult = (promise) =&gt; promise.then(</span><br><span class="line">                                        (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                                        (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;),</span><br><span class="line">                                        )</span><br><span class="line">Promise.all([</span><br><span class="line">          setSuccessResult(task1()),</span><br><span class="line">          setSuccessResult(task2()),</span><br><span class="line">          setSuccessResult(task3()),</span><br><span class="line">          ])</span><br><span class="line">  .then((result)=&gt;console.log(result))                                     </span><br><span class="line">// 打印结果</span><br><span class="line">/*</span><br><span class="line">[</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第一扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;not ok&quot;, reason: &quot;第二扇门关了&quot;&#125;</span><br><span class="line">  &#123;status: &quot;ok&quot;, value: &quot;第三扇门开了&quot;&#125;</span><br><span class="line">]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// 还能再次简化</span><br><span class="line">setSuccessResultList = (promiseList) =&gt; promiseList.map(</span><br><span class="line">  promise =&gt; promise.then(</span><br><span class="line">                         (value)=&gt;(&#123;status:&quot;ok&quot;,value&#125;),</span><br><span class="line">                         (reason)=&gt;(&#123;status:&quot;not ok&quot;,reason&#125;)</span><br><span class="line">                        )</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">Promise.all(setSuccessResultList([task1(),task2(),task3()]))</span><br><span class="line">  .then((result)=&gt;console.log(result))  </span><br><span class="line"></span><br><span class="line">// 再次简化 你不是不支持  Promise.allSettled 吗？</span><br><span class="line">Promise.allSettled2 = function(promiseList)&#123;</span><br><span class="line">  return Promise.all(setSuccessResultList(promiseList))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 这其实就是 allSettled2 的实现</span><br><span class="line">Promise.allSettled2([task1(),task2(),task3()])</span><br><span class="line">  .then((result)=&gt;console.log(result))</span><br></pre></td></tr></table></figure>
-
-        
-        
-        <p class="article-more-link">
-          
-       </p>
-    </div>
-    <footer class="article-footer clearfix">
-<div class="article-catetags">
-
-
-  <div class="article-tags">
-  
-  <span></span> <a href="/tags/Node后端/">Node后端</a>
-  </div>
-
-</div>
-
-
-
-
-<div class="comments-count">
-	
-</div>
-
-</footer>
-
-
-    </article>
-
-
-
-
-
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/53/">53</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
@@ -1649,13 +1577,13 @@
         
           <li>
             
-            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            	<a href="https://github.com/slTrust/" target="_blank" title="Github">Github</a>
             
           </li>
         
           <li>
             
-            	<a href="http://wuchong.me" target="_blank" title="Jark&#39;s Blog">Jark&#39;s Blog</a>
+            	<a href="https://huangheping.com/" target="_blank" title="个人网站">个人网站</a>
             
           </li>
         
