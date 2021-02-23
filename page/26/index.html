@@ -62,6 +62,412 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py008-11-02部署实例之安装python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/07/Py008-11-02部署实例之安装python/" class="article-date">
+  <time datetime="2019-01-07T13:39:58.000Z" itemprop="datePublished">2019-01-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/07/Py008-11-02部署实例之安装python/">Py008-11-02部署实例之安装python</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="安装python"><a href="#安装python" class="headerlink" title="安装python"></a>安装python</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># 远程登录服务器后 </span><br><span class="line"></span><br><span class="line">cd /usr/local/src</span><br><span class="line"></span><br><span class="line"># python3.7.1</span><br><span class="line">wget https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tar.xz</span><br><span class="line"># 解压</span><br><span class="line">tar xf Python-3.7.1.tar.xz</span><br><span class="line"># 进入解压文件目录</span><br><span class="line">cd Python-3.7.1</span><br><span class="line"></span><br><span class="line"># 安装依赖</span><br><span class="line">yum -y install gcc-* openssl-* libffi-devel  sqlite-devel</span><br><span class="line"></span><br><span class="line"># configure</span><br><span class="line">./configure --enable-optimizations --with-openssl=/usr/bin/openssl</span><br><span class="line"></span><br><span class="line"># make</span><br><span class="line">make -j4</span><br><span class="line"></span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"># 默认安装路径为</span><br><span class="line">/usr/local/lib/python3.7</span><br><span class="line"></span><br><span class="line"># 验证python</span><br><span class="line">python3</span><br></pre></td></tr></table></figure>
+<h4 id="安装pip3"><a href="#安装pip3" class="headerlink" title="安装pip3"></a>安装pip3</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pip3 install --upgrade pip</span><br><span class="line"># 此时会警告一个 ssl问题</span><br><span class="line"># pip is configured with locations that require TLS/SSL, however the</span><br><span class="line"># ssl module in Python is not available.</span><br><span class="line"></span><br><span class="line"># 解决方案</span><br><span class="line"># 去python源码目录</span><br><span class="line">vi Modules/Setup </span><br><span class="line"># 把下边这段话的#去掉 211 SSL=/usr/local/ssl</span><br><span class="line">212 _ssl _ssl.c \</span><br><span class="line">213 -DUSE_SSL -I$(SSL)/include -I$(SSL)/include/openssl \</span><br><span class="line">214         -L$(SSL)/lib -lssl -lcrypto</span><br><span class="line"></span><br><span class="line"># 再次make</span><br><span class="line">make -j4</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"># 再次升级pip</span><br><span class="line">pip3 install --upgrade pip</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>pip安装软件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 安装</span><br><span class="line">pip3 install ipython</span><br><span class="line"># 卸载</span><br><span class="line">pip3 uninstall ipython</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="安装python虚拟环境"><a href="#安装python虚拟环境" class="headerlink" title="安装python虚拟环境"></a>安装python虚拟环境</h4></blockquote>
+<ul>
+<li>virtualenv 是⼀一个创建隔绝的Python环境的⼯工具。virtualenv创建⼀一个包含所有必要 的可执⾏行行⽂文件的⽂文件夹，⽤用来使⽤用Python⼯工程所需的包。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">pip3 install virtualenv</span><br><span class="line"></span><br><span class="line">#  virtualenv 使用</span><br><span class="line"># 当前目录 创建一个基于python3的虚拟环境 web</span><br><span class="line">virtualenv -p python3 web</span><br><span class="line"># 如何生效这个 环境呢</span><br><span class="line">source web/bin/activate</span><br><span class="line"></span><br><span class="line"># 此时如果你想在 web环境里安装 django</span><br><span class="line">pip3 install django</span><br><span class="line"># 创建一个django项目</span><br><span class="line">django-admin.py startproject myweb</span><br><span class="line"># 进入目录</span><br><span class="line">cd myweb</span><br><span class="line"># 启动项目</span><br><span class="line">python3 manage.py runserver localhost:8080</span><br><span class="line"></span><br><span class="line"># 默认你是访问不到的 要设置 allowhost</span><br><span class="line">vi myweb/settings.py</span><br><span class="line"># 修改如下</span><br><span class="line">ALLOWED_HOSTS = [&apos;*&apos;]</span><br><span class="line"># 重新启动django</span><br><span class="line">python3 manage.py runserver localhost:8080</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>退出  virtualenv 虚拟环境</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deactivate</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/07/Py008-11-02部署实例之安装python/" data-id="cklhgn2if00likyfy763hvpv2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-11-01部署实例" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/03/Py008-11-01部署实例/" class="article-date">
+  <time datetime="2019-01-03T12:54:07.000Z" itemprop="datePublished">2019-01-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/03/Py008-11-01部署实例/">Py008-11-01部署实例</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="部署环境"><a href="#部署环境" class="headerlink" title="部署环境"></a>部署环境</h3><ul>
+<li>Centos7.5</li>
+<li>Nginx</li>
+<li>python</li>
+<li>Django</li>
+<li>uwsgi</li>
+<li>mysql</li>
+</ul>
+<blockquote>
+<p>前置条件</p>
+</blockquote>
+<ul>
+<li>Centos7.5</li>
+<li>防火墙：关闭</li>
+<li>Selinux:关闭</li>
+<li>有一个服务器IP</li>
+</ul>
+<h3 id="部署流程"><a href="#部署流程" class="headerlink" title="部署流程"></a>部署流程</h3><ol>
+<li>安装nginx</li>
+<li>安装python</li>
+<li>安装mysql</li>
+<li>部署发布平台</li>
+<li>测试</li>
+</ol>
+<h4 id="安装nginx"><a href="#安装nginx" class="headerlink" title="安装nginx"></a>安装nginx</h4><p>参考之前的文章安装</p>
+<p><a href="https://sltrust.github.io/2018/12/27/Py008-10-01nginx%E4%BB%8B%E7%BB%8D/" target="_blank" rel="noopener">nginx安装</a></p>
+<h4 id="安装mysql"><a href="#安装mysql" class="headerlink" title="安装mysql"></a>安装mysql</h4><p>一个关系型数据库，后来卖给oracle 目前分为商业版和社区版</p>
+<p>目前有两大版本 mysql5/mysql8</p>
+<p>目前建议使用5.7最新版本就行。官方提供RPM和源码包两种方式</p>
+<blockquote>
+<p>mysql安装步骤</p>
+</blockquote>
+<ol>
+<li>安装依赖包</li>
+<li>升级cmake工具</li>
+<li>升级boost库文件</li>
+<li>安装mysql</li>
+<li>启动测试</li>
+</ol>
+<ul>
+<li>安装依赖</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum -y install ncurses-devel gcc-* bzip2-*</span><br><span class="line"></span><br><span class="line">安装好之后看看你本地有木有 cmake</span><br><span class="line">yum search cmake</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cmake安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">需要先升级 cmake </span><br><span class="line">1.获取软件</span><br><span class="line"></span><br><span class="line">https://cmake.org/download/</span><br><span class="line">复制下载链接</span><br><span class="line">https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz</span><br><span class="line"></span><br><span class="line">wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz</span><br><span class="line"></span><br><span class="line"># 我用的是3.6.0</span><br><span class="line">wget https://github.com/Kitware/CMake/archive/v3.6.0-rc1.tar.gz</span><br><span class="line"></span><br><span class="line">2.安装软件</span><br><span class="line"></span><br><span class="line">tar xf cmake-3.6.0-rc1.tar</span><br><span class="line"></span><br><span class="line">cd cmake-3.6.0-rc1</span><br><span class="line"></span><br><span class="line">./configure</span><br><span class="line"></span><br><span class="line"># 还差一些依赖</span><br><span class="line">yum -y install ncurses-devel gcc-* bzip2-* bison</span><br><span class="line"></span><br><span class="line"># 编译</span><br><span class="line">make -j4</span><br><span class="line"># 安装</span><br><span class="line">make install </span><br><span class="line"></span><br><span class="line"># 验证安装</span><br><span class="line">cmake --version</span><br></pre></td></tr></table></figure>
+<ul>
+<li>boost安装</li>
+</ul>
+<p><a href="https://www.boost.org/" target="_blank" rel="noopener">https://www.boost.org/</a></p>
+<p>我下载的1.59版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">https://nchc.dl.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cd ~</span><br><span class="line">wget https://nchc.dl.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2</span><br><span class="line"></span><br><span class="line">tar xf boost_1_59_0.tar.bz2</span><br><span class="line"></span><br><span class="line">mv boost_1_59_0 /usr/local/boost</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>mysql安装</li>
+</ul>
+<p><a href="https://www.oracle.com/index.html" target="_blank" rel="noopener">https://www.oracle.com/index.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">访问 https://www.oracle.com/index.html 去页脚的 software downloads </span><br><span class="line">获得网址 https://www.oracle.com/downloads/</span><br><span class="line">选择 database -&gt;mysql   ---&gt; https://www.mysql.com/downloads/ </span><br><span class="line">访问 https://www.mysql.com/downloads/  拉到最后 选择社区版本  Community (GPL) Downloads »</span><br><span class="line"></span><br><span class="line">选第一个 MySQL Community Server (GPL)</span><br><span class="line"></span><br><span class="line">此时有8.0 和 5.7 我们使用 5.7</span><br><span class="line">选择 MySQL Community Server 5.7 »</span><br><span class="line"></span><br><span class="line">Select Operating System:</span><br><span class="line">- 如果你想选 rpm的  系统选择 红帽</span><br><span class="line">- 选择源码包安装就选择 source code</span><br><span class="line"></span><br><span class="line">我们使用 源码包安装 选择 source code</span><br><span class="line"></span><br><span class="line">Select OS Version:我们选择通用版</span><br><span class="line">Generic Linux (Architecture Independent)</span><br><span class="line">然后下载列表里选择</span><br><span class="line">Compressed TAR Archive	</span><br><span class="line">然后下载</span><br><span class="line"></span><br><span class="line">cd ~</span><br><span class="line">wget https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.24.tar.gz</span><br><span class="line">tar xf mysql-5.7.24.tar.gz</span><br><span class="line"></span><br><span class="line">cd mysql-5.7.24</span><br><span class="line"></span><br><span class="line">使用cmake安装</span><br><span class="line">cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data/ -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock -DDOWNLOAD_BOOST=0 -DWITH_INNODBBASE_STORAGE_ENGINE=1 -DENABLE_LOCAL_INFILE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DMYSQL_USER=mysql -DWITH_DEBUG=0 -DWITH_EMBEDED_SERVER=0 -DDOWNLOAD_BOOST=1 -DWITH_BOOST=/usr/local/boost</span><br><span class="line"></span><br><span class="line"># -DMYSQL_USER=mysql 这个会有问题去掉</span><br><span class="line"></span><br><span class="line">cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data/ -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock -DDOWNLOAD_BOOST=0 -DWITH_INNODBBASE_STORAGE_ENGINE=1 -DENABLE_LOCAL_INFILE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_DEBUG=0 -DWITH_EMBEDED_SERVER=0 -DDOWNLOAD_BOOST=1 -DWITH_BOOST=/usr/local/boost</span><br><span class="line"></span><br><span class="line"># 注意如果你想要重新配置</span><br><span class="line">就在这个目录里 mysql-5.7.24/删除  CMackCache.txt</span><br><span class="line">rm -rf CMakeCache.txt</span><br><span class="line"></span><br><span class="line"># 然后重新配置</span><br><span class="line"></span><br><span class="line">cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data/ -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock -DDOWNLOAD_BOOST=0 -DWITH_INNODBBASE_STORAGE_ENGINE=1 -DENABLE_LOCAL_INFILE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_DEBUG=0 -DWITH_EMBEDED_SERVER=0 -DDOWNLOAD_BOOST=1 -DWITH_BOOST=/usr/local/boost</span><br><span class="line"></span><br><span class="line"># 安装</span><br><span class="line">make</span><br><span class="line"></span><br><span class="line"># 如果你用的服务器是单核的很可能会报错  什么到45%的时候 报错 </span><br><span class="line">Building CXX object sql/CMakeFiles/sql.dir/geometry_rtree.cc.o</span><br><span class="line">c++: 编译器内部错误：已杀死(程序 cc1plus)</span><br><span class="line">Please submit a full bug report,</span><br><span class="line"></span><br><span class="line">解决方案 https://blog.csdn.net/razertang/article/details/45694567/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="源码安装特容易失败"><a href="#源码安装特容易失败" class="headerlink" title="源码安装特容易失败"></a>源码安装特容易失败</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># yum 安装</span><br><span class="line">https://blog.csdn.net/z13615480737/article/details/78906598</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 修改密码</span><br><span class="line">mysql_secure_installation</span><br><span class="line"></span><br><span class="line"># 登录数据库</span><br><span class="line">mysql -uroot -p</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/03/Py008-11-01部署实例/" data-id="cklhgn2ie00lgkyfyxyzivnm9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-10-08url重写" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/Py008-10-08url重写/" class="article-date">
+  <time datetime="2019-01-02T14:43:00.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/Py008-10-08url重写/">Py008-10-08url重写</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="url重写"><a href="#url重写" class="headerlink" title="url重写"></a>url重写</h3><ul>
+<li>rewrite模块(ngx_http_rewrite_module)</li>
+<li>Rewrite功能是Nginx服务器提供的⼀个重要功能。⼏乎是所有的web产品必备技能，⽤于实现URL重写。URL重写是⾮常有用的功能，比如它可以在 我们在改变网站结构后，不需要客户端修改原来的书签，也不需要其他⽹站修改对我们⽹站的友情链接，还可以在一定程度上提⾼网站的安全性，能够让我们的网站显得更专业。</li>
+<li>Nginx服务器Rewrite功能的实现是依赖于PCRE(Perl Compatible Regular Expression。Perl兼容的正则表达式)的支持，所以在编译安装Nginx之前， 需要安装PCRE库。</li>
+</ul>
+<p>如 <a href="http://www.360buy.com" target="_blank" rel="noopener">www.360buy.com</a> 就是京东的url重写</p>
+<blockquote>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4></blockquote>
+<ul>
+<li>域名变更(京东)</li>
+<li>用户跳转(从某个链接跳到另一个链接)</li>
+<li>伪静态场景(便于CDN缓存动态页面数据)</li>
+</ul>
+<h4 id="重写原理"><a href="#重写原理" class="headerlink" title="重写原理"></a>重写原理</h4><p>你找我，我不给你数据，我告诉你哪里有数据</p>
+<p>张三找李四借钱，李四说王五有钱去找王五</p>
+<h4 id="URL-rewrite实现"><a href="#URL-rewrite实现" class="headerlink" title="URL rewrite实现"></a>URL rewrite实现</h4><blockquote>
+<h4 id="url模块指令"><a href="#url模块指令" class="headerlink" title="url模块指令"></a>url模块指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1) set 设置变量</span><br><span class="line">2) if 负责判断</span><br><span class="line">3) return  返回返回值或 url</span><br><span class="line">4) break   终止后续的rewtite规则</span><br><span class="line">5) rewrite 重定向URL</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="set指令"><a href="#set指令" class="headerlink" title="set指令"></a>set指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># set指令 ⾃自定义变量量 </span><br><span class="line"># Syntax:语法</span><br><span class="line">set $variable value; </span><br><span class="line">Default:</span><br><span class="line">—</span><br><span class="line"># Context:作用域 可以放在 server/location/if里</span><br><span class="line">server, location, if</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 将http://www.baidu.com 重写为 http://www.baidu.com/xxx </span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    set $name hjx;</span><br><span class="line">    rewrite ^(.*)$ http://www.baidu.com/$name; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="if指令"><a href="#if指令" class="headerlink" title="if指令"></a>if指令</h4></blockquote>
+<ul>
+<li>nginx有一些内置变量 自行百度</li>
+<li>匹配规则  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 模糊匹配</span><br><span class="line">～ 匹配</span><br><span class="line">!~ 不匹配</span><br><span class="line">~* 匹配而且不区分大小写</span><br><span class="line"></span><br><span class="line"># 精确匹配</span><br><span class="line">=</span><br><span class="line">!=</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">if指令 负责判断 Syntax:</span><br><span class="line">if (condition) &#123; ... &#125; Default:</span><br><span class="line"></span><br><span class="line">—</span><br><span class="line">Context: server, location</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    # 日志里 $http_user_agent是用来代表客户端访问的浏览器(它其实是nginx的内置变量)</span><br><span class="line">    # 这里针对 google访问 返回403</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        </span><br><span class="line">        return 403;</span><br><span class="line">        #return http://www.jd.com; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="return指令"><a href="#return指令" class="headerlink" title="return指令"></a>return指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">return 指令 定义返回数据 Syntax: return code [text]; return code URL;</span><br><span class="line">return URL;</span><br><span class="line">Default: —</span><br><span class="line">Context: server, location, if</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">----------------------------- 如果chrome浏览器访问就返回 京东</span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        # return 403;</span><br><span class="line">        # return指令 既可以返回状态码 还可以返回url</span><br><span class="line">        return http://www.jd.com; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="break指令"><a href="#break指令" class="headerlink" title="break指令"></a>break指令</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 本来是匹配chrome浏览器访问就返回 京东 但是有 break 就导致提前结束 后续的url重写就失效了</span><br><span class="line">location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">    if ($http_user_agent ~* &apos;Chrome&apos;) &#123;</span><br><span class="line">        break;</span><br><span class="line">        # return 403;</span><br><span class="line">        # return指令 既可以返回状态码 还可以返回url</span><br><span class="line">        return http://www.jd.com; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="rewrite-语法"><a href="#rewrite-语法" class="headerlink" title="rewrite 语法"></a>rewrite 语法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rewrite  &lt;regex&gt;  &lt;replacement&gt; [flag];</span><br><span class="line">关键字    正则          替代内容 flag标记</span><br><span class="line"></span><br><span class="line">flag:</span><br><span class="line">last  # 本条规则匹配完成后，继续向下匹配新的location URL规则</span><br><span class="line">break # 本条规则匹配完成即终止，不再匹配后面的任何规则</span><br><span class="line">redirect # 返回302临时重定向，浏览器地址会显示跳转后URL地址</span><br><span class="line">permanent #返回301永久重定向，浏览器器地址栏会显示跳转后的URL地址</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">域名跳转</span><br><span class="line">www.ayitula.com 重写为 www.jd.com</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    # 修改本地host 里添加www.ayitula.com的解析</span><br><span class="line">    server_name www.ayitula.com; </span><br><span class="line">    location / &#123;</span><br><span class="line">        # 临时重定向301</span><br><span class="line">        rewrite ^/$ http://www.jd.com permanent ;</span><br><span class="line">        # 永久重定向302</span><br><span class="line">        rewrite ^/$ http://www.jd.com redirect ; </span><br><span class="line">        # 碰到break不往后处理了 直接返回 www.jd.com  也是302</span><br><span class="line">        rewrite ^/$ http://www.jd.com break ;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">注意:</span><br><span class="line">重定向就是将⽹页自动转向重定向 </span><br><span class="line"># 对新域名推广</span><br><span class="line">301永久性重定向:新网址完全继承旧网址，旧网址的排名等完全清零</span><br><span class="line">   301重定向是⽹页更改地址后对搜索引擎友好的最好⽅法，只要不是暂时搬移的情况，都建议使用301来做转址。</span><br><span class="line">   </span><br><span class="line"># 对老域名推广</span><br><span class="line">302临时性重定向:对旧⽹址没有影响，但新网址不会有排名</span><br><span class="line">    搜索引擎会抓取新的内容而保留旧的⽹址</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>last指令</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果是chrome浏览器器 就将 http://192.168.10.42/$URI 重写为 http://192.168.10.42/chrome/$URI</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">如果是chrome浏览器器 就将 http://192.168.10.42/$URI 重写为 http://192.168.10.42/chrome/$URI</span><br><span class="line">location / &#123;</span><br><span class="line">    if ($http_user_agent ~* &apos;chrome&apos;)&#123; </span><br><span class="line">        rewrite ^(.*)$ /chrome/$1 last;</span><br><span class="line">    &#125;</span><br><span class="line">    # 对重写为 http://192.168.10.42/chrome/$URI 匹配</span><br><span class="line">    location /chrome &#123;</span><br><span class="line">        root html ;</span><br><span class="line">        index index.html; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">根据⽤用户浏览器器重写访问⽬目录</span><br><span class="line">#^ 以什什么开头 ^a</span><br><span class="line">#$ 以什什么结尾 c$</span><br><span class="line">#. 除了了回⻋车以外的任意⼀一个字符</span><br><span class="line">#* 前⾯面的字符可以出现多次或者不不出现 #更更多内容看正则表达式 re</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/02/Py008-10-08url重写/" data-id="cklhgn2id00lekyfygxi1e1wi" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-10-07限速" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/Py008-10-07限速/" class="article-date">
+  <time datetime="2019-01-02T13:37:18.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/Py008-10-07限速/">Py008-10-07限速</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="限速"><a href="#限速" class="headerlink" title="限速"></a>限速</h3><ul>
+<li>限速该特性可以限制某个用户在⼀个给定时间段内能够产生的HTTP请求数。请求可以简单到就是⼀一个对于主页的GET请求或者一个登陆表格的POST请求。</li>
+<li>限速也可以⽤用于安全⽬的上，⽐如暴力密码破解攻击。通过限制进来的请求速率，并且(结合⽇志)标记出⽬目标URLs来帮助防范DDoS攻击。⼀般地说，限流是用在 保护上游应⽤服务器不被在同一时刻的大量⽤户请求湮没。</li>
+</ul>
+<blockquote>
+<p>经典案例 12306</p>
+</blockquote>
+<p>并非12306的开发人员low，而是因为环境太特殊。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">买票就是在浏览器里刷新。每刷新一次就会产生大量链接给服务器,服务器就要开很多的子进程来处理请求。</span><br><span class="line">频繁的刷服务器肯定受不了。</span><br><span class="line"></span><br><span class="line">服务器收到海量的刷新。</span><br><span class="line">承受不住就挂了。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>阮一峰的博客被攻击过——DDOS </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">比如：你在肯德基，一个肯德基店铺最多接受50来人。</span><br><span class="line">但是这一地点突然来了 几千个人。堵得水泄不通。导致KFC没法工作</span><br></pre></td></tr></table></figure>
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><ul>
+<li>DDOS防御</li>
+<li>下载场景保护IO （多个客户端打开迅雷下载一个文件）</li>
+</ul>
+<h3 id="nginx限速原理"><a href="#nginx限速原理" class="headerlink" title="nginx限速原理"></a>nginx限速原理</h3><p>漏桶原理</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_10_0701.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">水(请求)从上方倒入⽔桶，从⽔桶下方流出(被处理);</span><br><span class="line">来不及流出的水存在⽔桶中(缓冲)，以固定速率流出;</span><br><span class="line">⽔桶满后⽔溢出(丢弃)。</span><br><span class="line">这个算法的核⼼是:缓存请求、匀速处理、多余的请求直接丢弃。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> Nginx官⽅版本限制IP的连接和并发分别有两个模块:</span><br><span class="line">limit_req_zone 用来限制单位时间内的请求数，即速率限制。 </span><br><span class="line">limit_req_conn ⽤来限制同一时间连接数，即并发限制</span><br></pre></td></tr></table></figure>
+<ul>
+<li>limit_req_zone 参数配置</li>
+<li>Syntax: limit_req zone=name [burst=number] [nodelay];</li>
+<li>Default: —</li>
+<li>Context: http, server, location</li>
+</ul>
+<blockquote>
+<h4 id="限速案例一（请求限速）"><a href="#限速案例一（请求限速）" class="headerlink" title="限速案例一（请求限速）"></a>限速案例一（请求限速）</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#基于IP对下载速率做限制 限制每秒处理1次请求，对突发超过5个以后的请求放⼊缓存区 </span><br><span class="line">http &#123;</span><br><span class="line">    # 设置缓存区那个 桶</span><br><span class="line">    limit_req_zone $binary_remote_addr zone=hjx:10m rate=1r/s; </span><br><span class="line">    server &#123;</span><br><span class="line">        # 对abc目录进行限速</span><br><span class="line">        location /abc/ &#123;</span><br><span class="line">            # 使用缓存区 最大请求为5个，超过5个返回503</span><br><span class="line">            limit_req zone=hjx burst=5 nodelay;</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">limit_req_zone $binary_remote_addr zone=baism:10m rate=1r/s;</span><br><span class="line">第⼀个参数:$binary_remote_addr 表示通过remote_addr这个标识来做限制，“binary_”的⽬的是缩写内存占⽤量，是限制同⼀一客户端ip地址。</span><br><span class="line"></span><br><span class="line">第二个参数:zone=baism:10m表示生成⼀一个⼤⼩为10M，名字为one的内存区域，⽤来存储访问的频次信息。</span><br><span class="line"></span><br><span class="line">第三个参数:rate=1r/s表示允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有⽐如30r/m的。</span><br><span class="line">limit_req zone=baism burst=5 nodelay;</span><br><span class="line"></span><br><span class="line">第⼀个参数:zone=baism 设置使⽤哪个配置区域来做限制，与上面limit_req_zone 里的name对应。</span><br><span class="line"></span><br><span class="line">第二个参数:burst=5，重点说明一下这个配置，burst爆发的意思，这个配置的意思是设置一个⼤小为5的缓冲区当有⼤大量请求(爆发)过来时，超过了访问频次限制的请求可以先放到这个缓冲区内。</span><br><span class="line"></span><br><span class="line">第三个参数:nodelay，如果设置，超过访问频次⽽且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="限速案例二（下载限速）"><a href="#限速案例二（下载限速）" class="headerlink" title="限速案例二（下载限速）"></a>限速案例二（下载限速）</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#基于IP做连接限制 限制同⼀IP并发为1 下载速度为100K </span><br><span class="line">limit_conn_zone $binary_remote_addr zone=addr:10m; </span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; </span><br><span class="line">    server_name localhost; </span><br><span class="line">    location / &#123;</span><br><span class="line">        root html;</span><br><span class="line">        index index.html index.htm; </span><br><span class="line">    &#125;</span><br><span class="line">    location /abc &#123; </span><br><span class="line">        limit_conn addr 1; </span><br><span class="line">        limit_rate 100k;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>准备一个大文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># 造一个300m的文件</span><br><span class="line">dd if=/dev/zero of=/usr/local/nginx/html/abc/bigfile bs=1M count=300</span><br><span class="line"></span><br><span class="line"># 切换到临时目录下载这个文件</span><br><span class="line">wget http://45.77.47.0/abc/bigfile</span><br><span class="line"># 下载就很快,而且还能多台机器同时下载</span><br><span class="line"></span><br><span class="line"># 修改配置 nginx.conf</span><br><span class="line"></span><br><span class="line">limit_conn_zone $binary_remote_addr zone=addr:10m; </span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; </span><br><span class="line">    server_name localhost; </span><br><span class="line">    location / &#123;</span><br><span class="line">        root html;</span><br><span class="line">        index index.html index.htm; </span><br><span class="line">    &#125;</span><br><span class="line">    location /abc &#123; </span><br><span class="line">        # 限制同时连接的数量</span><br><span class="line">        limit_conn addr 1; </span><br><span class="line">        # 限制下载速率</span><br><span class="line">        limit_rate 100k;</span><br><span class="line">        # 下载100M的时候限速（这个参数不太重要，因为不是按比例只能按大小）</span><br><span class="line">        limit_rate_after 100m;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/02/Py008-10-07限速/" data-id="cklhgn2id00lckyfynq3pi80b" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-10-06反向代理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/02/Py008-10-06反向代理/" class="article-date">
+  <time datetime="2019-01-02T12:41:14.000Z" itemprop="datePublished">2019-01-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/02/Py008-10-06反向代理/">Py008-10-06反向代理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="反向代理介绍"><a href="#反向代理介绍" class="headerlink" title="反向代理介绍"></a>反向代理介绍</h3><p>客户机发送请求时，不会直接发送给目的主机，而是先发送给代理服务器，代理服务客户机请求之后，再向主机发出，并接收目的主机返回的数据，存放在代理服务器的硬盘中，再发送给客户端。</p>
+<blockquote>
+<p>正向代理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代替用户上网，如长城宽带有很多代理服务器，你访问新浪的时候就会把这个内容缓存到代理服务器上，下次再有用户访问新浪的时候就不用直接去新浪了，直接去代理服务器</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>反向代理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">代理服务器，就是把服务器发布出去。</span><br><span class="line"></span><br><span class="line">如：买车 的4S店  它就是厂家的代理</span><br><span class="line">你 ------&gt; 4s店 ------&gt; 汽车厂家</span><br><span class="line"></span><br><span class="line">在以前没有4S店，你就只能去厂家下单提车，</span><br><span class="line">如果有4S店，去4S店发起购买请求，然后下单，等待4S店把车拿来。</span><br></pre></td></tr></table></figure>
+<h4 id="反向代理的好处"><a href="#反向代理的好处" class="headerlink" title="反向代理的好处"></a>反向代理的好处</h4><p>就4S店的例子</p>
+<ul>
+<li>对我们来说：4S店 让我们买车更方便，在家门口，而且不用应对海量用户。同时也是一个问题收集窗口(出了问题你肯定去4S店闹，不会去厂家)</li>
+<li>对厂家来说：可以专心生产汽车</li>
+</ul>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><blockquote>
+<h4 id="堡垒机场景"><a href="#堡垒机场景" class="headerlink" title="堡垒机场景"></a>堡垒机场景</h4></blockquote>
+<blockquote>
+<p>前段时间，汉某酒店的住户数据被盗了，用户数据泄漏</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">客户端--------&gt; 反向代理服务器(公网)(堡垒机)--------&gt;业务服务器(私网)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">业务服务器：安全配置只接受来自堡垒机的链接访问，其他拒绝(客户端公网无法访问私网服务器)</span><br><span class="line">只接收堡垒机ip和xx端口的访问</span><br><span class="line"></span><br><span class="line">堡垒机：没有数据。防止拖库</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="内网服务器发布场景（就一个公网ip）"><a href="#内网服务器发布场景（就一个公网ip）" class="headerlink" title="内网服务器发布场景（就一个公网ip）"></a>内网服务器发布场景（就一个公网ip）</h4></blockquote>
+<p>适用于公网IP地址不足的场景</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">            (虚拟主机的方式配置三个代理)</span><br><span class="line">客户端--------&gt; 反向代理服务器(公网)--------&gt;业务服务器(私网) Php</span><br><span class="line">                        |---------------&gt; 业务服务器(私网) Java</span><br><span class="line">                        |---------------&gt; 业务服务器(私网) Python</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="缓存场景"><a href="#缓存场景" class="headerlink" title="缓存场景"></a>缓存场景</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">客户端--------&gt; 缓存服务器(公网)(缓存静态服务器)--------&gt;业务服务器(私网)</span><br><span class="line"></span><br><span class="line">静态数据直接从缓存服务器拿</span><br><span class="line">动态数据从业务服务器拿</span><br><span class="line"></span><br><span class="line">当用户访问一个网站时，就会瞬间得到静态数据，这个时候网站已经开始渲染了</span><br><span class="line">动态数据可能过来慢一点，当渲染完静态数据时，动态数据也过来了。这个时候你就看到整个页面了</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一个页面你选择5s后一次返回结果</li>
+<li>还是你访问的时候数据不断的开始展示。(更好的用户体验，减小业务服务器压力)</li>
+</ul>
+<h3 id="反向代理原理"><a href="#反向代理原理" class="headerlink" title="反向代理原理"></a>反向代理原理</h3><ol>
+<li>客户端通过浏览器器 发起请求 代理理服务器器</li>
+<li>代理理服务器器 接受请求</li>
+<li>代理理服务器器 发起请求 业务服务器器</li>
+<li>业务服务器器 接受请求</li>
+<li>业务服务器器 处理理请求</li>
+<li>业务服务器器 响应请求 代理理服务器器</li>
+<li>代理理服务器器 响应请求 客户端</li>
+<li>客户端通过浏览器器渲染请求并展示给⽤用户</li>
+</ol>
+<h4 id="反向代理实践"><a href="#反向代理实践" class="headerlink" title="反向代理实践"></a>反向代理实践</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">client mac</span><br><span class="line"></span><br><span class="line">反向代理 nginx </span><br><span class="line"></span><br><span class="line">业务机器 book.ayitula.com   http://118.190.209.153:4000/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>前提保证你的nginx能上网，不然代理是不行的</p>
+</blockquote>
+<ul>
+<li>proxy_pass配置 你的代理地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/nginx/conf</span><br><span class="line"></span><br><span class="line"># 备份配置</span><br><span class="line">cp nginx.conf nginx.conf.2</span><br><span class="line">cp nginx.conf.default nginx.conf</span><br><span class="line"></span><br><span class="line"># 修改配置文件</span><br><span class="line">vi nginx.conf</span><br><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">        # 代理的ip地址</span><br><span class="line">        proxy_pass http://118.190.209.153:4000/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 杀掉nginx进程</span><br><span class="line">killall nginx</span><br><span class="line"># 重启nginx</span><br><span class="line">/usr/local/nginx/sbin/nginx </span><br><span class="line"></span><br><span class="line"># 访问你的服务器ip就ok了</span><br></pre></td></tr></table></figure>
+<h3 id="优化反向代理的配置"><a href="#优化反向代理的配置" class="headerlink" title="优化反向代理的配置"></a>优化反向代理的配置</h3><blockquote>
+<h4 id="proxy-set-header设置请求头"><a href="#proxy-set-header设置请求头" class="headerlink" title="proxy_set_header设置请求头"></a>proxy_set_header设置请求头</h4></blockquote>
+<ul>
+<li>你访问代理的时候所有请求信息都在 代理服务器，对于代理服务器的日志它能知道谁访问了它</li>
+<li>但是对于 业务服务来说，只知道是代理服务器访问了，如果想知道 客户端是谁就要设置请求头 来告诉业务服务器是谁拿的数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">设置</span><br><span class="line">proxy_set_header X-Real-IP</span><br><span class="line">proxy_set_header X-Forwarded-For </span><br><span class="line">是因为不同厂家 设置的头不一样</span><br><span class="line">有的针对 X-Real-IP 有的针对  X-Forwarded-For 提取用户</span><br><span class="line">都加上就能满足所有需求</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>#### </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">    index index.php index.html index.htm; #定义⾸首⻚页索引⽂文件的名称</span><br><span class="line">    proxy_pass http://mysvr ;#请求转向mysvr 定义的服务器器列列表 proxy_set_header Host $host;</span><br><span class="line">    proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; </span><br><span class="line">    client_max_body_size 10m; #允许客户端请求的最⼤大单⽂文件字节数 </span><br><span class="line">    client_body_buffer_size 128k; #缓冲区代理理缓冲⽤用户端请求的最⼤大字节数， proxy_connect_timeout 90; #nginx跟后端服务器器连接超时时间(代理理连接超时)</span><br><span class="line">    #后端服务器器数据回传时间(代理理发送超时) #连接成功后，后端服务器器响应时间(代理理接收超时) #设置代理理服务器器(nginx)保存⽤用户头信息的缓冲区⼤大⼩小</span><br><span class="line">    proxy_send_timeout 90;</span><br><span class="line">    proxy_read_timeout 90;</span><br><span class="line">    proxy_buffer_size 4k;</span><br><span class="line">    proxy_buffers 4 32k;</span><br><span class="line">    proxy_busy_buffers_size 64k; #⾼高负荷下缓冲⼤大⼩小(proxy_buffers*2) proxy_temp_file_write_size 64k; #设定缓存⽂文件夹⼤大⼩小，⼤大于这个值，将从upstream服务器器传 </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/01/02/Py008-10-06反向代理/" data-id="cklhgn2ic00lakyfy9s5luk4y" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py008-10-05虚拟主机" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/28/Py008-10-05虚拟主机/" class="article-date">
@@ -149,7 +555,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/28/Py008-10-05虚拟主机/" data-id="cklcb6bkg00kzwo9164vf98wq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/28/Py008-10-05虚拟主机/" data-id="cklhgn2ib00l8kyfyths9c2d4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -281,7 +687,7 @@ return 403;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/Py008-10-04nginx入门/" data-id="cklcb6bkh00l3wo917mixvzqu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/Py008-10-04nginx入门/" data-id="cklhgn2ia00l6kyfyntpdkn4r" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -321,7 +727,7 @@ return 403;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/Py008-10-03nginx配置详解/" data-id="cklcb6bkg00l1wo918f3if2jz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/Py008-10-03nginx配置详解/" data-id="cklhgn2i900l4kyfyv4t2nuyi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -454,7 +860,7 @@ return 403;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/Py008-10-02nginx安装/" data-id="cklcb6bkf00kxwo91620378gg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/Py008-10-02nginx安装/" data-id="cklhgn2i800l2kyfyjg1pk52n" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -521,343 +927,7 @@ return 403;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/Py008-10-01nginx介绍/" data-id="cklcb6bkc00krwo91qjxraq01" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-02-02数据结构之栈" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/13/Py008-02-02数据结构之栈/" class="article-date">
-  <time datetime="2018-12-13T14:26:48.000Z" itemprop="datePublished">2018-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/13/Py008-02-02数据结构之栈/">Py008-02-02数据结构之栈</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="栈-Stack"><a href="#栈-Stack" class="headerlink" title="栈 Stack"></a>栈 Stack</h3><p>栈是一种数据集合，可以理解为只能在一端进行插入和删除操作的列表</p>
-<blockquote>
-<p>栈的特点</p>
-</blockquote>
-<ul>
-<li>后进先出LIFO</li>
-</ul>
-<blockquote>
-<p>栈的概念</p>
-</blockquote>
-<ul>
-<li>栈顶</li>
-<li>栈底</li>
-</ul>
-<blockquote>
-<p>栈的基本操作</p>
-</blockquote>
-<ul>
-<li>进栈（压栈）push</li>
-<li>出栈 pop</li>
-<li>取栈顶 gettop</li>
-</ul>
-<blockquote>
-<p>生活实例</p>
-</blockquote>
-<ul>
-<li>弹匣的  压子弹，取子弹</li>
-</ul>
-<blockquote>
-<h4 id="栈的简单实现"><a href="#栈的简单实现" class="headerlink" title="栈的简单实现"></a>栈的简单实现</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Stack:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.stack = []</span><br><span class="line">    </span><br><span class="line">    def push(self,element):</span><br><span class="line">        self.stack.append(element)</span><br><span class="line">    </span><br><span class="line">    def pop(self,element):</span><br><span class="line">        if len(self.stack) &gt; 0:</span><br><span class="line">            return self.pop()</span><br><span class="line">        else:</span><br><span class="line">            return None</span><br><span class="line">    def get_top(self):</span><br><span class="line">        if len(self.stack) &gt; 0 :</span><br><span class="line">            return self.stack[-1]</span><br><span class="line"></span><br><span class="line">    def is_empty(self):</span><br><span class="line">        return len(self.stack) == 0</span><br></pre></td></tr></table></figure>
-<h3 id="栈的应用"><a href="#栈的应用" class="headerlink" title="栈的应用"></a>栈的应用</h3><blockquote>
-<p>括号匹配问题：给一个字符串，其中包括小括号，中括号，大括号，求该字符串中括号是否匹配</p>
-</blockquote>
-<p>例如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">()()[]&#123;&#125; 匹配</span><br><span class="line">([&#123;()&#125;]) 匹配</span><br><span class="line">[](      不匹配</span><br><span class="line">[(])     不匹配</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">class Stack:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.stack = []</span><br><span class="line">    </span><br><span class="line">    def push(self,element):</span><br><span class="line">        self.stack.append(element)</span><br><span class="line">    </span><br><span class="line">    def pop(self,element):</span><br><span class="line">        if len(self.stack) &gt; 0:</span><br><span class="line">            return self.pop()</span><br><span class="line">        else:</span><br><span class="line">            return None</span><br><span class="line">    def get_top(self):</span><br><span class="line">        if len(self.stack) &gt; 0 :</span><br><span class="line">            return self.stack[-1]</span><br><span class="line"></span><br><span class="line">    def is_empty(self):</span><br><span class="line">        return len(self.stack) == 0</span><br><span class="line"></span><br><span class="line">def brace_match(s):</span><br><span class="line">    match = &#123;</span><br><span class="line">        &apos;&#125;&apos;:&apos;&#123;&apos;,</span><br><span class="line">        &apos;]&apos;:&apos;[&apos;,</span><br><span class="line">        &apos;)&apos;:&apos;(&apos;</span><br><span class="line">        &#125;</span><br><span class="line">    stack = Stack()</span><br><span class="line">    for ch in s:</span><br><span class="line">        if ch in &#123;&apos;&#123;&apos;,&apos;[&apos;,&apos;(&apos;&#125;:</span><br><span class="line">            stack.push(ch)</span><br><span class="line">        else: # &#123;&apos;&#125;&apos;,&apos;]&apos;,&apos;)&apos;&#125;</span><br><span class="line">            if stack.is_empty():</span><br><span class="line">                return False</span><br><span class="line">            elif stack.get_top() == match[ch]:</span><br><span class="line">                stack.pop()</span><br><span class="line">            else: # stack.get_top() != match[ch]</span><br><span class="line">                return False</span><br><span class="line">    if stack.is_empty():</span><br><span class="line">        return True</span><br><span class="line">    else:</span><br><span class="line">        return False</span><br><span class="line"></span><br><span class="line">print(brace_match(&apos;[&#123;(&#123;[]&#125;)&#125;]&apos;))</span><br><span class="line">print(brace_match(&apos;[&#123;]&apos;))</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/Py008-02-02数据结构之栈/" data-id="cklcb6bke00kvwo91vqbyqd5n" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-02-01数据结构之列表" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/13/Py008-02-01数据结构之列表/" class="article-date">
-  <time datetime="2018-12-13T13:16:59.000Z" itemprop="datePublished">2018-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/13/Py008-02-01数据结构之列表/">Py008-02-01数据结构之列表</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><blockquote>
-<p>相互之间存在一种或多种关系的数据元素的集合和该集合中数据元素之间的关系组成</p>
-</blockquote>
-<ul>
-<li>数据结构就是设计数据以何种方式组织并存储在计算机中。</li>
-<li>比如：列表/集合与字典等都是一种数据结构</li>
-</ul>
-<h4 id="数据结构的分类"><a href="#数据结构的分类" class="headerlink" title="数据结构的分类"></a>数据结构的分类</h4><ul>
-<li>线性结构:数据结构中的元素存在一对一的相互关系</li>
-<li>树结构：数据结构中的元素存在一对多的相互关系</li>
-<li>图结构：数据结构中的元素存在多对多的相互关系</li>
-</ul>
-<h3 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h3><ul>
-<li>列表是如何存储的</li>
-<li>列表的下标查找，插入，删除操作的时间复杂度</li>
-<li>python的列表是如何实现的</li>
-</ul>
-<h4 id="列表是如何存储的"><a href="#列表是如何存储的" class="headerlink" title="列表是如何存储的"></a>列表是如何存储的</h4><ul>
-<li>顺序存储，一块(一个接一个)连续的内存</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">32位机器上，一个整数四个字节32位</span><br><span class="line">在c语言里的数组</span><br><span class="line">arr = [1,2,3,4,5]</span><br><span class="line">假设arr[0] 内存地址是100</span><br><span class="line">整型变量占用4个字节</span><br><span class="line">那么a[1] 的内存地址就是104</span><br><span class="line">a[2] 的内存地址是 108 。。。</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>数组和列表两点不同</p>
-</blockquote>
-<ul>
-<li>数组元素类型要相同</li>
-<li>数组长度固定</li>
-</ul>
-<blockquote>
-<h4 id="通过li-index-的寻址过程和处理数组内数据类型不同问题"><a href="#通过li-index-的寻址过程和处理数组内数据类型不同问题" class="headerlink" title="通过li[index]的寻址过程和处理数组内数据类型不同问题"></a>通过li[index]的寻址过程和处理数组内数据类型不同问题</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">python中列表</span><br><span class="line">li = [1,2,3]</span><br><span class="line">针对常用的小整数python直接分配固定的内存</span><br><span class="line">假设分配的addr</span><br><span class="line">1 addr = 200</span><br><span class="line">2 addr = 305</span><br><span class="line">3 addr = 500</span><br><span class="line">那么 li = [1,2,3]</span><br><span class="line">32位机器上，一个整数四个字节32位</span><br><span class="line">假设li[0] 的地址为 100  它里面存的是1的内存地址200</span><br><span class="line">假设li[1] 的地址为 104  它里面存的是1的内存地址305 </span><br><span class="line">假设li[2] 的地址为 108  它里面存的是1的内存地址500</span><br><span class="line"></span><br><span class="line">这就是python列表解决 类型不同的问题</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如何解决数组动态添加元素的问题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">内存动态分配</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="append的时间复杂度"><a href="#append的时间复杂度" class="headerlink" title="append的时间复杂度"></a>append的时间复杂度</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">O(1)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="插入和删除的时间复杂度"><a href="#插入和删除的时间复杂度" class="headerlink" title="插入和删除的时间复杂度"></a>插入和删除的时间复杂度</h4></blockquote>
-<ul>
-<li>O(n)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[1,2,3,4,5,6]</span><br><span class="line">删除第一个元素</span><br><span class="line">1后面的元素都要把地址向前迁移一位</span><br><span class="line">[2,3,4,5,6]</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/13/Py008-02-01数据结构之列表/" data-id="cklcb6bkd00ktwo91bk45su13" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-01-12NB三人组总结" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/12/Py008-01-12NB三人组总结/" class="article-date">
-  <time datetime="2018-12-12T15:36:44.000Z" itemprop="datePublished">2018-12-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/12/Py008-01-12NB三人组总结/">Py008-01-12NB三人组总结</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_1201.png" alt></p>
-<h3 id="综合数据"><a href="#综合数据" class="headerlink" title="综合数据"></a>综合数据</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_1202.png" alt></p>
-<blockquote>
-<p>#### 空间复杂度 </p>
-</blockquote>
-<ul>
-<li>快排和归并里有递归(递归需要压栈所有需要一定的空间)</li>
-</ul>
-<blockquote>
-<h4 id="稳定性"><a href="#稳定性" class="headerlink" title="稳定性"></a>稳定性</h4></blockquote>
-<ul>
-<li>挨个换   冒泡 插入 归并</li>
-<li>跳着换   选择 快排 堆排序</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/12/Py008-01-12NB三人组总结/" data-id="cklcb6bkc00kpwo91vxubn37d" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-01-11归并排序之归并" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/12/Py008-01-11归并排序之归并/" class="article-date">
-  <time datetime="2018-12-12T14:21:44.000Z" itemprop="datePublished">2018-12-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/12/Py008-01-11归并排序之归并/">Py008-01-11归并排序之归并</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="归并排序——归并"><a href="#归并排序——归并" class="headerlink" title="归并排序——归并"></a>归并排序——归并</h3><blockquote>
-<p>假设现在有一个列表 分两段有序，如何将其合并成一个有序列表</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如[2,5,7,8,9|华丽的分割线|1,3,4,6]</span><br></pre></td></tr></table></figure>
-<ul>
-<li>这种操作称为一次归并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">res = []</span><br><span class="line">两个列表分别取第一个</span><br><span class="line">[2,5,7,8,9] </span><br><span class="line">[1,3,4,6]</span><br><span class="line">2&gt;1 1出来 res = [1]</span><br><span class="line">[2,5,7,8,9] </span><br><span class="line">[3,4,6]</span><br><span class="line">2&lt;3 2出来 res = [1,2]</span><br><span class="line">[5,7,8,9] </span><br><span class="line">[3,4,6]</span><br><span class="line">5&gt;3 3出来 res = [1,2,3]</span><br><span class="line">[5,7,8,9] </span><br><span class="line">[4,6]</span><br><span class="line">5&gt;4 4出来 res = [1,2,3,4]</span><br><span class="line">[5,7,8,9] </span><br><span class="line">[6]</span><br><span class="line">5&lt;6 5出来 res = [1,2,3,4,5]</span><br><span class="line">[7,8,9] </span><br><span class="line">[6]</span><br><span class="line">7&gt;6 6出来 res = [1,2,3,4,5,6]</span><br><span class="line">[7,8,9] </span><br><span class="line">[]</span><br><span class="line">[7,8,9] 都出来 res = [1,2,3,4,5,6,7,8,9]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>代码实现</p>
-</blockquote>
-<ul>
-<li>大前提：两段有序的归并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def merge(li,low,mid,high):</span><br><span class="line">    i = low # 第一个列表起点</span><br><span class="line">    j = mid+1 # 第二个列表起点</span><br><span class="line">    ltmp = [] # 没法用到原地排序了</span><br><span class="line">    while i&lt;=mid and j&lt;=high:# 只要左右两边都有数</span><br><span class="line">        if li[i] &lt; li[j]:</span><br><span class="line">            ltmp.append(li[i])</span><br><span class="line">            i += 1</span><br><span class="line">        else:</span><br><span class="line">            ltmp.append(li[j])</span><br><span class="line">            j += 1</span><br><span class="line"></span><br><span class="line">    # while执行完了，肯定有一头 没数了</span><br><span class="line">    while i &lt;= mid:</span><br><span class="line">        ltmp.append(li[i])</span><br><span class="line">        i += 1</span><br><span class="line">    while j &lt;= high:</span><br><span class="line">        ltmp.append(li[j])</span><br><span class="line">        j += 1</span><br><span class="line">    li[low:high+1] = ltmp</span><br><span class="line"></span><br><span class="line">li = [2,4,5,7,1,3,6,8]</span><br><span class="line">merge(li,0,3,7)</span><br><span class="line">print(li)</span><br></pre></td></tr></table></figure>
-<h3 id="归并排序——使用归并"><a href="#归并排序——使用归并" class="headerlink" title="归并排序——使用归并"></a>归并排序——使用归并</h3><ul>
-<li>分解：将列表越分越小，直至分成一个元素</li>
-<li>终止条件：一个元素是有序的</li>
-<li>合并：将两个有序列表归并，列表越来越大。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">def merge(li,low,mid,high):</span><br><span class="line">    i = low # 第一个列表起点</span><br><span class="line">    j = mid+1 # 第二个列表起点</span><br><span class="line">    ltmp = [] # 没法用到原地排序了</span><br><span class="line">    while i&lt;=mid and j&lt;=high:# 只要左右两边都有数</span><br><span class="line">        if li[i] &lt; li[j]:</span><br><span class="line">            ltmp.append(li[i])</span><br><span class="line">            i += 1</span><br><span class="line">        else:</span><br><span class="line">            ltmp.append(li[j])</span><br><span class="line">            j += 1</span><br><span class="line"></span><br><span class="line">    # while执行完了，肯定有一头 没数了</span><br><span class="line">    while i &lt;= mid:</span><br><span class="line">        ltmp.append(li[i])</span><br><span class="line">        i += 1</span><br><span class="line">    while j &lt;= high:</span><br><span class="line">        ltmp.append(li[j])</span><br><span class="line">        j += 1</span><br><span class="line">    li[low:high+1] = ltmp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def merge_sort(li,low,high):</span><br><span class="line">    if low &lt; high:#至少有两个元素，递归</span><br><span class="line">        mid = (low + high)//2</span><br><span class="line">        merge_sort(li,low,mid)</span><br><span class="line">        merge_sort(li,mid+1,high)</span><br><span class="line">        merge(li,low,mid,high)</span><br><span class="line"></span><br><span class="line">li = list(range(16))</span><br><span class="line">import random</span><br><span class="line">random.shuffle(li)</span><br><span class="line">print(li)</span><br><span class="line">merge_sort(li,0,len(li)-1)</span><br><span class="line">print(li)</span><br></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_1101.png" alt></p>
-<h3 id="归并排序复杂度"><a href="#归并排序复杂度" class="headerlink" title="归并排序复杂度"></a>归并排序复杂度</h3><blockquote>
-<p>时间复杂度</p>
-</blockquote>
-<ul>
-<li>O(nlogn)</li>
-</ul>
-<blockquote>
-<p>空间复杂度</p>
-</blockquote>
-<ul>
-<li>O(n) 因为不是原地排序需要单独开辟空间</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/12/Py008-01-11归并排序之归并/" data-id="cklcb6bkb00knwo91utyaqj4j" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-01-10堆排序之topk问题" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/12/Py008-01-10堆排序之topk问题/" class="article-date">
-  <time datetime="2018-12-12T13:37:36.000Z" itemprop="datePublished">2018-12-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/12/Py008-01-10堆排序之topk问题/">Py008-01-10堆排序之topk问题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="topk问题"><a href="#topk问题" class="headerlink" title="topk问题"></a>topk问题</h3><ul>
-<li>现在有n个数，设计算法得到前k大的数。 (k&lt;n)</li>
-<li>解决思路：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 1.排序后切片 O(nlogn) + k</span><br><span class="line"></span><br><span class="line">- 2.排序lowB三人组 O(kn) </span><br><span class="line">    如果是冒泡只需要k趟就可以</span><br><span class="line"></span><br><span class="line">- 3.堆排序思路  O(nlogk)</span><br></pre></td></tr></table></figure>
-<h4 id="堆排序解决思路"><a href="#堆排序解决思路" class="headerlink" title="堆排序解决思路"></a>堆排序解决思路</h4><ul>
-<li>取列表前k个元素建立一个小根堆。堆顶就是目前第k大的数。</li>
-<li>依次向后遍历原列表，对于列表中的元素，如果小于堆顶，则忽略该元素；如果大于堆顶，则将堆顶更换为该元素，并且对堆进行一次调整；</li>
-<li>遍历列表所有元素后，倒序弹出堆顶</li>
-</ul>
-<blockquote>
-<p>如假设一个长度为10的列表,取最大的前5个数</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[6,8,1,9,3,0,7,2,4,5]</span><br><span class="line">思路</span><br><span class="line">step001 </span><br><span class="line">从列表里取出前5个数[6,8,1,9,3]</span><br><span class="line">step002 将这5个数变成一个小根堆</span><br><span class="line">      1</span><br><span class="line">  3       6</span><br><span class="line">9   8</span><br><span class="line">step003 循环剩余列表[0,7,2,4,5]依次跟堆顶比较</span><br><span class="line"></span><br><span class="line">0 &lt; 1 不换 [7,2,4,5]</span><br><span class="line"></span><br><span class="line">7 &gt; 1 换 [2,4,5]</span><br><span class="line">      7</span><br><span class="line">  3       6</span><br><span class="line">9   8</span><br><span class="line">此时向上调整</span><br><span class="line">      3</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br><span class="line">2 &lt; 3 不换 [4,5]</span><br><span class="line">4 &gt; 3 换 [5]</span><br><span class="line">      4</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br><span class="line">无需调整继续循环</span><br><span class="line">5 &gt; 4 换 []</span><br><span class="line">      5</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br></pre></td></tr></table></figure>
-<ul>
-<li>此时时间复杂度是O(nlogk)</li>
-</ul>
-<h4 id="topk实现"><a href="#topk实现" class="headerlink" title="topk实现"></a>topk实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">#-*- encoding:utf-8 -*-</span><br><span class="line"></span><br><span class="line"># 原地排序，所以 大根堆 堆顶下来的元素会放到列表的末尾</span><br><span class="line"># high则标记 堆的最后一个元素</span><br><span class="line">def sift(li,low,high):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    :param li: 列表</span><br><span class="line">    :param low: 堆的根节点位置</span><br><span class="line">    :param high: 堆的最后一个元素的位置</span><br><span class="line">    :return:</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    i = low # i最开始指向根节点</span><br><span class="line">    j = 2 * i + 1 # j就是i的左孩子</span><br><span class="line">    tmp = li[low] # 把堆顶存起来</span><br><span class="line">    while j &lt;= high: # 只要j位置有数</span><br><span class="line">        if j + 1 &lt;= high and li[j+1] &lt; li[j]: # 如果有右孩子而且 右孩子比左孩子小</span><br><span class="line">            j = j + 1 # 指向右孩子</span><br><span class="line"></span><br><span class="line">        if li[j] &lt; tmp: # 要么是左孩子  要么是右孩子</span><br><span class="line">            li[i] = li[j]</span><br><span class="line">            i = j    # 往下看一层</span><br><span class="line">            j = 2 * i + 1</span><br><span class="line"></span><br><span class="line">        else: # tmp最大，把tmp放到i的位置上</span><br><span class="line">            li[i] = tmp # 把tmp放到某一级领导位置上</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        li[i] = tmp # 把tmp放到叶子节点上</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#</span><br><span class="line">def topk(li,k):</span><br><span class="line">    heap = li[0:k];</span><br><span class="line">    for i in range((k-2)//2,-1,-1):</span><br><span class="line">        sift(heap,i,k-1)</span><br><span class="line">    # 1。建堆</span><br><span class="line">    # 循环 k到 len(li)-1</span><br><span class="line">    for i in range(k,len(li)-1):</span><br><span class="line">        if li[i] &gt; heap[0]:</span><br><span class="line">            heap[0] = li[i]</span><br><span class="line">            sift(heap,0,k-1)</span><br><span class="line">    # 2。遍历</span><br><span class="line">    for i in range(k-1,-1,-1):</span><br><span class="line">        heap[0],heap[i] = heap[i],heap[0]</span><br><span class="line">        sift(heap,0,i-1)</span><br><span class="line"></span><br><span class="line">    # 3。出数</span><br><span class="line">    return heap</span><br><span class="line"></span><br><span class="line">import random</span><br><span class="line">li = list(range(1000))</span><br><span class="line">random.shuffle(li)</span><br><span class="line"></span><br><span class="line">print(topk(li,10))</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/12/Py008-01-10堆排序之topk问题/" data-id="cklcb6bka00klwo91xpxx11h6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/Py008-10-01nginx介绍/" data-id="cklhgn2i700l0kyfyomsa7yds" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -873,7 +943,7 @@ return 403;
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/25/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><a class="page-number" href="/page/28/">28</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/27/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/25/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><a class="page-number" href="/page/28/">28</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/27/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -897,7 +967,7 @@ return 403;
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -919,23 +989,23 @@ return 403;
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

@@ -62,6 +62,468 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-移动端-003-移动端适配方案" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/12/移动端-003-移动端适配方案/" class="article-date">
+  <time datetime="2020-10-12T12:02:26.000Z" itemprop="datePublished">2020-10-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/12/移动端-003-移动端适配方案/">移动端-003-移动端适配方案</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="移动端适配方案"><a href="#移动端适配方案" class="headerlink" title="移动端适配方案"></a>移动端适配方案</h1><h2 id="viewport-缩放适配"><a href="#viewport-缩放适配" class="headerlink" title="viewport 缩放适配"></a>viewport 缩放适配</h2><p>假设你做移动端，公司UI给了你一个750px宽的 设计稿</p>
+<p>你直接按照标注写样式，如果只关注iphone6 就只需要这样即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iphone的设备独立像素为 375 刚好是 750设计稿的一半</span><br><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=750, initial-scale=0.5&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="改善"><a href="#改善" class="headerlink" title="改善"></a>改善</h3><p>我们不可能只处理 iphone6，因为还有 ipad，iphone5,android呢</p>
+<p>所以需要动态设置缩放比例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750;</span><br><span class="line">    let mobileAdapter = ()=&gt;&#123;</span><br><span class="line">      let scale = screen.width/WIDTH</span><br><span class="line">      let content = `width=$&#123;WIDTH&#125;, user-scalable=no, initial-scale=$&#123;scale&#125;, maximum-scale=$&#123;scale&#125;, minimum-scale=$&#123;scale&#125;`</span><br><span class="line">      let meta = document.querySelector(&apos;meta[name=viewport]&apos;);</span><br><span class="line">      if(!meta)&#123;</span><br><span class="line">        meta = document.creatElement(&apos;meta&apos;)</span><br><span class="line">        meta.setAttribute(&apos;name&apos;,viewport)</span><br><span class="line">        document.head.appendChild(meta)</span><br><span class="line">      &#125;</span><br><span class="line">      meta.setAttribute(&apos;content&apos;,content)</span><br><span class="line">    &#125;</span><br><span class="line">    mobileAdapter()</span><br><span class="line">    // 当屏幕翻转的时候再次执行这个函数</span><br><span class="line">    window.onorientationchange = mobileAdapter</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .btn &#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:98px</span><br><span class="line">    &#125;</span><br><span class="line">    .btn2&#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:100%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  </span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;btn&quot;&gt;98px&lt;/div&gt;</span><br><span class="line">  &lt;hr&gt;</span><br><span class="line">  &lt;div class=&quot;btn2&quot;&gt;100%&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h3><ul>
+<li>边框线可能在大屏幕会变粗</li>
+</ul>
+<h2 id="vw适配方案"><a href="#vw适配方案" class="headerlink" title="vw适配方案"></a>vw适配方案</h2><h3 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h3><p>1、拿到设计稿（假设为750px）</p>
+<p>2、开始开发，对设计稿的标注进行转换，把px换成vw。比如页面元素字体标注的大小是32px，换成vw为 (100/750)*32 vw</p>
+<p>3、对于需要等比缩放的元素，CSS使用转换后的单位</p>
+<p>4、对于不需要缩放的元素，比如边框阴影，使用固定单位px</p>
+<h3 id="代码编写"><a href="#代码编写" class="headerlink" title="代码编写"></a>代码编写</h3><p>1、viewport设置 <code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</code> 。把layout viewport 宽度设置为设备宽度，不需要缩放</p>
+<p>2、用js定义css的自定义属性–width，对应的是把设计稿分成100份，每份的像素数。</p>
+<p>3、根据设计稿标注设置样式， 比如标注稿里元素宽度为20px。这这里设置 calc(20px * var(–width))</p>
+<p>4、对于不需要等比缩放的元素，比如边框，可以直接使用固定单位px即可。比如border-bottom: 1px solid #ccc</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750</span><br><span class="line">    document.documentElement.style.setProperty(&apos;--width&apos;, (100/WIDTH));</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;span class=&quot;active&quot; target=&quot;hot&quot;&gt;热门&lt;/span&gt;</span><br><span class="line">    &lt;span target=&quot;focus&quot;&gt;关注&lt;/span&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    :root &#123;</span><br><span class="line">      --color: red; </span><br><span class="line">    &#125;</span><br><span class="line">    body, figure &#123;</span><br><span class="line">      margin: 0;</span><br><span class="line">    &#125;</span><br><span class="line">    body &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      background: #888;</span><br><span class="line">      background-size: cover;</span><br><span class="line">      min-height: 100vh;</span><br><span class="line">    &#125;</span><br><span class="line">    header &#123;</span><br><span class="line">      font-size: calc(28vw * var(--width));</span><br><span class="line">      display: flex;</span><br><span class="line">      padding: 0 calc(20vw * var(--width));</span><br><span class="line">      text-align: center;</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span &#123;</span><br><span class="line">      flex: 1;</span><br><span class="line">      line-height: calc(84vw * var(--width));</span><br><span class="line">      color: rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span.active &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      border-bottom: 2px solid rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="REM方式"><a href="#REM方式" class="headerlink" title="REM方式"></a>REM方式</h2><h3 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h3><p>1、viewport设置 <code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</code> 。把layout viewport 宽度设置为设备宽度，不需要缩放</p>
+<p>2、用js定义html的fontSize。假设设计稿的宽度和屏幕宽度相同，我们设置html的fontSize为100px，对应设计稿的20px即为0.2rem。若设计稿的尺寸和屏幕尺寸不同，那让html的fontSize为 100*屏幕宽度/设计稿宽度，此时设计稿中的20px仍然对应0.2rem。</p>
+<p>3、对于不需要等比缩放的元素，比如边框，可以直接使用固定单位px即可。比如border-bottom: 1px solid #ccc</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750  //设计稿尺寸</span><br><span class="line">    const setView = () =&gt; &#123;</span><br><span class="line">      console.log(screen.width)</span><br><span class="line">      document.documentElement.style.fontSize = (100*screen.width/WIDTH) + &apos;px&apos;</span><br><span class="line">    &#125;</span><br><span class="line">    window.onorientationchange = setView</span><br><span class="line">    setView()</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;span class=&quot;active&quot; target=&quot;hot&quot;&gt;热门&lt;/span&gt;</span><br><span class="line">    &lt;span target=&quot;focus&quot;&gt;关注&lt;/span&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    &#125;</span><br><span class="line">    html &#123;</span><br><span class="line">      /*font-size: 100 * window.innerWidth / 750*/</span><br><span class="line">    &#125;</span><br><span class="line">    body, figure &#123;</span><br><span class="line">      margin: 0;</span><br><span class="line">    &#125;</span><br><span class="line">    body &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      background: #888;</span><br><span class="line">      background-size: cover;</span><br><span class="line">      min-height: 100vh;</span><br><span class="line">    &#125;</span><br><span class="line">    header &#123;</span><br><span class="line">      font-size: .28rem;</span><br><span class="line">      display: flex;</span><br><span class="line">      padding: 0 .20rem;</span><br><span class="line">      text-align: center;</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span &#123;</span><br><span class="line">      flex: 1;</span><br><span class="line">      line-height: .80rem;</span><br><span class="line">      color: rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span.active &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      border-bottom: 2px solid rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="弹性盒适配方案"><a href="#弹性盒适配方案" class="headerlink" title="弹性盒适配方案"></a>弹性盒适配方案</h2><ul>
+<li>不需要等比缩放，页面元素使用固定单位。使用弹性盒(flex)做布局，可结合媒体查询调整文字大小。</li>
+</ul>
+<p>针对上面的适配方案，都是等比例缩小</p>
+<p>但是某些场景 一段文字介绍 在手机到ipad上我们不需要变大，字体还是跟手机上一样即可</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;jirengu.com&lt;/title&gt;</span><br><span class="line">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;aaa&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;aaaaaa&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;bbb&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;bbbbbbb&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;ccc&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;cccccccc&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line"></span><br><span class="line">    &lt;style&gt;</span><br><span class="line"></span><br><span class="line">      section &#123;</span><br><span class="line">        display: flex;</span><br><span class="line">        padding: 10px 0;</span><br><span class="line">        margin: 10px;</span><br><span class="line">        border-bottom: 1px solid #ccc;</span><br><span class="line">        background: #fff;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section &gt; .img &#123;</span><br><span class="line">        background:red;</span><br><span class="line">        width: 60px;</span><br><span class="line">        height: 60px;</span><br><span class="line">        border-radius: 50%;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail &#123;</span><br><span class="line">        margin-left: 10px;</span><br><span class="line">        flex: 1;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail h2 &#123;</span><br><span class="line">        font-size: 20px;</span><br><span class="line">        margin-top: 10px;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail p &#123;</span><br><span class="line">        font-size: 14px;</span><br><span class="line">        color: #676767;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/10/12/移动端-003-移动端适配方案/" data-id="cklhgn2mm00vakyfyrftscrc5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-移动端-002-viewport" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/12/移动端-002-viewport/" class="article-date">
+  <time datetime="2020-10-12T11:10:44.000Z" itemprop="datePublished">2020-10-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/12/移动端-002-viewport/">移动端-002-viewport</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="viewport"><a href="#viewport" class="headerlink" title="viewport"></a>viewport</h1><h2 id="尺寸的区别"><a href="#尺寸的区别" class="headerlink" title="尺寸的区别"></a>尺寸的区别</h2><h3 id="屏幕的尺寸"><a href="#屏幕的尺寸" class="headerlink" title="屏幕的尺寸"></a>屏幕的尺寸</h3><ul>
+<li>就是电脑设置的分辨率<ul>
+<li>mac pro 默认 screen.width 为 1440</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">screen.width</span><br><span class="line">screen.height</span><br></pre></td></tr></table></figure>
+<h3 id="窗口的尺寸"><a href="#窗口的尺寸" class="headerlink" title="窗口的尺寸"></a>窗口的尺寸</h3><ul>
+<li>浏览器窗口的大小</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">window.innerHeight</span><br><span class="line">window.innerWidth</span><br></pre></td></tr></table></figure>
+<h3 id="viewport的概念"><a href="#viewport的概念" class="headerlink" title="viewport的概念"></a>viewport的概念</h3><p>对于页面一个div的宽度，我们设置width:10%; 这是 10%是相对于谁？最终是多宽</p>
+<ul>
+<li>div宽度首先是相对于父亲 也就是 body的 10%</li>
+<li>body的宽度，因为它是撑满html的，所以它应该和 html等宽，注意 body是有 margin的 ，清除margin 后html和body的宽度就都一致了</li>
+<li>html的宽度是多少呢？ <strong>html和窗口等宽</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .aaa&#123;</span><br><span class="line">      height: 300px;</span><br><span class="line">      width: 10%;</span><br><span class="line">      background:red;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;aaa&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="测试viewport"><a href="#测试viewport" class="headerlink" title="测试viewport"></a>测试viewport</h3><p>document.documentElement.clientWidth 和 document.documentElement.clientHeight 测试视窗宽高</p>
+<h4 id="document-documentElement-clientWidth-和-window-innerWidth-的区别"><a href="#document-documentElement-clientWidth-和-window-innerWidth-的区别" class="headerlink" title="document.documentElement.clientWidth 和 window.innerWidth 的区别"></a>document.documentElement.clientWidth 和 window.innerWidth 的区别</h4><p><strong>当页面出现滚动条的时候</strong></p>
+<ul>
+<li>document.documentElement.clientWidth 不包含滚动条</li>
+<li>window.innerWidth 包含滚动条</li>
+</ul>
+<h3 id="测量html的宽高"><a href="#测量html的宽高" class="headerlink" title="测量html的宽高"></a>测量html的宽高</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">document.documentElement.offsetHeight </span><br><span class="line">document.documentElement.offsetWidth</span><br></pre></td></tr></table></figure>
+<h2 id="移动端的-viewport"><a href="#移动端的-viewport" class="headerlink" title="移动端的 viewport"></a>移动端的 viewport</h2><p>差异：屏幕太窄了，基本没有宽度超过400px的</p>
+<p>此时有个网站 设置<code>min-width:1000px</code>比如有个侧栏 宽度为10% 那么 在PC没有问题，到了手机就会有问题，因为手机总共不超过 400px 宽度 ，这就导致了一个侧栏就占了屏幕的三分之一</p>
+<p>为了解决这个问题 手机浏览器的厂商就提出了 两个概念 visual viewport 和 layout viewport</p>
+<h3 id="visual-viewport-和-layout-viewport"><a href="#visual-viewport-和-layout-viewport" class="headerlink" title="visual viewport 和 layout viewport"></a>visual viewport 和 layout viewport</h3><ul>
+<li>visual viewport 可视窗口：移动端视窗的设备独立像素</li>
+<li>layout viewport 用于布局的窗口：页面渲染时参考的宽高</li>
+</ul>
+<p>在移动端，页面渲染以 layout viewport 宽度作为计算标准。以iphone 为例，其 layout viewport 是980px,页面渲染时就认为窗口为 980px。 一些老网站（没做移动端适配） 在手机打开的时候就会按照 980的宽度计算 相当于 把980px的宽度内容缩小到手机上显示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .btn &#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:98px;</span><br><span class="line">    &#125;</span><br><span class="line">    .btn2&#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:100%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;btn&quot;&gt;98px&lt;/div&gt;</span><br><span class="line">  &lt;hr&gt;</span><br><span class="line">  &lt;div class=&quot;btn2&quot;&gt;100%&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>手机端显示 98px的按钮就被缩小了<ul>
+<li>而且 document.documentElement.clientWidth 一取是 980px，你就懵逼了。</li>
+</ul>
+</li>
+<li>PC端显示 98px就很正常</li>
+</ul>
+<p><strong>总结</strong></p>
+<p>移动端渲染的时候不去管你窗口是多大，他就认为我的宽度是980，然后按照980去渲染这个页面,同样的内容 你看到PC在看手机 感觉手机上的内容缩小了。</p>
+<h3 id="现在做唯一的修改"><a href="#现在做唯一的修改" class="headerlink" title="现在做唯一的修改"></a>现在做唯一的修改</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line"></span><br><span class="line">快捷键是输入 meta:vp + tab键</span><br><span class="line"></span><br><span class="line">效果就是 </span><br><span class="line">layout viewport 的宽度 = device width</span><br><span class="line"></span><br><span class="line">此时再去做布局的时候，缩放比就为1:1，就达到 你写100px 在手机上也显示为 100px</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/10/12/移动端-002-viewport/" data-id="cklhgn2ml00v9kyfyjslzkmvk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-移动端-001-像素单位" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/12/移动端-001-像素单位/" class="article-date">
+  <time datetime="2020-10-12T09:56:38.000Z" itemprop="datePublished">2020-10-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/12/移动端-001-像素单位/">移动端-001-像素单位</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="像素"><a href="#像素" class="headerlink" title="像素"></a>像素</h1><h3 id="设备像素-device-pixels"><a href="#设备像素-device-pixels" class="headerlink" title="设备像素 device pixels"></a>设备像素 device pixels</h3><ul>
+<li>物理像素,屏幕上一个点。</li>
+<li>这个点，实际是由RGB三原色排列组成。</li>
+<li>想想霓虹灯(物理像素)由红绿蓝小灯组成，三盏灯不同的亮度混合出各种彩色</li>
+</ul>
+<h3 id="设备独立像素-device-independent-pixels"><a href="#设备独立像素-device-independent-pixels" class="headerlink" title="设备独立像素(device independent pixels)"></a>设备独立像素(device independent pixels)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可以通过 api 查看 </span><br><span class="line">window.screen.width</span><br><span class="line">window.screen.height</span><br></pre></td></tr></table></figure>
+<ul>
+<li>iphone6 的 375x812指的是设备独立像素</li>
+<li>chrome调试移动端不同手机型号的尺寸也是设备独立像素</li>
+</ul>
+<p>概念</p>
+<p><strong>一个设备独立像素里可能包含1个或多个物理像素点，包含的越多看起来越清晰</strong></p>
+<blockquote>
+<p>参考普通屏的mac air 和 mac pro</p>
+</blockquote>
+<ul>
+<li>很明显 mac pro的看起来更清晰，因为 mac pro 一个设备独立像素包含的物理像素点更多</li>
+</ul>
+<h3 id="像素分辨率"><a href="#像素分辨率" class="headerlink" title="像素分辨率"></a>像素分辨率</h3><p>以 iphone手机为例它的像素分辨率是 1125x2436 指的是横向能显示1125个物理像素点，纵向能显示2436个物理像素点。</p>
+<p>现在的4K屏就是 4096x2160s</p>
+<h3 id="PPI-pix-per-inch"><a href="#PPI-pix-per-inch" class="headerlink" title="PPI(pix per inch)"></a>PPI(pix per inch)</h3><p>每英寸的像素数。如5.8寸 iphone为例。</p>
+<ul>
+<li>手机屏幕对角线长度就是 英寸数</li>
+<li>分辨率为1125x2436</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ppi = Math.sqrt(1125*1125 + 2436*2436) / 5.8 = 463ppi</span><br></pre></td></tr></table></figure>
+<h3 id="CSS像素"><a href="#CSS像素" class="headerlink" title="CSS像素"></a>CSS像素</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div&#123;width:100px;&#125;</span><br><span class="line">在页面 缩放比为1:1情况下， 1个CSS像素=1个设备独立像素。</span><br><span class="line"></span><br><span class="line">假设当前屏幕分辨率是 1440，如果给元素设置宽度720px，则视觉上宽度是屏幕的一半。 这也解释了为什么分辨率跳高后感觉网页文字变小了。</span><br></pre></td></tr></table></figure>
+<h3 id="devicePixelRatio"><a href="#devicePixelRatio" class="headerlink" title="devicePixelRatio"></a>devicePixelRatio</h3><p>window.devicePixelRatio指的是设备物理像素和设备独立像素（device-independent pixels, dips）的比例。window.devicePixelRatio = 物理像素 / 设备独立像素（dips） 。经计算， iphonex的 devicePixelRatio 是3。</p>
+<h3 id="为啥普通电脑上的图片放到-mac-pro-变模糊了？"><a href="#为啥普通电脑上的图片放到-mac-pro-变模糊了？" class="headerlink" title="为啥普通电脑上的图片放到 mac pro 变模糊了？"></a>为啥普通电脑上的图片放到 mac pro 变模糊了？</h3><ul>
+<li>参考芯片的制程，分别有28nm、7nm、5nm。</li>
+<li>假设在<code>1厘米x1厘米</code>的空间很明显 5nm能放置更多的晶体管</li>
+</ul>
+<p>高清屏实际就是1个设备独立像素能容纳更多的 物理像素</p>
+<p>一张图 假设宽高100px 的图片普通电脑可能就是 100x100 = 10000个物理像素点</p>
+<p>而在高清屏的时候 100px 的图片 可能是 400*400 = 160000 个物理像素点</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/10/12/移动端-001-像素单位/" data-id="cklhgn2mk00v6kyfyndnaqiw7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-CSS-010-动态REM" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/12/CSS-010-动态REM/" class="article-date">
+  <time datetime="2020-10-12T06:32:17.000Z" itemprop="datePublished">2020-10-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/12/CSS-010-动态REM/">CSS-010-动态REM</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="动态REM"><a href="#动态REM" class="headerlink" title="动态REM"></a>动态REM</h1><p>手机专用的自适应方案</p>
+<h2 id="REM是什么"><a href="#REM是什么" class="headerlink" title="REM是什么"></a>REM是什么</h2><blockquote>
+<p>常见单位</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">px 像素</span><br><span class="line">em 一个字母的宽度 、一个汉子的宽度？</span><br><span class="line">rem root em 根元素的 font-size</span><br><span class="line">vh viewport height 100vh = 视口高度</span><br><span class="line">vw viewport width 100vw = 视口宽度</span><br></pre></td></tr></table></figure>
+<p><strong>网页的默认font-size是 16px</strong></p>
+<p>chrome有设置最小字号是12px，此时你就算写出 font-size:6px 也会变成 12px</p>
+<blockquote>
+<p>问题1: font-size:1rem 是多少像素</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16</span><br><span class="line"></span><br><span class="line">body&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16, html才是根元素</span><br><span class="line"></span><br><span class="line">html&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 20px,因为根元素font-size是20</span><br></pre></td></tr></table></figure>
+<h2 id="REM和-EM区别"><a href="#REM和-EM区别" class="headerlink" title="REM和 EM区别"></a>REM和 EM区别</h2><blockquote>
+<p>p 的高度是多少</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>经过浏览器检查发现是 32px</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">      font-size:30px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>经过浏览器检查发现是 60px,结论：<strong>1em就是自身元素 font-size的像素值</strong></p>
+<p><strong>REM是根元素的font-size,em是自身元素的font-size</strong></p>
+<h2 id="动态REM-1"><a href="#动态REM-1" class="headerlink" title="动态REM"></a>动态REM</h2><blockquote>
+<p>移动端写页面的演进</p>
+</blockquote>
+<ul>
+<li>百分比布局，只能保证水平方向没问题，但是高度呢？<ul>
+<li>要求高度是宽度的1半，就很难做到，因为 height是不会按照父容器的宽度来定的</li>
+</ul>
+</li>
+<li><p>动态REM</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">当屏幕 640px的时候 banner为 320*320</span><br><span class="line"></span><br><span class="line">当屏幕 320px的时候 banner为 160*160</span><br><span class="line"></span><br><span class="line">当屏幕 414px的时候 banner为 212*212</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一切单位以“宽度”为基准，等比例缩放</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height: 0.2rem;</span><br><span class="line">      width: 0.4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.05rem 0.05rem;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="对REM进行微调"><a href="#对REM进行微调" class="headerlink" title="对REM进行微调"></a>对REM进行微调</h2><ul>
+<li>border:1px问题，无法在小的情况</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    *&#123;box-sizing:border-box;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height:2rem;</span><br><span class="line">      width: 4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.5rem 0.5rem;</span><br><span class="line">      /* 当像素特别小的时候就用1px因为网页最小1px */</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth/10+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/10/12/CSS-010-动态REM/" data-id="cklhgn29g000hkyfyu502w5s5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-CSS-009-BFC" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/10/11/CSS-009-BFC/" class="article-date">
+  <time datetime="2020-10-11T15:56:55.000Z" itemprop="datePublished">2020-10-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/10/11/CSS-009-BFC/">CSS-009-BFC</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="BFC"><a href="#BFC" class="headerlink" title="BFC"></a>BFC</h1><blockquote>
+<p>Block Formatting Context</p>
+</blockquote>
+<p>块格式化上下文</p>
+<h3 id="CSS规范中对-BFC-的描述"><a href="#CSS规范中对-BFC-的描述" class="headerlink" title="CSS规范中对 BFC 的描述"></a>CSS规范中对 BFC 的描述</h3><blockquote>
+<p>9.4.1 块格式化上下文</p>
+</blockquote>
+<blockquote>
+<p>浮动，绝对定位元素，非块盒的块容器（例如，inline-blocks，table-cells和table-captions）和’overflow’不为’visible’的块盒会为它们的内容建立一个新的块格式化上下文</p>
+</blockquote>
+<blockquote>
+<p>在一个块格式化上下文中，盒在竖直方向一个接一个地放置，从包含块的顶部开始。两个兄弟盒之间的竖直距离由’margin’属性决定。同一个块格式化上下文中的相邻块级盒之间的竖直margin会合并</p>
+</blockquote>
+<blockquote>
+<p>在一个块格式化上下文中，每个盒的left外边（left outer edge）挨着包含块的left边（对于从右向左的格式化，right边挨着）。即使存在浮动（尽管一个盒的行盒可能会因为浮动收缩），这也成立。除非该盒建立了一个新的块格式化上下文（这种情况下，该盒自身可能会因为浮动变窄）</p>
+</blockquote>
+<h3 id="MDN-对-BFC-的描述"><a href="#MDN-对-BFC-的描述" class="headerlink" title="MDN 对 BFC 的描述"></a>MDN 对 BFC 的描述</h3><blockquote>
+<p>一个块格式化上下文（block formatting context） 是Web页面的可视化CSS渲染出的一部分。它是块级盒布局出现的区域，也是浮动层元素进行交互的区域。</p>
+</blockquote>
+<blockquote>
+<p>一个块格式化上下文由以下之一创建：</p>
+</blockquote>
+<ul>
+<li>根元素或其它包含它的元素</li>
+<li>浮动元素 (元素的 float 不是 none)</li>
+<li>绝对定位元素 (元素具有 position 为 absolute 或 fixed)</li>
+<li>内联块 (元素具有 display: inline-block)</li>
+<li>表格单元格 (元素具有 display: table-cell，HTML表格单元格默认属性)</li>
+<li>表格标题 (元素具有 display: table-caption, HTML表格标题默认属性)</li>
+<li>具有overflow 且值不是 visible 的块元素，</li>
+<li>display: flow-root <strong>触发BFC</strong></li>
+<li>column-span: all 应当总是会创建一个新的格式化上下文，即便具有 column-span: all 的元素并不被包裹在一个多列容器中。</li>
+</ul>
+<blockquote>
+<p>一个块格式化上下文包括创建它的元素内部所有内容，除了被包含于创建新的块级格式化上下文的后代元素内的元素。</p>
+</blockquote>
+<blockquote>
+<p>块格式化上下文对于定位 (参见 float) 与清除浮动 (参见 clear) 很重要。定位和清除浮动的样式规则只适用于处于同一块格式化上下文内的元素。浮动不会影响其它块格式化上下文中元素的布局，并且清除浮动只能清除同一块格式化上下文中在它前面的元素的浮动。</p>
+</blockquote>
+<h3 id="张鑫旭对-BFC-的描述"><a href="#张鑫旭对-BFC-的描述" class="headerlink" title="张鑫旭对 BFC 的描述"></a>张鑫旭对 BFC 的描述</h3><p><a href="http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/" target="_blank" rel="noopener">http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/</a></p>
+<blockquote>
+<p>BFC全称”Block Formatting Context”, 中文为“块级格式化上下文”。啪啦啪啦特性什么的，一言难尽，大家可以自行去查找，我这里不详述，免得乱了主次，总之，记住这么一句话：BFC元素特性表现原则就是，内部子元素再怎么翻江倒海，翻云覆雨都不会影响外部的元素。所以，避免margin穿透啊，清除浮动什么的也好理解了。</p>
+</blockquote>
+<h3 id="BFC-到底是什么？"><a href="#BFC-到底是什么？" class="headerlink" title="BFC 到底是什么？"></a>BFC 到底是什么？</h3><p>先思考一个问题：</p>
+<p>请问：什么是色情？</p>
+<p>联邦最高法院大法官斯图尔特更有一句名言</p>
+<blockquote>
+<p>我不知道什么是色情，不过，我看了之后，就能知道</p>
+</blockquote>
+<p><code>I know it when I see it</code></p>
+<p>类似地：</p>
+<p>1、我不知道什么是 BFC<br>2、但是你写出样式，我就知道这是不是 BFC</p>
+<p>BFC 就是这样的东西（堆叠上下文也是）</p>
+<p>1、它没有定义<br>2、它只有特性/功能</p>
+<h3 id="功能1：爸爸管儿子"><a href="#功能1：爸爸管儿子" class="headerlink" title="功能1：爸爸管儿子"></a>功能1：爸爸管儿子</h3><p>用 BFC 包住浮动元素。(这不是清除浮动，.clearfix 才是清除浮动）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      float:left; /* 浮动就会脱离文档流 ，导致 baba 的高度塌陷 */</span><br><span class="line">      width: 300px;</span><br><span class="line">      height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如何触发BFC</p>
+</blockquote>
+<ul>
+<li>父级 浮动、定位、或者 <code>display = inline-block\table-cell\table-caption</code> 或者 display不是block的值的容器、 overflow 不为 visible的<ul>
+<li>overflow:auto</li>
+<li>overflow:hidden 会引发副作用，如果内部元素，超出内容不会显示</li>
+<li>display:inline-block</li>
+<li>display:table-cell</li>
+<li>display:flow-root <strong>让当前元素触发BFC，CSS3新出的属性，兼容性不太好</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="解释BFC内部元素-margin融合问题"><a href="#解释BFC内部元素-margin融合问题" class="headerlink" title="解释BFC内部元素 margin融合问题"></a>解释BFC内部元素 margin融合问题</h3><ul>
+<li>如果两个div没有浮动，它们在一个div中，它们的竖直margin会合并</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"><a href="#一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的" class="headerlink" title="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"></a>一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的</h3><blockquote>
+<p>通俗理解</p>
+</blockquote>
+<ul>
+<li>baba是BFC</li>
+<li>erzi是 baba的子元素，同时也是BFC</li>
+<li>sunzi 是 erzi的子元素，它的内容就不会被 baba包含</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      width:500px;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display:flow-root;</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">      float:left; /* 触发BFC */</span><br><span class="line">      margin-top:100px; /* 由于父级 触发BFC所以 这个距离会被包含进 baba里*/</span><br><span class="line">    &#125;</span><br><span class="line">    .sunzi&#123;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 400px;</span><br><span class="line">      margin-top:200px; /* 由于 sunzi被 BFC元素 erzi罩着， 所以无法被包含进 baba内 */</span><br><span class="line">      background:blue; </span><br><span class="line">      /* 由于 erzi在带sunzi，所以baba 就不管这个sunzi了 */</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;sunzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="功能2：兄弟之间划清界限"><a href="#功能2：兄弟之间划清界限" class="headerlink" title="功能2：兄弟之间划清界限"></a>功能2：兄弟之间划清界限</h3><p>用 float + div 做左右自适应布局</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .gege&#123;</span><br><span class="line">  width: 100px;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 3px solid red;</span><br><span class="line">  float: left;</span><br><span class="line">  margin-right: 20px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.didi&#123;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 5px solid green;</span><br><span class="line">  overflow:auto; </span><br><span class="line">  /* display:flow-root; */</span><br><span class="line">&#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;gege&quot;&gt;gege&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;didi&quot;&gt;1234&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第一个方式就是 overflow:auto</li>
+<li>第二个方式就是 display:flow-root;</li>
+</ul>
+<h3 id="如何回答面试官"><a href="#如何回答面试官" class="headerlink" title="如何回答面试官"></a>如何回答面试官</h3><p>千万别解释什么是 BFC，一解释就错<br>用上面的例子回答什么是 BFC</p>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><blockquote>
+<p>BFC和文档流有什么关系</p>
+</blockquote>
+<ul>
+<li>BFC说的是一个div有一些属性后(float:left 或position:absolute)它自己就是BFC。BFC说的是这个 div 的特性，说的是这个div会包住它里面，它里面的内容是不会变得</li>
+<li>文档流是 内联元素从左到右，块级元素从上到下排列</li>
+<li>BFC影响一个元素的宽高，文档流影响是排列顺序</li>
+</ul>
+<blockquote>
+<p>BFC使用场景</p>
+</blockquote>
+<ul>
+<li>爸爸管儿子(参考上面的功能1)，注意这不是清除浮动，这是BFC让爸爸管儿子<ul>
+<li>BFC可以模拟清除浮动的效果，但是我可以直接 clearfix，那么BFC就没意义了，BFC会导致副作用 如 overflow:hidden;的时候，但是clearfix不会有副作用，除非所有浏览器都支持<code>display:flow-root</code></li>
+<li><strong>不要用BFC清除浮动</strong></li>
+</ul>
+</li>
+<li>兄弟之间划清界限(参考上面的功能2)<ul>
+<li>也就是以前的左右布局</li>
+<li>同样也可以不用它，用flex解决这些问题</li>
+<li>BFC是时代的产物</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>margin穿透</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .baba&#123;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .erzi&#123;</span><br><span class="line">    height: 100px;</span><br><span class="line">    margin-top:100px;</span><br><span class="line">    background:green;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>现在 erzi 的 margin会穿过 baba </li>
+<li>给 baba 添加 <code>overflow:hidden</code> 就能触发BFC,不让 erzi穿出来，但是有副作用就是 erzi内如果有定位元素超出容易会被隐藏</li>
+<li>所以 你只能给 baba 加 <code>display:flow-root</code> 或者 <code>borer</code></li>
+</ul>
+<blockquote>
+<p>什么情况下一定要BFC呢？</p>
+</blockquote>
+<p>没有任何情况一定要BFC，所有的场景都可以不用BFC实现</p>
+<p><strong>面试一定要搞懂BFC</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/10/11/CSS-009-BFC/" data-id="cklhgn29f000fkyfy5gwofho8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-CSS-008-布局套路" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/10/11/CSS-008-布局套路/" class="article-date">
@@ -96,7 +558,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-008-布局套路/" data-id="cklcb6bbp000hwo9177nb3w7t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/11/CSS-008-布局套路/" data-id="cklhgn29d000dkyfy0etb2zm1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
@@ -148,7 +610,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-007-grid布局/" data-id="cklcb6bbe0004wo91hj55ugo1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/11/CSS-007-grid布局/" data-id="cklhgn29b000akyfyj3eydup4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
@@ -258,7 +720,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-006-flex布局/" data-id="cklcb6bbl000awo91bzfyfuwa" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/11/CSS-006-flex布局/" data-id="cklhgn29a0008kyfyh5awwvgi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
@@ -296,7 +758,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-004-icon/" data-id="cklcb6bbc0003wo91zpqqg8sl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/11/CSS-004-icon/" data-id="cklhgn2970004kyfyzepvm52d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
@@ -360,642 +822,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-005-移动端响应式/" data-id="cklcb6bbk0008wo91jkx9wop6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/11/CSS-005-移动端响应式/" data-id="cklhgn2980005kyfyyr1oqe0k" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-003-堆叠上下文" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/11/CSS-003-堆叠上下文/" class="article-date">
-  <time datetime="2020-10-11T07:19:02.000Z" itemprop="datePublished">2020-10-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/11/CSS-003-堆叠上下文/">CSS-003-堆叠上下文</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="堆叠上下文"><a href="#堆叠上下文" class="headerlink" title="堆叠上下文"></a>堆叠上下文</h1><h2 id="堆叠顺序"><a href="#堆叠顺序" class="headerlink" title="堆叠顺序"></a>堆叠顺序</h2><h3 id="盒模型"><a href="#盒模型" class="headerlink" title="盒模型"></a>盒模型</h3><p>一个盒子中主要的属性就5个：</p>
-<ul>
-<li>width</li>
-<li>height</li>
-<li>padding</li>
-<li>border</li>
-<li>margin</li>
-</ul>
-<h3 id="一个-div-背景色到底在哪个层级？"><a href="#一个-div-背景色到底在哪个层级？" class="headerlink" title="一个 div 背景色到底在哪个层级？"></a>一个 div 背景色到底在哪个层级？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    width:200px;</span><br><span class="line">    height:200px;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    padding:15px;</span><br><span class="line">    margin:15px;</span><br><span class="line">    background:black;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>给 border 设置半透明，你发现 black 在后面</li>
-</ul>
-<blockquote>
-<p>结论</p>
-</blockquote>
-<p><strong>背景色在border的后面</strong></p>
-<h4 id="div上有文字内容-谁先谁后？"><a href="#div上有文字内容-谁先谁后？" class="headerlink" title="div上有文字内容 谁先谁后？"></a>div上有文字内容 谁先谁后？</h4><p>答案是</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">背景色 &gt;  border &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
-<h4 id="情况复杂了"><a href="#情况复杂了" class="headerlink" title="情况复杂了"></a>情况复杂了</h4><ul>
-<li>parent 里的 child 有文字</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      margin-top:-15px;</span><br><span class="line">      color:black;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;BBB&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>结论</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- parent的文字 会盖住 child 的背景色</span><br><span class="line">- child的文字 会盖住 parent的 文字，因为它是后出现的</span><br><span class="line"></span><br><span class="line">background &gt; border &gt; child的 div/块级元素 &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
-<h4 id="如果有浮动元素呢？"><a href="#如果有浮动元素呢？" class="headerlink" title="如果有浮动元素呢？"></a>如果有浮动元素呢？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">        text-indent:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      color:black;</span><br><span class="line">      height: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">    .float&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      background:blue;</span><br><span class="line">      height: 30px;</span><br><span class="line">      width: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;float&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>浮动元素 盖住了 child 说明，浮动元素天生比块级元素要高</li>
-<li>parent的文字 盖在 浮动元素上面</li>
-</ul>
-<p><strong>如果浮动元素里面有文字咋办？</strong></p>
-<ul>
-<li>答案是 浮动元素 是 parent 的孩子节点， parent的文字 显示层级天生就比 浮动元素高</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- parent的文字 会盖住 child 的背景色</span><br><span class="line">- child的文字 会盖住 parent的 文字，因为它是后出现的</span><br><span class="line">- 浮动元素 会盖住 child</span><br><span class="line">- parent的文字 会盖住 浮动元素</span><br><span class="line"></span><br><span class="line">background &gt; border &gt; child的 div/块级元素 &gt; 浮动元素 &gt; 文字/内联元素</span><br></pre></td></tr></table></figure>
-<h4 id="定位元素呢？"><a href="#定位元素呢？" class="headerlink" title="定位元素呢？"></a>定位元素呢？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">        width:200px;</span><br><span class="line">        height:200px;</span><br><span class="line">        border:10px solid rgba(255,0,0,0.5);</span><br><span class="line">        padding:15px;</span><br><span class="line">        margin:15px;</span><br><span class="line">        background:green;</span><br><span class="line">        color:red;</span><br><span class="line">        text-indent:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      color:black;</span><br><span class="line">      height: 30px;</span><br><span class="line">    &#125;</span><br><span class="line">    .float&#123;</span><br><span class="line">      float:left;</span><br><span class="line">      background:blue;</span><br><span class="line">      height: 30px;</span><br><span class="line">      width: 30px;</span><br><span class="line">      margin-top:-10px;</span><br><span class="line">    &#125;</span><br><span class="line">    .relative&#123;</span><br><span class="line">      position:relative;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 50px;</span><br><span class="line">      background:orange;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    AAAA</span><br><span class="line">    &lt;div class=&quot;relative&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;float&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>定位元素会在 float 之前</li>
-</ul>
-<h4 id="z-index"><a href="#z-index" class="headerlink" title="z-index"></a>z-index</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">parent 内 同级别元素直接加 z-index 不会影响 堆叠顺序</span><br><span class="line"></span><br><span class="line">只有 position不为 static 默认值的元素 z-index才会生效</span><br></pre></td></tr></table></figure>
-<h3 id="堆叠顺序-1"><a href="#堆叠顺序-1" class="headerlink" title="堆叠顺序"></a>堆叠顺序</h3><p><img src="https://static.xiedaimala.com/FrbdiFEq7r5xDideYoKtAFaPbnvD" alt></p>
-<ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context</a></li>
-</ul>
-<p>可以理解为堆叠作用域。跟 BFC 一样，我们只知道一些属性会触发堆叠上下文，但并不知道堆叠上下文是什么。</p>
-<ul>
-<li>根元素 (HTML),</li>
-<li>z-index 值不为 “auto”的 绝对/相对定位 <strong>（只记住这个就行了，其他凭感觉）</strong></li>
-<li>一个 z-index 值不为 “auto”的 flex 项目 (flex item)，即：父元素 display: flex|inline-flex，</li>
-<li>opacity 属性值小于 1 的元素（参考 the specification for opacity），</li>
-<li>transform 属性值不为 “none”的元素，</li>
-<li>mix-blend-mode 属性值不为 “normal”的元素，</li>
-<li>filter值不为“none”的元素，</li>
-<li>perspective值不为“none”的元素，</li>
-<li>isolation 属性被设置为 “isolate”的元素，</li>
-<li>position: fixed</li>
-<li>在 will-change 中指定了任意 CSS 属性，即便你没有直接指定这些属性的值（参考 这篇文章）</li>
-<li>-webkit-overflow-scrolling 属性被设置 “touch”的元素</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-003-堆叠上下文/" data-id="cklcb6bbf0005wo91c2sr6956" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-002-宽度与高度" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/11/CSS-002-宽度与高度/" class="article-date">
-  <time datetime="2020-10-11T06:33:39.000Z" itemprop="datePublished">2020-10-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/11/CSS-002-宽度与高度/">CSS-002-宽度与高度</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="宽度与高度"><a href="#宽度与高度" class="headerlink" title="宽度与高度"></a>宽度与高度</h1><h3 id="文档流"><a href="#文档流" class="headerlink" title="文档流"></a>文档流</h3><ul>
-<li>参考<a href="https://sltrust.github.io/2017/10/22/N011CSS%E5%B8%83%E5%B1%80%E4%B8%8E%E5%AE%9A%E4%BD%8D/" target="_blank" rel="noopener">这篇</a></li>
-</ul>
-<h3 id="文字两边对其"><a href="#文字两边对其" class="headerlink" title="文字两边对其"></a>文字两边对其</h3><h4 id="多行文字两端对其"><a href="#多行文字两端对其" class="headerlink" title="多行文字两端对其"></a>多行文字两端对其</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;p style=&quot;text-align:justify;&quot;&gt; fjalsfjdsalkj&lt;/p&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="单行文字两端对齐"><a href="#单行文字两端对齐" class="headerlink" title="单行文字两端对齐"></a>单行文字两端对齐</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    span&#123;</span><br><span class="line">      width:5em;</span><br><span class="line">      display:inline-block;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">      text-align:justify;</span><br><span class="line">      height: 20px;</span><br><span class="line">      line-height:20px;</span><br><span class="line">      overflow:hidden;</span><br><span class="line">    &#125;</span><br><span class="line">    span::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:inline-block;</span><br><span class="line">      width:100%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;span&gt;姓名&lt;/span&gt;</span><br><span class="line">    &lt;br&gt;</span><br><span class="line">    &lt;span&gt;手机号&lt;/span&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="文字省略溢出"><a href="#文字省略溢出" class="headerlink" title="文字省略溢出"></a>文字省略溢出</h3><blockquote>
-<p>单行文本溢出省略号</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">white-space:nowrap;</span><br><span class="line">overflow:hidden;</span><br><span class="line">text-overflow:ellipse;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>多行文本溢出</p>
-</blockquote>
-<ul>
-<li>google 搜索 <a href="https://css-tricks.com/line-clampin/" target="_blank" rel="noopener">css multi line text ellipse</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.block-with-text &#123;</span><br><span class="line">    overflow: hidden;</span><br><span class="line">    display: -webkit-box;</span><br><span class="line">    -webkit-line-clamp: 3;</span><br><span class="line">    -webkit-box-orient: vertical;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="文字水平垂直居中"><a href="#文字水平垂直居中" class="headerlink" title="文字水平垂直居中"></a>文字水平垂直居中</h3><blockquote>
-<p>水平</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text-align:center;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>文字垂直居中 ，比如要求40px</p>
-</blockquote>
-<ul>
-<li>不要写死宽度</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">line-height:24px;</span><br><span class="line">padding:8px 0;</span><br><span class="line">/* 一旦设置高度，多行文本就有bug */</span><br></pre></td></tr></table></figure>
-<h3 id="margin-合并"><a href="#margin-合并" class="headerlink" title="margin 合并"></a>margin 合并</h3><ul>
-<li>给 parent 设置 border 上下的 margin 就不会合并</li>
-<li>给 parent 设置 padding 上下的 margin 就不会合并</li>
-<li>给 parent 设置 <code>overflow:hidden</code> 上下的 margin 就不会合并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    body&#123;</span><br><span class="line">      border:1px solid green;</span><br><span class="line">    &#125;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      margin:10px;</span><br><span class="line">      outline:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      border:10px solid black;</span><br><span class="line">      background:pink;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="视口内容水平垂直居中"><a href="#视口内容水平垂直居中" class="headerlink" title="视口内容水平垂直居中"></a>视口内容水平垂直居中</h3><h4 id="child-定宽定高"><a href="#child-定宽定高" class="headerlink" title="child 定宽定高"></a>child 定宽定高</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.child&#123;</span><br><span class="line">    top:0;</span><br><span class="line">    left:0;</span><br><span class="line">    right:0;</span><br><span class="line">    bottom:0;</span><br><span class="line">    position:absolute;</span><br><span class="line">    width:100px;</span><br><span class="line">    height:100px;</span><br><span class="line">    margin:auto;</span><br><span class="line">&#125;</span><br><span class="line">.parent&#123;</span><br><span class="line">    height:100vh;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="child-不定宽不定高"><a href="#child-不定宽不定高" class="headerlink" title="child 不定宽不定高"></a>child 不定宽不定高</h4><ul>
-<li>flex</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.child&#123;</span><br><span class="line">    height:auto;</span><br><span class="line">&#125;</span><br><span class="line">.parent&#123;</span><br><span class="line">    height:100vh;</span><br><span class="line">    display:flex;</span><br><span class="line">    justify-contnet:center;</span><br><span class="line">    align-items:center;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="实现-1比1的div"><a href="#实现-1比1的div" class="headerlink" title="实现 1比1的div"></a>实现 1比1的div</h3><ul>
-<li>高度为0</li>
-<li>宽度自适应</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.one&#123;</span><br><span class="line">    border:1px solid red;</span><br><span class="line">    padding-top:100%;</span><br><span class="line">    /* padding 和 宽度一样 */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-002-宽度与高度/" data-id="cklcb6bb90001wo91mz0cdnnk" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-001-CSS不正交" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/11/CSS-001-CSS不正交/" class="article-date">
-  <time datetime="2020-10-11T05:43:57.000Z" itemprop="datePublished">2020-10-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/11/CSS-001-CSS不正交/">CSS-001-CSS不正交</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="CSS不正交"><a href="#CSS不正交" class="headerlink" title="CSS不正交"></a>CSS不正交</h1><h2 id="CSS难学"><a href="#CSS难学" class="headerlink" title="CSS难学"></a>CSS难学</h2><h3 id="Margin塌陷问题"><a href="#Margin塌陷问题" class="headerlink" title="Margin塌陷问题"></a>Margin塌陷问题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .demo&#123;</span><br><span class="line">      border:1px solid red;</span><br><span class="line">      height: 60px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;demo&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;demo&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div style=&quot;border-top:0.1px solid green;&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;demo&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div style=&quot;display:table;&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;demo&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>第一个和第二个div之间的margin 不是 20px 而是 10px</li>
-</ul>
-<blockquote>
-<p>如何不让他塌陷？</p>
-</blockquote>
-<ul>
-<li>加入一个 div 设置 <code>border-top:0.1px solid green;</code></li>
-<li>加入一个 div 设置 <code>display:table;</code></li>
-<li>加入一个 div 设置 <code>display:flex;</code></li>
-</ul>
-<p><strong>这就是CSS不正交之处</strong></p>
-<h3 id="Margin贯穿"><a href="#Margin贯穿" class="headerlink" title="Margin贯穿"></a>Margin贯穿</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      outline:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      outline:1px solid green;</span><br><span class="line">      height: 60px;</span><br><span class="line">      margin-top:100px;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>child 的 margin 贯穿了 parent 把div整体 顶了下来</li>
-</ul>
-<blockquote>
-<p>如何让他不贯穿</p>
-</blockquote>
-<ul>
-<li>给 parent 加 border <code>border-top:0.1px solid blue;</code></li>
-<li>给 parent 设置 <code>overflow:hidden;</code></li>
-<li>给 parent 设置 <code>display:flex;</code> ，但要同时设置 child <code>width:100%;</code>,因为是 flex</li>
-</ul>
-<h3 id="display-影响-li-标签小圆点"><a href="#display-影响-li-标签小圆点" class="headerlink" title="display 影响 li 标签小圆点"></a>display 影响 li 标签小圆点</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    li&#123;</span><br><span class="line">      display:inline;</span><br><span class="line">      /* display:block; */</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">  &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>li 默认是 <code>display:list-item;</code></p>
-<h3 id="position-会改变-display"><a href="#position-会改变-display" class="headerlink" title="position 会改变 display"></a>position 会改变 display</h3><ul>
-<li>child display 已经从 inline 变成了 block</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      height: 100px;</span><br><span class="line">      position:relative;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      display:inline;</span><br><span class="line">      position:absolute;</span><br><span class="line">      right:0;</span><br><span class="line">      bottom:0;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;hahaha&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="position-fixed-和-transform相互影响"><a href="#position-fixed-和-transform相互影响" class="headerlink" title="position:fixed 和 transform相互影响"></a>position:fixed 和 transform相互影响</h3><ul>
-<li>直觉上 fixed 会相对视口定位到左下角</li>
-<li>而因为 parent 里 设置了 <code>transform:scale(1.1);</code> 因为要做动画所以会把 parent内的所有东西一起包含进来，于是 child就从 视口左下角 定位到了 parent 左下角</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      height: 300px;</span><br><span class="line">      transform:scale(1.1);</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      display:inline;</span><br><span class="line">      position:fixed;</span><br><span class="line">      left:0;</span><br><span class="line">      bottom:0;</span><br><span class="line">      background:green;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;hahaha&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="float-对-inline-元素影响"><a href="#float-对-inline-元素影响" class="headerlink" title="float 对 inline 元素影响"></a>float 对 inline 元素影响</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .parent&#123;</span><br><span class="line">      background:pink;</span><br><span class="line">      height: 200px;</span><br><span class="line">    &#125;</span><br><span class="line">    .float&#123;</span><br><span class="line">      background:green;</span><br><span class="line">      float:left;</span><br><span class="line">      width:100px;</span><br><span class="line">      opacity:0.5;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      height: 100px;</span><br><span class="line">      background:white;</span><br><span class="line">      width:200px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;float&quot;&gt;aaa&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;hahaha&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>float 不影响 child的位置</li>
-<li>float 能感知 到 child 里的文字形成 图文混排</li>
-</ul>
-<h2 id="CSS容易学"><a href="#CSS容易学" class="headerlink" title="CSS容易学"></a>CSS容易学</h2><h3 id="布局常规套路"><a href="#布局常规套路" class="headerlink" title="布局常规套路"></a>布局常规套路</h3><h4 id="两栏、三栏布局"><a href="#两栏、三栏布局" class="headerlink" title="两栏、三栏布局"></a>两栏、三栏布局</h4><ul>
-<li>PC<ul>
-<li>IE8 只能控制宽度设置 float 了</li>
-<li>Chrome flex</li>
-</ul>
-</li>
-<li>Mobile<ul>
-<li>flex</li>
-</ul>
-</li>
-</ul>
-<h4 id="居中"><a href="#居中" class="headerlink" title="居中"></a>居中</h4><blockquote>
-<p>水平居中</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;parent&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>child 宽度不确定， <code>margin-left:20px;margin-right:20px;</code></li>
-<li>child 宽度确定 <code>margin-left:auto;margin-right:auto;</code></li>
-</ul>
-<p>如果是 inline元素 直接<code>text-align:center</code></p>
-<blockquote>
-<p>垂直居中</p>
-</blockquote>
-<ul>
-<li>child高度确定不确定都是这样<ul>
-<li>parent 上加 上下内边距 <code>padding-top:20px;padding-bottom:20px;</code></li>
-</ul>
-</li>
-</ul>
-<p><strong>难点在于 parent 高度确定如何做？</strong></p>
-<ul>
-<li>理论上不该出现这个现象，应该避免这种现象。</li>
-<li>实在避免不了也有办法<ul>
-<li>IE: table</li>
-<li>chrome:flex</li>
-<li>mobild: flex</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-001-CSS不正交/" data-id="cklcb6bb50000wo910kcccb8i" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web03_03Next" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/03/21/Node-web03_03Next/" class="article-date">
-  <time datetime="2020-03-21T07:56:44.000Z" itemprop="datePublished">2020-03-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/21/Node-web03_03Next/">Node-web03_03Next</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Next深入2"><a href="#Next深入2" class="headerlink" title="Next深入2"></a>Next深入2</h1><h3 id="SSR"><a href="#SSR" class="headerlink" title="SSR"></a>SSR</h3><h4 id="SSG-存在问题"><a href="#SSG-存在问题" class="headerlink" title="SSG 存在问题"></a>SSG 存在问题</h4><blockquote>
-<p>跟用户数据相关的时候，我们必须获取用户数据后，在渲染页面，这样就无法静态化</p>
-</blockquote>
-<ul>
-<li>虽然也能把用户内容静态化，但是新浪微薄，几亿个用户，难道生产那么多html?</li>
-<li>数据更新快，用户自己改身份信息 年龄，昵称等</li>
-</ul>
-<h4 id="咋办？"><a href="#咋办？" class="headerlink" title="咋办？"></a>咋办？</h4><ul>
-<li>BSR 客户端渲染，下拉更新</li>
-<li>SSR 服务端渲染，下拉更新</li>
-<li>但是不能用 getStaticProps<ul>
-<li>因为这个是 SSG </li>
-<li>它是 yarn build 后</li>
-</ul>
-</li>
-<li>可用 <code>getServerSideProps(context:NextPageContext)</code></li>
-</ul>
-<h3 id="获取用户浏览器信息"><a href="#获取用户浏览器信息" class="headerlink" title="获取用户浏览器信息"></a>获取用户浏览器信息</h3><ul>
-<li><p>不同浏览器user-agent不同</p>
-</li>
-<li><p>定义 getServerSideProps 函数</p>
-</li>
-<li>pages/posts/index_ssr.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import &#123; GetServerSideProps, NextPage &#125; from &apos;next&apos;;</span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">type Props = &#123;</span><br><span class="line">  browser: string;</span><br><span class="line">&#125;</span><br><span class="line">const Index_SSR: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  return (</span><br><span class="line">    &lt;&gt;</span><br><span class="line">      &lt;div&gt;SSR服务端生成</span><br><span class="line">        你的浏览器是：&#123;props.browser&#125;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Index_SSR;</span><br><span class="line"></span><br><span class="line">export const getServerSideProps: GetServerSideProps = async (context) =&gt; &#123;</span><br><span class="line">  const ua = context.req.headers[&apos;user-agent&apos;];</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      browser: ua</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="getServerSideProps"><a href="#getServerSideProps" class="headerlink" title="getServerSideProps"></a>getServerSideProps</h4><ul>
-<li>运行时机<ul>
-<li>无论开发还是生产环境</li>
-<li>都是在请求后运行 getServerSideProps</li>
-</ul>
-</li>
-<li>回顾 getStaticProps<ul>
-<li>开发环境，每次请求后运行</li>
-<li>生产环境，build时运行一次</li>
-</ul>
-</li>
-<li>参数<ul>
-<li>context 类型为 NextPageContext</li>
-<li><code>context.req / context.res</code> 可以获取请求和响应</li>
-<li>一般只用 <code>context.req</code></li>
-</ul>
-</li>
-</ul>
-<h3 id="SSR缺点"><a href="#SSR缺点" class="headerlink" title="SSR缺点"></a>SSR缺点</h3><ul>
-<li>无法获取客户端信息，如浏览器窗口大小</li>
-</ul>
-<h3 id="三种渲染方式如何选择"><a href="#三种渲染方式如何选择" class="headerlink" title="三种渲染方式如何选择"></a>三种渲染方式如何选择</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if(有动态内容吗？)&#123;</span><br><span class="line">  if(跟客户端相关？)&#123;</span><br><span class="line">    // 跟请求用户数据相关</span><br><span class="line">    return BSR || SSR</span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 跟用户数据无关</span><br><span class="line">    return SSG</span><br><span class="line">  &#125;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  return 直接html</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="升级SSG：文章详情"><a href="#升级SSG：文章详情" class="headerlink" title="升级SSG：文章详情"></a>升级SSG：文章详情</h3><ul>
-<li><p>step01 修改跳转链接 </p>
-<ul>
-<li>pages/posts/index_ssg.tsx<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Link href=&#123;`/posts/$&#123;p.id&#125;`&#125;&gt;&#123;p.id&#125;&lt;/Link&gt;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>step02 新建 <code>pages/posts/[id].tsx</code></p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">import &#123; getPost, getPostIds, Post &#125; from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">type Props = &#123;</span><br><span class="line">  post: Post</span><br><span class="line">&#125;</span><br><span class="line">const postShow: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  const &#123; post &#125; = props</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      文章详情</span><br><span class="line">      &lt;h1&gt;&#123;post.title&#125;&lt;/h1&gt;</span><br><span class="line">      &lt;article&gt;</span><br><span class="line">        &#123;post.content&#125;</span><br><span class="line">      &lt;/article&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default postShow;</span><br><span class="line"></span><br><span class="line">export const getStaticPaths = async () =&gt; &#123;</span><br><span class="line">  const idList = await getPostIds();</span><br><span class="line">  console.log(idList)</span><br><span class="line">  return &#123;</span><br><span class="line">    paths: idList.map(id =&gt; (&#123; params: &#123; id: id &#125; &#125;)),</span><br><span class="line">    fallback: false</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const getStaticProps = async (x: any) =&gt; &#123;</span><br><span class="line">  const id = x.params.id;</span><br><span class="line">  const post = await getPost(id);</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      post: JSON.parse(JSON.stringify(post))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="pages-posts-id-tsx的作用"><a href="#pages-posts-id-tsx的作用" class="headerlink" title="pages/posts/[id].tsx的作用"></a><code>pages/posts/[id].tsx</code>的作用</h4><ul>
-<li>声明路由 <code>/posts/:id</code></li>
-<li>同时是 <code>/posts/:id</code>的页面实现程序</li>
-</ul>
-<p>你需要实现三个东西</p>
-<ul>
-<li>PostsShow组件 从props里接受 post数据</li>
-<li>实现 getStaticProps,从第一个参数接受 <code>params.id</code></li>
-<li>实现 getStaticPaths,返回 id列表</li>
-</ul>
-<h4 id="fallback的作用"><a href="#fallback的作用" class="headerlink" title="fallback的作用"></a>fallback的作用</h4><p><strong>是否自动兜底</strong></p>
-<ul>
-<li>false 表示请求的 id 文章不存在 返回404页面</li>
-<li><p>true代表自动兜底， id找不到 依然尝试渲染页面</p>
-<ul>
-<li>id不在 getStaticPaths ，不代表不存在，比如大型项目无法将所有页面静态化(几亿用户，它静态化一部分如 常用的10%) 不在这里 你可以走 SSR</li>
-</ul>
-<h3 id="完整版代码"><a href="#完整版代码" class="headerlink" title="完整版代码"></a>完整版代码</h3><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7" target="_blank" rel="noopener">https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7</a></li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/21/Node-web03_03Next/" data-id="cklcb6bg0009rwo91llq54x5j" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web03_02Next" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/03/21/Node-web03_02Next/" class="article-date">
-  <time datetime="2020-03-21T05:56:44.000Z" itemprop="datePublished">2020-03-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/21/Node-web03_02Next/">Node-web03_02Next</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="next深入"><a href="#next深入" class="headerlink" title="next深入"></a>next深入</h1><ul>
-<li>基于 <a href="https://github.com/slTrust/next-demo-1" target="_blank" rel="noopener">https://github.com/slTrust/next-demo-1</a> 版本</li>
-</ul>
-<h2 id="使用-TypeScript-开发-Next"><a href="#使用-TypeScript-开发-Next" class="headerlink" title="使用 TypeScript 开发 Next"></a>使用 TypeScript 开发 Next</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 全局安装 tsx</span><br><span class="line">yarn global add typescript@3.9.2</span><br><span class="line"># 安装成功后会有两个命令</span><br><span class="line">- tsc</span><br><span class="line">- tsserver</span><br></pre></td></tr></table></figure>
-<ul>
-<li>创建 tsconfig.json <code>tsc --init</code></li>
-<li><p>把 jsconfig.json内容 合并到 tsconfig.json</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;compilerOptions&quot;: &#123;</span><br><span class="line">    &quot;baseUrl&quot;: &quot;.&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装类型声明文件 <code>yarn add --dev typescript @types/react @types/react-dom @types/node</code></p>
-<ul>
-<li>你就可以用ts开发 react和 node了</li>
-</ul>
-</li>
-<li>重启 yarn dev</li>
-<li>结果报错了，找不 xx.png</li>
-<li>修改类型声明文件next-env.d.ts</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>把js文件都修改为 tsx后缀</li>
-</ul>
-<h4 id="强烈建议加上一句配置-tsconfig-json里"><a href="#强烈建议加上一句配置-tsconfig-json里" class="headerlink" title="强烈建议加上一句配置 tsconfig.json里"></a>强烈建议加上一句配置 tsconfig.json里</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 禁用隐式 any</span><br><span class="line">noImplicitAny:&quot;true&quot;</span><br></pre></td></tr></table></figure>
-<h2 id="Next-js-API"><a href="#Next-js-API" class="headerlink" title="Next.js API"></a>Next.js API</h2><h3 id="如何返回-JSON"><a href="#如何返回-JSON" class="headerlink" title="如何返回 JSON"></a>如何返回 JSON</h3><ul>
-<li>新建 pages/api/v1/posts.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextApiRequest, NextApiResponse &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts = (req: NextApiRequest, res: NextApiResponse) =&gt; &#123;</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(&#123; name: &apos;hjx&apos; &#125;))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
-<p>你还可以这样写</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextApiHandler &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts:NextApiHandler = (req, res) =&gt; &#123;</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(&#123; name: &apos;hjx&apos; &#125;))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
-<ul>
-<li>重启后，访问 <a href="http://localhost:3000/api/v1/posts" target="_blank" rel="noopener">http://localhost:3000/api/v1/posts</a></li>
-</ul>
-<h3 id="读取markdown文件"><a href="#读取markdown文件" class="headerlink" title="读取markdown文件"></a>读取markdown文件</h3><ul>
-<li>step01 在 <code>markdown/</code> 目录建立几个文章 ,形如</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: hjx的博客</span><br><span class="line">date: 2021-01-30</span><br><span class="line">--- </span><br><span class="line"></span><br><span class="line">hjx发布的博客 内容1111</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>step02 安装 matter <code>yarn add gray-matter</code></p>
-</li>
-<li><p>step03 新建功能函数 getPosts <code>lib/posts.tsx</code></p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import fs, &#123; promises as fsPromise &#125; from &apos;fs&apos;;</span><br><span class="line">import path from &quot;path&quot;;</span><br><span class="line">import matter from &apos;gray-matter&apos;;</span><br><span class="line"></span><br><span class="line">const getPosts = async () =&gt; &#123;</span><br><span class="line">  const markdownDir = path.join(process.cwd(), &apos;markdown&apos;)</span><br><span class="line">  const fileNames = await fsPromise.readdir(markdownDir)</span><br><span class="line">  const posts = fileNames.map(fileName =&gt; &#123;</span><br><span class="line">    const fullPath = path.join(markdownDir, fileName)</span><br><span class="line">    const id = fileName.replace(/\.md$/g, &apos;&apos;);</span><br><span class="line">    const text = fs.readFileSync(fullPath, &apos;utf-8&apos;);</span><br><span class="line">    const &#123; data: &#123; title, date &#125;, content &#125; = matter(text);</span><br><span class="line">    return &#123; id, title, date, content &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  return posts;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default getPosts;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>step04 新建 pages/api/v1/posts2.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import getPosts from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextApiHandler &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts: NextApiHandler = async (req, res) =&gt; &#123;</span><br><span class="line">  const posts = await getPosts()</span><br><span class="line">  console.log(posts)</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(posts))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
-<ul>
-<li>step05 重启访问 <a href="http://localhost:3000/api/v1/posts2" target="_blank" rel="noopener">http://localhost:3000/api/v1/posts2</a></li>
-</ul>
-<h2 id="Next-js的三种渲染方式"><a href="#Next-js的三种渲染方式" class="headerlink" title="Next.js的三种渲染方式"></a>Next.js的三种渲染方式</h2><ul>
-<li>客户端渲染 BSR<ul>
-<li>只在浏览器上执行的渲染</li>
-</ul>
-</li>
-<li>静态页面生成 SSG<ul>
-<li>Static Site Generation,解决白屏问题，SEO问题</li>
-<li>无法生成用户相关内容(所有用户请求的结果都一样)</li>
-</ul>
-</li>
-<li>服务器渲染 SSR<ul>
-<li>解决白屏问题，SEO问题</li>
-<li>可以生成用户相关的内容(不同用户不同结果)</li>
-</ul>
-</li>
-</ul>
-<p><strong>SSG和 SSR都属于预渲染 Pre-rendering</strong></p>
-<h3 id="三种方式实际以前就有"><a href="#三种方式实际以前就有" class="headerlink" title="三种方式实际以前就有"></a>三种方式实际以前就有</h3><ul>
-<li>BSR —— 客户端渲染 vue/react创建 html</li>
-<li>SSG —— 页面静态化 把PHP提前渲染成 HTML</li>
-<li>SSR —— 大部分后台语言java,python 如JSP</li>
-</ul>
-<h4 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h4><p>Next.js 的预渲染可以和前端 React无缝对接</p>
-<h3 id="客户端渲染-BSR"><a href="#客户端渲染-BSR" class="headerlink" title="客户端渲染 BSR"></a>客户端渲染 BSR</h3><ul>
-<li>安装 axios <code>yarn add axios</code></li>
-<li><code>yarn add --dev @types/axios</code></li>
-<li>pages/posts/index.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line">import axios from &apos;axios&apos;;</span><br><span class="line">import &#123; useEffect, useState &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">type Posts = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">&#125;</span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const [posts, setPosts] = useState&lt;Posts[]&gt;([]);</span><br><span class="line">  const [isLoading, setIsLoading] = useState(false);</span><br><span class="line">  const [isEmpty, setIsEmpty] = useState(false);</span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    setIsLoading(true)</span><br><span class="line">    axios.get(&apos;/api/v1/posts2&apos;).then(response =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        setPosts(response.data)</span><br><span class="line">        if (response.data.length === 0) &#123;</span><br><span class="line">          setIsEmpty(true);</span><br><span class="line">        &#125;</span><br><span class="line">        setIsLoading(false)</span><br><span class="line">      &#125;, 3000);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
-<h3 id="优化代码：自定义Hooks"><a href="#优化代码：自定义Hooks" class="headerlink" title="优化代码：自定义Hooks"></a>优化代码：自定义Hooks</h3><ul>
-<li>hooks/usePosts.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import &#123; useState, useEffect &#125; from &quot;react&quot;;</span><br><span class="line">import axios from &apos;axios&apos;;</span><br><span class="line"></span><br><span class="line">type Posts = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const usePosts = () =&gt; &#123;</span><br><span class="line">  const [posts, setPosts] = useState&lt;Posts[]&gt;([]);</span><br><span class="line">  const [isLoading, setIsLoading] = useState(false);</span><br><span class="line">  const [isEmpty, setIsEmpty] = useState(false);</span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    setIsLoading(true)</span><br><span class="line">    axios.get(&apos;/api/v1/posts2&apos;).then(response =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        setPosts(response.data)</span><br><span class="line">        if (response.data.length === 0) &#123;</span><br><span class="line">          setIsEmpty(true);</span><br><span class="line">        &#125;</span><br><span class="line">        setIsLoading(false)</span><br><span class="line">      &#125;, 3000);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  return &#123;</span><br><span class="line">    posts,</span><br><span class="line">    setPosts,</span><br><span class="line">    isLoading,</span><br><span class="line">    setIsLoading,</span><br><span class="line">    isEmpty,</span><br><span class="line">    setIsEmpty</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>pages/posts/index.tsx</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import &#123; usePosts &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const &#123; isLoading, isEmpty, posts &#125; = usePosts();</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>访问 <a href="http://localhost:3000/posts" target="_blank" rel="noopener">http://localhost:3000/posts</a></li>
-</ul>
-<h4 id="客户端渲染的缺点"><a href="#客户端渲染的缺点" class="headerlink" title="客户端渲染的缺点"></a>客户端渲染的缺点</h4><ul>
-<li>白屏<ul>
-<li>ajax请求结果之前，显示的是 loading</li>
-</ul>
-</li>
-<li>SEO不友好<ul>
-<li>搜索引擎不友好，看不到 posts数据</li>
-<li>因为搜索引擎不会执行JS只会看到HTML</li>
-</ul>
-</li>
-</ul>
-<h4 id="问题分析，上面的渲染方式"><a href="#问题分析，上面的渲染方式" class="headerlink" title="问题分析，上面的渲染方式"></a>问题分析，上面的渲染方式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import &#123; usePosts &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const &#123; isLoading, isEmpty, posts &#125; = usePosts();</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>是服务器渲染的还是客户端渲染的？</li>
-<li>渲染了几次？一次还是两次？</li>
-</ul>
-<h5 id="参考-React-SSR的官网"><a href="#参考-React-SSR的官网" class="headerlink" title="参考 React SSR的官网"></a>参考 React SSR的官网</h5><ul>
-<li>推荐 <a href="https://reactjs.org/docs/react-dom-server.html#rendertostring" target="_blank" rel="noopener">在后端renderToString()在前端 hydrate()</a></li>
-<li><code>hydrate()</code> 混合 ,会保留HTML附上事件监听</li>
-<li>后端渲染 html,前端比对一下，有监听，前端添加监听事件</li>
-<li>前端也会渲染一次，用以确保前后端渲染结果一致</li>
-</ul>
-<h3 id="SSG-页面静态生成"><a href="#SSG-页面静态生成" class="headerlink" title="SSG 页面静态生成"></a>SSG 页面静态生成</h3><ul>
-<li>之前的BSR 每个人访问文章列表都是一样的<ul>
-<li>每次访问 BSR 页面都会发 ajax请求 一样的数据，然后由前端渲染</li>
-</ul>
-</li>
-<li>为什么？ 不在后端渲染好，然后发给每个人</li>
-<li>N次渲染变成了一次</li>
-<li>N次ajax请求没了</li>
-<li>N次客户端渲染变成了一次静态页面生成</li>
-<li><p>这个过程 <strong>动态内容静态化</strong></p>
-</li>
-<li><p>pages/posts/index_ssg.tsx</p>
-<ul>
-<li>新建 <code>getStaticProps</code> 函数，返回 <code>{props:{posts:post}}]}</code></li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//格式要求，函数名称必须是 getStaticProps</span><br><span class="line">// 而且必须 export 导出</span><br><span class="line">export const getStaticProps = async () =&gt; &#123;</span><br><span class="line">  const posts = await getPosts() // 你的内容</span><br><span class="line">  // 返回格式</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      posts: JSON.parse(JSON.stringify(posts))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>pages/posts/index_ssg.tsx</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Post &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import getPosts from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">  posts: Post[]</span><br><span class="line">&#125;</span><br><span class="line">const PostsIndex: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  // 这个 posts是 前端/后端 都可以拿到的</span><br><span class="line">  const &#123; posts &#125; = props;</span><br><span class="line">  console.log(posts)</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index(SSG)</span><br><span class="line">      &#123;posts.map(p =&gt; &#123;</span><br><span class="line">        return (</span><br><span class="line">          &lt;div key=&#123;p.id&#125;&gt;&#123;p.id&#125;&lt;/div&gt;</span><br><span class="line">        )</span><br><span class="line">      &#125;)&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br><span class="line"></span><br><span class="line">export const getStaticProps = async () =&gt; &#123;</span><br><span class="line">  const posts = await getPosts()</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      posts: JSON.parse(JSON.stringify(posts))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><a href="http://localhost:3000/posts/index_ssg" target="_blank" rel="noopener">http://localhost:3000/posts/index_ssg</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 你会发现页面会有个如下标签把数据封装了</span><br><span class="line">&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;&#123;&quot;props&quot;:&#123;&quot;pageProps&quot;:&#123;&quot;posts&quot;:[&#123;&quot;id&quot;:&quot;第一篇博客&quot;,&quot;title&quot;:&quot;hjx的博客&quot;,&quot;date&quot;:&quot;2021-01-30T00:00:00.000Z&quot;,&quot;content&quot;:&quot; \n\nhjx发布的博客 内容1111&quot;&#125;,&#123;&quot;id&quot;:&quot;第二篇博客&quot;,&quot;title&quot;:&quot;hjx的博客2&quot;,&quot;date&quot;:&quot;2021-01-30T00:00:00.000Z&quot;,&quot;content&quot;:&quot; \n\nhjx发布的博客2 内容22222&quot;&#125;]&#125;,&quot;__N_SSG&quot;:true&#125;,&quot;page&quot;:&quot;/posts/index_ssg&quot;,&quot;query&quot;:&#123;&#125;,&quot;buildId&quot;:&quot;development&quot;,&quot;nextExport&quot;:false,&quot;isFallback&quot;:false,&quot;gsp&quot;:true&#125;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="惊叹的发现"><a href="#惊叹的发现" class="headerlink" title="惊叹的发现"></a>惊叹的发现</h4><ul>
-<li>前端不用ajax也能拿到数据 posts</li>
-<li>这就是 SSG的好处：后端数据直接给前端</li>
-<li>前端 JSON.parse 就可以得到 posts</li>
-</ul>
-<p><strong>为啥 java/php/python做不到？</strong></p>
-<ul>
-<li>也可以做到，思路一样</li>
-<li>但是他们不支持JSX,很难和React无缝对接</li>
-<li>而且他们的对象不能直接给JS用，需要类型转换</li>
-</ul>
-<h3 id="生产环境静态化示例"><a href="#生产环境静态化示例" class="headerlink" title="生产环境静态化示例"></a>生产环境静态化示例</h3><ul>
-<li><code>yarn build</code></li>
-<li>项目根目录 <code>.next/server</code>就是 我们静态化的内容</li>
-<li>如果运行 build后的页面 <code>yarn start</code></li>
-</ul>
-<h4 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">λ  (Server) SSR 不能自动创建HTML</span><br><span class="line">○  (Static) 自动创建 HTML</span><br><span class="line">●  (SSG) 自动创建 HTML JS JSON</span><br></pre></td></tr></table></figure>
-<h4 id="三种文件类型"><a href="#三种文件类型" class="headerlink" title="三种文件类型"></a>三种文件类型</h4><ul>
-<li>posts.html含有静态内容，用于客户直接访问</li>
-<li>posts.js 含有静态内容，用于 快速导航<pre><code>&lt;Link href=&quot;/posts/index_bsr&quot;&gt;posts BSR&lt;/Link&gt;
-&lt;Link href=&quot;/posts/index_ssg&quot;&gt;posts SSG&lt;/Link&gt;
-</code></pre><ul>
-<li>就会预先加载 快速导航里页面对应的js <code>index_bsr.js 和 index_ssg.js</code></li>
-</ul>
-</li>
-<li>posts.json 含有数据， 和 posts.js结合得到页面</li>
-</ul>
-<h4 id="为什么不直接把-数据-放入-posts-js-呢？"><a href="#为什么不直接把-数据-放入-posts-js-呢？" class="headerlink" title="为什么不直接把 数据 放入 posts.js 呢？"></a>为什么不直接把 数据 放入 posts.js 呢？</h4><h4 id="SSG总结"><a href="#SSG总结" class="headerlink" title="SSG总结"></a>SSG总结</h4><ul>
-<li>动态内容静态化</li>
-<li>如果动态内容和用户无关，可以提前静态化</li>
-<li>通过 getStaticProps 可以获取数据</li>
-<li>静态内容(JS) + 数据(JSON) 就得到完整页面</li>
-<li>代替了之前 BSR的 静态内容 + 动态内容 (AJAX获取)</li>
-</ul>
-<blockquote>
-<p>时机</p>
-</blockquote>
-<p>静态化是在  <code>yarn build</code> 时候实现的</p>
-<blockquote>
-<p>优点</p>
-</blockquote>
-<ul>
-<li>生产环境直接给出完整页面</li>
-<li>首屏不会有白屏</li>
-<li>有利于搜索引擎(SEO)</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/21/Node-web03_02Next/" data-id="cklcb6bgf00atwo91fi860144" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
 
     </footer>
   </div>
@@ -1008,7 +838,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1032,7 +862,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1054,23 +884,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

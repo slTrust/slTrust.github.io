@@ -62,6 +62,326 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Java-015-多线程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/20/Java-015-多线程/" class="article-date">
+  <time datetime="2019-05-20T14:08:00.000Z" itemprop="datePublished">2019-05-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/20/Java-015-多线程/">Java-015-多线程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Java线程的概念"><a href="#Java线程的概念" class="headerlink" title="Java线程的概念"></a>Java线程的概念</h3><p>多线程程序包含两条或两条以上并发运行的部分.程序中每个这样的部分都叫一个线程（thread），每个线程都有独立的执行路径。因此，多线程是多任务处理的一种特殊形式.</p>
+<p>一句话总结进程和线程的关系: 进程是线程的容器!</p>
+<h4 id="进程的主线程"><a href="#进程的主线程" class="headerlink" title="进程的主线程"></a>进程的主线程</h4><p>主线程的重要性体现在：</p>
+<ul>
+<li>它是产生其他子线程的线程</li>
+<li>通常它必须最后完成执行，因为它执行各种关闭动作</li>
+</ul>
+<p>主线程是运行程序时候自动创建的, 但是其也是一个Thread类的实例对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class CurrentThreadDemo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        System.out.println(&quot;Current thread: &quot; + t);</span><br><span class="line">        // change the name of the thread</span><br><span class="line">        t.setName(&quot;My Thread&quot;);</span><br><span class="line">        System.out.println(&quot;After name change: &quot; + t);</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int n = 5; n &gt; 0; n--) &#123;</span><br><span class="line">                System.out.println(n);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><blockquote>
+<h4 id="继承Thread"><a href="#继承Thread" class="headerlink" title="继承Thread"></a>继承Thread</h4></blockquote>
+<ul>
+<li>我们可以通过继承Thread类, 然后Override run()方法, 然后创建该类的实例来创建除了主线程之外的其他线程, 并且在run()方法中赋予属于这个线程的代码逻辑, 这个run()方法是新线程的入口.</li>
+<li>这个新建的Thread类的子类, 会继承Thread类的一个方法 – start(), 当我们调用start()方法时候会自动生成一个线程, 然后调用run()方法执行线程的逻辑.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">// Create a second thread by extending Thread</span><br><span class="line">class NewThread extends Thread &#123;</span><br><span class="line">    NewThread() &#123;</span><br><span class="line">        // Create a new, second thread</span><br><span class="line">        super(&quot;Demo Thread&quot;);</span><br><span class="line">        System.out.println(&quot;Child thread: &quot; + this);</span><br><span class="line">        start(); // Start the thread</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // This is the entry point for the second thread.</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(&quot;Child Thread: &quot; + i);</span><br><span class="line">                Thread.sleep(500);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Child interrupted.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Exiting child thread.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Demo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        new NewThread(); // create a new thread</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(&quot;Main Thread: &quot; + i);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread interrupted.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Main thread exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="实现-Runnable-接口"><a href="#实现-Runnable-接口" class="headerlink" title="实现 Runnable 接口"></a>实现 Runnable 接口</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">// Create multiple threads.</span><br><span class="line">class NewThread implements Runnable &#123;</span><br><span class="line">    String name; // name of thread</span><br><span class="line">    Thread t;</span><br><span class="line"></span><br><span class="line">    NewThread(String threadname) &#123;</span><br><span class="line">        name = threadname;</span><br><span class="line">        t = new Thread(this, name);</span><br><span class="line">        System.out.println(&quot;New thread: &quot; + t);</span><br><span class="line">        t.start(); // Start the thread</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // This is the entry point for thread.</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(name + &quot;: &quot; + i);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(name + &quot;Interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(name + &quot; exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Demo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        new NewThread(&quot;One&quot;); // start threads</span><br><span class="line">        new NewThread(&quot;Two&quot;);</span><br><span class="line">        new NewThread(&quot;Three&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            // wait for other threads to end</span><br><span class="line">            Thread.sleep(10000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread Interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Main thread exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><blockquote>
+<p>使用多线程技术, 写一个程序, 创建3个线程, 然后完成工作:</p>
+</blockquote>
+<ul>
+<li>主线程一直循环输出从1 开始的数字, 一直到100;</li>
+<li>创建的2个子线程: 子线程A输出大写字母从A到Z, 子线程B输出小写字母从a到z</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">package com.repeat;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class Work01 &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        t.setName(&quot;main thread&quot;);</span><br><span class="line"></span><br><span class="line">        MyThread t2 = new MyThread(&quot;aaa&quot;);</span><br><span class="line">        MyThread2 t3 = new MyThread2(&quot;bbb&quot;);</span><br><span class="line"></span><br><span class="line">        t2.start();</span><br><span class="line">        t3.start();</span><br><span class="line"></span><br><span class="line">        for (int i = 1; i &lt;= 100; i++) &#123;</span><br><span class="line">            System.out.println(t.getName() + &quot; running &quot; + i);</span><br><span class="line">            Thread.sleep(50);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread extends Thread&#123;</span><br><span class="line">    private Thread t;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public MyThread(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 65; i &lt; 65+26; i++) &#123;</span><br><span class="line">                char a = (char) i;</span><br><span class="line">                System.out.println(name+ &quot; running &quot; + a);</span><br><span class="line">                Thread.sleep(50);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void start()&#123;</span><br><span class="line">        t = new Thread (this, name);</span><br><span class="line">        t.start ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread2 implements Runnable&#123;</span><br><span class="line">    private Thread t;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public MyThread2(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 97; i &lt; 97 + 26; i++) &#123;</span><br><span class="line">                char a = (char) i;</span><br><span class="line">                System.out.println(name+ &quot; running &quot; + a);</span><br><span class="line">                Thread.sleep(50);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void start()&#123;</span><br><span class="line">        t = new Thread (this, name);</span><br><span class="line">        t.start ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们的任务是: 在命令行模拟类似的逻辑:</p>
+</blockquote>
+<ul>
+<li>程序运行之后, 会接收用户输入的字符串, 用户输入回车之后, 把这行字符串写入到一个新的文件中,命名为数字序号 (1.txt, 2.txt, 3.txt)… (回顾一下之前IO的课程中, 对文件写入的操作)</li>
+<li>用户输入回车之后, 重新等待用户输入字符串, 并且循环执行 1 中的逻辑</li>
+<li>要求是敲下回车之后, 不能有卡顿的情况, 也就是, 写入文件必须在子线程中完成</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">package com.repeat;</span><br><span class="line"></span><br><span class="line">import java.io.*;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Work02 &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">        while (true)&#123;</span><br><span class="line">            // 获取输入</span><br><span class="line">            String input = getInput();</span><br><span class="line">            // 新开线程，写入文件</span><br><span class="line">            new MyFileIoThread( input ).start();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static String getInput()&#123;</span><br><span class="line">        Scanner sc = new Scanner(System.in);</span><br><span class="line">        String str = sc.next();</span><br><span class="line">        return str;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyFileIoThread extends Thread&#123;</span><br><span class="line">    public static int count = 1;</span><br><span class="line">    private String content;</span><br><span class="line"></span><br><span class="line">    public MyFileIoThread(String content) &#123;</span><br><span class="line">        this.content = content;</span><br><span class="line">        MyFileIoThread.count++;</span><br><span class="line">        System.out.println(MyFileIoThread.count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        FileOutputStream output = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            String fileName = MyFileIoThread.count + &quot;.txt&quot;;</span><br><span class="line">            output = new FileOutputStream(&quot;day015Thread/res/&quot; + fileName);</span><br><span class="line">            OutputStreamWriter writer = new OutputStreamWriter(output,&quot;UTF-8&quot;);</span><br><span class="line">            PrintWriter printWriter = new PrintWriter(writer);</span><br><span class="line"></span><br><span class="line">            // 模拟写入文件慢的操作</span><br><span class="line">            Thread.sleep(500);</span><br><span class="line">            System.out.println(&quot; file: &quot; + fileName + &quot; 写入成功&quot;);</span><br><span class="line"></span><br><span class="line">            printWriter.write(content);</span><br><span class="line">            printWriter.close();</span><br><span class="line">            output.close();</span><br><span class="line">        &#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (UnsupportedEncodingException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="参考阅读资料"><a href="#参考阅读资料" class="headerlink" title="参考阅读资料"></a>参考阅读资料</h4></blockquote>
+<p>可以慢慢看, 或者简单过一遍, 然后脑子留个概念. 等之后有经验和需求的时候反复回来咀嚼</p>
+<ul>
+<li><a href="https://www.runoob.com/java/java-multithreading.html" target="_blank" rel="noopener">Java 多线程编程 | 菜鸟教程</a></li>
+</ul>
+<p>大致了解下一些应用场景, 如果不理解也没关系, 慢慢等你有需求被逼无奈就会懂了</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/65200684" target="_blank" rel="noopener">知乎: java中的多线程究竟在什么情况下使用？</a></li>
+<li><a href="https://www.zhihu.com/question/19901763" target="_blank" rel="noopener">知乎: 多线程有什么用</a></li>
+</ul>
+<p>一个不错的Java多线程面试相关的题目总结, 可以准备面试时候大致过一遍, 有些内容可能是因为需要用于面试中题目原因, 忽略很多不同概念的联系和有些概念不是特别准确, 但是准备面试后可以看一下. 学习还是需要训练中慢慢体会</p>
+<p><a href="https://github.com/Homiss/Java-interview-questions/blob/master/%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B9%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B(%E4%B8%80" target="_blank" rel="noopener">Java面试题之多线程</a>.md)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/20/Java-015-多线程/" data-id="cklhgn2ak0034kyfyo1p7olz9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-014-maven和包管理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/18/Java-014-maven和包管理/" class="article-date">
+  <time datetime="2019-05-18T03:42:12.000Z" itemprop="datePublished">2019-05-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/18/Java-014-maven和包管理/">Java-014-maven和包管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="maven"><a href="#maven" class="headerlink" title="maven"></a>maven</h3><blockquote>
+<p>maven 添加运行命令 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exec:java -Dexec.mainClass=你的包名.类名 -Dexec.args</span><br></pre></td></tr></table></figure>
+<h3 id="mac安装-maven"><a href="#mac安装-maven" class="headerlink" title="mac安装 maven"></a><a href="https://www.cnblogs.com/vitasyuan/p/7395601.html?utm_source=debugrun&amp;utm_medium=referral" target="_blank" rel="noopener">mac安装 maven</a></h3><h3 id="安装并且配置好了-maven-但是一直报-command-not-found"><a href="#安装并且配置好了-maven-但是一直报-command-not-found" class="headerlink" title="安装并且配置好了 maven 但是一直报 command not found"></a>安装并且配置好了 maven 但是一直报 command not found</h3><p>~/.bash_profile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export M2_HOME=/Users/huangjiaxi/Desktop/soft/apache-maven-3.6.1</span><br><span class="line">export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</span><br><span class="line"># 这句一定要在上句下面</span><br><span class="line">export PATH=$PATH:$M2_HOME/bin</span><br></pre></td></tr></table></figure>
+<h3 id="maven-修改配置文件"><a href="#maven-修改配置文件" class="headerlink" title="maven 修改配置文件"></a>maven 修改配置文件</h3><p>修改maven根目录下的conf文件夹中的setting.xml文件，内容如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;</span><br><span class="line">      xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">      xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0</span><br><span class="line">                          https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">      &lt;mirrors&gt;</span><br><span class="line">        &lt;mirror&gt;  </span><br><span class="line">            &lt;id&gt;alimaven&lt;/id&gt;  </span><br><span class="line">            &lt;name&gt;aliyun maven&lt;/name&gt;  </span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;  </span><br><span class="line">            &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;          </span><br><span class="line">        &lt;/mirror&gt;  </span><br><span class="line">      &lt;/mirrors&gt;</span><br><span class="line">&lt;/settings&gt;</span><br><span class="line">`</span><br></pre></td></tr></table></figure>
+<p>macOS下可以配置同样内容在: ~/.m2/settings.xml</p>
+<h3 id="maven-运行报错"><a href="#maven-运行报错" class="headerlink" title="maven 运行报错"></a>maven 运行报错</h3><p>第一种可能</p>
+<blockquote>
+<h4 id="class-not-found"><a href="#class-not-found" class="headerlink" title="class not found"></a>class not found</h4></blockquote>
+<ul>
+<li>原因大概是找不到 jar包里的文件，需要添加才行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://blog.csdn.net/Liu_xud/article/details/84385755</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="第二种可能"><a href="#第二种可能" class="headerlink" title="第二种可能"></a>第二种可能</h4></blockquote>
+<p>你只运行了 clean 没运行 compile 也就是没编译</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/18/Java-014-maven和包管理/" data-id="cklhgn2aj0032kyfy87jg1g6k" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-013-泛型和集合" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/18/Java-013-泛型和集合/" class="article-date">
+  <time datetime="2019-05-18T02:42:12.000Z" itemprop="datePublished">2019-05-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/18/Java-013-泛型和集合/">Java-013-泛型和集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>先看代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Demo01泛型 &#123;</span><br><span class="line">    // 泛型</span><br><span class="line">    // 定义了hash表 key是 String类型 value是 Integer类型</span><br><span class="line">    static HashMap&lt;String,Integer&gt; counts = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;String&gt; stringStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;Integer&gt; intStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        stringStack.push(&quot;abc&quot;);</span><br><span class="line"></span><br><span class="line">        String one = stringStack.pop();</span><br><span class="line"></span><br><span class="line">        intStack.push(1);</span><br><span class="line">        Integer two = intStack.pop();</span><br><span class="line"></span><br><span class="line">        // intStack.push(&quot;ssss&quot;);  规定了Stack 内的类型是 int的 所以无法 加入 String类型的</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="为什么有泛型"><a href="#为什么有泛型" class="headerlink" title="为什么有泛型?"></a>为什么有泛型?</h4></blockquote>
+<p>假如我们想要实现一个只接受 Integer 和一个只接受String 的栈</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class IntStack &#123;</span><br><span class="line">    ArrayList&lt;Integer&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(Integer item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Integer pop()&#123;</span><br><span class="line">        Integer tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class StringStack &#123;</span><br><span class="line">    ArrayList&lt;String&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(String item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String pop()&#123;</span><br><span class="line">        String tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次"><a href="#很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次" class="headerlink" title="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次"></a>很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次</h4></blockquote>
+<h4 id="泛型出现了！"><a href="#泛型出现了！" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-1"><a href="#泛型出现了！-1" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-2"><a href="#泛型出现了！-2" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// 自己实现一个泛型，支持任意类型的Stack ，</span><br><span class="line">// 把数据类型变成参数，把重复代码去除了 如 IntStack / StringStack</span><br><span class="line">// T 是 类型参数</span><br><span class="line">public class Stack2&lt;T&gt; &#123;</span><br><span class="line">    ArrayList&lt;T&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(T item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T pop()&#123;</span><br><span class="line">        T tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="集合-List"><a href="#集合-List" class="headerlink" title="集合 List"></a>集合 List</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 列表</span><br><span class="line">List&lt;String&gt; arrayList = new ArrayList&lt;&gt;();</span><br><span class="line">List&lt;String&gt; linkedList = new LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">// 操作 在尾部添加</span><br><span class="line">arrayList.add(&quot;hello&quot;);</span><br><span class="line">arrayList.add(&quot;world&quot;);</span><br><span class="line">arrayList.add(&quot;~~~~&quot;);</span><br><span class="line"></span><br><span class="line">// 通过索引去访问</span><br><span class="line">arrayList.get(0);</span><br><span class="line"></span><br><span class="line">//arrayList.subList(0,5); // 取出 索引从 0 到 5 位置的列表  内容不够就报错</span><br><span class="line"></span><br><span class="line">// 通过索引 删除</span><br><span class="line">arrayList.remove(0);</span><br><span class="line"></span><br><span class="line">// 访问 列表的长度</span><br><span class="line">int size = arrayList.size();</span><br><span class="line"></span><br><span class="line">// for循环里的语法糖</span><br><span class="line"></span><br><span class="line">for (String item: arrayList) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Set 主要用来去重复</span><br><span class="line">Set&lt;String&gt; set = new HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;);</span><br><span class="line">set.add(&quot;b&quot;);</span><br><span class="line">set.add(&quot;c&quot;);</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;); // 去重复</span><br><span class="line"></span><br><span class="line">for (String item: set) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="练习题"><a href="#练习题" class="headerlink" title="练习题"></a>练习题</h3><blockquote>
+<h4 id="汉诺塔问题"><a href="#汉诺塔问题" class="headerlink" title="汉诺塔问题"></a>汉诺塔问题</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">在经典的汉诺塔问题中，有 3 个塔和 N 个可用来堆砌成塔的不同大小的盘子。要求盘子必须按照从小到大的顺序从上往下堆 （如，任意一个盘子，其必须堆在比它大的盘子上面）。同时，你必须满足以下限制条件：</span><br><span class="line"></span><br><span class="line">(1) 每次只能移动一个盘子。</span><br><span class="line">(2) 每个盘子从堆的顶部被移动后，只能置放于下一个堆中。</span><br><span class="line">(3) 每个盘子只能放在比它大的盘子上面。</span><br><span class="line"></span><br><span class="line">请写一段程序，实现将第一个堆的盘子移动到最后一个堆中.</span><br><span class="line"></span><br><span class="line">在编程训练网站完成训练: https://www.lintcode.com/problem/mock-hanoi-tower-by-stacks/description</span><br></pre></td></tr></table></figure>
+<p>代码实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public class Tower &#123;</span><br><span class="line">    private Stack&lt;Integer&gt; disks;</span><br><span class="line">  </span><br><span class="line">    public Tower(int i) &#123;</span><br><span class="line">        // create three towers</span><br><span class="line">        disks = new Stack();</span><br><span class="line">    &#125;</span><br><span class="line">    public void add(int d) &#123;</span><br><span class="line">        // Add a disk into this tower</span><br><span class="line">        if (!disks.isEmpty() &amp;&amp; disks.peek() &lt;= d) &#123;</span><br><span class="line">            System.out.println(&quot;Error placing disk &quot; + d);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            disks.push(d);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveTopTo(Tower t) &#123;</span><br><span class="line">        // Move the top disk of this tower to the top of t.</span><br><span class="line">        if(t.disks.isEmpty() || (!disks.isEmpty() &amp;&amp; t.disks.peek() &gt;= disks.peek())) &#123;</span><br><span class="line">            t.disks.push(disks.pop());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveDisks(int n, Tower destination, Tower buffer) &#123;</span><br><span class="line">        // Move n Disks from this tower to destination by buffer tower</span><br><span class="line">        if(n &lt;= 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125; else if(n == 1) &#123;</span><br><span class="line">            moveTopTo(destination);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            moveDisks(n-1, buffer, destination);</span><br><span class="line">            moveDisks(1, destination, buffer);</span><br><span class="line">            buffer.moveDisks(n-1, destination, this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public Stack&lt;Integer&gt; getDisks() &#123;</span><br><span class="line">        // write your code here</span><br><span class="line">        return disks;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="找不同"><a href="#找不同" class="headerlink" title="找不同"></a>找不同</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Given two strings s and t which consist of only lowercase letters.</span><br><span class="line"></span><br><span class="line">String t is generated by random shuffling string s and then add one more letter at a random position.</span><br><span class="line"></span><br><span class="line">Find the letter that was added in t.</span><br><span class="line"></span><br><span class="line">输入给两个只包含小写字母的字符串 S 和 T.</span><br><span class="line"></span><br><span class="line">字符串 T 是在字符串 S 基础上添加一个小写字母, 然后随机打乱之后生成.</span><br><span class="line"></span><br><span class="line">请找出那个被加入的小写字母.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">Input:</span><br><span class="line">s = &quot;abcd&quot;</span><br><span class="line">t = &quot;abcde&quot;</span><br><span class="line"></span><br><span class="line">Output:</span><br><span class="line">e</span><br><span class="line"></span><br><span class="line">Explanation:</span><br><span class="line">&apos;e&apos; is the letter that was added.</span><br><span class="line">在线测试网站: https://leetcode.com/problems/find-the-difference/description</span><br></pre></td></tr></table></figure>
+<p>代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">public class Test02 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        char a = findTheDifference(&quot;abc&quot;,&quot;abcd&quot;);</span><br><span class="line">        System.out.println(a);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static  char findTheDifference(String s, String t) &#123;</span><br><span class="line">        HashMap&lt;Character,Integer&gt; hash = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        String tmp = s + t;</span><br><span class="line">        for(int i = 0;i&lt;tmp.length();i++)&#123;</span><br><span class="line">            char current = tmp.charAt(i);</span><br><span class="line">            if(hash.containsKey(current))&#123;</span><br><span class="line">                hash.put(current,hash.get(current) + 1);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                hash.put(current,1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Set&lt;Character&gt; a = hash.keySet();</span><br><span class="line">        Character res = null;</span><br><span class="line">        for (Character item: a) &#123;</span><br><span class="line">            if(hash.get(item)==1)&#123;</span><br><span class="line">                res = item;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="Min-Stack"><a href="#Min-Stack" class="headerlink" title="Min Stack"></a>Min Stack</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.</span><br><span class="line"></span><br><span class="line">push(x) -- Push element x onto stack.</span><br><span class="line">pop() -- Removes the element on top of the stack.</span><br><span class="line">top() -- Get the top element.</span><br><span class="line">getMin() -- Retrieve the minimum element in the stack.</span><br><span class="line">设计一个栈, 支持4种操作: push, pop, top和getMin, 关键是getMin是获取栈中的最小值.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">MinStack minStack = new MinStack();</span><br><span class="line">minStack.push(-2);</span><br><span class="line">minStack.push(0);</span><br><span class="line">minStack.push(-3);</span><br><span class="line">minStack.getMin();   --&gt; Returns -3.</span><br><span class="line">minStack.pop();</span><br><span class="line">minStack.top();      --&gt; Returns 0.</span><br><span class="line">minStack.getMin();   --&gt; Returns -2.</span><br><span class="line">基本代码框架:</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line"></span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line">    private ArrayList&lt;Integer&gt; store;</span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line">        store = new ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line">        store.add(x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        store.remove(store.get(store.size()-1));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return store.get(store.size()-1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int res = store.get(0);</span><br><span class="line">        for (int i = 1; i &lt; store.size(); i++) &#123;</span><br><span class="line">            if( res &gt; store.get(i) )&#123;</span><br><span class="line">                res = store.get(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="推荐一个-idea的插件"><a href="#推荐一个-idea的插件" class="headerlink" title="推荐一个 idea的插件"></a>推荐一个 idea的插件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">首选项- plugins-搜索 rainbow brackets</span><br></pre></td></tr></table></figure>
+<h3 id="推荐书籍"><a href="#推荐书籍" class="headerlink" title="推荐书籍"></a>推荐书籍</h3><ul>
+<li>Efective java</li>
+<li>设计模式</li>
+<li>算法**(强烈推荐)</li>
+<li>if web开发 推荐<ul>
+<li>Spring</li>
+<li>Play</li>
+</ul>
+</li>
+<li>分布式系统开发<ul>
+<li>Hadoop</li>
+<li>MapReduce</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/18/Java-013-泛型和集合/" data-id="cklhgn2ai0030kyfyk72cznsq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-012-算法入门" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/18/Java-012-算法入门/" class="article-date">
+  <time datetime="2019-05-18T01:42:12.000Z" itemprop="datePublished">2019-05-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/18/Java-012-算法入门/">Java-012-算法入门</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><ul>
+<li>冒泡排序 - O(n^2)</li>
+<li>插入排序 - O(n^2)</li>
+<li>快速排序 - O(nlogn)</li>
+<li>堆排序 - O(nlogn)</li>
+</ul>
+<p><a href="https://visualgo.net/zh/sorting?slide=1" target="_blank" rel="noopener">可视化排序</a></p>
+<h3 id="搜索算法"><a href="#搜索算法" class="headerlink" title="搜索算法"></a>搜索算法</h3><ul>
+<li>深度优先搜索<ul>
+<li>使用栈或者递归存储搜索状态, 递归本质上是利用系统栈空间.</li>
+</ul>
+</li>
+<li>广度优先搜索<ul>
+<li>实用队列存储搜索状态</li>
+</ul>
+</li>
+</ul>
+<p><a href="https://visualgo.net/zh/dfsbfs?slide=1" target="_blank" rel="noopener">可视化搜索</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/18/Java-012-算法入门/" data-id="cklhgn2ah002ykyfyya2cm760" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-011-05ResizingArrayQueue实现" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/05/17/Java-011-05ResizingArrayQueue实现/" class="article-date">
+  <time datetime="2019-05-17T15:24:32.000Z" itemprop="datePublished">2019-05-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/05/17/Java-011-05ResizingArrayQueue实现/">Java-011-05ResizingArrayQueue实现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="ResizingArrayQueue"><a href="#ResizingArrayQueue" class="headerlink" title="ResizingArrayQueue"></a>ResizingArrayQueue</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br></pre></td><td class="code"><pre><span class="line">/******************************************************************************</span><br><span class="line"> *  Compilation:  javac ResizingArrayQueue.java</span><br><span class="line"> *  Execution:    java ResizingArrayQueue &lt; input.txt</span><br><span class="line"> *  Dependencies: StdIn.java StdOut.java</span><br><span class="line"> *  Data files:   https://algs4.cs.princeton.edu/13stacks/tobe.txt  </span><br><span class="line"> *  </span><br><span class="line"> *  Queue implementation with a resizing array.</span><br><span class="line"> *</span><br><span class="line"> *  % java ResizingArrayQueue &lt; tobe.txt </span><br><span class="line"> *  to be or not to be (2 left on queue)</span><br><span class="line"> *</span><br><span class="line"> ******************************************************************************/</span><br><span class="line"></span><br><span class="line">package edu.princeton.cs.algs4;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.NoSuchElementException;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> *  The &#123;@code ResizingArrayQueue&#125; class represents a first-in-first-out (FIFO)</span><br><span class="line"> *  queue of generic items.</span><br><span class="line"> *  It supports the usual &lt;em&gt;enqueue&lt;/em&gt; and &lt;em&gt;dequeue&lt;/em&gt;</span><br><span class="line"> *  operations, along with methods for peeking at the first item,</span><br><span class="line"> *  testing if the queue is empty, and iterating through</span><br><span class="line"> *  the items in FIFO order.</span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  This implementation uses a resizing array, which double the underlying array</span><br><span class="line"> *  when it is full and halves the underlying array when it is one-quarter full.</span><br><span class="line"> *  The &lt;em&gt;enqueue&lt;/em&gt; and &lt;em&gt;dequeue&lt;/em&gt; operations take constant amortized time.</span><br><span class="line"> *  The &lt;em&gt;size&lt;/em&gt;, &lt;em&gt;peek&lt;/em&gt;, and &lt;em&gt;is-empty&lt;/em&gt; operations takes</span><br><span class="line"> *  constant time in the worst case. </span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  For additional documentation, see &lt;a href=&quot;https://algs4.cs.princeton.edu/13stacks&quot;&gt;Section 1.3&lt;/a&gt; of</span><br><span class="line"> *  &lt;i&gt;Algorithms, 4th Edition&lt;/i&gt; by Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  @author Robert Sedgewick</span><br><span class="line"> *  @author Kevin Wayne</span><br><span class="line"> */</span><br><span class="line">public class ResizingArrayQueue&lt;Item&gt; implements Iterable&lt;Item&gt; &#123;</span><br><span class="line">    private Item[] q;       // queue elements</span><br><span class="line">    private int n;          // number of elements on queue</span><br><span class="line">    private int first;      // index of first element of queue</span><br><span class="line">    private int last;       // index of next available slot</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Initializes an empty queue.</span><br><span class="line">     */</span><br><span class="line">    public ResizingArrayQueue() &#123;</span><br><span class="line">        q = (Item[]) new Object[2];</span><br><span class="line">        n = 0;</span><br><span class="line">        first = 0;</span><br><span class="line">        last = 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Is this queue empty?</span><br><span class="line">     * @return true if this queue is empty; false otherwise</span><br><span class="line">     */</span><br><span class="line">    public boolean isEmpty() &#123;</span><br><span class="line">        return n == 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the number of items in this queue.</span><br><span class="line">     * @return the number of items in this queue</span><br><span class="line">     */</span><br><span class="line">    public int size() &#123;</span><br><span class="line">        return n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // resize the underlying array</span><br><span class="line">    private void resize(int capacity) &#123;</span><br><span class="line">        assert capacity &gt;= n;</span><br><span class="line">        Item[] temp = (Item[]) new Object[capacity];</span><br><span class="line">        for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">            temp[i] = q[(first + i) % q.length];</span><br><span class="line">        &#125;</span><br><span class="line">        q = temp;</span><br><span class="line">        first = 0;</span><br><span class="line">        last  = n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Adds the item to this queue.</span><br><span class="line">     * @param item the item to add</span><br><span class="line">     */</span><br><span class="line">    public void enqueue(Item item) &#123;</span><br><span class="line">        // double size of array if necessary and recopy to front of array</span><br><span class="line">        if (n == q.length) resize(2*q.length);   // double size of array if necessary</span><br><span class="line">        q[last++] = item;                        // add item</span><br><span class="line">        if (last == q.length) last = 0;          // wrap-around</span><br><span class="line">        n++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Removes and returns the item on this queue that was least recently added.</span><br><span class="line">     * @return the item on this queue that was least recently added</span><br><span class="line">     * @throws java.util.NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item dequeue() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        Item item = q[first];</span><br><span class="line">        q[first] = null;                            // to avoid loitering</span><br><span class="line">        n--;</span><br><span class="line">        first++;</span><br><span class="line">        if (first == q.length) first = 0;           // wrap-around</span><br><span class="line">        // shrink size of array if necessary</span><br><span class="line">        if (n &gt; 0 &amp;&amp; n == q.length/4) resize(q.length/2); </span><br><span class="line">        return item;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the item least recently added to this queue.</span><br><span class="line">     * @return the item least recently added to this queue</span><br><span class="line">     * @throws java.util.NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item peek() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        return q[first];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns an iterator that iterates over the items in this queue in FIFO order.</span><br><span class="line">     * @return an iterator that iterates over the items in this queue in FIFO order</span><br><span class="line">     */</span><br><span class="line">    public Iterator&lt;Item&gt; iterator() &#123;</span><br><span class="line">        return new ArrayIterator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // an iterator, doesn&apos;t implement remove() since it&apos;s optional</span><br><span class="line">    private class ArrayIterator implements Iterator&lt;Item&gt; &#123;</span><br><span class="line">        private int i = 0;</span><br><span class="line">        public boolean hasNext()  &#123; return i &lt; n;                               &#125;</span><br><span class="line">        public void remove()      &#123; throw new UnsupportedOperationException();  &#125;</span><br><span class="line"></span><br><span class="line">        public Item next() &#123;</span><br><span class="line">            if (!hasNext()) throw new NoSuchElementException();</span><br><span class="line">            Item item = q[(i + first) % q.length];</span><br><span class="line">            i++;</span><br><span class="line">            return item;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   /**</span><br><span class="line">     * Unit tests the &#123;@code ResizingArrayQueue&#125; data type.</span><br><span class="line">     *</span><br><span class="line">     * @param args the command-line arguments</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ResizingArrayQueue&lt;String&gt; queue = new ResizingArrayQueue&lt;String&gt;();</span><br><span class="line">        while (!StdIn.isEmpty()) &#123;</span><br><span class="line">            String item = StdIn.readString();</span><br><span class="line">            if (!item.equals(&quot;-&quot;)) queue.enqueue(item);</span><br><span class="line">            else if (!queue.isEmpty()) StdOut.print(queue.dequeue() + &quot; &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        StdOut.println(&quot;(&quot; + queue.size() + &quot; left on queue)&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/******************************************************************************</span><br><span class="line"> *  Copyright 2002-2018, Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  This file is part of algs4.jar, which accompanies the textbook</span><br><span class="line"> *</span><br><span class="line"> *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,</span><br><span class="line"> *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.</span><br><span class="line"> *      http://algs4.cs.princeton.edu</span><br><span class="line"> *</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is free software: you can redistribute it and/or modify</span><br><span class="line"> *  it under the terms of the GNU General Public License as published by</span><br><span class="line"> *  the Free Software Foundation, either version 3 of the License, or</span><br><span class="line"> *  (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is distributed in the hope that it will be useful,</span><br><span class="line"> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> *  GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> *  You should have received a copy of the GNU General Public License</span><br><span class="line"> *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.</span><br><span class="line"> ******************************************************************************/</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/05/17/Java-011-05ResizingArrayQueue实现/" data-id="cklhgn2am0038kyfyf8rtc59l" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Java-011-04LinkedQueue实现" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/05/17/Java-011-04LinkedQueue实现/" class="article-date">
@@ -89,7 +409,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/17/Java-011-04LinkedQueue实现/" data-id="cklcb6bct002two91kbgm6cn3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/17/Java-011-04LinkedQueue实现/" data-id="cklhgn2ag002wkyfyvo5tdsyx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -128,7 +448,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/17/Java-011-03Queue实现/" data-id="cklcb6bcs002rwo91q6x6m003" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/17/Java-011-03Queue实现/" data-id="cklhgn2af002ukyfyzt3kt0ge" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -167,7 +487,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/17/Java-011-02LinkedStack实现/" data-id="cklcb6bcr002pwo91yh3h9b43" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/17/Java-011-02LinkedStack实现/" data-id="cklhgn2ae002rkyfyoi4zdc4d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -206,7 +526,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/17/Java-011-01Stack实现/" data-id="cklcb6bcq002nwo916h3269m9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/17/Java-011-01Stack实现/" data-id="cklhgn2ac002mkyfyrcmhyd9g" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -413,509 +733,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/14/Java-011-00数据结构初探/" data-id="cklcb6bco002jwo916ll1gxzi" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-010-面向对象二" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/14/Java-010-面向对象二/" class="article-date">
-  <time datetime="2019-05-14T14:54:33.000Z" itemprop="datePublished">2019-05-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/14/Java-010-面向对象二/">Java_010_面向对象二</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="https://github.com/slTrust/java" target="_blank" rel="noopener">代码参考</a></p>
-<h3 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h3><ul>
-<li>父类对象指向子类实例</li>
-</ul>
-<p>如下例子 Man / Dog /Car 都会跑</p>
-<ul>
-<li>如果单独调用自己的 manRun/dogRun/carRun 就很重复和耦合</li>
-<li>而使用多态就可以只用一个 objRun 此时只要传递实现类 调用即可</li>
-</ul>
-<blockquote>
-<p>便利性</p>
-</blockquote>
-<ul>
-<li>少写重复代码</li>
-<li>功能易于扩展和维护</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">package com.oop.demo.aaa;</span><br><span class="line"></span><br><span class="line">public class TestA &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        // 不使用多态</span><br><span class="line">        Man man1 = new Man();</span><br><span class="line">        Dog dog1 = new Dog();</span><br><span class="line">        Car car1 = new Car();</span><br><span class="line">        System.out.println(&quot;不使用多态&quot;);</span><br><span class="line">        manRun(man1);</span><br><span class="line">        dogRun(dog1);</span><br><span class="line">        carRun(car1);</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;使用多态&quot;);</span><br><span class="line">        Runable man2 = new Man();</span><br><span class="line">        Runable dog2 = new Dog();</span><br><span class="line">        Runable car2 = new Car();</span><br><span class="line"></span><br><span class="line">        // 使用多态</span><br><span class="line">        objRun(man2);</span><br><span class="line">        objRun(dog2);</span><br><span class="line">        objRun(car2);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void objRun(Runable runObj)&#123;</span><br><span class="line">        runObj.run();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void manRun(Man man)&#123;</span><br><span class="line">        man.run();</span><br><span class="line">    &#125;</span><br><span class="line">    public static void dogRun(Dog dog)&#123;</span><br><span class="line">        dog.run();</span><br><span class="line">    &#125;</span><br><span class="line">    public static void carRun(Car car)&#123;</span><br><span class="line">        car.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">interface Runable&#123;</span><br><span class="line">    void run();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Man implements Runable&#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;两条腿跑&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Dog implements Runable&#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;四条腿跑&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Car  implements Runable&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        System.out.println(&quot;四个轱辘跑。。。。&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="抽象类（未构建完成的类，残缺的类）"><a href="#抽象类（未构建完成的类，残缺的类）" class="headerlink" title="抽象类（未构建完成的类，残缺的类）"></a>抽象类（未构建完成的类，残缺的类）</h3><blockquote>
-<p>举个例子：抽象类就像一个梦想，但可能要经历几代人来实现</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">伪代码，开发里肯定用英文</span><br><span class="line">*/</span><br><span class="line">abstract class 东汉末年没落的皇族&#123;</span><br><span class="line">    void 招兵买马( );</span><br><span class="line">    void 统一天下( );</span><br><span class="line">&#125;</span><br><span class="line">// 刘备由于没统一天下，所以他把重任交给了后代</span><br><span class="line">abstract class 刘备 extends 东汉末年没落的皇族&#123;</span><br><span class="line">    void 招兵买马( )&#123;</span><br><span class="line">        System.out.println(&quot;刘关张桃园结义&quot;);</span><br><span class="line">        System.out.println(&quot;诸葛加入，三分天下&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 虽然刘禅没统一，我们暂且假设他成功了吧！不然写不完了</span><br><span class="line">class 刘禅 extends 刘备&#123;</span><br><span class="line">     void 统一天下( )&#123;</span><br><span class="line">          System.out.println(&quot;在梦里！！！终于统一了天下&quot;);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ul>
-<li>更具体的某种行为/特质</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如上面的 Runable 接口</span><br><span class="line">不是所有事物都会 run的  如盒子/山</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">interface 充电接口&#123;</span><br><span class="line">    void 充电( );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class 手机 implements Runable&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void 充电() &#123;</span><br><span class="line">        System.out.println(&quot;手机充电&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class 电脑 implements Runable&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void 充电() &#123;</span><br><span class="line">        System.out.println(&quot;电脑充电&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="接口和抽象类的区别"><a href="#接口和抽象类的区别" class="headerlink" title="接口和抽象类的区别"></a>接口和抽象类的区别</h3><ul>
-<li><p>它们表示的不一样 </p>
-<ul>
-<li><p>接口更倾向于某种特性/行为</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">充电功能</span><br><span class="line">    安卓手机充电 usb头</span><br><span class="line">    电脑充电 圆头</span><br><span class="line">    air平板充电 type-c头</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>抽象类是更倾向于某类事物的特性/行为</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">动物</span><br><span class="line">    毛发</span><br><span class="line">    行走</span><br><span class="line">    吼叫</span><br><span class="line">    吃饭</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/14/Java-010-面向对象二/" data-id="cklcb6bcm002fwo91amz7izz7" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-009-面向对象编程一" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/12/Java-009-面向对象编程一/" class="article-date">
-  <time datetime="2019-05-12T14:39:59.000Z" itemprop="datePublished">2019-05-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/12/Java-009-面向对象编程一/">Java_009_面向对象编程一</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><ul>
-<li>在⾯面向对象程式设计⽅方法中, 封装(英语:Encapsulation)是指⼀一种将类实现细节部分包装, 隐藏起 来的方法.</li>
-<li>封装⽅式: 类.</li>
-<li>对类的内部状态的访问进行控制, 只提供该提供的信息</li>
-<li>把代码分成两个部分: 接口 和 实现!</li>
-<li>接⼝因为涉及和外部的交互, 对⽤户暴露, 应该保持稳定. 例如: API和库</li>
-<li>内部实现不需要暴露给外部用户. 在接⼝功能不被影响的前提下, 可以随意修改和重构</li>
-<li>良好的封装是解耦的基础!</li>
-<li>代码实例例</li>
-</ul>
-<h3 id="访问修饰符"><a href="#访问修饰符" class="headerlink" title="访问修饰符"></a>访问修饰符</h3><ul>
-<li>public</li>
-<li>protected</li>
-<li>default</li>
-<li>private</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">访问权限   类   包  子类  其他包</span><br><span class="line">  　　　　  public     ∨   ∨    ∨     ∨          （对任何人都是可用的）</span><br><span class="line">   　　　　 protected    ∨   ∨   ∨     ×　　　 （继承的类可以访问以及和private一样的权限）</span><br><span class="line">   　　　　 default    ∨   ∨   ×     ×　　　 （包访问权限，即在整个包内均可被访问）</span><br><span class="line">   　　　　 private    ∨   ×   ×     ×　　　 （除类型创建者和类型的内部方法之外的任何人都不能访问的元素）</span><br></pre></td></tr></table></figure>
-<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><h4 id="get-和-set"><a href="#get-和-set" class="headerlink" title="get 和 set"></a>get 和 set</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">class Student &#123;</span><br><span class="line"></span><br><span class="line">    private String name; // 姓名</span><br><span class="line">    private int age; // 年龄</span><br><span class="line">    private boolean male; // 是不是爷们儿</span><br><span class="line"></span><br><span class="line">    public void setMale(boolean b) &#123;</span><br><span class="line">        male = b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public boolean isMale() &#123;</span><br><span class="line">        return male;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setName(String str) &#123;</span><br><span class="line">        name = str;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setAge(int num) &#123;</span><br><span class="line">        age = num;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getAge() &#123;</span><br><span class="line">        return age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="构造方法的重载"><a href="#构造方法的重载" class="headerlink" title="构造方法的重载"></a>构造方法的重载</h4><blockquote>
-<p>注意事项：</p>
-</blockquote>
-<ol>
-<li>构造方法的名称必须和所在的类名称完全一样，就连大小写也要一样</li>
-<li>构造方法不要写返回值类型，连void都不写</li>
-<li>构造方法不能return一个具体的返回值</li>
-<li>如果没有编写任何构造方法，那么编译器将会默认赠送一个构造方法，没有参数、方法体什么事情都不做。<br>public Student() {}</li>
-<li>一旦编写了至少一个构造方法，那么编译器将不再赠送。</li>
-<li>构造方法也是可以进行重载的。</li>
-</ol>
-<p>重载：方法名称相同，参数列表不同。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">构造方法是专门用来创建对象的方法，当我们通过关键字new来创建对象时，其实就是在调用构造方法。</span><br><span class="line">格式：</span><br><span class="line">public 类名称(参数类型 参数名称) &#123;</span><br><span class="line">    方法体</span><br><span class="line">&#125;</span><br><span class="line"> */</span><br><span class="line">public class Student &#123;</span><br><span class="line"></span><br><span class="line">    // 成员变量</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line"></span><br><span class="line">    // 无参数的构造方法</span><br><span class="line">    public Student() &#123;</span><br><span class="line">        System.out.println(&quot;无参构造方法执行啦！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 全参数的构造方法</span><br><span class="line">    public Student(String name, int age) &#123;</span><br><span class="line">        System.out.println(&quot;全参构造方法执行啦！&quot;);</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Getter Setter</span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setAge(int age) &#123;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getAge() &#123;</span><br><span class="line">        return age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="final"><a href="#final" class="headerlink" title="final"></a>final</h4><p>final关键字代表最终、不可改变的。<br>常见四种用法：</p>
-<ol>
-<li>可以用来修饰一个类</li>
-<li>可以用来修饰一个方法</li>
-<li>还可以用来修饰一个局部变量</li>
-<li>还可以用来修饰一个成员变量</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">int num1 = 10;</span><br><span class="line">System.out.println(num1); // 10</span><br><span class="line">num1 = 20;</span><br><span class="line">System.out.println(num1); // 20</span><br><span class="line"></span><br><span class="line">// 一旦使用final用来修饰局部变量，那么这个变量就不能进行更改。</span><br><span class="line">// “一次赋值，终生不变”</span><br><span class="line">final int num2 = 200;</span><br><span class="line">System.out.println(num2); // 200</span><br><span class="line"></span><br><span class="line">// num2 = 250; // 错误写法！不能改变！</span><br><span class="line">// num2 = 200; // 错误写法！</span><br><span class="line"></span><br><span class="line">// 正确写法！只要保证有唯一一次赋值即可</span><br><span class="line">final int num3;</span><br><span class="line">num3 = 30;</span><br><span class="line"></span><br><span class="line">// 对于基本类型来说，不可变说的是变量当中的数据不可改变</span><br><span class="line">// 对于引用类型来说，不可变说的是变量当中的地址值不可改变</span><br><span class="line">Student stu1 = new Student(&quot;赵丽颖&quot;);</span><br><span class="line">System.out.println(stu1);</span><br><span class="line">System.out.println(stu1.getName()); // 赵丽颖</span><br><span class="line">stu1 = new Student(&quot;霍建华&quot;);</span><br><span class="line">System.out.println(stu1);</span><br><span class="line">System.out.println(stu1.getName()); // 霍建华</span><br><span class="line">System.out.println(&quot;===============&quot;);</span><br><span class="line"></span><br><span class="line">final Student stu2 = new Student(&quot;高圆圆&quot;);</span><br><span class="line">// 错误写法！final的引用类型变量，其中的地址不可改变</span><br><span class="line">//        stu2 = new Student(&quot;赵又廷&quot;);</span><br><span class="line">System.out.println(stu2.getName()); // 高圆圆</span><br><span class="line">stu2.setName(&quot;高圆圆圆圆圆圆&quot;);</span><br><span class="line">System.out.println(stu2.getName()); // 高圆圆圆圆圆圆</span><br></pre></td></tr></table></figure>
-<h3 id="JavaBean"><a href="#JavaBean" class="headerlink" title="JavaBean"></a>JavaBean</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">一个标准的类通常要拥有下面四个组成部分：</span><br><span class="line">1. 所有的成员变量都要使用private关键字修饰</span><br><span class="line">2. 为每一个成员变量编写一对儿Getter/Setter方法</span><br><span class="line">3. 编写一个无参数的构造方法</span><br><span class="line">4. 编写一个全参数的构造方法</span><br><span class="line">这样标准的类也叫做Java Bean</span><br><span class="line"> */</span><br><span class="line">class Student &#123;</span><br><span class="line"></span><br><span class="line">    private String name; // 姓名</span><br><span class="line">    private int age; // 年龄</span><br><span class="line"></span><br><span class="line">    public Student() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Student(String name, int age) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String getName() &#123;</span><br><span class="line">        return name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setName(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getAge() &#123;</span><br><span class="line">        return age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void setAge(int age) &#123;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/12/Java-009-面向对象编程一/" data-id="cklcb6bcn002hwo91xjn6hu07" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-008-IO和异常" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/12/Java-008-IO和异常/" class="article-date">
-  <time datetime="2019-05-12T13:40:24.000Z" itemprop="datePublished">2019-05-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/12/Java-008-IO和异常/">Java_008_IO和异常</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ul>
-<li><a href="https://wdxtub.com/2016/04/16/thin-csapp-0/" target="_blank" rel="noopener">数据表示 - 不同的数据是如何存储与表示的</a></li>
-<li><a href="http://www.runoob.com/java/java-files-io.html" target="_blank" rel="noopener">Java流, 文件和IO</a></li>
-<li><a href="https://commons.apache.org/proper/commons-io/description.html" target="_blank" rel="noopener">Apache Commons IO工具类</a></li>
-</ul>
-<h3 id="I-O和流"><a href="#I-O和流" class="headerlink" title="I/O和流"></a>I/O和流</h3><ul>
-<li>I/O是Input和Output的缩写</li>
-<li>从读写设备,包括硬盘⽂文件,内存,键盘输⼊入,屏幕输出,⽹网络</li>
-<li>输⼊入输出 ”内容” (字节或⽂文本)</li>
-<li>流是对输⼊入输出设备的⼀一种抽象</li>
-<li>从流中读取内容,输出内容到流中</li>
-<li>“Linux中⼀一起都是⽂文件”</li>
-<li>从程序的⻆角度, 就是对读写设备进⾏行行封装, ⽐比如:创建⼀一个对象, 然后调⽤用⽅方法 读取(输出)内容, 然后对象会更更新当前⽂文件的位置</li>
-</ul>
-<h4 id="标准输⼊入输出流"><a href="#标准输⼊入输出流" class="headerlink" title="标准输⼊入输出流"></a>标准输⼊入输出流</h4><blockquote>
-<p>标准输出流</p>
-</blockquote>
-<p>System.in;</p>
-<h4 id="字节流"><a href="#字节流" class="headerlink" title="字节流"></a>字节流</h4><ul>
-<li>InputStream<ul>
-<li>System.in</li>
-<li>FileInputStream </li>
-</ul>
-</li>
-<li>OutputStream<ul>
-<li>System.out</li>
-<li>FileOutputStream </li>
-<li>BufferedInputStream和BufferedOutputStream </li>
-</ul>
-</li>
-<li>Stream⽤用于直接处理理”字节”</li>
-</ul>
-<h4 id="字符流"><a href="#字符流" class="headerlink" title="字符流"></a>字符流</h4><ul>
-<li>Reader</li>
-<li>InputStreamReader<ul>
-<li>FileReader </li>
-<li>BufferedReader<br>  bufferedReader.readLine();</li>
-</ul>
-</li>
-</ul>
-<h4 id="字符流-1"><a href="#字符流-1" class="headerlink" title="字符流"></a>字符流</h4><ul>
-<li>Writer</li>
-<li>OutputStreamWriter<ul>
-<li>FileWriter BufferedWriter<br>  bufferedWriter.write(String);</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">// System.out 标准输出流</span><br><span class="line">PrintStream out = System.out;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">System.out.println(&quot;hello java&quot;);</span><br><span class="line"></span><br><span class="line">// 标准输入</span><br><span class="line">InputStream in = System.in;</span><br><span class="line"></span><br><span class="line">InputStreamReader stdReader = new InputStreamReader(System.in);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">char[] buffer = new char[20];</span><br><span class="line"></span><br><span class="line">int length = stdReader.read(buffer);</span><br><span class="line"></span><br><span class="line">System.out.println(length);</span><br><span class="line">/*</span><br><span class="line">* 我们读取字符串的时候，需要用到其他的读取</span><br><span class="line">* 把字节转换成字符串</span><br><span class="line">*</span><br><span class="line">* */</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 从一个文件读取内容，输出到另一个文件</span><br><span class="line">FileInputStream input = new FileInputStream(&quot;res/input.txt&quot;);</span><br><span class="line">FileOutputStream output = new FileOutputStream(&quot;res/output.txt&quot;);</span><br><span class="line"></span><br><span class="line">InputStreamReader reader = new InputStreamReader(input,&quot;UTF-8&quot;);</span><br><span class="line">OutputStreamWriter writer = new OutputStreamWriter(output,&quot;UTF-8&quot;);</span><br><span class="line"></span><br><span class="line">BufferedReader bufferedReader = new BufferedReader(reader);</span><br><span class="line">PrintWriter printWriter = new PrintWriter(writer);</span><br><span class="line"></span><br><span class="line">//        String context = &quot;&quot;;</span><br><span class="line">//        for(String line = bufferedReader.readLine() ;line != null;line = bufferedReader.readLine())&#123;</span><br><span class="line">//            // 处理这一行</span><br><span class="line">//            context += line;</span><br><span class="line">//        &#125;</span><br><span class="line"></span><br><span class="line">String context2 = &quot;&quot;;</span><br><span class="line">String line = null;</span><br><span class="line">while(( line = bufferedReader.readLine()) != null)&#123;</span><br><span class="line">    // 加 \n 是因为 拼接的时候去掉了</span><br><span class="line">    context2 += line + &quot;\n&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">reader.close();</span><br><span class="line">input.close();</span><br><span class="line"></span><br><span class="line">System.out.println(context2);</span><br><span class="line">printWriter.print(context2);</span><br><span class="line"></span><br><span class="line">printWriter.close();</span><br><span class="line">output.close();</span><br></pre></td></tr></table></figure>
-<h4 id="IOUtils"><a href="#IOUtils" class="headerlink" title="IOUtils"></a>IOUtils</h4><ul>
-<li>IOUtils是Apache开源项⽬目的⼀一个很⼴广泛使⽤用的IO⼯工具库 </li>
-<li>主要提供更更⾼高抽象程度的IO访问⼯工具,⽅方便便写IO相关的代码 </li>
-<li>常⽤用类<ul>
-<li>FileUtils </li>
-<li>Charset </li>
-<li>DirectoryWalker </li>
-<li>copyUtils</li>
-</ul>
-</li>
-</ul>
-<h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><ul>
-<li>Java异常 (Exception) 是⽤用来在正常程序运⾏行行流程中遇到”异常”情况, 跳出正 常运⾏行行流程, 进⾏行行出错处理理的⼀一种机制</li>
-<li>异常类: new Exception();</li>
-<li>异常捕捉语句句:</li>
-<li>try {正常代码;} catch (Exception e) {处理理异常代码;}</li>
-</ul>
-<h4 id="异常-和-NULL"><a href="#异常-和-NULL" class="headerlink" title="异常 和 NULL"></a>异常 和 NULL</h4><ul>
-<li>Null是⼀一个值, 可以赋值给所有类型的变量量</li>
-<li>表达的是”空”, 指这个变量量不不指向任何对象</li>
-<li>Integer x = null; Object object = null;</li>
-<li>当调⽤用 x.xxx() 或 object.test() 时候, 会返回NullpointerException;</li>
-<li>这是⾮非常常⻅见的⼀一种错误, 所以使⽤用⼀一个变量量的时候, 需要检查这个变量量是否<br>指向null, 以免出错</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/12/Java-008-IO和异常/" data-id="cklcb6bcl002cwo91dg9joxm7" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-007-java基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/11/Java-007-java基础/" class="article-date">
-  <time datetime="2019-05-11T14:52:51.000Z" itemprop="datePublished">2019-05-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/11/Java-007-java基础/">Java_007_java基础</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="常量和变量"><a href="#常量和变量" class="headerlink" title="常量和变量"></a>常量和变量</h3><h4 id="常量：在程序运行期间，固定不变的量。"><a href="#常量：在程序运行期间，固定不变的量。" class="headerlink" title="常量：在程序运行期间，固定不变的量。"></a>常量：在程序运行期间，固定不变的量。</h4><blockquote>
-<p>常量的分类：</p>
-</blockquote>
-<ol>
-<li>字符串常量：凡是用双引号引起来的部分，叫做字符串常量。例如：”abc”、”Hello”、”123”</li>
-<li>整数常量：直接写上的数字，没有小数点。例如：100、200、0、-250</li>
-<li>浮点数常量：直接写上的数字，有小数点。例如：2.5、-3.14、0.0</li>
-<li>字符常量：凡是用单引号引起来的单个字符，就做字符常量。例如：’A’、’b’、’9’、’中’</li>
-<li>布尔常量：只有量中取值。true、false。</li>
-<li>空常量：null。代表没有任何数据。</li>
-</ol>
-<h4 id="变量：程序运行期间，内容可以发生改变的量。"><a href="#变量：程序运行期间，内容可以发生改变的量。" class="headerlink" title="变量：程序运行期间，内容可以发生改变的量。"></a>变量：程序运行期间，内容可以发生改变的量。</h4><blockquote>
-<p>创建一个变量并且使用的格式：</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">数据类型 变量名称; // 创建了一个变量</span><br><span class="line">变量名称 = 数据值; // 赋值，将右边的数据值，赋值交给左边的变量</span><br><span class="line">一步到位的格式：</span><br><span class="line">数据类型 变量名称 = 数据值; // 在创建一个变量的同时，立刻放入指定的数据值</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>创建一个变量</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">// 格式：数据类型 变量名称;</span><br><span class="line">int num1;</span><br><span class="line">// 向变量当中存入一个数据</span><br><span class="line">// 格式：变量名称 = 数据值;</span><br><span class="line">num1 = 10;</span><br><span class="line">// 当打印输出变量名称的时候，显示出来的是变量的内容</span><br><span class="line">System.out.println(num1); // 10</span><br><span class="line"></span><br><span class="line">// 改变变量当中本来的数字，变成新的数字</span><br><span class="line">num1 = 20;</span><br><span class="line">System.out.println(num1); // 20</span><br><span class="line"></span><br><span class="line">// 使用一步到位的格式来定义变量</span><br><span class="line">// 格式：数据类型 变量名称 = 数据值;</span><br><span class="line">int num2 = 25;</span><br><span class="line">System.out.println(num2); // 25</span><br><span class="line"></span><br><span class="line">num2 = 35;</span><br><span class="line">System.out.println(num2); // 35</span><br><span class="line">System.out.println(&quot;===============&quot;);</span><br><span class="line"></span><br><span class="line">byte num3 = 30; // 注意：右侧数值的范围不能超过左侧数据类型的取值范围</span><br><span class="line">System.out.println(num3); // 30</span><br><span class="line"></span><br><span class="line">// byte num4 = 400; // 右侧超出了byte数据范围，错误！</span><br><span class="line"></span><br><span class="line">short num5 = 50;</span><br><span class="line">System.out.println(num5); // 50</span><br><span class="line"></span><br><span class="line">long num6 = 3000000000L;</span><br><span class="line">System.out.println(num6); // 3000000000</span><br><span class="line"></span><br><span class="line">float num7 = 2.5F;</span><br><span class="line">System.out.println(num7); // 2.5</span><br><span class="line"></span><br><span class="line">double num8 = 1.2;</span><br><span class="line">System.out.println(num8); // 1.2</span><br><span class="line"></span><br><span class="line">char zifu1 = &apos;A&apos;;</span><br><span class="line">System.out.println(zifu1); // A</span><br><span class="line"></span><br><span class="line">zifu1 = &apos;中&apos;;</span><br><span class="line">System.out.println(zifu1); // 中</span><br><span class="line"></span><br><span class="line">boolean var1 = true;</span><br><span class="line">System.out.println(var1); // true</span><br><span class="line"></span><br><span class="line">var1 = false;</span><br><span class="line">System.out.println(var1); // false</span><br><span class="line"></span><br><span class="line">// 将一个变量的数据内容，赋值交给另一个变量</span><br><span class="line">// 右侧的变量名称var1已经存在，里面装的是false布尔值</span><br><span class="line">// 将右侧变量里面的false值，向左交给var2变量进行存储</span><br><span class="line">boolean var2 = var1;</span><br><span class="line">System.out.println(var2); // false</span><br></pre></td></tr></table></figure>
-<h3 id="分支语句"><a href="#分支语句" class="headerlink" title="分支语句"></a>分支语句</h3><blockquote>
-<h4 id="if-else"><a href="#if-else" class="headerlink" title="if / else"></a>if / else</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 标准 if-else 语句</span><br><span class="line">int num = 666;</span><br><span class="line"></span><br><span class="line">if (num % 2 == 0) &#123; // 如果除以2能够余数为0，说明是偶数</span><br><span class="line">    System.out.println(&quot;偶数&quot;);</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    System.out.println(&quot;奇数&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="switch"><a href="#switch" class="headerlink" title="switch"></a>switch</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">int num = 2;</span><br><span class="line">switch (num) &#123;</span><br><span class="line">    case 1:</span><br><span class="line">        System.out.println(&quot;你好&quot;);</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        System.out.println(&quot;我好&quot;);</span><br><span class="line">        // break;</span><br><span class="line">    case 3:</span><br><span class="line">        System.out.println(&quot;大家好&quot;);</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        System.out.println(&quot;他好，我也好。&quot;);</span><br><span class="line">        break;</span><br></pre></td></tr></table></figure>
-<h3 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h3><blockquote>
-<h4 id="for"><a href="#for" class="headerlink" title="for"></a>for</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 1; i &lt;= 100; i++) &#123;</span><br><span class="line">    System.out.println(&quot;我错啦！原谅我吧！&quot; + i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="while"><a href="#while" class="headerlink" title="while"></a>while</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int i = 1; // 1. 初始化语句</span><br><span class="line">while (i &lt;= 10) &#123; // 2. 条件判断</span><br><span class="line">    System.out.println(&quot;我错啦！&quot; + i); // 3. 循环体</span><br><span class="line">    i++; // 4. 步进语句</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="类"><a href="#类" class="headerlink" title="类"></a>类</h3><p>同类事物的抽象描述</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class Student &#123;</span><br><span class="line"></span><br><span class="line">    // 成员变量</span><br><span class="line">    String name; // 姓名</span><br><span class="line">    int age; // 姓名</span><br><span class="line"></span><br><span class="line">    // 成员方法</span><br><span class="line">    public void eat() &#123;</span><br><span class="line">        System.out.println(&quot;吃饭饭！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void sleep() &#123;</span><br><span class="line">        System.out.println(&quot;睡觉觉！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void study() &#123;</span><br><span class="line">        System.out.println(&quot;学习！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="代码参考"><a href="#代码参考" class="headerlink" title="代码参考"></a><a href="https://github.com/slTrust/java" target="_blank" rel="noopener">代码参考</a></h3>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/11/Java-007-java基础/" data-id="cklcb6bcp002lwo91q6g2xot5" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-006-计算机知识体系结构" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/09/Java-006-计算机知识体系结构/" class="article-date">
-  <time datetime="2019-05-09T15:14:36.000Z" itemprop="datePublished">2019-05-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/09/Java-006-计算机知识体系结构/">Java_006_计算机知识体系结构</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="计算机体系结构"><a href="#计算机体系结构" class="headerlink" title="计算机体系结构"></a>计算机体系结构</h2><h3 id="计算的目的"><a href="#计算的目的" class="headerlink" title="计算的目的"></a>计算的目的</h3><ul>
-<li>解决数学问题<ul>
-<li>表达式 a + b</li>
-<li>逻辑判断 if else</li>
-</ul>
-</li>
-<li><p>现实问题</p>
-<ul>
-<li>现实问题-&gt; 数学问题 -&gt; 计算问题</li>
-</ul>
-</li>
-<li><p>完成计算</p>
-</li>
-<li>计算的基本结构<ul>
-<li>表达式</li>
-<li>逻辑判断</li>
-<li>流程控制</li>
-<li>读取和存储</li>
-</ul>
-</li>
-<li>基本构造<ul>
-<li>计算</li>
-<li>存储</li>
-</ul>
-</li>
-</ul>
-<h3 id="编程的本质"><a href="#编程的本质" class="headerlink" title="编程的本质"></a>编程的本质</h3><ul>
-<li>把现实问题抽象成编程语言中的数据类型(存储)</li>
-<li>通过组合编程语言基本元素来表达数据的结构和对数据的转换和操作(计算)</li>
-<li>编程就是使用编程语言对现实进行理解和表达</li>
-</ul>
-<h3 id="编程语言基本结构"><a href="#编程语言基本结构" class="headerlink" title="编程语言基本结构"></a>编程语言基本结构</h3><ul>
-<li>基本数据类型<ul>
-<li>int</li>
-<li>String</li>
-<li>boolean</li>
-<li>float</li>
-</ul>
-</li>
-<li>语句和语法<ul>
-<li>const </li>
-<li>a = 1+2</li>
-<li>if</li>
-<li>for while</li>
-<li>函数和方法</li>
-</ul>
-</li>
-<li>执行环境<ul>
-<li>编译器/jvm</li>
-</ul>
-</li>
-<li>类型模型和类型系统</li>
-<li>编程范式<ul>
-<li>过测式</li>
-<li>面向对象</li>
-<li>函数式</li>
-<li>泛型</li>
-</ul>
-</li>
-</ul>
-<h3 id="程序的执行环境"><a href="#程序的执行环境" class="headerlink" title="程序的执行环境"></a>程序的执行环境</h3><ul>
-<li>编译器：将某种语言的源代码转换成目标代码<ul>
-<li>计算机和人类理解程序代码不同 它只认0和1</li>
-</ul>
-</li>
-<li>解释器：解释执行代码的程序，产生我们要的结果<ul>
-<li>jvm</li>
-<li>js解释器(浏览器,v8)</li>
-</ul>
-</li>
-<li>编译时和运行时</li>
-</ul>
-<blockquote>
-<h4 id="面试题：静态类型-vs-动态类型-和-强类型-vs-弱类型"><a href="#面试题：静态类型-vs-动态类型-和-强类型-vs-弱类型" class="headerlink" title="面试题：静态类型 vs 动态类型 和 强类型 vs 弱类型"></a>面试题：静态类型 vs 动态类型 和 强类型 vs 弱类型</h4></blockquote>
-<ul>
-<li>静态类型 vs 动态类型<ul>
-<li>静态：编译时能确定一个变量的类型</li>
-<li>动态：运行时才能确定一个变量的类型</li>
-</ul>
-</li>
-<li>强类型 vs 弱类型<ul>
-<li>强类型：一个对象只有一种解释方式</li>
-<li>弱类型：一个对象可以被解释成不同的类型</li>
-</ul>
-</li>
-<li>java是静态类型和强类型语言</li>
-<li>类型系统是程序语言的一种限制机制，动态类型和弱类型语言更加灵活，但是更容易出错，静态类型和强类型更加容易理解，减少出错的肯能性。</li>
-</ul>
-<h3 id="分布式系统"><a href="#分布式系统" class="headerlink" title="分布式系统"></a>分布式系统</h3><blockquote>
-<p>随着互联网的发展，越来越多人有个人设备。一台电脑无法承受数以亿计的访问量</p>
-</blockquote>
-<ul>
-<li>计算 -&gt; 分布式</li>
-<li>存储 -&gt; 分布式</li>
-<li>把原来在单机上的计算“分布”到多台机器上，单台计算机上的存储“分布”到多台机子上</li>
-<li>带来什么问题？<ul>
-<li>沟通</li>
-<li>协作</li>
-<li>误差</li>
-<li>同步</li>
-<li>效率损失</li>
-</ul>
-</li>
-<li>分布的机器数据一致</li>
-<li>分布的机器计算协调</li>
-<li>分布的机器交流和协作</li>
-</ul>
-<blockquote>
-<p>横向的分布式(计算分到不同机器上)</p>
-</blockquote>
-<ul>
-<li>把计算分到不同机器去执行</li>
-<li>把存储数据分布到不同机器</li>
-<li>例子：MapReduce  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">100T数据 一台机子存不了</span><br><span class="line">只能分两台 一台50T</span><br><span class="line"></span><br><span class="line">100T数据 里面都存了很多 单词</span><br><span class="line">如果在一台机子上查很慢</span><br><span class="line">把文件拆成两半放在两台机子上 同时查</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p>竖向分布式(按功能分)</p>
-</blockquote>
-<ul>
-<li>一组机器负责计算</li>
-<li>一组机器负责存储<ul>
-<li>例子：Lamada ,Casandra 和 Kafka(非常值得学习)</li>
-</ul>
-</li>
-</ul>
-<h3 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h3><ul>
-<li><a href="http://www.yinwang.org/blog-cn/2018/04/13/computer-science" target="_blank" rel="noopener">解谜计算机科学</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/09/Java-006-计算机知识体系结构/" data-id="cklcb6bck002awo91kkx4ja1p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/14/Java-011-00数据结构初探/" data-id="cklhgn2a9002kkyfym6thq0lj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -931,7 +749,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/19/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/21/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/19/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/21/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -955,7 +773,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -977,23 +795,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

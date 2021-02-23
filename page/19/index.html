@@ -62,6 +62,723 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Java-025-sql进阶" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/11/Java-025-sql进阶/" class="article-date">
+  <time datetime="2019-06-11T05:34:25.000Z" itemprop="datePublished">2019-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/11/Java-025-sql进阶/">Java-025-sql进阶</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="进阶—SQL语言"><a href="#进阶—SQL语言" class="headerlink" title="进阶—SQL语言"></a>进阶—SQL语言</h3><h4 id="SQL-语言"><a href="#SQL-语言" class="headerlink" title="SQL 语言"></a>SQL 语言</h4><p>SQL 全称 Structured Query Language, 主要用来查询和更新数据库的一个语言.</p>
+<p>SQL 也就是关系数据库的一个标准化交互接口, 而关系数据库中的数据是结构化, 主要的一个操作就是从数据库中查询我们需要的内容.</p>
+<h5 id="结构化数据"><a href="#结构化数据" class="headerlink" title="结构化数据"></a>结构化数据</h5><blockquote>
+<p>数据表</p>
+</blockquote>
+<p>关系数据库的结构主题是数据表, 数据库可以说是数据表的合集. 然后数据表中就包含具体的数据记录. 一个数据表会有不同的字段.</p>
+<ul>
+<li>数据表</li>
+<li>字段 / 主键</li>
+<li>记录</li>
+</ul>
+<p>主键是每一条数据记录的唯一标志, 同一张数据表中, 所有记录的主键都是不同的!</p>
+<p>具体实例就是用户数据库, 我们可以设置用户 id 作为主键, 然后就可以通过用户 id 来唯一确定一个用户. 其他的字段, 用来表示用户的属性, 比如用户的名字, 用户的性别, 用户密码之类属性, 从语义上说, 不同用户是可以有相同的名字, 性别或密码.</p>
+<p>用户表 user:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>type</th>
+<th>password</th>
+<th>content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Alex</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is the first</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Alice</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is thhe first user</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Alex</td>
+<td>vip</td>
+<td>password</td>
+<td>Here is the second Alex</td>
+</tr>
+</tbody>
+</table>
+<p>数据库是表的合集, 然后不同表之间可能有相同的字段 (一般是其中一个表的主键), 也就是说, 这些表通过这些相同的字段给联系在一起了, 也就是所谓的关系. 我们查询过程中, 也是通过这些键从不同的数据表中查询到相关的数据.</p>
+<p>订单表 order:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>5</td>
+<td>203231232</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>15</td>
+<td>1</td>
+<td>324324234</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>213213219</td>
+</tr>
+</tbody>
+</table>
+<p>上面两个示例表, 可以通过用户id在用户表中查询一个用户的信息, 然后再在订单表中查询这个用户的订单.</p>
+<p>SQL数据类型<br>请参考: <a href="http://www.w3school.com.cn/sql/sql_datatypes.asp" target="_blank" rel="noopener">SQL数据类型</a></p>
+<p>数据约束<br>请参考: <a href="http://www.w3school.com.cn/sql/sql_constraints.asp" target="_blank" rel="noopener">SQL约束</a></p>
+<h4 id="常用查询-更新-管理-语句"><a href="#常用查询-更新-管理-语句" class="headerlink" title="常用查询(更新, 管理)语句"></a>常用查询(更新, 管理)语句</h4><h5 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE shop;</span><br><span class="line">USE shop; // 使用shop这个数据库, 之后在这个数据库下执行语句</span><br></pre></td></tr></table></figure>
+<h5 id="创建数据表"><a href="#创建数据表" class="headerlink" title="创建数据表"></a>创建数据表</h5><p>用户表 user:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `user` (</span><br><span class="line">    id          INTEGER         PRIMARY KEY NOT NULL,</span><br><span class="line">    name        VARCHAR(20)     UNIQUE NOT NULL, </span><br><span class="line">    type        VARCHAR(25)     NOT NULL,</span><br><span class="line">    password    VARCHAR(25)     NOT NULL,</span><br><span class="line">    content     VARCHAR(255)     </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>订单表 order:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `order` (</span><br><span class="line">    id          INTEGER        PRIMARY KEY NOT NULL,</span><br><span class="line">    user_id     INTEGER        NOT NULL, </span><br><span class="line">    product_id  INTEGER        NOT NULL,</span><br><span class="line">    quantity    INTEGER        NOT NULL,     </span><br><span class="line">    time        DATETIME       NOT NULL,</span><br><span class="line">    status      VARCHAR(20)    NOT NULL</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h5 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h5><blockquote>
+<p>插入数据到user表</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;alex&apos;, &apos;ADMIN&apos;, &apos;password&apos;, &apos;管理员账号, 属于shiyang&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;alic&apos;, &apos;NORMAL&apos;, &apos;password&apos;, &apos;普通账号&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;bob&apos;, &apos;NORMAL&apos;, &apos;password&apos;, &apos;普通账号Bob&apos;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>插入数据到order表</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `order` (user_id, product_id, quantity, time, status)</span><br><span class="line">VALUES (1, 1, 5, CURRENT_TIMESTAMP, &apos;PENDING&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `order` (user_id, product_id, quantity, time, status)</span><br><span class="line">VALUES (2, 1, 1, CURRENT_TIMESTAMP, &apos;PENDING&apos;);</span><br></pre></td></tr></table></figure>
+<h5 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h5><blockquote>
+<p>基本查询语法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT 通配符,字段或函数 FROM 表 WHERE 条件 group by 字段</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>实例</p>
+</blockquote>
+<p>查询所有用户信息:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user`;</span><br></pre></td></tr></table></figure>
+<p>通过用户id查询用户名和密码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT name FROM `user` WHERE id = 1;</span><br><span class="line">SELECT name, password FROM `user` WHERE id = 1;</span><br></pre></td></tr></table></figure>
+<p>查询特定数量范围内的订单:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `order` WHERE quantity between 1 and 10;</span><br></pre></td></tr></table></figure>
+<p>根据用户类型分组查询用户:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` GROUP BY type;</span><br></pre></td></tr></table></figure>
+<h5 id="更新数据"><a href="#更新数据" class="headerlink" title="更新数据"></a>更新数据</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UPDATE `user` SET password = &apos;123456&apos;  WHERE id = 1;</span><br><span class="line">UPDATE `user` SET content = &apos;这是更新之后的内容&apos;, password = &apos;09876&apos; WHERE id = 1;</span><br></pre></td></tr></table></figure>
+<h5 id="Join-查询"><a href="#Join-查询" class="headerlink" title="Join 查询"></a>Join 查询</h5><p>SQL 的 Join 子句用于结合两个或多个数据库中表的记录. JOIN 是一种通过共同值来结合两个表中字段的手段. 也就是所谓的关系.</p>
+<p>比如: 我们需要查询一个用户的用户名简介及其所有订单商品的id和数量, 这种查询应该怎么做呢?</p>
+<p>主要难点: 需要查询的内容来自两个表</p>
+<blockquote>
+<p>Cross Join</p>
+</blockquote>
+<p>Cross join把两个表的所有行进行叉乘拼接 (XY). 即表A的每一行会拼接表B的的所有行 (n行), 然后生成n行数据. 假设表A有x行, 表B有y行, 则输输出总行数为xy行.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` CROSS JOIN `order`;</span><br><span class="line"></span><br><span class="line">SELECT * FROM `user` CROSS JOIN `order` WHERE `user`.id = 1 AND `order`.user_id = 1;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Inner Join</p>
+</blockquote>
+<p>Inner Join和Cross Join相似, 只是可以接收一个条件, 然后把满足这个条件的行组合再一起.</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql1.png" alt></p>
+<p>比如: 我们需要查询用户的信息, 简介及其所有订单商品的id和数量, 这种查询应该怎么做呢?</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` INNER JOIN `order` ON `user`.id =  `order`.user_id;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Outter Join</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql2.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql3.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql4.png" alt></p>
+<h5 id="JAVA执行SQL"><a href="#JAVA执行SQL" class="headerlink" title="JAVA执行SQL"></a>JAVA执行SQL</h5><p><code>`</code><br>CREATE TABLE <code>product</code> (<br>    id          INTEGER         PRIMARY KEY NOT NULL,<br>    name        VARCHAR(20)     NOT NULL,<br>    description VARCHAR(25)     NOT NULL,<br>    price       DOUBLE          NOT NULL<br>);<br>INSERT INTO <code>product</code> (name, description, price)<br>VALUES (‘milk’, ‘1 milk 1 day, healthy’, 2.50);</p>
+<p>INSERT INTO <code>product</code> (name, description, price)<br>VALUES (‘coke’, ‘1 coke 1 day, unhealthy’, 1.50);<br><code></code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/11/Java-025-sql进阶/" data-id="cklhgn2ar003mkyfyqm1kvu3w" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-024-数据库和jdbc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/11/Java-024-数据库和jdbc/" class="article-date">
+  <time datetime="2019-06-11T03:31:54.000Z" itemprop="datePublished">2019-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/11/Java-024-数据库和jdbc/">Java-024-数据库和jdbc</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="数据库和JDBC"><a href="#数据库和JDBC" class="headerlink" title="数据库和JDBC"></a>数据库和JDBC</h3><h4 id="关于数据库的What和Why"><a href="#关于数据库的What和Why" class="headerlink" title="关于数据库的What和Why"></a>关于数据库的What和Why</h4><p>之前我们在计算机程序模型中提到过, 在计算机世界中需要处理的几个核心问题:</p>
+<ul>
+<li>存储</li>
+<li>计算</li>
+<li>交互</li>
+</ul>
+<p>具体到存储这一块, 之前我们了解过</p>
+<ul>
+<li>存储设备 – 内存和硬盘, 以及对具体硬盘磁片的存储单元, 块和内存的存储单元</li>
+<li>文件系统 – 在操作系统层面上对存储的抽象, 比如说目录和文件.</li>
+<li>应用程序 – 针对不同的应用场景, 可能数据内容的形式和模型会有不同的需求. 比如说, Web程序可能很多文本形式的数据, 多媒体数据等等</li>
+</ul>
+<p>数据库则是提供针对不同类型的应用程序 (Web前端程序, Web后端程序, 终端应用等等)的通用数据存储需求的存储需求的高级抽象</p>
+<p>本质上, 我们谈存储和数据, 就是在谈状态. 比如:</p>
+<ul>
+<li>账号信息</li>
+<li>产品信息</li>
+<li>订单信息等等</li>
+</ul>
+<p>存储, 不管哪个层面上, 都是为了在特定的时限内保存这些实体的状态.</p>
+<p>然后很重要的一类计算就是对这些实体的状态的转换和维护, 以及比如:</p>
+<ul>
+<li>更新账号密码</li>
+<li>更新产品的库存</li>
+<li>创建订单</li>
+</ul>
+<p>从各种各样的应用程序的实例中, 提炼抽象出的一些通用的数据存储需求, 一起实现到一套系统中, 就产生了数据库:</p>
+<ul>
+<li>数据存储</li>
+<li>数据结构和组织</li>
+<li>数据索引 (如何找到数据)</li>
+<li>数据的更新和查询</li>
+<li>数据的备份和冗余 (防止丢失和保持可用)</li>
+<li>数据一致性, 事务</li>
+<li>数据管理</li>
+<li>等等</li>
+</ul>
+<p>市面上各种不同的数据库, 就是针对不同的场景和不同的需求, 对以上的问题提出针对性的解决方案, 并且有不同的侧重点</p>
+<h4 id="数据库类型"><a href="#数据库类型" class="headerlink" title="数据库类型"></a>数据库类型</h4><p>按照上面的逻辑, 数据库的特性和应用需求是多维度的. 所以我们在考虑数据库的分类的时候, 也得从不同维度来考虑!</p>
+<blockquote>
+<h4 id="从数据结构和组织"><a href="#从数据结构和组织" class="headerlink" title="从数据结构和组织"></a>从数据结构和组织</h4></blockquote>
+<p>关系数据库 / SQL</p>
+<p>MySQL, Oracle, DB2, PostgreSQL, SQLite</p>
+<p>对象 / Document / 列-Based (NoSQL)</p>
+<p>MongoDB, DynamoDB 等等</p>
+<p>图</p>
+<p>Key-Value<br>leveldb</p>
+<p>时间序列<br>比如金融量化交易系统的金融数据, 时间维度是很重要的!</p>
+<blockquote>
+<h4 id="从数据存储"><a href="#从数据存储" class="headerlink" title="从数据存储"></a>从数据存储</h4></blockquote>
+<blockquote>
+<p>终端应用数据库</p>
+</blockquote>
+<p>在应用本地存储数据的数据库, 比如说Web前端, Android/ios应用的本地数据库.</p>
+<ul>
+<li>SQLite</li>
+</ul>
+<blockquote>
+<p>内存数据库</p>
+</blockquote>
+<p>在后端系统中, 可能需要一些访问更快但是不需要持久性的数据, 就可能需要在内存中的数据库. 但是可以获得更快的读取更新速度</p>
+<ul>
+<li>Redis</li>
+<li>Memcached</li>
+</ul>
+<p>比如:</p>
+<ul>
+<li>Web程序中的用户登录状态, 就可以存储在内存里, 如果Web后端程序重启之后, 内存的数据库会丢失, 但是只需要用户重新登录就好了, 但是可以获得更快的读取和更新速度</li>
+<li>爬虫中的已经访问过的URLs</li>
+</ul>
+<blockquote>
+<h4 id="持久化数据库"><a href="#持久化数据库" class="headerlink" title="持久化数据库"></a>持久化数据库</h4></blockquote>
+<p>MySQL, Oracle, MongoDB可能会更关注持久性存储, 冗余和备份, 保证数据的安全(Security和Safety)等等.</p>
+<blockquote>
+<h4 id="分布式数据库"><a href="#分布式数据库" class="headerlink" title="分布式数据库"></a>分布式数据库</h4></blockquote>
+<p>数据规模扩大之后, 可能需要在多台机器 (分布式) 上存储, 同时提供保证大量数据的存储能力, 数据冗余, 高吞吐的能力</p>
+<ul>
+<li>HBase</li>
+<li>Cassandra</li>
+</ul>
+<blockquote>
+<h4 id="云数据库"><a href="#云数据库" class="headerlink" title="云数据库"></a>云数据库</h4></blockquote>
+<p>云上的完整解决方案, 按需付费, 可伸缩性, 更专业稳定的运维能力</p>
+<ul>
+<li>DynamoDB</li>
+<li>腾讯云数据库</li>
+<li>阿里云数据库</li>
+</ul>
+<blockquote>
+<p>区块链</p>
+</blockquote>
+<p>区块链本质上是一个可以完全分布到整个互联网的数据库!</p>
+<h4 id="关系数据库"><a href="#关系数据库" class="headerlink" title="关系数据库"></a>关系数据库</h4><p>关系型数据库是对一类数据库设计经验的总结和设计方法的抽象，以期得到一个通用的数据库的解决方法</p>
+<p>关系数据组织数据的基本结构:</p>
+<ul>
+<li>数据库</li>
+<li>数据库表</li>
+<li>数据库字段</li>
+<li>数据库记录</li>
+</ul>
+<p>SQL是一个对SQL数据库的查询和操作的通用语言</p>
+<blockquote>
+<h4 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h4></blockquote>
+<p>Java程序连接SQL数据库,操作SQL数据库和执行SQL语句的库.</p>
+<ul>
+<li>程序接口</li>
+<li>数据库驱动程序</li>
+</ul>
+<p>sqlite-jdbc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">import java.sql.Connection;</span><br><span class="line">import java.sql.DriverManager;</span><br><span class="line">import java.sql.ResultSet;</span><br><span class="line">import java.sql.SQLException;</span><br><span class="line">import java.sql.Statement;</span><br><span class="line"></span><br><span class="line">public class JdbcSample &#123;</span><br><span class="line">    public static void main(String[] args)</span><br><span class="line">    &#123;</span><br><span class="line">        Connection connection = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            // 创建数据库连接</span><br><span class="line">            connection = DriverManager.getConnection(&quot;jdbc:sqlite:resources/sample.db&quot;);</span><br><span class="line">            Statement statement = connection.createStatement();</span><br><span class="line">            statement.setQueryTimeout(30);  // set timeout to 30 sec.</span><br><span class="line"></span><br><span class="line">            statement.executeUpdate(&quot;drop table if exists person&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;create table person (id integer, name string)&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;insert into person values(1, &apos;leo&apos;)&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;insert into person values(2, &apos;yui&apos;)&quot;);</span><br><span class="line">            ResultSet rs = statement.executeQuery(&quot;select * from person&quot;);</span><br><span class="line">            while(rs.next()) &#123;</span><br><span class="line">                // read the result set</span><br><span class="line">                System.out.println(&quot;name = &quot; + rs.getString(&quot;name&quot;));</span><br><span class="line">                System.out.println(&quot;id = &quot; + rs.getInt(&quot;id&quot;));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch(SQLException e) &#123;</span><br><span class="line">            // if the error message is &quot;out of memory&quot;,</span><br><span class="line">            // it probably means no database file is found</span><br><span class="line">            System.err.println(e.getMessage());</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                if(connection != null)</span><br><span class="line">                    connection.close();</span><br><span class="line">            &#125; catch(SQLException e) &#123;</span><br><span class="line">                // connection close failed.</span><br><span class="line">                System.err.println(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><blockquote>
+<h4 id="数据库学习"><a href="#数据库学习" class="headerlink" title="数据库学习"></a>数据库学习</h4></blockquote>
+<ul>
+<li><a href="https://sltrust.github.io/tags/mysql/" target="_blank" rel="noopener">mysql基本语法</a></li>
+<li><a href="http://www.runoob.com/sqlite/sqlite-java.html" target="_blank" rel="noopener">sqlite教程</a></li>
+<li><a href="https://www.zhihu.com/question/273489729" target="_blank" rel="noopener">为什么要学数据库原理和设计?</a></li>
+<li><a href="https://www.zhihu.com/question/26788013" target="_blank" rel="noopener">数据库这门课为什么这么难学，该怎么学?</a></li>
+<li><a href="https://book.douban.com/subject/2334295/" target="_blank" rel="noopener">Head First SQL</a></li>
+</ul>
+<blockquote>
+<h4 id="数据库选择"><a href="#数据库选择" class="headerlink" title="数据库选择"></a>数据库选择</h4></blockquote>
+<ul>
+<li><a href="https://arcentry.com/blog/choosing-a-database-in-2018/" target="_blank" rel="noopener">How to choose a database in 2018</a></li>
+</ul>
+<blockquote>
+<h4 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h4></blockquote>
+<ul>
+<li>Google 开源 Key-Value store: <a href="https://github.com/google/leveldb" target="_blank" rel="noopener">leveldb</a></li>
+<li>开源分布式数据库: <a href="http://cassandra.apache.org/" target="_blank" rel="noopener">Cassandra</a></li>
+</ul>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h4><ul>
+<li><a href="http://github.com/slTrust/java_024_jdbc" target="_blank" rel="noopener">java_024_jdbc</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/11/Java-024-数据库和jdbc/" data-id="cklhgn2aq003kkyfyxtweokqt" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-022-控制反转和依赖注入" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/09/Java-022-控制反转和依赖注入/" class="article-date">
+  <time datetime="2019-06-09T03:31:54.000Z" itemprop="datePublished">2019-06-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/09/Java-022-控制反转和依赖注入/">Java-022-控制反转和依赖注入</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="控制反转和依赖注入"><a href="#控制反转和依赖注入" class="headerlink" title="控制反转和依赖注入"></a>控制反转和依赖注入</h3><h4 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h4><p>控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如:</p>
+<p>A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁</p>
+<p>而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解耦.</p>
+<p>因为A类里的代码需要去new一个B的对象, 就需要调用B的构造方法: 更新了B的构造方法 –&gt; A中调用的B的构造方法!<br>X –&gt; A, B, C –&gt; D</p>
+<p>在X里创建D的对象, 然后再传给A, B, C</p>
+<p>和封装实现细节的对比</p>
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>通过控制反转, 我们把B的控制权转移到A的外部, 但是A仍然依赖于B, 需要使用B的对象去完成一些事情. 那问题来了:</p>
+<blockquote>
+<h4 id="我们如何把在外部创建的B的对象交给A呢"><a href="#我们如何把在外部创建的B的对象交给A呢" class="headerlink" title="我们如何把在外部创建的B的对象交给A呢?"></a>我们如何把在外部创建的B的对象交给A呢?</h4></blockquote>
+<ul>
+<li>在A的构造方法里把B作为一个参数传给A</li>
+<li>使用setter方法把B传给A</li>
+</ul>
+<p>这个其实就是所谓的依赖注入! 依赖注入其实就是控制反转的一个实现, 差不多也是同一回事.</p>
+<h4 id="组件和依赖注入"><a href="#组件和依赖注入" class="headerlink" title="组件和依赖注入"></a>组件和依赖注入</h4><p>回忆之前讲Java程序的基本结构: 抽象出一些类和对象, 然后处理对象之间的交互.</p>
+<p>然后在具体的场景中, 我们会有一些常用的对象来处理一些常见的逻辑结构, 比如说特定本地数据的访问, 数据库的访问, 配置文件访问, 认证, 这种我们会称之为组件或者模块, 在Spring里称之为Bean.</p>
+<p>同一个组件通常可能会在程序中很多地方需要使用, 比如说 UserController 可能会使用到 UserDao 这个组件, ManageControler 也会使用到 UserDao 这个组件. 那最简单的方式是, 我们每次使用的时候都创建一个组件 UserDao 的实例, 即使这个组件是可以重用的! (这里违反了什么原则?)</p>
+<p>但是有没有其他更好的方式呢? 就是统一管理组件的创建, 然后在需要使用的地方把这个组件的实例注入.</p>
+<h4 id="Spring的组件管理和依赖注入"><a href="#Spring的组件管理和依赖注入" class="headerlink" title="Spring的组件管理和依赖注入"></a>Spring的组件管理和依赖注入</h4><blockquote>
+<h4 id="常用的两种注入方式"><a href="#常用的两种注入方式" class="headerlink" title="常用的两种注入方式:"></a>常用的两种注入方式:</h4></blockquote>
+<ul>
+<li>组件直接标记注入</li>
+<li>工厂模式注入</li>
+</ul>
+<blockquote>
+<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></blockquote>
+<blockquote>
+<p>直接注入</p>
+</blockquote>
+<p>如果需要被注入的组件, 是我们能够控制的, 那我们就可以使用直接标记注入, 简洁优雅.</p>
+<blockquote>
+<p>工厂模式注入</p>
+</blockquote>
+<p>如果需要注入的组件, 我们需要更复杂的控制创建过程, 比如说动态根据输入内容创建组件, 那就使用工厂模式注入.</p>
+<p>或者需要注入的组件是一个外部库的类, 那我们没法给它加上@Component这样的标记, 那我们就必须使用工厂模式注入.</p>
+<p>再或者, 我们希望控制组件的数量, 如果是只需要一个组件的实例, 则使用直接注入或者工厂模式都可以. 但是如果需要使用多个实例(比如每次使用都创建一个新的实例), 那就使用工厂模式!</p>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a><a href="https://github.com/slTrust/java_022_spring" target="_blank" rel="noopener">代码链接</a></h4>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/" data-id="cklhgn2at003qkyfyt1tzyzd4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-021-单元测试" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/08/Java-021-单元测试/" class="article-date">
+  <time datetime="2019-06-08T03:31:10.000Z" itemprop="datePublished">2019-06-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/08/Java-021-单元测试/">Java-021-单元测试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><p>@(Programming_Training)</p>
+<h4 id="What-–-单元测试是什么"><a href="#What-–-单元测试是什么" class="headerlink" title="What – 单元测试是什么"></a>What – 单元测试是什么</h4><blockquote>
+<h4 id="单元"><a href="#单元" class="headerlink" title="单元"></a>单元</h4></blockquote>
+<p>我们在构建程序的时候, </p>
+<p>都是把程序分成一个个小的模块和组件</p>
+<p>这些模块在java里面按照层次可以对应的是:</p>
+<ul>
+<li>包</li>
+<li>类</li>
+<li>方法</li>
+</ul>
+<p>意思就是测试的粒度, 一般在类和方法这样的粒度上做测试, 也就是说, 一个单元可以是一个类的一个方法</p>
+<blockquote>
+<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4></blockquote>
+<p>顾名思义, 为了Double check我们实现的代码功能符合我们的预期</p>
+<h4 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h4><blockquote>
+<h4 id="Double-check"><a href="#Double-check" class="headerlink" title="Double check"></a>Double check</h4></blockquote>
+<p>类和方法的实现没有bug, 符合我们在设计时候的预期和要求</p>
+<blockquote>
+<h4 id="功能稳定的保证"><a href="#功能稳定的保证" class="headerlink" title="功能稳定的保证"></a>功能稳定的保证</h4></blockquote>
+<p>类和方法的实现, 在代码的进化和发展过程, 会需要进行反复的修改和重构, 当我们更改代码的时候, 单元测试能够保证修改后功能不会受影响, 从而影响下层依赖这个类和方法的代码</p>
+<p>良好的单元测试是重构的基础, 感受一下</p>
+<blockquote>
+<h4 id="对设计的帮助"><a href="#对设计的帮助" class="headerlink" title="对设计的帮助"></a>对设计的帮助</h4></blockquote>
+<p>当你在写单元测试的时候, 势必会把从一个个小的单元(或模块)来考虑程序, 也就是模块化思维, 因为如果不这样思考, 根本没办法写单元测试. 这样测试时候, 强迫自己去考虑代码的模块化</p>
+<p>也就是江湖上流传的, 编写可测试的代码</p>
+<blockquote>
+<h5 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h5></blockquote>
+<ul>
+<li><a href="https://www.ibm.com/developerworks/cn/linux/l-tdd/index.html" target="_blank" rel="noopener">测试驱动开发</a></li>
+<li><a href="https://book.douban.com/subject/1230036/" target="_blank" rel="noopener">测试驱动开发(中文版)</a></li>
+</ul>
+<blockquote>
+<h5 id="代码文档"><a href="#代码文档" class="headerlink" title="代码文档"></a>代码文档</h5></blockquote>
+<p>好的测试也可以是一个很好的文档, 刚开始学习一个系统或者程序时候, 可以从其单元测试开始, 了解如何使用其代码, 输入是什么, 输出是什么, 预期的运行结果是什么</p>
+<h4 id="How-–-如何做单元测试"><a href="#How-–-如何做单元测试" class="headerlink" title="How – 如何做单元测试"></a>How – 如何做单元测试</h4><p>到此为止, 我们大概知道单元测试的目标是什么 — 试着调用实现的类和方法, 然后确定其正确性</p>
+<p>比如, 我们可以在main方法里写测试, 然后开发时候直接跑一下.</p>
+<p>但是这样效率太低了, 而且当测试量大的时候, 需要结构化的组织测试代码.</p>
+<h3 id="Junit"><a href="#Junit" class="headerlink" title="Junit"></a>Junit</h3><p><a href="https://github.com/junit-team/junit4/wiki/Getting-started" target="_blank" rel="noopener">https://github.com/junit-team/junit4/wiki/Getting-started</a></p>
+<p>通过Java的标记, 组织测试代码, 组织成测试集. 然后每次编译之后, 运行所有的测试集.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Calculator &#123;</span><br><span class="line">  public int evaluate(String expression) &#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for (String summand: expression.split(&quot;\\+&quot;))</span><br><span class="line">      sum += Integer.valueOf(summand);</span><br><span class="line">    return sum;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">import static org.junit.Assert.assertEquals;</span><br><span class="line">import org.junit.Test;</span><br><span class="line"></span><br><span class="line">public class CalculatorTest &#123;</span><br><span class="line">  @Test</span><br><span class="line">  public void evaluatesExpression() &#123;</span><br><span class="line">    Calculator calculator = new Calculator();</span><br><span class="line">    int sum = calculator.evaluate(&quot;1+2+3&quot;);</span><br><span class="line">    assertEquals(6, sum);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="EasyMock"><a href="#EasyMock" class="headerlink" title="EasyMock"></a>EasyMock</h4><p><a href="http://easymock.org" target="_blank" rel="noopener">http://easymock.org</a></p>
+<p>当我们在写测试的时候, 我们会经常遇到一个问题就是, 我们会有很多依赖的模块, 或者依赖的内容, 比如一些我们使用的库, 查询的数据库, 采集的网络数据</p>
+<p>如果测试中都去获取这些依赖的内容, 就会影响测试代码的可靠性和性能.</p>
+<p>而且我们依赖的模块和内容, 维护其正确性的责任不在我们! 我们测试应该更关注我们自己代码的逻辑和实现的正确性!</p>
+<blockquote>
+<p>比如在爬虫中, 我们采集的网页内容, 就是依赖, 如果我们测试时候, 我们都必须去爬一下内容, 那效率就特别低! 我们可以在本地存储一份用于测试的网页内容</p>
+</blockquote>
+<blockquote>
+<p>比如数据库查询, 我们不可能在测试代码中真正去操作数据库(炒鸡危险的行为!), 所以我们需要模拟(Mock)一个假的数据对象</p>
+</blockquote>
+<p>EasyMock就是用来解决这个问题的! Mock需要的依赖, 一般EasyMock是配合JUnit一起使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class JsonNewsTestableReaderTest extends EasyMockSupport &#123;</span><br><span class="line"></span><br><span class="line">    private TextNewsTestableReader textNewsTestableReader;</span><br><span class="line">    private BufferedReader newsReader;</span><br><span class="line"></span><br><span class="line">    @Before</span><br><span class="line">    public void setup() &#123;</span><br><span class="line">        newsReader = createStrictMock(BufferedReader.class);</span><br><span class="line">        textNewsTestableReader = new TextNewsTestableReader(newsReader);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void shouldReadNews() throws Exception &#123;</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;title&quot;);</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;\n&quot;);</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;content&quot;);</span><br><span class="line"></span><br><span class="line">        replayAll();</span><br><span class="line">        News  news = textNewsTestableReader.readNews();</span><br><span class="line">        verifyAll();</span><br><span class="line"></span><br><span class="line">        assertEquals(&quot;title&quot;, news.getTitle());</span><br><span class="line">        assertEquals(&quot;content&quot;, news.getContent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="maven项目引入单元测试"><a href="#maven项目引入单元测试" class="headerlink" title="maven项目引入单元测试"></a>maven项目引入单元测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> &lt;dependencies&gt;</span><br><span class="line">    &lt;!-- junit --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.12&lt;/version&gt;</span><br><span class="line">        &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- mock --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.easymock&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;easymock&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.0.2&lt;/version&gt;</span><br><span class="line">        &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a href="https://github.com/slTrust/java_021_junit_demo" target="_blank" rel="noopener">代码链接</a></p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/08/Java-021-单元测试/" data-id="cklhgn2ap003ikyfy1ov20uht" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-020-RESTful" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/07/Java-020-RESTful/" class="article-date">
+  <time datetime="2019-06-07T03:30:20.000Z" itemprop="datePublished">2019-06-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/07/Java-020-RESTful/">Java-020-RESTful</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h3><h4 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h4><ul>
+<li>URI – 互联网资源的地址</li>
+<li>操作 – 对资源执行的操作: GET, PUT, POST, DELETE</li>
+<li>返回状态码 – 表示执行结果: 200, 201, 403, 404, 500</li>
+</ul>
+<p>以上是 HTTP协议在程序语义层面的定义, 同时也抽象了整个互联网内容的组织和交互方式.</p>
+<ul>
+<li>互联网上所有的内容都是资源, 每个资源有唯一的URI</li>
+<li>交互就是对互联网资源的操作(GET, PUT, POST, DELETE)</li>
+<li>然后资源的操作结果就是状态返回码</li>
+</ul>
+<p>每一次请求的发起都是客户端向服务端发起.</p>
+<h4 id="RESTful-API-1"><a href="#RESTful-API-1" class="headerlink" title="RESTful API"></a>RESTful API</h4><p>RESTful API就是基于HTTP协议对互联网的内容定义的方式提出的一套互联网应用的架构体系.</p>
+<p>RESTful是一种设计模式规范的指南, 不是一个强制性的要求, 所以遵守都必须是靠开发者自己遵守.</p>
+<h4 id="RESTful-API的基本要求"><a href="#RESTful-API的基本要求" class="headerlink" title="RESTful API的基本要求"></a>RESTful API的基本要求</h4><blockquote>
+<p>URI</p>
+</blockquote>
+<ol>
+<li>协议: HTTP或HTTPS</li>
+<li><p>域名和地址一般格式: http://&lt;域名&gt;/api/<version></version></p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">有 api 路径是为了版本的更新</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>域名和地址之后接资源名字统一用复数, 例如</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://api.example.com/v1/zoos</span><br><span class="line">https://api.example.com/v1/animals</span><br><span class="line">https://api.example.com/v1/employees</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>操作</p>
+</blockquote>
+<ol>
+<li>GET /accounts – 列出所有的账户信息</li>
+<li>GET /accounts/<id> – 查询id为<id>的账户信息</id></id></li>
+<li>PUT /accounts/<id> – 更新id为<id>的账户信息, 注意这个操作是幂等的, 幂等是多次同样的操作, 最终结果只有一个!</id></id></li>
+<li>POST /accounts – 创建一个新的账户</li>
+<li>DELETE /accounts – 删除一个账户 (危险操作)</li>
+</ol>
+<blockquote>
+<p>额外参数</p>
+</blockquote>
+<p>URI里的参数列表, 一般用在查询里面. 比如 GET /accounts?type=ADMIN 这样用来筛选账户, 一般不推荐直接把id这样直接资源的索引键值直接用在URL的参数列表里, 而是直接放在URI里, 因为它本身是一个资源!</p>
+<blockquote>
+<p>状态转换</p>
+</blockquote>
+<p>HTTP协议是无状态的, 也就是说, 客户端不保存状态, 然后通过RESTful API定义的操作改变资源在服务端的状态</p>
+<blockquote>
+<p>返回状态</p>
+</blockquote>
+<p>操作的执行结果</p>
+<ul>
+<li>请求负载和返回负载</li>
+</ul>
+<p>JSON – JSON(JavaScript Object Notation) 是一种轻量级的数据交换格式。 易于人阅读和编写。同时也易于机器解析和生成。 它基于JavaScript Programming Language, Standard ECMA-262 3rd Edition - December 1999的一个子集。 JSON采用完全独立于语言的文本格式，但是也使用了类似于C语言家族的习惯（包括C, C++, C#, Java, JavaScript, Perl, Python等）。 这些特性使JSON成为理想的数据交换语言。</p>
+<p>JSON的基本结构是对象, 以及对象里的键值对, 例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123; &quot;user&quot;: &#123;</span><br><span class="line">      &quot;username&quot;: &quot;admin&quot;,</span><br><span class="line">      &quot;password&quot;: &quot;1234&quot;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>详细资料参见: <a href="https://www.json.org/json-zh.html" target="_blank" rel="noopener">https://www.json.org/json-zh.html</a></p>
+<p>或者XML</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>我们如果反思一下上述对RESTful API的介绍, 是不是就很容易感觉到, 其实RESTful = HTTP + JSON</p>
+<p>确实也是这样的</p>
+<h3 id="为什么我们需要RESTful-API"><a href="#为什么我们需要RESTful-API" class="headerlink" title="为什么我们需要RESTful API"></a>为什么我们需要RESTful API</h3><ul>
+<li>原生的互联网架构方式来建构互联网内容</li>
+<li>统一的通信协议和开发语义. 统一标准可以带来效率的提升和协作的高效</li>
+<li>接口一致, 操作没有歧义</li>
+</ul>
+<h3 id="RESTful-API-扩展阅读"><a href="#RESTful-API-扩展阅读" class="headerlink" title="RESTful API 扩展阅读"></a>RESTful API 扩展阅读</h3><ul>
+<li><p><a href="https://www.zhihu.com/question/28557115" target="_blank" rel="noopener">知乎: 怎样用通俗的语言解释REST，以及RESTful?</a></p>
+</li>
+<li><p><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">阮一峰: 理解RESTful架构</a></p>
+</li>
+<li><p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">阮一峰: RESTful API 设计指南</a></p>
+</li>
+<li><p><a href="https://www.json.org/json-zh.html" target="_blank" rel="noopener">JSON</a></p>
+</li>
+<li><p><a href="https://github.com/aisuhua/restful-api-design-references" target="_blank" rel="noopener">Github仓库: RESTful API设计参考</a></p>
+</li>
+<li><p><a href="https://swoole.app/2018/03/22/Github%E7%9A%84Restful-HTTP-API%E8%AE%BE%E8%AE%A1%E5%88%86%E8%A7%A3/" target="_blank" rel="noopener">Github的RESTful API设计分解</a></p>
+</li>
+</ul>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><blockquote>
+<p>登录逻辑</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 以前的登录url</span><br><span class="line">/signup?username=abc&amp;password=123456</span><br><span class="line"></span><br><span class="line">POST /accounts</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">&quot;username&quot;: &quot;abc&quot;,</span><br><span class="line">&quot;password&quot;: &quot;123456&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET /accounts 列举 -- ListAccounts(filter: AccountType, Account创建时间)</span><br><span class="line">GET /accounts/&lt;id&gt; -- GetAccount()</span><br><span class="line">PUT /accounts/&lt;id&gt; -- UpdateAccount()</span><br><span class="line">POST /accounts -- CreateAccount()</span><br><span class="line">DELETE /accounts -- DeleteAccount()</span><br><span class="line"></span><br><span class="line"># 错误的url </span><br><span class="line">GetAccount() -- GET /accounts?id=   -&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;ListAccounts()</span><br><span class="line"># url 应该用户一看到就知道是获取什么内容</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>状态码</p>
+</blockquote>
+<ul>
+<li>200, 201 – 成功</li>
+<li>400, 403, 404 – 用户的输入错误</li>
+<li>500 – 服务端的错误</li>
+</ul>
+<blockquote>
+<p>我们RESTful API交互</p>
+</blockquote>
+<ul>
+<li>读别人的API, 然后理解和使用 =&gt; 用户</li>
+<li>写自己的API, 让别人理解和使用 =&gt; 开发者</li>
+</ul>
+<blockquote>
+<p>读API</p>
+</blockquote>
+<ol>
+<li>有什么资源, 资源的层次结构是什么样的?<br>用户 -&gt; 仓库 -&gt; issues</li>
+<li>操作: 增删改查</li>
+<li>请求参数: URL的参数, 负载里的json</li>
+<li>返回的状态(200, 201, 404) 和 返回的json格式</li>
+</ol>
+<blockquote>
+<p>调用API</p>
+</blockquote>
+<ol>
+<li>调用 API: 构造URL (资源) –&gt; 发送响应请求(GET, POST, PUT) –&gt; 参数</li>
+<li>检验返回的状态码: 成功状态如何下一步的解析结果, 错误处理</li>
+<li>解析结果</li>
+</ol>
+<blockquote>
+<h4 id="写RESTful-API"><a href="#写RESTful-API" class="headerlink" title="写RESTful API"></a>写RESTful API</h4></blockquote>
+<ol>
+<li>想清楚我们的应用里可以抽象出什么样的资源, 和他们的层次结构</li>
+<li>想清楚对对象的基本操作: GET, POST, PUT, DELETE的含义是什么</li>
+<li>组织接口代码, Spring如何去定义这些路由(URI): URI -&gt; Java类和方法</li>
+<li>开始实现</li>
+</ol>
+<h4 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h4><blockquote>
+<p>资源</p>
+</blockquote>
+<ul>
+<li>RestController</li>
+<li>GetMapping, PutMapping, PostMapping, DeleteMapping: URI -&gt; Java类和方法</li>
+</ul>
+<blockquote>
+<p>参数</p>
+</blockquote>
+<ul>
+<li>RequestParam: URL额外参数</li>
+<li>PathVariable</li>
+<li>RequestBody</li>
+</ul>
+<blockquote>
+<p>处理逻辑*</p>
+</blockquote>
+<ul>
+<li>遵循Java代码的组织和开发方式</li>
+<li>面向对象的方式抽象和组织代码</li>
+</ul>
+<blockquote>
+<p>状态和结果</p>
+</blockquote>
+<ul>
+<li>使用正确和准确的状态码!</li>
+<li>返回结果!</li>
+<li>ResponseEntity</li>
+<li>HttpStatus</li>
+</ul>
+<h4 id="PUT和POST的比较"><a href="#PUT和POST的比较" class="headerlink" title="PUT和POST的比较"></a>PUT和POST的比较</h4><ul>
+<li>PUT – 做具体资源的更新</li>
+<li>POST – 创建新的资源, 在资源列表里添加一个资源</li>
+</ul>
+<p>PUT — PUT操作是幂等的! op^n == op^(n + 1), 所以用PUT来做整体更新的时候, 多次重复同样内容的更新操作, 最终产生的结果是一致的!</p>
+<p>所以在代码实现PUT操作时候, 要把这个操作实现成幂等的!</p>
+<p>POST — POST操作不是幂等的! 创建的操作</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/07/Java-020-RESTful/" data-id="cklhgn2ap003gkyfyq5piuz28" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Java-019-HTTP" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/06/06/Java-019-HTTP/" class="article-date">
@@ -166,7 +883,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/06/Java-019-HTTP/" data-id="cklcb6bdb003rwo91yr4bn526" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/06/Java-019-HTTP/" data-id="cklhgn2ao003ekyfym4q9y3yr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -291,7 +1008,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/06/Java-018-springboot入门/" data-id="cklcb6bd3003bwo91h3o7s46h" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/06/Java-018-springboot入门/" data-id="cklhgn2an003ckyfyb088ojww" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -455,7 +1172,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用二/" data-id="cklcb6bd20039wo91294vq54b" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用二/" data-id="cklhgn2am003akyfyhzjiwb59" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -551,7 +1268,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用一/" data-id="cklcb6bd10037wo91167gbroa" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用一/" data-id="cklhgn2bj005hkyfypb8njroa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -643,327 +1360,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/20/Java-015-英语学习/" data-id="cklcb6bcz0033wo91k2k2l2jc" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-015-多线程" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/20/Java-015-多线程/" class="article-date">
-  <time datetime="2019-05-20T14:08:00.000Z" itemprop="datePublished">2019-05-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/20/Java-015-多线程/">Java-015-多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="Java线程的概念"><a href="#Java线程的概念" class="headerlink" title="Java线程的概念"></a>Java线程的概念</h3><p>多线程程序包含两条或两条以上并发运行的部分.程序中每个这样的部分都叫一个线程（thread），每个线程都有独立的执行路径。因此，多线程是多任务处理的一种特殊形式.</p>
-<p>一句话总结进程和线程的关系: 进程是线程的容器!</p>
-<h4 id="进程的主线程"><a href="#进程的主线程" class="headerlink" title="进程的主线程"></a>进程的主线程</h4><p>主线程的重要性体现在：</p>
-<ul>
-<li>它是产生其他子线程的线程</li>
-<li>通常它必须最后完成执行，因为它执行各种关闭动作</li>
-</ul>
-<p>主线程是运行程序时候自动创建的, 但是其也是一个Thread类的实例对象</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class CurrentThreadDemo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        System.out.println(&quot;Current thread: &quot; + t);</span><br><span class="line">        // change the name of the thread</span><br><span class="line">        t.setName(&quot;My Thread&quot;);</span><br><span class="line">        System.out.println(&quot;After name change: &quot; + t);</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int n = 5; n &gt; 0; n--) &#123;</span><br><span class="line">                System.out.println(n);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><blockquote>
-<h4 id="继承Thread"><a href="#继承Thread" class="headerlink" title="继承Thread"></a>继承Thread</h4></blockquote>
-<ul>
-<li>我们可以通过继承Thread类, 然后Override run()方法, 然后创建该类的实例来创建除了主线程之外的其他线程, 并且在run()方法中赋予属于这个线程的代码逻辑, 这个run()方法是新线程的入口.</li>
-<li>这个新建的Thread类的子类, 会继承Thread类的一个方法 – start(), 当我们调用start()方法时候会自动生成一个线程, 然后调用run()方法执行线程的逻辑.</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">// Create a second thread by extending Thread</span><br><span class="line">class NewThread extends Thread &#123;</span><br><span class="line">    NewThread() &#123;</span><br><span class="line">        // Create a new, second thread</span><br><span class="line">        super(&quot;Demo Thread&quot;);</span><br><span class="line">        System.out.println(&quot;Child thread: &quot; + this);</span><br><span class="line">        start(); // Start the thread</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // This is the entry point for the second thread.</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(&quot;Child Thread: &quot; + i);</span><br><span class="line">                Thread.sleep(500);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Child interrupted.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Exiting child thread.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Demo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        new NewThread(); // create a new thread</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(&quot;Main Thread: &quot; + i);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread interrupted.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Main thread exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="实现-Runnable-接口"><a href="#实现-Runnable-接口" class="headerlink" title="实现 Runnable 接口"></a>实现 Runnable 接口</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">// Create multiple threads.</span><br><span class="line">class NewThread implements Runnable &#123;</span><br><span class="line">    String name; // name of thread</span><br><span class="line">    Thread t;</span><br><span class="line"></span><br><span class="line">    NewThread(String threadname) &#123;</span><br><span class="line">        name = threadname;</span><br><span class="line">        t = new Thread(this, name);</span><br><span class="line">        System.out.println(&quot;New thread: &quot; + t);</span><br><span class="line">        t.start(); // Start the thread</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // This is the entry point for thread.</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 5; i &gt; 0; i--) &#123;</span><br><span class="line">                System.out.println(name + &quot;: &quot; + i);</span><br><span class="line">                Thread.sleep(1000);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(name + &quot;Interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(name + &quot; exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Demo &#123;</span><br><span class="line">    public static void main(String args[]) &#123;</span><br><span class="line">        new NewThread(&quot;One&quot;); // start threads</span><br><span class="line">        new NewThread(&quot;Two&quot;);</span><br><span class="line">        new NewThread(&quot;Three&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            // wait for other threads to end</span><br><span class="line">            Thread.sleep(10000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(&quot;Main thread Interrupted&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(&quot;Main thread exiting.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><blockquote>
-<p>使用多线程技术, 写一个程序, 创建3个线程, 然后完成工作:</p>
-</blockquote>
-<ul>
-<li>主线程一直循环输出从1 开始的数字, 一直到100;</li>
-<li>创建的2个子线程: 子线程A输出大写字母从A到Z, 子线程B输出小写字母从a到z</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">package com.repeat;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class Work01 &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        t.setName(&quot;main thread&quot;);</span><br><span class="line"></span><br><span class="line">        MyThread t2 = new MyThread(&quot;aaa&quot;);</span><br><span class="line">        MyThread2 t3 = new MyThread2(&quot;bbb&quot;);</span><br><span class="line"></span><br><span class="line">        t2.start();</span><br><span class="line">        t3.start();</span><br><span class="line"></span><br><span class="line">        for (int i = 1; i &lt;= 100; i++) &#123;</span><br><span class="line">            System.out.println(t.getName() + &quot; running &quot; + i);</span><br><span class="line">            Thread.sleep(50);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread extends Thread&#123;</span><br><span class="line">    private Thread t;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public MyThread(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 65; i &lt; 65+26; i++) &#123;</span><br><span class="line">                char a = (char) i;</span><br><span class="line">                System.out.println(name+ &quot; running &quot; + a);</span><br><span class="line">                Thread.sleep(50);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void start()&#123;</span><br><span class="line">        t = new Thread (this, name);</span><br><span class="line">        t.start ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyThread2 implements Runnable&#123;</span><br><span class="line">    private Thread t;</span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    public MyThread2(String name) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            for (int i = 97; i &lt; 97 + 26; i++) &#123;</span><br><span class="line">                char a = (char) i;</span><br><span class="line">                System.out.println(name+ &quot; running &quot; + a);</span><br><span class="line">                Thread.sleep(50);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void start()&#123;</span><br><span class="line">        t = new Thread (this, name);</span><br><span class="line">        t.start ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>我们的任务是: 在命令行模拟类似的逻辑:</p>
-</blockquote>
-<ul>
-<li>程序运行之后, 会接收用户输入的字符串, 用户输入回车之后, 把这行字符串写入到一个新的文件中,命名为数字序号 (1.txt, 2.txt, 3.txt)… (回顾一下之前IO的课程中, 对文件写入的操作)</li>
-<li>用户输入回车之后, 重新等待用户输入字符串, 并且循环执行 1 中的逻辑</li>
-<li>要求是敲下回车之后, 不能有卡顿的情况, 也就是, 写入文件必须在子线程中完成</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">package com.repeat;</span><br><span class="line"></span><br><span class="line">import java.io.*;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Work02 &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">        while (true)&#123;</span><br><span class="line">            // 获取输入</span><br><span class="line">            String input = getInput();</span><br><span class="line">            // 新开线程，写入文件</span><br><span class="line">            new MyFileIoThread( input ).start();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static String getInput()&#123;</span><br><span class="line">        Scanner sc = new Scanner(System.in);</span><br><span class="line">        String str = sc.next();</span><br><span class="line">        return str;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MyFileIoThread extends Thread&#123;</span><br><span class="line">    public static int count = 1;</span><br><span class="line">    private String content;</span><br><span class="line"></span><br><span class="line">    public MyFileIoThread(String content) &#123;</span><br><span class="line">        this.content = content;</span><br><span class="line">        MyFileIoThread.count++;</span><br><span class="line">        System.out.println(MyFileIoThread.count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        FileOutputStream output = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            String fileName = MyFileIoThread.count + &quot;.txt&quot;;</span><br><span class="line">            output = new FileOutputStream(&quot;day015Thread/res/&quot; + fileName);</span><br><span class="line">            OutputStreamWriter writer = new OutputStreamWriter(output,&quot;UTF-8&quot;);</span><br><span class="line">            PrintWriter printWriter = new PrintWriter(writer);</span><br><span class="line"></span><br><span class="line">            // 模拟写入文件慢的操作</span><br><span class="line">            Thread.sleep(500);</span><br><span class="line">            System.out.println(&quot; file: &quot; + fileName + &quot; 写入成功&quot;);</span><br><span class="line"></span><br><span class="line">            printWriter.write(content);</span><br><span class="line">            printWriter.close();</span><br><span class="line">            output.close();</span><br><span class="line">        &#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (UnsupportedEncodingException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="参考阅读资料"><a href="#参考阅读资料" class="headerlink" title="参考阅读资料"></a>参考阅读资料</h4></blockquote>
-<p>可以慢慢看, 或者简单过一遍, 然后脑子留个概念. 等之后有经验和需求的时候反复回来咀嚼</p>
-<ul>
-<li><a href="https://www.runoob.com/java/java-multithreading.html" target="_blank" rel="noopener">Java 多线程编程 | 菜鸟教程</a></li>
-</ul>
-<p>大致了解下一些应用场景, 如果不理解也没关系, 慢慢等你有需求被逼无奈就会懂了</p>
-<ul>
-<li><a href="https://www.zhihu.com/question/65200684" target="_blank" rel="noopener">知乎: java中的多线程究竟在什么情况下使用？</a></li>
-<li><a href="https://www.zhihu.com/question/19901763" target="_blank" rel="noopener">知乎: 多线程有什么用</a></li>
-</ul>
-<p>一个不错的Java多线程面试相关的题目总结, 可以准备面试时候大致过一遍, 有些内容可能是因为需要用于面试中题目原因, 忽略很多不同概念的联系和有些概念不是特别准确, 但是准备面试后可以看一下. 学习还是需要训练中慢慢体会</p>
-<p><a href="https://github.com/Homiss/Java-interview-questions/blob/master/%E5%A4%9A%E7%BA%BF%E7%A8%8B/Java%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B9%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B(%E4%B8%80" target="_blank" rel="noopener">Java面试题之多线程</a>.md)</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/20/Java-015-多线程/" data-id="cklcb6bd00035wo911gaua3nt" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-014-maven和包管理" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/18/Java-014-maven和包管理/" class="article-date">
-  <time datetime="2019-05-18T03:42:12.000Z" itemprop="datePublished">2019-05-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/18/Java-014-maven和包管理/">Java-014-maven和包管理</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="maven"><a href="#maven" class="headerlink" title="maven"></a>maven</h3><blockquote>
-<p>maven 添加运行命令 </p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exec:java -Dexec.mainClass=你的包名.类名 -Dexec.args</span><br></pre></td></tr></table></figure>
-<h3 id="mac安装-maven"><a href="#mac安装-maven" class="headerlink" title="mac安装 maven"></a><a href="https://www.cnblogs.com/vitasyuan/p/7395601.html?utm_source=debugrun&amp;utm_medium=referral" target="_blank" rel="noopener">mac安装 maven</a></h3><h3 id="安装并且配置好了-maven-但是一直报-command-not-found"><a href="#安装并且配置好了-maven-但是一直报-command-not-found" class="headerlink" title="安装并且配置好了 maven 但是一直报 command not found"></a>安装并且配置好了 maven 但是一直报 command not found</h3><p>~/.bash_profile</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export M2_HOME=/Users/huangjiaxi/Desktop/soft/apache-maven-3.6.1</span><br><span class="line">export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</span><br><span class="line"># 这句一定要在上句下面</span><br><span class="line">export PATH=$PATH:$M2_HOME/bin</span><br></pre></td></tr></table></figure>
-<h3 id="maven-修改配置文件"><a href="#maven-修改配置文件" class="headerlink" title="maven 修改配置文件"></a>maven 修改配置文件</h3><p>修改maven根目录下的conf文件夹中的setting.xml文件，内容如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;settings xmlns=&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;</span><br><span class="line">      xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">      xsi:schemaLocation=&quot;http://maven.apache.org/SETTINGS/1.0.0</span><br><span class="line">                          https://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">      &lt;mirrors&gt;</span><br><span class="line">        &lt;mirror&gt;  </span><br><span class="line">            &lt;id&gt;alimaven&lt;/id&gt;  </span><br><span class="line">            &lt;name&gt;aliyun maven&lt;/name&gt;  </span><br><span class="line">            &lt;url&gt;http://maven.aliyun.com/nexus/content/groups/public/&lt;/url&gt;  </span><br><span class="line">            &lt;mirrorOf&gt;central&lt;/mirrorOf&gt;          </span><br><span class="line">        &lt;/mirror&gt;  </span><br><span class="line">      &lt;/mirrors&gt;</span><br><span class="line">&lt;/settings&gt;</span><br><span class="line">`</span><br></pre></td></tr></table></figure>
-<p>macOS下可以配置同样内容在: ~/.m2/settings.xml</p>
-<h3 id="maven-运行报错"><a href="#maven-运行报错" class="headerlink" title="maven 运行报错"></a>maven 运行报错</h3><p>第一种可能</p>
-<blockquote>
-<h4 id="class-not-found"><a href="#class-not-found" class="headerlink" title="class not found"></a>class not found</h4></blockquote>
-<ul>
-<li>原因大概是找不到 jar包里的文件，需要添加才行</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://blog.csdn.net/Liu_xud/article/details/84385755</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="第二种可能"><a href="#第二种可能" class="headerlink" title="第二种可能"></a>第二种可能</h4></blockquote>
-<p>你只运行了 clean 没运行 compile 也就是没编译</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/18/Java-014-maven和包管理/" data-id="cklcb6bcw0031wo91q1sp9xz2" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-013-泛型和集合" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/18/Java-013-泛型和集合/" class="article-date">
-  <time datetime="2019-05-18T02:42:12.000Z" itemprop="datePublished">2019-05-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/18/Java-013-泛型和集合/">Java-013-泛型和集合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>先看代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Demo01泛型 &#123;</span><br><span class="line">    // 泛型</span><br><span class="line">    // 定义了hash表 key是 String类型 value是 Integer类型</span><br><span class="line">    static HashMap&lt;String,Integer&gt; counts = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;String&gt; stringStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    static Stack&lt;Integer&gt; intStack = new Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        stringStack.push(&quot;abc&quot;);</span><br><span class="line"></span><br><span class="line">        String one = stringStack.pop();</span><br><span class="line"></span><br><span class="line">        intStack.push(1);</span><br><span class="line">        Integer two = intStack.pop();</span><br><span class="line"></span><br><span class="line">        // intStack.push(&quot;ssss&quot;);  规定了Stack 内的类型是 int的 所以无法 加入 String类型的</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="为什么有泛型"><a href="#为什么有泛型" class="headerlink" title="为什么有泛型?"></a>为什么有泛型?</h4></blockquote>
-<p>假如我们想要实现一个只接受 Integer 和一个只接受String 的栈</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class IntStack &#123;</span><br><span class="line">    ArrayList&lt;Integer&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(Integer item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Integer pop()&#123;</span><br><span class="line">        Integer tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class StringStack &#123;</span><br><span class="line">    ArrayList&lt;String&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(String item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String pop()&#123;</span><br><span class="line">        String tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次"><a href="#很明显，代码结构和意思都一样，很重复，但是有了问题就是bug-改两次" class="headerlink" title="很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次"></a>很明显，代码结构和意思都一样，很重复，但是有了问题就是bug,改两次</h4></blockquote>
-<h4 id="泛型出现了！"><a href="#泛型出现了！" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-1"><a href="#泛型出现了！-1" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><h4 id="泛型出现了！-2"><a href="#泛型出现了！-2" class="headerlink" title="泛型出现了！"></a>泛型出现了！</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// 自己实现一个泛型，支持任意类型的Stack ，</span><br><span class="line">// 把数据类型变成参数，把重复代码去除了 如 IntStack / StringStack</span><br><span class="line">// T 是 类型参数</span><br><span class="line">public class Stack2&lt;T&gt; &#123;</span><br><span class="line">    ArrayList&lt;T&gt; store = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    public void push(T item)&#123;</span><br><span class="line">        store.add(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public T pop()&#123;</span><br><span class="line">        T tmp = store.get(store.size() - 1);</span><br><span class="line">        store.remove(store.size() - 1);</span><br><span class="line">        return tmp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int size()&#123;</span><br><span class="line">        return store.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="集合-List"><a href="#集合-List" class="headerlink" title="集合 List"></a>集合 List</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 列表</span><br><span class="line">List&lt;String&gt; arrayList = new ArrayList&lt;&gt;();</span><br><span class="line">List&lt;String&gt; linkedList = new LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">// 操作 在尾部添加</span><br><span class="line">arrayList.add(&quot;hello&quot;);</span><br><span class="line">arrayList.add(&quot;world&quot;);</span><br><span class="line">arrayList.add(&quot;~~~~&quot;);</span><br><span class="line"></span><br><span class="line">// 通过索引去访问</span><br><span class="line">arrayList.get(0);</span><br><span class="line"></span><br><span class="line">//arrayList.subList(0,5); // 取出 索引从 0 到 5 位置的列表  内容不够就报错</span><br><span class="line"></span><br><span class="line">// 通过索引 删除</span><br><span class="line">arrayList.remove(0);</span><br><span class="line"></span><br><span class="line">// 访问 列表的长度</span><br><span class="line">int size = arrayList.size();</span><br><span class="line"></span><br><span class="line">// for循环里的语法糖</span><br><span class="line"></span><br><span class="line">for (String item: arrayList) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Set 主要用来去重复</span><br><span class="line">Set&lt;String&gt; set = new HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;);</span><br><span class="line">set.add(&quot;b&quot;);</span><br><span class="line">set.add(&quot;c&quot;);</span><br><span class="line"></span><br><span class="line">set.add(&quot;a&quot;); // 去重复</span><br><span class="line"></span><br><span class="line">for (String item: set) &#123;</span><br><span class="line">    System.out.println( item );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="练习题"><a href="#练习题" class="headerlink" title="练习题"></a>练习题</h3><blockquote>
-<h4 id="汉诺塔问题"><a href="#汉诺塔问题" class="headerlink" title="汉诺塔问题"></a>汉诺塔问题</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">在经典的汉诺塔问题中，有 3 个塔和 N 个可用来堆砌成塔的不同大小的盘子。要求盘子必须按照从小到大的顺序从上往下堆 （如，任意一个盘子，其必须堆在比它大的盘子上面）。同时，你必须满足以下限制条件：</span><br><span class="line"></span><br><span class="line">(1) 每次只能移动一个盘子。</span><br><span class="line">(2) 每个盘子从堆的顶部被移动后，只能置放于下一个堆中。</span><br><span class="line">(3) 每个盘子只能放在比它大的盘子上面。</span><br><span class="line"></span><br><span class="line">请写一段程序，实现将第一个堆的盘子移动到最后一个堆中.</span><br><span class="line"></span><br><span class="line">在编程训练网站完成训练: https://www.lintcode.com/problem/mock-hanoi-tower-by-stacks/description</span><br></pre></td></tr></table></figure>
-<p>代码实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public class Tower &#123;</span><br><span class="line">    private Stack&lt;Integer&gt; disks;</span><br><span class="line">  </span><br><span class="line">    public Tower(int i) &#123;</span><br><span class="line">        // create three towers</span><br><span class="line">        disks = new Stack();</span><br><span class="line">    &#125;</span><br><span class="line">    public void add(int d) &#123;</span><br><span class="line">        // Add a disk into this tower</span><br><span class="line">        if (!disks.isEmpty() &amp;&amp; disks.peek() &lt;= d) &#123;</span><br><span class="line">            System.out.println(&quot;Error placing disk &quot; + d);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            disks.push(d);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveTopTo(Tower t) &#123;</span><br><span class="line">        // Move the top disk of this tower to the top of t.</span><br><span class="line">        if(t.disks.isEmpty() || (!disks.isEmpty() &amp;&amp; t.disks.peek() &gt;= disks.peek())) &#123;</span><br><span class="line">            t.disks.push(disks.pop());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public void moveDisks(int n, Tower destination, Tower buffer) &#123;</span><br><span class="line">        // Move n Disks from this tower to destination by buffer tower</span><br><span class="line">        if(n &lt;= 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125; else if(n == 1) &#123;</span><br><span class="line">            moveTopTo(destination);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            moveDisks(n-1, buffer, destination);</span><br><span class="line">            moveDisks(1, destination, buffer);</span><br><span class="line">            buffer.moveDisks(n-1, destination, this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public Stack&lt;Integer&gt; getDisks() &#123;</span><br><span class="line">        // write your code here</span><br><span class="line">        return disks;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="找不同"><a href="#找不同" class="headerlink" title="找不同"></a>找不同</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Given two strings s and t which consist of only lowercase letters.</span><br><span class="line"></span><br><span class="line">String t is generated by random shuffling string s and then add one more letter at a random position.</span><br><span class="line"></span><br><span class="line">Find the letter that was added in t.</span><br><span class="line"></span><br><span class="line">输入给两个只包含小写字母的字符串 S 和 T.</span><br><span class="line"></span><br><span class="line">字符串 T 是在字符串 S 基础上添加一个小写字母, 然后随机打乱之后生成.</span><br><span class="line"></span><br><span class="line">请找出那个被加入的小写字母.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">Input:</span><br><span class="line">s = &quot;abcd&quot;</span><br><span class="line">t = &quot;abcde&quot;</span><br><span class="line"></span><br><span class="line">Output:</span><br><span class="line">e</span><br><span class="line"></span><br><span class="line">Explanation:</span><br><span class="line">&apos;e&apos; is the letter that was added.</span><br><span class="line">在线测试网站: https://leetcode.com/problems/find-the-difference/description</span><br></pre></td></tr></table></figure>
-<p>代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">public class Test02 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        char a = findTheDifference(&quot;abc&quot;,&quot;abcd&quot;);</span><br><span class="line">        System.out.println(a);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static  char findTheDifference(String s, String t) &#123;</span><br><span class="line">        HashMap&lt;Character,Integer&gt; hash = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        String tmp = s + t;</span><br><span class="line">        for(int i = 0;i&lt;tmp.length();i++)&#123;</span><br><span class="line">            char current = tmp.charAt(i);</span><br><span class="line">            if(hash.containsKey(current))&#123;</span><br><span class="line">                hash.put(current,hash.get(current) + 1);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                hash.put(current,1);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Set&lt;Character&gt; a = hash.keySet();</span><br><span class="line">        Character res = null;</span><br><span class="line">        for (Character item: a) &#123;</span><br><span class="line">            if(hash.get(item)==1)&#123;</span><br><span class="line">                res = item;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="Min-Stack"><a href="#Min-Stack" class="headerlink" title="Min Stack"></a>Min Stack</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.</span><br><span class="line"></span><br><span class="line">push(x) -- Push element x onto stack.</span><br><span class="line">pop() -- Removes the element on top of the stack.</span><br><span class="line">top() -- Get the top element.</span><br><span class="line">getMin() -- Retrieve the minimum element in the stack.</span><br><span class="line">设计一个栈, 支持4种操作: push, pop, top和getMin, 关键是getMin是获取栈中的最小值.</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">MinStack minStack = new MinStack();</span><br><span class="line">minStack.push(-2);</span><br><span class="line">minStack.push(0);</span><br><span class="line">minStack.push(-3);</span><br><span class="line">minStack.getMin();   --&gt; Returns -3.</span><br><span class="line">minStack.pop();</span><br><span class="line">minStack.top();      --&gt; Returns 0.</span><br><span class="line">minStack.getMin();   --&gt; Returns -2.</span><br><span class="line">基本代码框架:</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line"></span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">package work;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line"></span><br><span class="line">class MinStack &#123;</span><br><span class="line">    private ArrayList&lt;Integer&gt; store;</span><br><span class="line">    /** initialize your data structure here. */</span><br><span class="line">    public MinStack() &#123;</span><br><span class="line">        store = new ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void push(int x) &#123;</span><br><span class="line">        store.add(x);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void pop() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        store.remove(store.get(store.size()-1));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int top() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return store.get(store.size()-1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getMin() &#123;</span><br><span class="line">        if(store.size()==0)&#123;</span><br><span class="line">            throw new Error(&quot;数组元素为空&quot;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int res = store.get(0);</span><br><span class="line">        for (int i = 1; i &lt; store.size(); i++) &#123;</span><br><span class="line">            if( res &gt; store.get(i) )&#123;</span><br><span class="line">                res = store.get(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="推荐一个-idea的插件"><a href="#推荐一个-idea的插件" class="headerlink" title="推荐一个 idea的插件"></a>推荐一个 idea的插件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">首选项- plugins-搜索 rainbow brackets</span><br></pre></td></tr></table></figure>
-<h3 id="推荐书籍"><a href="#推荐书籍" class="headerlink" title="推荐书籍"></a>推荐书籍</h3><ul>
-<li>Efective java</li>
-<li>设计模式</li>
-<li>算法**(强烈推荐)</li>
-<li>if web开发 推荐<ul>
-<li>Spring</li>
-<li>Play</li>
-</ul>
-</li>
-<li>分布式系统开发<ul>
-<li>Hadoop</li>
-<li>MapReduce</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/18/Java-013-泛型和集合/" data-id="cklcb6bcv002zwo91w0rqho67" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-012-算法入门" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/18/Java-012-算法入门/" class="article-date">
-  <time datetime="2019-05-18T01:42:12.000Z" itemprop="datePublished">2019-05-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/18/Java-012-算法入门/">Java-012-算法入门</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><ul>
-<li>冒泡排序 - O(n^2)</li>
-<li>插入排序 - O(n^2)</li>
-<li>快速排序 - O(nlogn)</li>
-<li>堆排序 - O(nlogn)</li>
-</ul>
-<p><a href="https://visualgo.net/zh/sorting?slide=1" target="_blank" rel="noopener">可视化排序</a></p>
-<h3 id="搜索算法"><a href="#搜索算法" class="headerlink" title="搜索算法"></a>搜索算法</h3><ul>
-<li>深度优先搜索<ul>
-<li>使用栈或者递归存储搜索状态, 递归本质上是利用系统栈空间.</li>
-</ul>
-</li>
-<li>广度优先搜索<ul>
-<li>实用队列存储搜索状态</li>
-</ul>
-</li>
-</ul>
-<p><a href="https://visualgo.net/zh/dfsbfs?slide=1" target="_blank" rel="noopener">可视化搜索</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/18/Java-012-算法入门/" data-id="cklcb6bct002vwo91n5lw7cgh" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-011-05ResizingArrayQueue实现" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/17/Java-011-05ResizingArrayQueue实现/" class="article-date">
-  <time datetime="2019-05-17T15:24:32.000Z" itemprop="datePublished">2019-05-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/17/Java-011-05ResizingArrayQueue实现/">Java-011-05ResizingArrayQueue实现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="ResizingArrayQueue"><a href="#ResizingArrayQueue" class="headerlink" title="ResizingArrayQueue"></a>ResizingArrayQueue</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br></pre></td><td class="code"><pre><span class="line">/******************************************************************************</span><br><span class="line"> *  Compilation:  javac ResizingArrayQueue.java</span><br><span class="line"> *  Execution:    java ResizingArrayQueue &lt; input.txt</span><br><span class="line"> *  Dependencies: StdIn.java StdOut.java</span><br><span class="line"> *  Data files:   https://algs4.cs.princeton.edu/13stacks/tobe.txt  </span><br><span class="line"> *  </span><br><span class="line"> *  Queue implementation with a resizing array.</span><br><span class="line"> *</span><br><span class="line"> *  % java ResizingArrayQueue &lt; tobe.txt </span><br><span class="line"> *  to be or not to be (2 left on queue)</span><br><span class="line"> *</span><br><span class="line"> ******************************************************************************/</span><br><span class="line"></span><br><span class="line">package edu.princeton.cs.algs4;</span><br><span class="line"></span><br><span class="line">import java.util.Iterator;</span><br><span class="line">import java.util.NoSuchElementException;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> *  The &#123;@code ResizingArrayQueue&#125; class represents a first-in-first-out (FIFO)</span><br><span class="line"> *  queue of generic items.</span><br><span class="line"> *  It supports the usual &lt;em&gt;enqueue&lt;/em&gt; and &lt;em&gt;dequeue&lt;/em&gt;</span><br><span class="line"> *  operations, along with methods for peeking at the first item,</span><br><span class="line"> *  testing if the queue is empty, and iterating through</span><br><span class="line"> *  the items in FIFO order.</span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  This implementation uses a resizing array, which double the underlying array</span><br><span class="line"> *  when it is full and halves the underlying array when it is one-quarter full.</span><br><span class="line"> *  The &lt;em&gt;enqueue&lt;/em&gt; and &lt;em&gt;dequeue&lt;/em&gt; operations take constant amortized time.</span><br><span class="line"> *  The &lt;em&gt;size&lt;/em&gt;, &lt;em&gt;peek&lt;/em&gt;, and &lt;em&gt;is-empty&lt;/em&gt; operations takes</span><br><span class="line"> *  constant time in the worst case. </span><br><span class="line"> *  &lt;p&gt;</span><br><span class="line"> *  For additional documentation, see &lt;a href=&quot;https://algs4.cs.princeton.edu/13stacks&quot;&gt;Section 1.3&lt;/a&gt; of</span><br><span class="line"> *  &lt;i&gt;Algorithms, 4th Edition&lt;/i&gt; by Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  @author Robert Sedgewick</span><br><span class="line"> *  @author Kevin Wayne</span><br><span class="line"> */</span><br><span class="line">public class ResizingArrayQueue&lt;Item&gt; implements Iterable&lt;Item&gt; &#123;</span><br><span class="line">    private Item[] q;       // queue elements</span><br><span class="line">    private int n;          // number of elements on queue</span><br><span class="line">    private int first;      // index of first element of queue</span><br><span class="line">    private int last;       // index of next available slot</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Initializes an empty queue.</span><br><span class="line">     */</span><br><span class="line">    public ResizingArrayQueue() &#123;</span><br><span class="line">        q = (Item[]) new Object[2];</span><br><span class="line">        n = 0;</span><br><span class="line">        first = 0;</span><br><span class="line">        last = 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Is this queue empty?</span><br><span class="line">     * @return true if this queue is empty; false otherwise</span><br><span class="line">     */</span><br><span class="line">    public boolean isEmpty() &#123;</span><br><span class="line">        return n == 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the number of items in this queue.</span><br><span class="line">     * @return the number of items in this queue</span><br><span class="line">     */</span><br><span class="line">    public int size() &#123;</span><br><span class="line">        return n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // resize the underlying array</span><br><span class="line">    private void resize(int capacity) &#123;</span><br><span class="line">        assert capacity &gt;= n;</span><br><span class="line">        Item[] temp = (Item[]) new Object[capacity];</span><br><span class="line">        for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">            temp[i] = q[(first + i) % q.length];</span><br><span class="line">        &#125;</span><br><span class="line">        q = temp;</span><br><span class="line">        first = 0;</span><br><span class="line">        last  = n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Adds the item to this queue.</span><br><span class="line">     * @param item the item to add</span><br><span class="line">     */</span><br><span class="line">    public void enqueue(Item item) &#123;</span><br><span class="line">        // double size of array if necessary and recopy to front of array</span><br><span class="line">        if (n == q.length) resize(2*q.length);   // double size of array if necessary</span><br><span class="line">        q[last++] = item;                        // add item</span><br><span class="line">        if (last == q.length) last = 0;          // wrap-around</span><br><span class="line">        n++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Removes and returns the item on this queue that was least recently added.</span><br><span class="line">     * @return the item on this queue that was least recently added</span><br><span class="line">     * @throws java.util.NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item dequeue() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        Item item = q[first];</span><br><span class="line">        q[first] = null;                            // to avoid loitering</span><br><span class="line">        n--;</span><br><span class="line">        first++;</span><br><span class="line">        if (first == q.length) first = 0;           // wrap-around</span><br><span class="line">        // shrink size of array if necessary</span><br><span class="line">        if (n &gt; 0 &amp;&amp; n == q.length/4) resize(q.length/2); </span><br><span class="line">        return item;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns the item least recently added to this queue.</span><br><span class="line">     * @return the item least recently added to this queue</span><br><span class="line">     * @throws java.util.NoSuchElementException if this queue is empty</span><br><span class="line">     */</span><br><span class="line">    public Item peek() &#123;</span><br><span class="line">        if (isEmpty()) throw new NoSuchElementException(&quot;Queue underflow&quot;);</span><br><span class="line">        return q[first];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * Returns an iterator that iterates over the items in this queue in FIFO order.</span><br><span class="line">     * @return an iterator that iterates over the items in this queue in FIFO order</span><br><span class="line">     */</span><br><span class="line">    public Iterator&lt;Item&gt; iterator() &#123;</span><br><span class="line">        return new ArrayIterator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // an iterator, doesn&apos;t implement remove() since it&apos;s optional</span><br><span class="line">    private class ArrayIterator implements Iterator&lt;Item&gt; &#123;</span><br><span class="line">        private int i = 0;</span><br><span class="line">        public boolean hasNext()  &#123; return i &lt; n;                               &#125;</span><br><span class="line">        public void remove()      &#123; throw new UnsupportedOperationException();  &#125;</span><br><span class="line"></span><br><span class="line">        public Item next() &#123;</span><br><span class="line">            if (!hasNext()) throw new NoSuchElementException();</span><br><span class="line">            Item item = q[(i + first) % q.length];</span><br><span class="line">            i++;</span><br><span class="line">            return item;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   /**</span><br><span class="line">     * Unit tests the &#123;@code ResizingArrayQueue&#125; data type.</span><br><span class="line">     *</span><br><span class="line">     * @param args the command-line arguments</span><br><span class="line">     */</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ResizingArrayQueue&lt;String&gt; queue = new ResizingArrayQueue&lt;String&gt;();</span><br><span class="line">        while (!StdIn.isEmpty()) &#123;</span><br><span class="line">            String item = StdIn.readString();</span><br><span class="line">            if (!item.equals(&quot;-&quot;)) queue.enqueue(item);</span><br><span class="line">            else if (!queue.isEmpty()) StdOut.print(queue.dequeue() + &quot; &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        StdOut.println(&quot;(&quot; + queue.size() + &quot; left on queue)&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/******************************************************************************</span><br><span class="line"> *  Copyright 2002-2018, Robert Sedgewick and Kevin Wayne.</span><br><span class="line"> *</span><br><span class="line"> *  This file is part of algs4.jar, which accompanies the textbook</span><br><span class="line"> *</span><br><span class="line"> *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,</span><br><span class="line"> *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.</span><br><span class="line"> *      http://algs4.cs.princeton.edu</span><br><span class="line"> *</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is free software: you can redistribute it and/or modify</span><br><span class="line"> *  it under the terms of the GNU General Public License as published by</span><br><span class="line"> *  the Free Software Foundation, either version 3 of the License, or</span><br><span class="line"> *  (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> *  algs4.jar is distributed in the hope that it will be useful,</span><br><span class="line"> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> *  GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> *  You should have received a copy of the GNU General Public License</span><br><span class="line"> *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.</span><br><span class="line"> ******************************************************************************/</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/17/Java-011-05ResizingArrayQueue实现/" data-id="cklcb6bcu002xwo91opac7x79" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/05/20/Java-015-英语学习/" data-id="cklhgn2al0036kyfylhz1jy00" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -979,7 +1376,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/18/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/20/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/18/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/20/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1003,7 +1400,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1025,23 +1422,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

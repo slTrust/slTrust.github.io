@@ -62,6 +62,542 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-ReactWheels04-03Icon组件下" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/25/ReactWheels04-03Icon组件下/" class="article-date">
+  <time datetime="2019-06-25T13:39:56.000Z" itemprop="datePublished">2019-06-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/25/ReactWheels04-03Icon组件下/">ReactWheels04-03Icon组件下</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="让Icon支持sass"><a href="#让Icon支持sass" class="headerlink" title="让Icon支持sass"></a>让Icon支持sass</h3><p>icon.scss</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.fui-icon &#123;</span><br><span class="line">    width: 1.4em;</span><br><span class="line">    height: 1.4em;</span><br><span class="line">    display: inline-block;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 icon.tsx 里 import ‘./icon.scss’</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import &apos;./importIcons&apos;;</span><br><span class="line">import &apos;./icon.scss&apos;</span><br><span class="line"></span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&quot;fui-icon&quot;&gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<p><strong>运行 yarn start ，报错了</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ERROR in ./lib/icon/icon.scss 1:0</span><br><span class="line">Module parse failed: Unexpected token (1:0)</span><br><span class="line">You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders</span><br><span class="line">&gt; .fui-icon &#123;</span><br><span class="line">|     width: 1.4em;</span><br><span class="line">|     height: 1.4em;</span><br><span class="line"> @ ./lib/icon/icon.tsx 4:0-21</span><br><span class="line"> @ ./lib/index.tsx</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>安装loader,修改webpack配置</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 安装</span><br><span class="line">yarn add style-loader css-loader sass-loader node-sass --dev</span><br><span class="line"></span><br><span class="line"># use 里的数组意思是 从右往左 </span><br><span class="line">&#123;</span><br><span class="line">    test: /\.scss$/,</span><br><span class="line">    use: [&apos;style-loader&apos;, &apos;css-loader&apos;, &apos;sass-loader&apos;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>sass-loader 将你的 icon.scss读取到内存(字符串) 把 sass语法变成 icon.css</li>
+<li>css-loader 将 icon.css 变成一个对象</li>
+<li>style-loader 将 对象 变成 一个 style标签 把对象里的内容放到 style.innerHTML里</li>
+</ol>
+<h4 id="让Icon支持-click"><a href="#让Icon支持-click" class="headerlink" title="让Icon支持 click"></a>让Icon支持 click</h4><p>于是你去 index.tsx 里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon name=&quot;qq&quot; onClick=&#123;() =&gt; console.log(1)&#125;</span><br><span class="line">    /&gt;</span><br><span class="line">&lt;/div&gt;, document.querySelector(&apos;#root&apos;));</span><br></pre></td></tr></table></figure>
+<p>竟然直接报错了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">client:159 [at-loader] ./lib/index.tsx:24:6 </span><br><span class="line">    TS2322: Type &apos;&#123; name: string; onClick: () =&gt; void; &#125;&apos; is not assignable to type &apos;IntrinsicAttributes &amp; IconProps &amp; &#123; children?: ReactNode; &#125;&apos;.</span><br><span class="line">  Property &apos;onClick&apos; does not exist on type &apos;IntrinsicAttributes &amp; IconProps &amp; &#123; children?: ReactNode; &#125;&apos;.</span><br></pre></td></tr></table></figure>
+<p>意思就是 IconProps 接口里没有onClick 属性</p>
+<blockquote>
+<p>添加  onClick ，但是它的类型是什么</p>
+</blockquote>
+<p>此时就体现你是js程序员和ts程序员的区别了</p>
+<ul>
+<li>js只管它叫什么从来不管它是什么</li>
+<li>ts一定要问你它到底是什么</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 最终答案</span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    // svg元素的鼠标处理函数</span><br><span class="line">    onClick:React.MouseEventHandler&lt;SVGAElement&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>以推敲的方式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">// icon.tsx</span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    onClick:()=&gt;undefined</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// index.tsx</span><br><span class="line">const fn = ()=&gt;&#123;</span><br><span class="line">    console.log(1);</span><br><span class="line">&#125;</span><br><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon name=&quot;qq&quot; onClick=&#123;fn&#125;</span><br><span class="line">    /&gt;</span><br><span class="line">&lt;/div&gt;, document.querySelector(&apos;#root&apos;));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 又报错了</span><br><span class="line">TS2322: Type &apos;() =&gt; void&apos; is not assignable to type &apos;() =&gt; undefined&apos;.</span><br><span class="line">  Type &apos;void&apos; is not assignable to type &apos;undefined&apos;.</span><br><span class="line"></span><br><span class="line">意思是你声明的函数 fn返回的是 void,而你要的函数返回的是undefined</span><br><span class="line"></span><br><span class="line">所以你不能写 undefined，所以应该改写 void</span><br><span class="line"></span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    onClick:()=&gt; void</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&quot;fui-icon&quot; onClick=&#123;props.onClick&#125;&gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="我想把点击的元素打印出来怎么办？"><a href="#我想把点击的元素打印出来怎么办？" class="headerlink" title="我想把点击的元素打印出来怎么办？"></a>我想把点击的元素打印出来怎么办？</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">//index.tsx</span><br><span class="line">const fn = (e)=&gt;&#123;</span><br><span class="line">    console.log(e);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">此时 ide 提示 不知道这个e是什么 你需要在IconProps里定义函数的参数的类型</span><br><span class="line"></span><br><span class="line">// 修改 index.tsx</span><br><span class="line">const fn = (e:React.MouseEvent)=&gt;&#123;</span><br><span class="line">    console.log(e);</span><br><span class="line">    console.log(e.target);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// icon.tsx</span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    onClick:(e:React.MouseEvent) =&gt; void</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="此时我想打印-e-target-style"><a href="#此时我想打印-e-target-style" class="headerlink" title="此时我想打印 e.target.style"></a>此时我想打印 e.target.style</h4></blockquote>
+<ul>
+<li>style被标红了，意思是 我怎么知道 target里面有没有 style属性呢？</li>
+<li>因为这样是存在潜在bug的，因为你不知道target到底是什么 可能是div也可能是 img 你没法保证它一定有 width属性<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 修改index.tsx,此时 </span><br><span class="line"></span><br><span class="line">const fn = (e:React.MouseEvent)=&gt;&#123;</span><br><span class="line">    console.log(e);</span><br><span class="line">    console.log(e.target);</span><br><span class="line">    console.log(e.target.style);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>答案是 React.MouseEvent 是可以接受参数的</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 如果你要明确 target的类型 就要在 MouseEvent 上加参数</span><br><span class="line">const fn = (e:React.MouseEvent&lt;SVGElement | SVGUseElement&gt;)=&gt;&#123;</span><br><span class="line">    console.log(e);</span><br><span class="line">    console.log(e.target);</span><br><span class="line">    console.log((e.target as SVGUseElement).href);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// target as xxxElement 意思把这个target当作 xxx元素用</span><br><span class="line">// 它是一种断言，有可能是错的</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="标准写法-清爽写法"><a href="#标准写法-清爽写法" class="headerlink" title="标准写法(清爽写法)"></a>标准写法(清爽写法)</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// icon.tsx</span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    onClick:React.MouseEventHandler&lt;SVGElement&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// index.tsx</span><br><span class="line">const fn:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">    console.log(e.target);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="如何接受所有事件，-mouseover-doubleclick-mouseleave-这样写那么多事件要猴年马月啊"><a href="#如何接受所有事件，-mouseover-doubleclick-mouseleave-这样写那么多事件要猴年马月啊" class="headerlink" title="如何接受所有事件， mouseover/doubleclick/mouseleave 这样写那么多事件要猴年马月啊"></a>如何接受所有事件， mouseover/doubleclick/mouseleave 这样写那么多事件要猴年马月啊</h4><ul>
+<li>IconProps 里一个一个写(太笨了)</li>
+<li>是否记得 打印 target的时候有很多属性 如name/width/href 是从那里来的 是<strong>继承</strong>来的</li>
+<li>所以我们的IconProps 应该继承 一个东西</li>
+<li>编辑器里点击 <code>import React from &#39;react&#39;</code> 搜索 onClick 看到 DOMAttributes</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">interface IconProps extends React.SVGAttributes&#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line">// 这样写会报错，然后提示你还需要一个参数，意思就是它里面的内容如 onClick 要接受一个 target是什么类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 最终答案</span><br><span class="line">interface IconProps extends React.SVGAttributes&lt;SVGElement&gt;&#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改 index.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import Icon from &apos;./icon/icon&apos;;</span><br><span class="line">const fn:React.MouseEventHandler = (e)=&gt;&#123;</span><br><span class="line">    console.log(e.target);</span><br><span class="line">&#125;</span><br><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon name=&quot;qq&quot; </span><br><span class="line">        onClick=&#123;fn&#125;</span><br><span class="line">        onMouseEnter=&#123;()=&gt;&#123;console.log(&apos;enter&apos;)&#125;&#125;</span><br><span class="line">        onMouseLeave=&#123;()=&gt;&#123;console.log(&apos;leave&apos;)&#125;&#125;</span><br><span class="line">    /&gt;</span><br><span class="line">&lt;/div&gt;, document.querySelector(&apos;#root&apos;));</span><br></pre></td></tr></table></figure>
+<p>修改 icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">interface IconProps extends React.SVGAttributes&lt;SVGElement&gt;&#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&quot;fui-icon&quot; </span><br><span class="line">            onClick=&#123;props.onClick&#125;</span><br><span class="line">            onMouseEnter=&#123;props.onMouseEnter&#125;</span><br><span class="line">            onMouseLeave=&#123;props.onMouseLeave&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>虽然完成了我们的需求，但是如果N多个事件难道要在组件里一个一个的写吗？</p>
+<blockquote>
+<h4 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h4></blockquote>
+<p>修改 icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//&#123;...props&#125;  react 里规定 写js要用 &quot;&#123;&#125;&quot; 包起来</span><br><span class="line">//所以 &#123;...props&#125; 别误以为是对象</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&quot;fui-icon&quot; </span><br><span class="line">            &#123;...props&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>这样写没问题吗？此时有bug</strong></p>
+<ul>
+<li>bug就是如果外面的人也传递了 className呢？</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;Icon name=&quot;qq&quot; </span><br><span class="line">    className=&quot;qq&quot;</span><br><span class="line">    onClick=&#123;fn&#125;</span><br><span class="line">    onMouseEnter=&#123;()=&gt;&#123;console.log(&apos;enter&apos;)&#125;&#125;</span><br><span class="line">    onMouseLeave=&#123;()=&gt;&#123;console.log(&apos;leave&apos;)&#125;&#125;</span><br><span class="line">/&gt;</span><br><span class="line"></span><br><span class="line">这样导致 我们的Icon组件 class=&quot;qq&quot; 而不是 &quot;fui-icon qq&quot;</span><br></pre></td></tr></table></figure>
+<p>这就是 react和vue的理念冲突，如果你用vue不用操心它帮你处理，而react则需要你自己处理</p>
+<blockquote>
+<h4 id="再一次优化"><a href="#再一次优化" class="headerlink" title="再一次优化"></a>再一次优化</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    const &#123;className,...restProps&#125; = props;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&#123;`fui-icon $&#123;className&#125;`&#125; </span><br><span class="line">            &#123;...restProps&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>此时还有bug</strong> 如果用户不传递 className呢？ 就导致 class=”fui-icon undefined”</p>
+<blockquote>
+<h4 id="classnames库，它就是把多个-class合并的库，但是很明显我们不会额外引入其他的库"><a href="#classnames库，它就是把多个-class合并的库，但是很明显我们不会额外引入其他的库" class="headerlink" title="classnames库，它就是把多个 class合并的库，但是很明显我们不会额外引入其他的库"></a>classnames库，它就是把多个 class合并的库，但是很明显我们不会额外引入其他的库</h4></blockquote>
+<blockquote>
+<h4 id="新建-lib-helpers-classes-tsx"><a href="#新建-lib-helpers-classes-tsx" class="headerlink" title="新建 lib/helpers/classes.tsx"></a>新建 lib/helpers/classes.tsx</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 将所有参数放到names数组里，然后声明names是一个字符串数组</span><br><span class="line">function classes(...names: string[]) &#123;</span><br><span class="line">    return names.join(&apos; &apos;);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">export default classes;</span><br></pre></td></tr></table></figure>
+<p>修改 icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import &apos;./importIcons&apos;;</span><br><span class="line">import &apos;./icon.scss&apos;</span><br><span class="line">import classes from &apos;../helpers/classes&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps extends React.SVGAttributes&lt;SVGElement&gt;&#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    const &#123;className,...restProps&#125; = props;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&#123;classes(&apos;fui-icon&apos;,className)&#125; </span><br><span class="line">            &#123;...restProps&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br><span class="line">// 此时className=&#123;classes(&apos;fui-icon&apos;,className)&#125;  标红了 意思这里的className可能不是 string</span><br></pre></td></tr></table></figure>
+<p>再次修改 classnames.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function classes(...names: (string|undefined)[]) &#123;</span><br><span class="line">    return names.join(&apos; &apos;);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">export default classes;</span><br><span class="line"></span><br><span class="line">// 但是这样 [&quot;1&quot;,undefined] ===&gt; &quot;1 &quot; 多了一个空格，强迫症导致必须改了</span><br><span class="line"></span><br><span class="line">function classes(...names: (string | undefined)[]) &#123;</span><br><span class="line">    return names.filter(Boolean).join(&apos; &apos;);</span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line">export default classes;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// Boolean(xxx) 的好处就是接受一个值返回 true/false</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="再次优化我们的-Icon-解构赋值"><a href="#再次优化我们的-Icon-解构赋值" class="headerlink" title="再次优化我们的 Icon(解构赋值)"></a>再次优化我们的 Icon(解构赋值)</h4></blockquote>
+<ul>
+<li>svg里面有name属性 ，所以name也要单独提取出来</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import &apos;./importIcons&apos;;</span><br><span class="line">import &apos;./icon.scss&apos;</span><br><span class="line">import classes from &apos;../helpers/classes&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps extends React.SVGAttributes&lt;SVGElement&gt;&#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    const &#123;className,name,...restProps&#125; = props;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&#123;classes(&apos;fui-icon&apos;,className)&#125; </span><br><span class="line">            &#123;...restProps&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<p>我们可以直接把解构赋值放在参数里 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import &apos;./importIcons&apos;;</span><br><span class="line">import &apos;./icon.scss&apos;;</span><br><span class="line">import classes from &apos;../helpers/classes&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps extends React.SVGAttributes&lt;SVGElement&gt; &#123;</span><br><span class="line">    name: string;</span><br><span class="line">    onClick: React.MouseEventHandler&lt;SVGElement&gt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon: React.FunctionComponent&lt;IconProps&gt; = </span><br><span class="line">(&#123; className, name, ...restProps &#125;) =&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg className=&#123;classes(&apos;fui-icon&apos;, className)&#125;</span><br><span class="line">            &#123;...restProps&#125;</span><br><span class="line">        &gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;name&#125;`&#125; /&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    );</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h4><ul>
+<li><a href="https://github.com/slTrust/react-gulu-test-3/tree/3e772af27aa39a2e48857fe48bc6758a31f051b1" target="_blank" rel="noopener">https://github.com/slTrust/react-gulu-test-3/tree/3e772af27aa39a2e48857fe48bc6758a31f051b1</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/25/ReactWheels04-03Icon组件下/" data-id="cklhgn2jf00nrkyfy1dh5nx0g" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ReactWheels04-02Icon组件上" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/24/ReactWheels04-02Icon组件上/" class="article-date">
+  <time datetime="2019-06-24T14:05:05.000Z" itemprop="datePublished">2019-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/24/ReactWheels04-02Icon组件上/">ReactWheels04-02Icon组件上</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Icon组件"><a href="#Icon组件" class="headerlink" title="Icon组件"></a>Icon组件</h3><p>icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">function Icon()&#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;span&gt;icon&lt;/span&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<p>index.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import Icon from &apos;./icon/icon&apos;;</span><br><span class="line"></span><br><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon /&gt;</span><br><span class="line">&lt;/div&gt;, document.body);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为 Icon 添加 name属性</p>
+</blockquote>
+<ul>
+<li>React.FunctionComponent 代表这是一个函数式组件  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">React.FunctionComponent&lt;IconProps&gt; 代表这个组件必须遵循 IconProps 里的属性也就是必须有name属性</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;span&gt;&#123;props.name&#125;&lt;/span&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<p>index.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import Icon from &apos;./icon/icon&apos;;</span><br><span class="line"></span><br><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon name=&quot;qq&quot;/&gt;</span><br><span class="line">&lt;/div&gt;, document.body);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="消除IDE的警告"><a href="#消除IDE的警告" class="headerlink" title="消除IDE的警告"></a>消除IDE的警告</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 为什么这样有警告</span><br><span class="line">&lt;Icon name=&quot;qq&quot;&gt;&lt;/Icon&gt;</span><br><span class="line"># 上面的写法是 xml</span><br><span class="line"></span><br><span class="line"># 而这里推荐的是这样，如果没有子内容就自闭和</span><br><span class="line">&lt;Icon name=&quot;qq&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如何现实-微信的-图标"><a href="#如何现实-微信的-图标" class="headerlink" title="如何现实 微信的 图标"></a>如何现实 微信的 图标</h4></blockquote>
+<ol>
+<li>打开 iconfont.cn 随便选个图标，账号登录，最后点svg下载</li>
+<li><strong>如何在一个组件里显示svg</strong><ul>
+<li>要改loader，因为webpack不认识svg</li>
+<li>svg-sprite-loader<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># 安装依赖</span><br><span class="line">yarn add svg-sprite-loader --dev</span><br><span class="line"></span><br><span class="line"># 修改webpack.config.js</span><br><span class="line">   module:&#123;</span><br><span class="line">    rules:[</span><br><span class="line">        &#123;</span><br><span class="line">            test: /\.svg$/,</span><br><span class="line">            loader: &apos;svg-sprite-loader&apos;,</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># icon.tsx里</span><br><span class="line">import wechar from &apos;../icons/wechat.svg&apos;</span><br><span class="line"></span><br><span class="line"># 重新运行 yarn start </span><br><span class="line">失败了 因为 js认识 svg， ts不认识 svg</span><br><span class="line"></span><br><span class="line"># 重新声明 svg的类型让 ts认识</span><br><span class="line">新建  lib/types/custom.d.ts</span><br><span class="line">// 内容如下</span><br><span class="line">declare module &apos;*.svg&apos; &#123;</span><br><span class="line">    const content: any;</span><br><span class="line">    export default content;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"># 此时 ide里还是报错 ，修改 tsconfig.json</span><br><span class="line"></span><br><span class="line">&quot;include&quot;: [</span><br><span class="line">    &quot;lib/**/*&quot;,</span><br><span class="line">    &quot;types/**/*&quot;</span><br><span class="line">]</span><br><span class="line"># 此时不报错了</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<h4 id="路径里的-星星什么意思"><a href="#路径里的-星星什么意思" class="headerlink" title="路径里的 星星什么意思"></a>路径里的 星星什么意思</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&quot;lib/**/*&quot;,</span><br><span class="line"></span><br><span class="line">如有如下目录</span><br><span class="line">|a</span><br><span class="line">|--1.js</span><br><span class="line">|--2.js</span><br><span class="line">|--b</span><br><span class="line">|--|--3.js</span><br><span class="line"></span><br><span class="line">如果写 a/* 就不会匹配 3.js</span><br><span class="line"></span><br><span class="line">如果写 a/b/* 就只会匹配3.js而不会匹配 1.js 2.js</span><br><span class="line"></span><br><span class="line">所以写 a/**/* 就是所有目录的 js</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="yarn-start-页面警告了"><a href="#yarn-start-页面警告了" class="headerlink" title="yarn start 页面警告了"></a>yarn start 页面警告了</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">react-dom.development.js:506 Warning: render(): Rendering components directly into document.body is discouraged, since its children are often manipulated by third-party scripts and browser extensions. This may lead to subtle reconciliation issues. Try rendering into a container element created for your app.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 意思是 不能直接渲染在 document.body上</span><br><span class="line"># 在 index.html里 写一个 &lt;div id=&quot;root&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line"># 修改 index.tsx</span><br><span class="line">ReactDOM.render(&lt;div&gt;</span><br><span class="line">    &lt;Icon name=&quot;qq&quot;/&gt;</span><br><span class="line">&lt;/div&gt;, document.querySelector(&apos;#root&apos;));</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如何渲染-svg"><a href="#如何渲染-svg" class="headerlink" title="如何渲染 svg"></a>如何渲染 svg</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import wechat from &apos;./icons/wechat.svg&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg&gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="custom-d-ts有什么用"><a href="#custom-d-ts有什么用" class="headerlink" title="custom.d.ts有什么用"></a>custom.d.ts有什么用</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/types/custom.d.ts 内容如下</span><br><span class="line">declare module &apos;*.svg&apos; &#123;</span><br><span class="line">    const content: any;</span><br><span class="line">    export default content;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"># 把 custom.d.ts 内容清空</span><br><span class="line"></span><br><span class="line"># 我们如果引入 svg 以这样的方式 ,依然可以正常显示</span><br><span class="line">import &apos;./icons/wechat.svg&apos;;</span><br><span class="line">import &apos;./icons/qq.svg&apos;;</span><br><span class="line">import &apos;./icons/alipay.svg&apos;;</span><br><span class="line"></span><br><span class="line"># 但是修改成这样</span><br><span class="line"></span><br><span class="line">import wechat from &apos;./icons/wechat.svg&apos;;</span><br><span class="line"></span><br><span class="line">就报错了， 因为 一个 export default xxx 对应一个 import xxx from &apos;x&apos;</span><br><span class="line">就报错了， 因为 一个 export default xxx 对应一个 import xxx from &apos;x&apos;</span><br><span class="line">就报错了， 因为 一个 export default xxx 对应一个 import xxx from &apos;x&apos;</span><br><span class="line"></span><br><span class="line"># 而 custom.d.ts 里的这些 意思就是所有的.svg文件 默认导出一个东西 </span><br><span class="line">declare module &apos;*.svg&apos; &#123;</span><br><span class="line">    const content: any;</span><br><span class="line">    export default content;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="有一个现实问题-，如果有100个svg-难道要写100个-import-‘xxx’"><a href="#有一个现实问题-，如果有100个svg-难道要写100个-import-‘xxx’" class="headerlink" title="有一个现实问题 ，如果有100个svg,难道要写100个 import ‘xxx’;"></a>有一个现实问题 ，如果有100个svg,难道要写100个 import ‘xxx’;</h4></blockquote>
+<p>importIcons.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">let importAll = (requireContext) =&gt; requireContext.keys().forEach(requireContext)</span><br><span class="line">try &#123;</span><br><span class="line">    importAll(require.context(&apos;./icons/&apos;, true, /\.svg$/))</span><br><span class="line">&#125; catch (error) &#123;</span><br><span class="line">    console.log(error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改icon.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import &apos;./importIcons&apos;;</span><br><span class="line"></span><br><span class="line">interface IconProps &#123;</span><br><span class="line">    name: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const Icon:React.FunctionComponent&lt;IconProps&gt; = (props)=&gt; &#123;</span><br><span class="line">    return (</span><br><span class="line">        &lt;svg&gt;</span><br><span class="line">            &lt;use xlinkHref=&#123;`#$&#123;props.name&#125;`&#125;/&gt;</span><br><span class="line">        &lt;/svg&gt;</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Icon;</span><br></pre></td></tr></table></figure>
+<h4 id="tree-shaking是什么"><a href="#tree-shaking是什么" class="headerlink" title="tree-shaking是什么"></a>tree-shaking是什么</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 到底我们应该</span><br><span class="line">import A from &apos;a&apos;</span><br><span class="line">import B from &apos;b&apos;</span><br><span class="line">import C from &apos;c&apos;</span><br><span class="line"></span><br><span class="line"># 还是应该像刚才一样</span><br><span class="line">importAll(&apos;./x&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">第一个叫做静态引入(方便我们 tree-shaking)</span><br><span class="line"></span><br><span class="line">第二个叫做非静态加载（写的时候方便）</span><br></pre></td></tr></table></figure>
+<p>比如你项目里依赖一个模块A，A里面有多个功能  a1/a2/a3 而你只用到了 a1 那么 a2/a3 则属于没有被依赖，</p>
+<p>而 tree-shaking 则是把没有用到的依赖从打包里删掉。只留下真正用到的依赖。</p>
+<p>tree-shaking的基础就是 静态引入</p>
+<ul>
+<li>非静态引入虽然方便，但是无法在后续使用 tree-shaking 来优化</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/react_wheels/react007_01.png" alt></p>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h4><p><a href="https://github.com/slTrust/react-gulu-test-3/tree/6c1bbb7b957d0090081215f9e9508279924ec8d1" target="_blank" rel="noopener">https://github.com/slTrust/react-gulu-test-3/tree/6c1bbb7b957d0090081215f9e9508279924ec8d1</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/24/ReactWheels04-02Icon组件上/" data-id="cklhgn2je00npkyfy9vwpe3fw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ReactWheels04-01为什么造轮子" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/24/ReactWheels04-01为什么造轮子/" class="article-date">
+  <time datetime="2019-06-24T12:41:19.000Z" itemprop="datePublished">2019-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/24/ReactWheels04-01为什么造轮子/">ReactWheels04-01为什么造轮子</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="为什么造轮子"><a href="#为什么造轮子" class="headerlink" title="为什么造轮子"></a>为什么造轮子</h3><blockquote>
+<p>不要重复造轮子，但是要有造轮子的能力</p>
+</blockquote>
+<ul>
+<li>现在的前端有一个代码检查工具 tslint (lint 细碎的线头) 就是把ts里细碎的不必要的东西帮你删掉</li>
+<li><p>tslint就是帮你检查代码的问题； 空格/回车/分号</p>
+<ol>
+<li>jslint 严格</li>
+<li>jshint 不那么严格</li>
+<li>jscs —— JS code style</li>
+<li><p>standard JS</p>
+<p>工具很多，造成选择困难。于是有了这句：不要重复造轮子。</p>
+</li>
+</ol>
+</li>
+<li>对于使用者：不要重复造轮子</li>
+<li>对于开发者：要造轮子。</li>
+</ul>
+<ol>
+<li><p>为了不求人<br> 假设你用了某UI框架，发现一个bug。于是你去github反馈给开发者，开发者说两周后修复，而你的项目要求一周后上线，你怎么办？</p>
+<blockquote>
+<p>比如著名的前端框架React 是FaceBook 开发的。而Google会使用它吗？ 不会，因为react留了一个巨大的坑，就是license里 任何一个公司如果你使用我司的react框架，如果你的产品被认为和我司的产品存在利益冲突，则收回你react的使用权</p>
+</blockquote>
+</li>
+<li>为了不流于平庸<br> 大家都是写CRUD,你跟别人比有什么优势？<br> 你如果说一句“我公司都用我写的UI框架” 是不是很NB?<br> 造UI轮子会遇到很多技术层面而非业务的知识，比如一些算法。</li>
+<li>为了创造<br> 你为别人做了这么久的事情，有没有为自己做过什么？<ul>
+<li>不为钱写代码——自驱动力 <a href="http://blog.sina.com.cn/s/blog_631d3a630101jzhi.html" target="_blank" rel="noopener">郭家宝 阿里星某一年最nb的应聘者年薪60K</a></li>
+<li>程序员最高评价——自我驱动力</li>
+</ul>
+</li>
+<li>为什么是UI轮子，不是其他方面的轮子<br> 比如，为什么不自己写个React框架，要写React UI框架呢？<ul>
+<li>风口，你写一个操作系统别人会用吗？我有苹果有安卓</li>
+<li>你写一个vue /react有人用吗？ 市场都占了。你能给公司带来什么？</li>
+<li>每个公司都需要UI框架</li>
+</ul>
+</li>
+</ol>
+<h3 id="造轮子步骤"><a href="#造轮子步骤" class="headerlink" title="造轮子步骤"></a>造轮子步骤</h3><ol>
+<li>SVG使用</li>
+<li>React的api</li>
+<li>TS用法</li>
+<li>Jest用法</li>
+<li>测试覆盖率</li>
+<li>Travis CI用法</li>
+<li>前端自动化</li>
+</ol>
+<h3 id="为什么手机上的UI框架那么不好用"><a href="#为什么手机上的UI框架那么不好用" class="headerlink" title="为什么手机上的UI框架那么不好用"></a>为什么手机上的UI框架那么不好用</h3><ol>
+<li>功能不符合要求</li>
+<li>很久不更新</li>
+<li>手机交互很少</li>
+<li>很多东西展示不了如 table</li>
+</ol>
+<ul>
+<li>PC上最重要的就是 table</li>
+<li>手机上最重要的就是 下拉更新</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/24/ReactWheels04-01为什么造轮子/" data-id="cklhgn2jd00nnkyfym5aum2j9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-030-cookie和session" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/15/Java-030-cookie和session/" class="article-date">
+  <time datetime="2019-06-15T04:02:27.000Z" itemprop="datePublished">2019-06-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/15/Java-030-cookie和session/">Java-030-cookie和session</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Session和Cookie"><a href="#Session和Cookie" class="headerlink" title="Session和Cookie"></a>Session和Cookie</h2><h3 id="HTTP是无状态协议"><a href="#HTTP是无状态协议" class="headerlink" title="HTTP是无状态协议"></a>HTTP是无状态协议</h3><p>之前我们学习HTTP协议的时候, 我们提到过, HTTP协议是无状态的!, 这个无状态是什么意思呢? 那首先我们来看一下有状态是什么样的.</p>
+<h4 id="有状态连接"><a href="#有状态连接" class="headerlink" title="有状态连接"></a>有状态连接</h4><ul>
+<li>客户端第一次给服务端发送请求1, 然后连接建立起来了</li>
+<li>客户端第二次给服务端发送请求2, 这时候, 服务端自然知道这个请求是来自客户端的<br>这个状态就是说, 客户端和服务端是可继续延续之前的请求, 然后继续.</li>
+</ul>
+<h4 id="无状态"><a href="#无状态" class="headerlink" title="无状态"></a>无状态</h4><p>就是说, 默认情况下, 每个HTTP请求都是独立的, 和之前的请求和之后的请求都没有关系.</p>
+<p>那问题来了, 如何基于无状态的HTTP协议, 实现有状态的Web应用功能呢? 例如:</p>
+<ul>
+<li>登录状态</li>
+<li>浏览记录</li>
+</ul>
+<h4 id="Session-会话"><a href="#Session-会话" class="headerlink" title="Session (会话)"></a>Session (会话)</h4><p>我们引入一个抽象概念, Session. 首先, 清空自己对这个概念的主观认识. Session不是Web开发的概念, 和Cookie也没有必然关系. 这是一个独立的概念!</p>
+<p>Session — 指的就是一种状态, 客户端和服务端连接中的会话状态! 以便让每次请求能够延续之前请求.</p>
+<p>回到Web开发, 我们需要基于无状态的HTTP协议, 实现有状态的Web应用功能, 本质上就是要实现一个Session的机制, 维护上一次请求的状态 (已完成或未完成). 为了维护这个状态, 则需要存储:</p>
+<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><p>第一种选择是在客户端存储和维护Session, 每次给服务端发送请求的时候, 在请求中夹带Session信息.</p>
+<h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><p>第二种选择是在服务端存储和维护Session, 然后每次处理客户端的请求时候, 从存储中找出与与这个客户端对应的Session信息.</p>
+<p>但是这里有个问题, 服务端需要把客户端发来的请求和服务端存储的Session信息对应上, 则客户端发来的请求还是需要夹带一个状态, 让服务端能够把这个请求和对应的客户端对应上.</p>
+<p>比如:</p>
+<ul>
+<li>客户端可以在请求中的authentication字段夹带一个SessionId或Session密钥.</li>
+<li>客户端可以在请求中的cookie字段夹带一个SessionId或Session密钥.</li>
+<li>客户端可以在请求中的RequestBody夹带一个SessionId或Session密钥.</li>
+<li>等等</li>
+</ul>
+<p>当服务端接收到请求,, 然后解析出请求中的这个Session密钥, 则可以把这个请求和对应的Session信息对应起来, 恢复出上一个请求的状态信息.</p>
+<h3 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h3><p>Cookie就是HTTP协议提供的一个机制, 能够在请求中夹带信息, 用于记录状态. 基本的操作流程是:</p>
+<ol>
+<li>客户端给服务端发送请求.</li>
+<li>服务端在HTTP响应中, 添加Cookie信息, 一起返回给客户端.</li>
+<li>客户端接收到请求的响应. 把Cookie信息存储在本地, 之后发送给服务端的请求中, 都会夹带这个Cookie信息(浏览器默认功能).</li>
+<li>服务端接收到这个Cookie信息, 就能够恢复出之前状态信息.</li>
+</ol>
+<p>比如我们使用Cookie实现Session:</p>
+<ol>
+<li>客户端给服务端发送请求.</li>
+<li>服务端接收到请求之后, 在存储中创建这个这个客户端的Session信息, 并且把这个Session的Id添加到Cookie中, 返回给客户端.</li>
+<li>客户端接受到请求响应之后, 把Cookie信息存储在本地, 之后发送给服务端的请求中, 都会夹带这个Cookie信息(浏览器默认功能).</li>
+<li>服务端再接收到这个客户端的请求, 解析出其中的Cookie信息 (包含SessionId), 通过这个SessionId提取出响应的Session信息, 恢复出之前和这个客户端之前请求的状态.</li>
+</ol>
+<h3 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h3><p><strong>Cookie盗用</strong></p>
+<p>我们很容易感觉到, Cookie里存储的SessionId是用来和服务端存储的Session有一一对应关系. 如果存储在客户端的Cookie信息被盗之后, 黑客可以使用这个SessionId, 伪造请求发送给服务端, 从而可以恢复出在服务端的Session信息, 从而可以利用.</p>
+<p><strong>威胁</strong></p>
+<p>本地存储</p>
+<ul>
+<li>本地加密</li>
+<li>防止跨站攻击</li>
+</ul>
+<p><strong>传输</strong></p>
+<p>加密存储HTTPS (HTTP + SSL), 也就是使用可以加密的请求.</p>
+<p><strong>服务端存储</strong></p>
+<p>有效期, Session有有效期, 需要重新提供认证信息.</p>
+<p><a href="http://github.com/slTrust/java_030_cookie_session" target="_blank" rel="noopener">代码链接</a></p>
+<h4 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h4><ul>
+<li><a href="https://sltrust.github.io/2018/02/09/N043_Cookie/" target="_blank" rel="noopener">cookie</a></li>
+<li><a href="https://sltrust.github.io/2018/02/10/N044__01_Session/" target="_blank" rel="noopener">session</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/15/Java-030-cookie和session/" data-id="cklhgn2ay0042kyfyvaifaf1u" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java-029-MVC架构" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/14/Java-029-MVC架构/" class="article-date">
+  <time datetime="2019-06-14T03:55:03.000Z" itemprop="datePublished">2019-06-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/14/Java-029-MVC架构/">Java-029-MVC架构</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Web-MVC架构"><a href="#Web-MVC架构" class="headerlink" title="Web MVC架构"></a>Web MVC架构</h2><h3 id="MVC架构"><a href="#MVC架构" class="headerlink" title="MVC架构"></a>MVC架构</h3><p><strong>为什么需要MVC架构</strong></p>
+<p>回顾一下 Web电子商务系统</p>
+<p><strong>Web电子商城主要逻辑模块</strong></p>
+<blockquote>
+<p>API</p>
+</blockquote>
+<ul>
+<li>处理HTTP请求, 请求校验</li>
+<li>解析和转换请求内容</li>
+<li>调用下层处理逻辑</li>
+<li>把处理结果转换成面向用户的结果</li>
+<li>构造HTTP响应和返回</li>
+</ul>
+<blockquote>
+<p>数据访问</p>
+</blockquote>
+<ul>
+<li>数据ORM</li>
+<li>实体对象</li>
+<li>数据访问模型 (DAO)</li>
+</ul>
+<blockquote>
+<p>业务逻辑</p>
+</blockquote>
+<ul>
+<li>用户身份校验</li>
+<li>产品信息校验</li>
+<li>创建购物车中的收藏记录</li>
+<li>产品库存管理</li>
+<li>订单生成</li>
+<li>等等等…..</li>
+</ul>
+<p>那最粗暴最极端的做法是把所有这些代码逻辑都写在API里!</p>
+<p>那很容易出现的问题就是:</p>
+<ul>
+<li>巨大的方法和类. 比如, 我见过15000行的类和其中5000行的方法</li>
+<li>逻辑的交叉, 可能会导致代码没法重用</li>
+<li>代码的重复和不可重用</li>
+<li>数据流的混乱</li>
+</ul>
+<blockquote>
+<p>那我们最先想到的的是划分模块:</p>
+</blockquote>
+<p><strong>API (Controller) 模块</strong></p>
+<ul>
+<li>处理HTTP请求, 请求校验</li>
+<li>解析和转换请求内容</li>
+<li>调用下层逻辑</li>
+<li>把内部处理结果转换成面向用户的结果 (View)</li>
+<li>构造HTTP响应2和返回</li>
+</ul>
+<p><strong>数据访问</strong></p>
+<ul>
+<li>数据ORM</li>
+<li>实体对象</li>
+<li>数据访问模型 (DAO)</li>
+</ul>
+<p><strong>业务逻辑 (Business) 模块</strong></p>
+<ul>
+<li>用户身份验证模块</li>
+<li>产品信息验证</li>
+<li>构建购物车中的收藏记录</li>
+<li>产品库存管理</li>
+<li>订单生成</li>
+<li>等等等……</li>
+</ul>
+<p>其中 API 模块中, 我们看到一块很重要的部分, 就是面向用户的部分, 这部分是API和前端或者用户直接交互的数据的结构, 所以单独抽象成一个模块</p>
+<p><strong>交互 (View) 模块</strong></p>
+<ul>
+<li>请求结构</li>
+<li>请求和内部Model的转换</li>
+<li>内部处理结构和面向用户结果的转换</li>
+<li>面向用户的结果</li>
+<li>页面, 如果HTTP页面是在后端构造 (JSP或者其他模板系统)</li>
+</ul>
+<blockquote>
+<p><strong>其中什么部分是Web项目中通用和必须的呢?</strong></p>
+</blockquote>
+<p>aView, Controller, Model</p>
+<h4 id="MVC架构-1"><a href="#MVC架构-1" class="headerlink" title="MVC架构"></a>MVC架构</h4><p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_029_01.png" alt></p>
+<h4 id="分层模型"><a href="#分层模型" class="headerlink" title="分层模型"></a>分层模型</h4><p>除了分模块, 我们应该注意到在MVC架构中, 我们还可以有一个分层的结构</p>
+<p>View —&gt; Controller —&gt; Business —&gt; Model</p>
+<p>这样单线的依赖关系, 可以让代码逻辑更加清晰, 我们可以想象成一个生产线或者流水线, 请求逻辑一层层拆解处理, 流水线上每个模块各司其职, 最后的终点是Model, 再把需要响应的内容, 从Model中提取出来, 再一层层按原来的路线往回传递.</p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_029_02.png" alt></p>
+<h4 id="Serverless架构"><a href="#Serverless架构" class="headerlink" title="Serverless架构"></a>Serverless架构</h4><p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_029_03.png" alt></p>
+<p><a href="https://github.com/slTrust/java_028_orm2" target="_blank" rel="noopener">代码链接</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/14/Java-029-MVC架构/" data-id="cklhgn2ax0040kyfyi7e4burw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Java-028-购物车实例" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/06/13/Java-028-购物车实例/" class="article-date">
@@ -147,7 +683,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/13/Java-028-购物车实例/" data-id="cklcb6bdc003vwo91aubxyvo2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/13/Java-028-购物车实例/" data-id="cklhgn2aw003ykyfyry19hpon" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -201,7 +737,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/13/Java-028-数据模型/" data-id="cklcb6bdb003two91wyao2yyz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/13/Java-028-数据模型/" data-id="cklhgn2aw003wkyfyy0q0p96d" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -253,7 +789,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/12/Java-027-ORM踩坑/" data-id="cklcb6bdd003xwo91gah8zdrd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/12/Java-027-ORM踩坑/" data-id="cklhgn2au003ukyfy0yl8e684" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -406,7 +942,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-027-ORM/" data-id="cklcb6bda003pwo91oosoodt9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/11/Java-027-ORM/" data-id="cklhgn2at003skyfyofns7i7q" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -660,724 +1196,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-026-sql范式/" data-id="cklcb6bd9003nwo91quyoaarj" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-025-sql进阶" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/11/Java-025-sql进阶/" class="article-date">
-  <time datetime="2019-06-11T05:34:25.000Z" itemprop="datePublished">2019-06-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/11/Java-025-sql进阶/">Java-025-sql进阶</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="进阶—SQL语言"><a href="#进阶—SQL语言" class="headerlink" title="进阶—SQL语言"></a>进阶—SQL语言</h3><h4 id="SQL-语言"><a href="#SQL-语言" class="headerlink" title="SQL 语言"></a>SQL 语言</h4><p>SQL 全称 Structured Query Language, 主要用来查询和更新数据库的一个语言.</p>
-<p>SQL 也就是关系数据库的一个标准化交互接口, 而关系数据库中的数据是结构化, 主要的一个操作就是从数据库中查询我们需要的内容.</p>
-<h5 id="结构化数据"><a href="#结构化数据" class="headerlink" title="结构化数据"></a>结构化数据</h5><blockquote>
-<p>数据表</p>
-</blockquote>
-<p>关系数据库的结构主题是数据表, 数据库可以说是数据表的合集. 然后数据表中就包含具体的数据记录. 一个数据表会有不同的字段.</p>
-<ul>
-<li>数据表</li>
-<li>字段 / 主键</li>
-<li>记录</li>
-</ul>
-<p>主键是每一条数据记录的唯一标志, 同一张数据表中, 所有记录的主键都是不同的!</p>
-<p>具体实例就是用户数据库, 我们可以设置用户 id 作为主键, 然后就可以通过用户 id 来唯一确定一个用户. 其他的字段, 用来表示用户的属性, 比如用户的名字, 用户的性别, 用户密码之类属性, 从语义上说, 不同用户是可以有相同的名字, 性别或密码.</p>
-<p>用户表 user:</p>
-<table>
-<thead>
-<tr>
-<th>id</th>
-<th>name</th>
-<th>type</th>
-<th>password</th>
-<th>content</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>Alex</td>
-<td>normal</td>
-<td>123456</td>
-<td>Here is the first</td>
-</tr>
-<tr>
-<td>1</td>
-<td>Alice</td>
-<td>normal</td>
-<td>123456</td>
-<td>Here is thhe first user</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Alex</td>
-<td>vip</td>
-<td>password</td>
-<td>Here is the second Alex</td>
-</tr>
-</tbody>
-</table>
-<p>数据库是表的合集, 然后不同表之间可能有相同的字段 (一般是其中一个表的主键), 也就是说, 这些表通过这些相同的字段给联系在一起了, 也就是所谓的关系. 我们查询过程中, 也是通过这些键从不同的数据表中查询到相关的数据.</p>
-<p>订单表 order:</p>
-<table>
-<thead>
-<tr>
-<th>id</th>
-<th>user_id</th>
-<th>product_id</th>
-<th>quantity</th>
-<th>timestamp</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>0</td>
-<td>15</td>
-<td>5</td>
-<td>203231232</td>
-</tr>
-<tr>
-<td>1</td>
-<td>2</td>
-<td>15</td>
-<td>1</td>
-<td>324324234</td>
-</tr>
-<tr>
-<td>2</td>
-<td>2</td>
-<td>1</td>
-<td>3</td>
-<td>213213219</td>
-</tr>
-</tbody>
-</table>
-<p>上面两个示例表, 可以通过用户id在用户表中查询一个用户的信息, 然后再在订单表中查询这个用户的订单.</p>
-<p>SQL数据类型<br>请参考: <a href="http://www.w3school.com.cn/sql/sql_datatypes.asp" target="_blank" rel="noopener">SQL数据类型</a></p>
-<p>数据约束<br>请参考: <a href="http://www.w3school.com.cn/sql/sql_constraints.asp" target="_blank" rel="noopener">SQL约束</a></p>
-<h4 id="常用查询-更新-管理-语句"><a href="#常用查询-更新-管理-语句" class="headerlink" title="常用查询(更新, 管理)语句"></a>常用查询(更新, 管理)语句</h4><h5 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE shop;</span><br><span class="line">USE shop; // 使用shop这个数据库, 之后在这个数据库下执行语句</span><br></pre></td></tr></table></figure>
-<h5 id="创建数据表"><a href="#创建数据表" class="headerlink" title="创建数据表"></a>创建数据表</h5><p>用户表 user:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `user` (</span><br><span class="line">    id          INTEGER         PRIMARY KEY NOT NULL,</span><br><span class="line">    name        VARCHAR(20)     UNIQUE NOT NULL, </span><br><span class="line">    type        VARCHAR(25)     NOT NULL,</span><br><span class="line">    password    VARCHAR(25)     NOT NULL,</span><br><span class="line">    content     VARCHAR(255)     </span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<p>订单表 order:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `order` (</span><br><span class="line">    id          INTEGER        PRIMARY KEY NOT NULL,</span><br><span class="line">    user_id     INTEGER        NOT NULL, </span><br><span class="line">    product_id  INTEGER        NOT NULL,</span><br><span class="line">    quantity    INTEGER        NOT NULL,     </span><br><span class="line">    time        DATETIME       NOT NULL,</span><br><span class="line">    status      VARCHAR(20)    NOT NULL</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h5 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h5><blockquote>
-<p>插入数据到user表</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;alex&apos;, &apos;ADMIN&apos;, &apos;password&apos;, &apos;管理员账号, 属于shiyang&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;alic&apos;, &apos;NORMAL&apos;, &apos;password&apos;, &apos;普通账号&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `user` (name, type, password, content)</span><br><span class="line">VALUES (&apos;bob&apos;, &apos;NORMAL&apos;, &apos;password&apos;, &apos;普通账号Bob&apos;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>插入数据到order表</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `order` (user_id, product_id, quantity, time, status)</span><br><span class="line">VALUES (1, 1, 5, CURRENT_TIMESTAMP, &apos;PENDING&apos;);</span><br><span class="line"></span><br><span class="line">INSERT INTO `order` (user_id, product_id, quantity, time, status)</span><br><span class="line">VALUES (2, 1, 1, CURRENT_TIMESTAMP, &apos;PENDING&apos;);</span><br></pre></td></tr></table></figure>
-<h5 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h5><blockquote>
-<p>基本查询语法</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT 通配符,字段或函数 FROM 表 WHERE 条件 group by 字段</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>实例</p>
-</blockquote>
-<p>查询所有用户信息:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user`;</span><br></pre></td></tr></table></figure>
-<p>通过用户id查询用户名和密码:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT name FROM `user` WHERE id = 1;</span><br><span class="line">SELECT name, password FROM `user` WHERE id = 1;</span><br></pre></td></tr></table></figure>
-<p>查询特定数量范围内的订单:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `order` WHERE quantity between 1 and 10;</span><br></pre></td></tr></table></figure>
-<p>根据用户类型分组查询用户:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` GROUP BY type;</span><br></pre></td></tr></table></figure>
-<h5 id="更新数据"><a href="#更新数据" class="headerlink" title="更新数据"></a>更新数据</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UPDATE `user` SET password = &apos;123456&apos;  WHERE id = 1;</span><br><span class="line">UPDATE `user` SET content = &apos;这是更新之后的内容&apos;, password = &apos;09876&apos; WHERE id = 1;</span><br></pre></td></tr></table></figure>
-<h5 id="Join-查询"><a href="#Join-查询" class="headerlink" title="Join 查询"></a>Join 查询</h5><p>SQL 的 Join 子句用于结合两个或多个数据库中表的记录. JOIN 是一种通过共同值来结合两个表中字段的手段. 也就是所谓的关系.</p>
-<p>比如: 我们需要查询一个用户的用户名简介及其所有订单商品的id和数量, 这种查询应该怎么做呢?</p>
-<p>主要难点: 需要查询的内容来自两个表</p>
-<blockquote>
-<p>Cross Join</p>
-</blockquote>
-<p>Cross join把两个表的所有行进行叉乘拼接 (XY). 即表A的每一行会拼接表B的的所有行 (n行), 然后生成n行数据. 假设表A有x行, 表B有y行, 则输输出总行数为xy行.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` CROSS JOIN `order`;</span><br><span class="line"></span><br><span class="line">SELECT * FROM `user` CROSS JOIN `order` WHERE `user`.id = 1 AND `order`.user_id = 1;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Inner Join</p>
-</blockquote>
-<p>Inner Join和Cross Join相似, 只是可以接收一个条件, 然后把满足这个条件的行组合再一起.</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql1.png" alt></p>
-<p>比如: 我们需要查询用户的信息, 简介及其所有订单商品的id和数量, 这种查询应该怎么做呢?</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM `user` INNER JOIN `order` ON `user`.id =  `order`.user_id;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Outter Join</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql2.png" alt></p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql3.png" alt></p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/java/java_025_sql4.png" alt></p>
-<h5 id="JAVA执行SQL"><a href="#JAVA执行SQL" class="headerlink" title="JAVA执行SQL"></a>JAVA执行SQL</h5><p><code>`</code><br>CREATE TABLE <code>product</code> (<br>    id          INTEGER         PRIMARY KEY NOT NULL,<br>    name        VARCHAR(20)     NOT NULL,<br>    description VARCHAR(25)     NOT NULL,<br>    price       DOUBLE          NOT NULL<br>);<br>INSERT INTO <code>product</code> (name, description, price)<br>VALUES (‘milk’, ‘1 milk 1 day, healthy’, 2.50);</p>
-<p>INSERT INTO <code>product</code> (name, description, price)<br>VALUES (‘coke’, ‘1 coke 1 day, unhealthy’, 1.50);<br><code></code></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-025-sql进阶/" data-id="cklcb6bd5003hwo91vo6ziyr0" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-024-数据库和jdbc" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/11/Java-024-数据库和jdbc/" class="article-date">
-  <time datetime="2019-06-11T03:31:54.000Z" itemprop="datePublished">2019-06-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/11/Java-024-数据库和jdbc/">Java-024-数据库和jdbc</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="数据库和JDBC"><a href="#数据库和JDBC" class="headerlink" title="数据库和JDBC"></a>数据库和JDBC</h3><h4 id="关于数据库的What和Why"><a href="#关于数据库的What和Why" class="headerlink" title="关于数据库的What和Why"></a>关于数据库的What和Why</h4><p>之前我们在计算机程序模型中提到过, 在计算机世界中需要处理的几个核心问题:</p>
-<ul>
-<li>存储</li>
-<li>计算</li>
-<li>交互</li>
-</ul>
-<p>具体到存储这一块, 之前我们了解过</p>
-<ul>
-<li>存储设备 – 内存和硬盘, 以及对具体硬盘磁片的存储单元, 块和内存的存储单元</li>
-<li>文件系统 – 在操作系统层面上对存储的抽象, 比如说目录和文件.</li>
-<li>应用程序 – 针对不同的应用场景, 可能数据内容的形式和模型会有不同的需求. 比如说, Web程序可能很多文本形式的数据, 多媒体数据等等</li>
-</ul>
-<p>数据库则是提供针对不同类型的应用程序 (Web前端程序, Web后端程序, 终端应用等等)的通用数据存储需求的存储需求的高级抽象</p>
-<p>本质上, 我们谈存储和数据, 就是在谈状态. 比如:</p>
-<ul>
-<li>账号信息</li>
-<li>产品信息</li>
-<li>订单信息等等</li>
-</ul>
-<p>存储, 不管哪个层面上, 都是为了在特定的时限内保存这些实体的状态.</p>
-<p>然后很重要的一类计算就是对这些实体的状态的转换和维护, 以及比如:</p>
-<ul>
-<li>更新账号密码</li>
-<li>更新产品的库存</li>
-<li>创建订单</li>
-</ul>
-<p>从各种各样的应用程序的实例中, 提炼抽象出的一些通用的数据存储需求, 一起实现到一套系统中, 就产生了数据库:</p>
-<ul>
-<li>数据存储</li>
-<li>数据结构和组织</li>
-<li>数据索引 (如何找到数据)</li>
-<li>数据的更新和查询</li>
-<li>数据的备份和冗余 (防止丢失和保持可用)</li>
-<li>数据一致性, 事务</li>
-<li>数据管理</li>
-<li>等等</li>
-</ul>
-<p>市面上各种不同的数据库, 就是针对不同的场景和不同的需求, 对以上的问题提出针对性的解决方案, 并且有不同的侧重点</p>
-<h4 id="数据库类型"><a href="#数据库类型" class="headerlink" title="数据库类型"></a>数据库类型</h4><p>按照上面的逻辑, 数据库的特性和应用需求是多维度的. 所以我们在考虑数据库的分类的时候, 也得从不同维度来考虑!</p>
-<blockquote>
-<h4 id="从数据结构和组织"><a href="#从数据结构和组织" class="headerlink" title="从数据结构和组织"></a>从数据结构和组织</h4></blockquote>
-<p>关系数据库 / SQL</p>
-<p>MySQL, Oracle, DB2, PostgreSQL, SQLite</p>
-<p>对象 / Document / 列-Based (NoSQL)</p>
-<p>MongoDB, DynamoDB 等等</p>
-<p>图</p>
-<p>Key-Value<br>leveldb</p>
-<p>时间序列<br>比如金融量化交易系统的金融数据, 时间维度是很重要的!</p>
-<blockquote>
-<h4 id="从数据存储"><a href="#从数据存储" class="headerlink" title="从数据存储"></a>从数据存储</h4></blockquote>
-<blockquote>
-<p>终端应用数据库</p>
-</blockquote>
-<p>在应用本地存储数据的数据库, 比如说Web前端, Android/ios应用的本地数据库.</p>
-<ul>
-<li>SQLite</li>
-</ul>
-<blockquote>
-<p>内存数据库</p>
-</blockquote>
-<p>在后端系统中, 可能需要一些访问更快但是不需要持久性的数据, 就可能需要在内存中的数据库. 但是可以获得更快的读取更新速度</p>
-<ul>
-<li>Redis</li>
-<li>Memcached</li>
-</ul>
-<p>比如:</p>
-<ul>
-<li>Web程序中的用户登录状态, 就可以存储在内存里, 如果Web后端程序重启之后, 内存的数据库会丢失, 但是只需要用户重新登录就好了, 但是可以获得更快的读取和更新速度</li>
-<li>爬虫中的已经访问过的URLs</li>
-</ul>
-<blockquote>
-<h4 id="持久化数据库"><a href="#持久化数据库" class="headerlink" title="持久化数据库"></a>持久化数据库</h4></blockquote>
-<p>MySQL, Oracle, MongoDB可能会更关注持久性存储, 冗余和备份, 保证数据的安全(Security和Safety)等等.</p>
-<blockquote>
-<h4 id="分布式数据库"><a href="#分布式数据库" class="headerlink" title="分布式数据库"></a>分布式数据库</h4></blockquote>
-<p>数据规模扩大之后, 可能需要在多台机器 (分布式) 上存储, 同时提供保证大量数据的存储能力, 数据冗余, 高吞吐的能力</p>
-<ul>
-<li>HBase</li>
-<li>Cassandra</li>
-</ul>
-<blockquote>
-<h4 id="云数据库"><a href="#云数据库" class="headerlink" title="云数据库"></a>云数据库</h4></blockquote>
-<p>云上的完整解决方案, 按需付费, 可伸缩性, 更专业稳定的运维能力</p>
-<ul>
-<li>DynamoDB</li>
-<li>腾讯云数据库</li>
-<li>阿里云数据库</li>
-</ul>
-<blockquote>
-<p>区块链</p>
-</blockquote>
-<p>区块链本质上是一个可以完全分布到整个互联网的数据库!</p>
-<h4 id="关系数据库"><a href="#关系数据库" class="headerlink" title="关系数据库"></a>关系数据库</h4><p>关系型数据库是对一类数据库设计经验的总结和设计方法的抽象，以期得到一个通用的数据库的解决方法</p>
-<p>关系数据组织数据的基本结构:</p>
-<ul>
-<li>数据库</li>
-<li>数据库表</li>
-<li>数据库字段</li>
-<li>数据库记录</li>
-</ul>
-<p>SQL是一个对SQL数据库的查询和操作的通用语言</p>
-<blockquote>
-<h4 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h4></blockquote>
-<p>Java程序连接SQL数据库,操作SQL数据库和执行SQL语句的库.</p>
-<ul>
-<li>程序接口</li>
-<li>数据库驱动程序</li>
-</ul>
-<p>sqlite-jdbc</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">import java.sql.Connection;</span><br><span class="line">import java.sql.DriverManager;</span><br><span class="line">import java.sql.ResultSet;</span><br><span class="line">import java.sql.SQLException;</span><br><span class="line">import java.sql.Statement;</span><br><span class="line"></span><br><span class="line">public class JdbcSample &#123;</span><br><span class="line">    public static void main(String[] args)</span><br><span class="line">    &#123;</span><br><span class="line">        Connection connection = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            // 创建数据库连接</span><br><span class="line">            connection = DriverManager.getConnection(&quot;jdbc:sqlite:resources/sample.db&quot;);</span><br><span class="line">            Statement statement = connection.createStatement();</span><br><span class="line">            statement.setQueryTimeout(30);  // set timeout to 30 sec.</span><br><span class="line"></span><br><span class="line">            statement.executeUpdate(&quot;drop table if exists person&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;create table person (id integer, name string)&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;insert into person values(1, &apos;leo&apos;)&quot;);</span><br><span class="line">            statement.executeUpdate(&quot;insert into person values(2, &apos;yui&apos;)&quot;);</span><br><span class="line">            ResultSet rs = statement.executeQuery(&quot;select * from person&quot;);</span><br><span class="line">            while(rs.next()) &#123;</span><br><span class="line">                // read the result set</span><br><span class="line">                System.out.println(&quot;name = &quot; + rs.getString(&quot;name&quot;));</span><br><span class="line">                System.out.println(&quot;id = &quot; + rs.getInt(&quot;id&quot;));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch(SQLException e) &#123;</span><br><span class="line">            // if the error message is &quot;out of memory&quot;,</span><br><span class="line">            // it probably means no database file is found</span><br><span class="line">            System.err.println(e.getMessage());</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                if(connection != null)</span><br><span class="line">                    connection.close();</span><br><span class="line">            &#125; catch(SQLException e) &#123;</span><br><span class="line">                // connection close failed.</span><br><span class="line">                System.err.println(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><blockquote>
-<h4 id="数据库学习"><a href="#数据库学习" class="headerlink" title="数据库学习"></a>数据库学习</h4></blockquote>
-<ul>
-<li><a href="https://sltrust.github.io/tags/mysql/" target="_blank" rel="noopener">mysql基本语法</a></li>
-<li><a href="http://www.runoob.com/sqlite/sqlite-java.html" target="_blank" rel="noopener">sqlite教程</a></li>
-<li><a href="https://www.zhihu.com/question/273489729" target="_blank" rel="noopener">为什么要学数据库原理和设计?</a></li>
-<li><a href="https://www.zhihu.com/question/26788013" target="_blank" rel="noopener">数据库这门课为什么这么难学，该怎么学?</a></li>
-<li><a href="https://book.douban.com/subject/2334295/" target="_blank" rel="noopener">Head First SQL</a></li>
-</ul>
-<blockquote>
-<h4 id="数据库选择"><a href="#数据库选择" class="headerlink" title="数据库选择"></a>数据库选择</h4></blockquote>
-<ul>
-<li><a href="https://arcentry.com/blog/choosing-a-database-in-2018/" target="_blank" rel="noopener">How to choose a database in 2018</a></li>
-</ul>
-<blockquote>
-<h4 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h4></blockquote>
-<ul>
-<li>Google 开源 Key-Value store: <a href="https://github.com/google/leveldb" target="_blank" rel="noopener">leveldb</a></li>
-<li>开源分布式数据库: <a href="http://cassandra.apache.org/" target="_blank" rel="noopener">Cassandra</a></li>
-</ul>
-<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h4><ul>
-<li><a href="http://github.com/slTrust/java_024_jdbc" target="_blank" rel="noopener">java_024_jdbc</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-024-数据库和jdbc/" data-id="cklcb6bd4003fwo91jw9m2kfl" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-022-控制反转和依赖注入" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/09/Java-022-控制反转和依赖注入/" class="article-date">
-  <time datetime="2019-06-09T03:31:54.000Z" itemprop="datePublished">2019-06-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/09/Java-022-控制反转和依赖注入/">Java-022-控制反转和依赖注入</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="控制反转和依赖注入"><a href="#控制反转和依赖注入" class="headerlink" title="控制反转和依赖注入"></a>控制反转和依赖注入</h3><h4 id="控制反转"><a href="#控制反转" class="headerlink" title="控制反转"></a>控制反转</h4><p>控制反转（Inversion of Control）是一种是面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度. 比如:</p>
-<p>A依赖于B, 一种写法是在类A里面使用 new 创建一个类B的对象, 这就是一般所说的A控制B的创建和销毁</p>
-<p>而控制反转, 则是让A移交出这个创建权给A的外部, 由外部(相对于A)控制B的创建和销毁. 这样就实现了B的创建和生命周期逻辑和A的解耦.</p>
-<p>因为A类里的代码需要去new一个B的对象, 就需要调用B的构造方法: 更新了B的构造方法 –&gt; A中调用的B的构造方法!<br>X –&gt; A, B, C –&gt; D</p>
-<p>在X里创建D的对象, 然后再传给A, B, C</p>
-<p>和封装实现细节的对比</p>
-<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>通过控制反转, 我们把B的控制权转移到A的外部, 但是A仍然依赖于B, 需要使用B的对象去完成一些事情. 那问题来了:</p>
-<blockquote>
-<h4 id="我们如何把在外部创建的B的对象交给A呢"><a href="#我们如何把在外部创建的B的对象交给A呢" class="headerlink" title="我们如何把在外部创建的B的对象交给A呢?"></a>我们如何把在外部创建的B的对象交给A呢?</h4></blockquote>
-<ul>
-<li>在A的构造方法里把B作为一个参数传给A</li>
-<li>使用setter方法把B传给A</li>
-</ul>
-<p>这个其实就是所谓的依赖注入! 依赖注入其实就是控制反转的一个实现, 差不多也是同一回事.</p>
-<h4 id="组件和依赖注入"><a href="#组件和依赖注入" class="headerlink" title="组件和依赖注入"></a>组件和依赖注入</h4><p>回忆之前讲Java程序的基本结构: 抽象出一些类和对象, 然后处理对象之间的交互.</p>
-<p>然后在具体的场景中, 我们会有一些常用的对象来处理一些常见的逻辑结构, 比如说特定本地数据的访问, 数据库的访问, 配置文件访问, 认证, 这种我们会称之为组件或者模块, 在Spring里称之为Bean.</p>
-<p>同一个组件通常可能会在程序中很多地方需要使用, 比如说 UserController 可能会使用到 UserDao 这个组件, ManageControler 也会使用到 UserDao 这个组件. 那最简单的方式是, 我们每次使用的时候都创建一个组件 UserDao 的实例, 即使这个组件是可以重用的! (这里违反了什么原则?)</p>
-<p>但是有没有其他更好的方式呢? 就是统一管理组件的创建, 然后在需要使用的地方把这个组件的实例注入.</p>
-<h4 id="Spring的组件管理和依赖注入"><a href="#Spring的组件管理和依赖注入" class="headerlink" title="Spring的组件管理和依赖注入"></a>Spring的组件管理和依赖注入</h4><blockquote>
-<h4 id="常用的两种注入方式"><a href="#常用的两种注入方式" class="headerlink" title="常用的两种注入方式:"></a>常用的两种注入方式:</h4></blockquote>
-<ul>
-<li>组件直接标记注入</li>
-<li>工厂模式注入</li>
-</ul>
-<blockquote>
-<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4></blockquote>
-<blockquote>
-<p>直接注入</p>
-</blockquote>
-<p>如果需要被注入的组件, 是我们能够控制的, 那我们就可以使用直接标记注入, 简洁优雅.</p>
-<blockquote>
-<p>工厂模式注入</p>
-</blockquote>
-<p>如果需要注入的组件, 我们需要更复杂的控制创建过程, 比如说动态根据输入内容创建组件, 那就使用工厂模式注入.</p>
-<p>或者需要注入的组件是一个外部库的类, 那我们没法给它加上@Component这样的标记, 那我们就必须使用工厂模式注入.</p>
-<p>再或者, 我们希望控制组件的数量, 如果是只需要一个组件的实例, 则使用直接注入或者工厂模式都可以. 但是如果需要使用多个实例(比如每次使用都创建一个新的实例), 那就使用工厂模式!</p>
-<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a><a href="https://github.com/slTrust/java_022_spring" target="_blank" rel="noopener">代码链接</a></h4>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/" data-id="cklcb6bd6003jwo91ztt1p686" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-021-单元测试" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/08/Java-021-单元测试/" class="article-date">
-  <time datetime="2019-06-08T03:31:10.000Z" itemprop="datePublished">2019-06-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/08/Java-021-单元测试/">Java-021-单元测试</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><p>@(Programming_Training)</p>
-<h4 id="What-–-单元测试是什么"><a href="#What-–-单元测试是什么" class="headerlink" title="What – 单元测试是什么"></a>What – 单元测试是什么</h4><blockquote>
-<h4 id="单元"><a href="#单元" class="headerlink" title="单元"></a>单元</h4></blockquote>
-<p>我们在构建程序的时候, </p>
-<p>都是把程序分成一个个小的模块和组件</p>
-<p>这些模块在java里面按照层次可以对应的是:</p>
-<ul>
-<li>包</li>
-<li>类</li>
-<li>方法</li>
-</ul>
-<p>意思就是测试的粒度, 一般在类和方法这样的粒度上做测试, 也就是说, 一个单元可以是一个类的一个方法</p>
-<blockquote>
-<h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4></blockquote>
-<p>顾名思义, 为了Double check我们实现的代码功能符合我们的预期</p>
-<h4 id="Why"><a href="#Why" class="headerlink" title="Why"></a>Why</h4><blockquote>
-<h4 id="Double-check"><a href="#Double-check" class="headerlink" title="Double check"></a>Double check</h4></blockquote>
-<p>类和方法的实现没有bug, 符合我们在设计时候的预期和要求</p>
-<blockquote>
-<h4 id="功能稳定的保证"><a href="#功能稳定的保证" class="headerlink" title="功能稳定的保证"></a>功能稳定的保证</h4></blockquote>
-<p>类和方法的实现, 在代码的进化和发展过程, 会需要进行反复的修改和重构, 当我们更改代码的时候, 单元测试能够保证修改后功能不会受影响, 从而影响下层依赖这个类和方法的代码</p>
-<p>良好的单元测试是重构的基础, 感受一下</p>
-<blockquote>
-<h4 id="对设计的帮助"><a href="#对设计的帮助" class="headerlink" title="对设计的帮助"></a>对设计的帮助</h4></blockquote>
-<p>当你在写单元测试的时候, 势必会把从一个个小的单元(或模块)来考虑程序, 也就是模块化思维, 因为如果不这样思考, 根本没办法写单元测试. 这样测试时候, 强迫自己去考虑代码的模块化</p>
-<p>也就是江湖上流传的, 编写可测试的代码</p>
-<blockquote>
-<h5 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h5></blockquote>
-<ul>
-<li><a href="https://www.ibm.com/developerworks/cn/linux/l-tdd/index.html" target="_blank" rel="noopener">测试驱动开发</a></li>
-<li><a href="https://book.douban.com/subject/1230036/" target="_blank" rel="noopener">测试驱动开发(中文版)</a></li>
-</ul>
-<blockquote>
-<h5 id="代码文档"><a href="#代码文档" class="headerlink" title="代码文档"></a>代码文档</h5></blockquote>
-<p>好的测试也可以是一个很好的文档, 刚开始学习一个系统或者程序时候, 可以从其单元测试开始, 了解如何使用其代码, 输入是什么, 输出是什么, 预期的运行结果是什么</p>
-<h4 id="How-–-如何做单元测试"><a href="#How-–-如何做单元测试" class="headerlink" title="How – 如何做单元测试"></a>How – 如何做单元测试</h4><p>到此为止, 我们大概知道单元测试的目标是什么 — 试着调用实现的类和方法, 然后确定其正确性</p>
-<p>比如, 我们可以在main方法里写测试, 然后开发时候直接跑一下.</p>
-<p>但是这样效率太低了, 而且当测试量大的时候, 需要结构化的组织测试代码.</p>
-<h3 id="Junit"><a href="#Junit" class="headerlink" title="Junit"></a>Junit</h3><p><a href="https://github.com/junit-team/junit4/wiki/Getting-started" target="_blank" rel="noopener">https://github.com/junit-team/junit4/wiki/Getting-started</a></p>
-<p>通过Java的标记, 组织测试代码, 组织成测试集. 然后每次编译之后, 运行所有的测试集.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Calculator &#123;</span><br><span class="line">  public int evaluate(String expression) &#123;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    for (String summand: expression.split(&quot;\\+&quot;))</span><br><span class="line">      sum += Integer.valueOf(summand);</span><br><span class="line">    return sum;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">import static org.junit.Assert.assertEquals;</span><br><span class="line">import org.junit.Test;</span><br><span class="line"></span><br><span class="line">public class CalculatorTest &#123;</span><br><span class="line">  @Test</span><br><span class="line">  public void evaluatesExpression() &#123;</span><br><span class="line">    Calculator calculator = new Calculator();</span><br><span class="line">    int sum = calculator.evaluate(&quot;1+2+3&quot;);</span><br><span class="line">    assertEquals(6, sum);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="EasyMock"><a href="#EasyMock" class="headerlink" title="EasyMock"></a>EasyMock</h4><p><a href="http://easymock.org" target="_blank" rel="noopener">http://easymock.org</a></p>
-<p>当我们在写测试的时候, 我们会经常遇到一个问题就是, 我们会有很多依赖的模块, 或者依赖的内容, 比如一些我们使用的库, 查询的数据库, 采集的网络数据</p>
-<p>如果测试中都去获取这些依赖的内容, 就会影响测试代码的可靠性和性能.</p>
-<p>而且我们依赖的模块和内容, 维护其正确性的责任不在我们! 我们测试应该更关注我们自己代码的逻辑和实现的正确性!</p>
-<blockquote>
-<p>比如在爬虫中, 我们采集的网页内容, 就是依赖, 如果我们测试时候, 我们都必须去爬一下内容, 那效率就特别低! 我们可以在本地存储一份用于测试的网页内容</p>
-</blockquote>
-<blockquote>
-<p>比如数据库查询, 我们不可能在测试代码中真正去操作数据库(炒鸡危险的行为!), 所以我们需要模拟(Mock)一个假的数据对象</p>
-</blockquote>
-<p>EasyMock就是用来解决这个问题的! Mock需要的依赖, 一般EasyMock是配合JUnit一起使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public class JsonNewsTestableReaderTest extends EasyMockSupport &#123;</span><br><span class="line"></span><br><span class="line">    private TextNewsTestableReader textNewsTestableReader;</span><br><span class="line">    private BufferedReader newsReader;</span><br><span class="line"></span><br><span class="line">    @Before</span><br><span class="line">    public void setup() &#123;</span><br><span class="line">        newsReader = createStrictMock(BufferedReader.class);</span><br><span class="line">        textNewsTestableReader = new TextNewsTestableReader(newsReader);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void shouldReadNews() throws Exception &#123;</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;title&quot;);</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;\n&quot;);</span><br><span class="line">        expect(newsReader.readLine()).andReturn(&quot;content&quot;);</span><br><span class="line"></span><br><span class="line">        replayAll();</span><br><span class="line">        News  news = textNewsTestableReader.readNews();</span><br><span class="line">        verifyAll();</span><br><span class="line"></span><br><span class="line">        assertEquals(&quot;title&quot;, news.getTitle());</span><br><span class="line">        assertEquals(&quot;content&quot;, news.getContent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="maven项目引入单元测试"><a href="#maven项目引入单元测试" class="headerlink" title="maven项目引入单元测试"></a>maven项目引入单元测试</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> &lt;dependencies&gt;</span><br><span class="line">    &lt;!-- junit --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.12&lt;/version&gt;</span><br><span class="line">        &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- mock --&gt;</span><br><span class="line">    &lt;dependency&gt;</span><br><span class="line">        &lt;groupId&gt;org.easymock&lt;/groupId&gt;</span><br><span class="line">        &lt;artifactId&gt;easymock&lt;/artifactId&gt;</span><br><span class="line">        &lt;version&gt;4.0.2&lt;/version&gt;</span><br><span class="line">        &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">    &lt;/dependency&gt;</span><br><span class="line">&lt;/dependencies&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p><a href="https://github.com/slTrust/java_021_junit_demo" target="_blank" rel="noopener">代码链接</a></p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/08/Java-021-单元测试/" data-id="cklcb6bd8003lwo91nzux6e0r" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-020-RESTful" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/06/07/Java-020-RESTful/" class="article-date">
-  <time datetime="2019-06-07T03:30:20.000Z" itemprop="datePublished">2019-06-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/07/Java-020-RESTful/">Java-020-RESTful</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h3><h4 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h4><ul>
-<li>URI – 互联网资源的地址</li>
-<li>操作 – 对资源执行的操作: GET, PUT, POST, DELETE</li>
-<li>返回状态码 – 表示执行结果: 200, 201, 403, 404, 500</li>
-</ul>
-<p>以上是 HTTP协议在程序语义层面的定义, 同时也抽象了整个互联网内容的组织和交互方式.</p>
-<ul>
-<li>互联网上所有的内容都是资源, 每个资源有唯一的URI</li>
-<li>交互就是对互联网资源的操作(GET, PUT, POST, DELETE)</li>
-<li>然后资源的操作结果就是状态返回码</li>
-</ul>
-<p>每一次请求的发起都是客户端向服务端发起.</p>
-<h4 id="RESTful-API-1"><a href="#RESTful-API-1" class="headerlink" title="RESTful API"></a>RESTful API</h4><p>RESTful API就是基于HTTP协议对互联网的内容定义的方式提出的一套互联网应用的架构体系.</p>
-<p>RESTful是一种设计模式规范的指南, 不是一个强制性的要求, 所以遵守都必须是靠开发者自己遵守.</p>
-<h4 id="RESTful-API的基本要求"><a href="#RESTful-API的基本要求" class="headerlink" title="RESTful API的基本要求"></a>RESTful API的基本要求</h4><blockquote>
-<p>URI</p>
-</blockquote>
-<ol>
-<li>协议: HTTP或HTTPS</li>
-<li><p>域名和地址一般格式: http://&lt;域名&gt;/api/<version></version></p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">有 api 路径是为了版本的更新</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>域名和地址之后接资源名字统一用复数, 例如</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://api.example.com/v1/zoos</span><br><span class="line">https://api.example.com/v1/animals</span><br><span class="line">https://api.example.com/v1/employees</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<blockquote>
-<p>操作</p>
-</blockquote>
-<ol>
-<li>GET /accounts – 列出所有的账户信息</li>
-<li>GET /accounts/<id> – 查询id为<id>的账户信息</id></id></li>
-<li>PUT /accounts/<id> – 更新id为<id>的账户信息, 注意这个操作是幂等的, 幂等是多次同样的操作, 最终结果只有一个!</id></id></li>
-<li>POST /accounts – 创建一个新的账户</li>
-<li>DELETE /accounts – 删除一个账户 (危险操作)</li>
-</ol>
-<blockquote>
-<p>额外参数</p>
-</blockquote>
-<p>URI里的参数列表, 一般用在查询里面. 比如 GET /accounts?type=ADMIN 这样用来筛选账户, 一般不推荐直接把id这样直接资源的索引键值直接用在URL的参数列表里, 而是直接放在URI里, 因为它本身是一个资源!</p>
-<blockquote>
-<p>状态转换</p>
-</blockquote>
-<p>HTTP协议是无状态的, 也就是说, 客户端不保存状态, 然后通过RESTful API定义的操作改变资源在服务端的状态</p>
-<blockquote>
-<p>返回状态</p>
-</blockquote>
-<p>操作的执行结果</p>
-<ul>
-<li>请求负载和返回负载</li>
-</ul>
-<p>JSON – JSON(JavaScript Object Notation) 是一种轻量级的数据交换格式。 易于人阅读和编写。同时也易于机器解析和生成。 它基于JavaScript Programming Language, Standard ECMA-262 3rd Edition - December 1999的一个子集。 JSON采用完全独立于语言的文本格式，但是也使用了类似于C语言家族的习惯（包括C, C++, C#, Java, JavaScript, Perl, Python等）。 这些特性使JSON成为理想的数据交换语言。</p>
-<p>JSON的基本结构是对象, 以及对象里的键值对, 例如:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123; &quot;user&quot;: &#123;</span><br><span class="line">      &quot;username&quot;: &quot;admin&quot;,</span><br><span class="line">      &quot;password&quot;: &quot;1234&quot;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>详细资料参见: <a href="https://www.json.org/json-zh.html" target="_blank" rel="noopener">https://www.json.org/json-zh.html</a></p>
-<p>或者XML</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>我们如果反思一下上述对RESTful API的介绍, 是不是就很容易感觉到, 其实RESTful = HTTP + JSON</p>
-<p>确实也是这样的</p>
-<h3 id="为什么我们需要RESTful-API"><a href="#为什么我们需要RESTful-API" class="headerlink" title="为什么我们需要RESTful API"></a>为什么我们需要RESTful API</h3><ul>
-<li>原生的互联网架构方式来建构互联网内容</li>
-<li>统一的通信协议和开发语义. 统一标准可以带来效率的提升和协作的高效</li>
-<li>接口一致, 操作没有歧义</li>
-</ul>
-<h3 id="RESTful-API-扩展阅读"><a href="#RESTful-API-扩展阅读" class="headerlink" title="RESTful API 扩展阅读"></a>RESTful API 扩展阅读</h3><ul>
-<li><p><a href="https://www.zhihu.com/question/28557115" target="_blank" rel="noopener">知乎: 怎样用通俗的语言解释REST，以及RESTful?</a></p>
-</li>
-<li><p><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">阮一峰: 理解RESTful架构</a></p>
-</li>
-<li><p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">阮一峰: RESTful API 设计指南</a></p>
-</li>
-<li><p><a href="https://www.json.org/json-zh.html" target="_blank" rel="noopener">JSON</a></p>
-</li>
-<li><p><a href="https://github.com/aisuhua/restful-api-design-references" target="_blank" rel="noopener">Github仓库: RESTful API设计参考</a></p>
-</li>
-<li><p><a href="https://swoole.app/2018/03/22/Github%E7%9A%84Restful-HTTP-API%E8%AE%BE%E8%AE%A1%E5%88%86%E8%A7%A3/" target="_blank" rel="noopener">Github的RESTful API设计分解</a></p>
-</li>
-</ul>
-<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><blockquote>
-<p>登录逻辑</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 以前的登录url</span><br><span class="line">/signup?username=abc&amp;password=123456</span><br><span class="line"></span><br><span class="line">POST /accounts</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">&quot;username&quot;: &quot;abc&quot;,</span><br><span class="line">&quot;password&quot;: &quot;123456&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">GET /accounts 列举 -- ListAccounts(filter: AccountType, Account创建时间)</span><br><span class="line">GET /accounts/&lt;id&gt; -- GetAccount()</span><br><span class="line">PUT /accounts/&lt;id&gt; -- UpdateAccount()</span><br><span class="line">POST /accounts -- CreateAccount()</span><br><span class="line">DELETE /accounts -- DeleteAccount()</span><br><span class="line"></span><br><span class="line"># 错误的url </span><br><span class="line">GetAccount() -- GET /accounts?id=   -&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;ListAccounts()</span><br><span class="line"># url 应该用户一看到就知道是获取什么内容</span><br></pre></td></tr></table></figure></p>
-</blockquote>
-<blockquote>
-<p>状态码</p>
-</blockquote>
-<ul>
-<li>200, 201 – 成功</li>
-<li>400, 403, 404 – 用户的输入错误</li>
-<li>500 – 服务端的错误</li>
-</ul>
-<blockquote>
-<p>我们RESTful API交互</p>
-</blockquote>
-<ul>
-<li>读别人的API, 然后理解和使用 =&gt; 用户</li>
-<li>写自己的API, 让别人理解和使用 =&gt; 开发者</li>
-</ul>
-<blockquote>
-<p>读API</p>
-</blockquote>
-<ol>
-<li>有什么资源, 资源的层次结构是什么样的?<br>用户 -&gt; 仓库 -&gt; issues</li>
-<li>操作: 增删改查</li>
-<li>请求参数: URL的参数, 负载里的json</li>
-<li>返回的状态(200, 201, 404) 和 返回的json格式</li>
-</ol>
-<blockquote>
-<p>调用API</p>
-</blockquote>
-<ol>
-<li>调用 API: 构造URL (资源) –&gt; 发送响应请求(GET, POST, PUT) –&gt; 参数</li>
-<li>检验返回的状态码: 成功状态如何下一步的解析结果, 错误处理</li>
-<li>解析结果</li>
-</ol>
-<blockquote>
-<h4 id="写RESTful-API"><a href="#写RESTful-API" class="headerlink" title="写RESTful API"></a>写RESTful API</h4></blockquote>
-<ol>
-<li>想清楚我们的应用里可以抽象出什么样的资源, 和他们的层次结构</li>
-<li>想清楚对对象的基本操作: GET, POST, PUT, DELETE的含义是什么</li>
-<li>组织接口代码, Spring如何去定义这些路由(URI): URI -&gt; Java类和方法</li>
-<li>开始实现</li>
-</ol>
-<h4 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h4><blockquote>
-<p>资源</p>
-</blockquote>
-<ul>
-<li>RestController</li>
-<li>GetMapping, PutMapping, PostMapping, DeleteMapping: URI -&gt; Java类和方法</li>
-</ul>
-<blockquote>
-<p>参数</p>
-</blockquote>
-<ul>
-<li>RequestParam: URL额外参数</li>
-<li>PathVariable</li>
-<li>RequestBody</li>
-</ul>
-<blockquote>
-<p>处理逻辑*</p>
-</blockquote>
-<ul>
-<li>遵循Java代码的组织和开发方式</li>
-<li>面向对象的方式抽象和组织代码</li>
-</ul>
-<blockquote>
-<p>状态和结果</p>
-</blockquote>
-<ul>
-<li>使用正确和准确的状态码!</li>
-<li>返回结果!</li>
-<li>ResponseEntity</li>
-<li>HttpStatus</li>
-</ul>
-<h4 id="PUT和POST的比较"><a href="#PUT和POST的比较" class="headerlink" title="PUT和POST的比较"></a>PUT和POST的比较</h4><ul>
-<li>PUT – 做具体资源的更新</li>
-<li>POST – 创建新的资源, 在资源列表里添加一个资源</li>
-</ul>
-<p>PUT — PUT操作是幂等的! op^n == op^(n + 1), 所以用PUT来做整体更新的时候, 多次重复同样内容的更新操作, 最终产生的结果是一致的!</p>
-<p>所以在代码实现PUT操作时候, 要把这个操作实现成幂等的!</p>
-<p>POST — POST操作不是幂等的! 创建的操作</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/07/Java-020-RESTful/" data-id="cklcb6bd4003dwo91jrd1mujb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/11/Java-026-sql范式/" data-id="cklhgn2as003okyfybowiied6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -1393,7 +1212,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/17/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/19/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/17/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/19/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1417,7 +1236,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1439,23 +1258,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

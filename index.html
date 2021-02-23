@@ -62,10 +62,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-Node-web05-07博客系统部署" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Node-web05-09-02博客系统部署最新版流程" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-07博客系统部署/" class="article-date">
-  <time datetime="2021-02-18T15:12:09.000Z" itemprop="datePublished">2021-02-18</time>
+    <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/" class="article-date">
+  <time datetime="2021-02-22T15:17:28.000Z" itemprop="datePublished">2021-02-22</time>
 </a>
     
   </div>
@@ -76,7 +76,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+      <a class="article-title" href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
     </h1>
   
 
@@ -84,57 +84,172 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="博客部署阿里云"><a href="#博客部署阿里云" class="headerlink" title="博客部署阿里云"></a>博客部署阿里云</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4" target="_blank" rel="noopener">初始代码</a></li>
+        <h1 id="一切从零开始"><a href="#一切从零开始" class="headerlink" title="一切从零开始"></a>一切从零开始</h1><ul>
+<li>按照 <a href="https://sltrust.github.io/2021/02/22/Node-web05-07-02服务器相关配置及使用/" target="_blank" rel="noopener">Node-web05-07-02服务器相关配置及使用</a> 的流程全部配置好</li>
+<li>按照 <a href="https://sltrust.github.io/2021/02/22/Node-web05-07-02服务器相关配置及使用/" target="_blank" rel="noopener">Node-web05-07-02服务器相关配置及使用</a> 的流程全部配置好</li>
+<li>按照 <a href="https://sltrust.github.io/2021/02/22/Node-web05-07-02服务器相关配置及使用/" target="_blank" rel="noopener">Node-web05-07-02服务器相关配置及使用</a> 的流程全部配置好</li>
 </ul>
-<h3 id="我们先build代码"><a href="#我们先build代码" class="headerlink" title="我们先build代码"></a>我们先build代码</h3><ul>
-<li><code>yarn build</code> 结果报错了，说找不到 Post</li>
-<li><p>原因是 next-env.d.ts ,一旦有 import 这个声明就不是全局的了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;reference types=&quot;next&quot; /&gt;</span><br><span class="line">/// &lt;reference types=&quot;next/types/global&quot; /&gt;</span><br><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line"></span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="前置条件"><a href="#前置条件" class="headerlink" title="前置条件"></a>前置条件</h2><ul>
+<li>充值110元 购买阿里云按量付费机器</li>
+<li>安装好 docker</li>
+<li>安装好 node</li>
+<li>配置好阿里云服务器的 root以及非root用户的 ssh 登陆</li>
+<li>配置好 非root用户 如 blog 用户的 docker执行权限</li>
+<li>配置好 git ssh key 用来<code>clone / pull</code>代码</li>
+</ul>
+<h3 id="登录服务器"><a href="#登录服务器" class="headerlink" title="登录服务器"></a>登录服务器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh blog@dev1</span><br></pre></td></tr></table></figure>
+<h3 id="设置环境变量"><a href="#设置环境变量" class="headerlink" title="设置环境变量"></a>设置环境变量</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.bashrc</span><br><span class="line"># 插入一句，后保存</span><br><span class="line">export NODE_ENV=production</span><br><span class="line"></span><br><span class="line"># 让这个变动生效</span><br><span class="line">source ~/.bashrc</span><br><span class="line"># 验证</span><br><span class="line">echo $NODE_ENV</span><br></pre></td></tr></table></figure>
+<h3 id="PG的一些设置"><a href="#PG的一些设置" class="headerlink" title="PG的一些设置"></a>PG的一些设置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># 创建数据库持久化目录</span><br><span class="line">mkdir ~/blog-data</span><br><span class="line"></span><br><span class="line"># 这里注意这个 --name my-pg-app 后面会用到,非常重要</span><br><span class="line">docker run --name my-pg-app -v ~/blog-data:/var/lib/postgresql/data --network=host -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 通过id or appname(--name 指定的名字)进入</span><br><span class="line"># docker exec -it &lt;id|appname&gt; bash</span><br><span class="line"># 创建数据库,这里通过这个 [my-pg-app] 进入数据库内部 ,你也可通过 容器id</span><br><span class="line"># 通过应用名进入</span><br><span class="line">docker exec -it my-pg-app bash</span><br><span class="line"></span><br><span class="line"># 登录数据库</span><br><span class="line">psql -U blog</span><br><span class="line"></span><br><span class="line"># 如果是服务器 生产环境你就这样</span><br><span class="line">CREATE DATABASE blog_production ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"></span><br><span class="line"># 如果是本地你就这样</span><br><span class="line">CREATE DATABASE blog_development ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br></pre></td></tr></table></figure>
+<h3 id="拉代码"><a href="#拉代码" class="headerlink" title="拉代码"></a>拉代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd ~/</span><br><span class="line">mkdir app</span><br><span class="line">cd app</span><br><span class="line"></span><br><span class="line"># 拉代码，前提你配置好 github的ssh key</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git .</span><br></pre></td></tr></table></figure>
+<h4 id="数据库配置"><a href="#数据库配置" class="headerlink" title="数据库配置"></a>数据库配置</h4><ul>
+<li><p>参考 <code>~/app/ormconfig.sample.json</code> 建立 production 环境的 config</p>
 </li>
-<li><p>新建 custom.d.ts 在项目根目录，里面放置全局的类型声明</p>
+<li><p>在服务器 <code>~/shared/ormconfig.json</code>这样建立文件</p>
 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">type Post = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">  htmlContent: string;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">cd ~/</span><br><span class="line">mkdir shared</span><br><span class="line">vi ormconfig.json</span><br><span class="line"></span><br><span class="line"># 内容如下,根据你的 pg设置自行设置</span><br><span class="line">&#123;</span><br><span class="line">  &quot;type&quot;: &quot;postgres&quot;,</span><br><span class="line">  &quot;host&quot;: &quot;localhost&quot;,</span><br><span class="line">  &quot;port&quot;: 5432,</span><br><span class="line">  &quot;username&quot;: &quot;blog&quot;,</span><br><span class="line">  &quot;password&quot;: &quot;&quot;,</span><br><span class="line">  &quot;database&quot;: &quot;blog_production&quot;,</span><br><span class="line">  &quot;synchronize&quot;: false,</span><br><span class="line">  &quot;logging&quot;: false,</span><br><span class="line">  &quot;entities&quot;: [</span><br><span class="line">    &quot;dist/entity/**/*.js&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;migrations&quot;: [</span><br><span class="line">    &quot;dist/migration/**/*.js&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;subscribers&quot;: [</span><br><span class="line">    &quot;dist/subscriber/**/*.js&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;cli&quot;: &#123;</span><br><span class="line">    &quot;entitiesDir&quot;: &quot;src/entity&quot;,</span><br><span class="line">    &quot;migrationsDir&quot;: &quot;src/migration&quot;,</span><br><span class="line">    &quot;subscribersDir&quot;: &quot;src/subscriber&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>此时再次 <code>yarn build</code> 构建成功</li>
-<li>去看 <code>.next/BUILD_ID</code> 这个是每次 build产生的id</li>
-<li>然后 <code>yarn start</code> 运行，部署代码也是这样运行</li>
+<li>建立软链接（非常重要）</li>
 </ul>
-<h3 id="docker化应用"><a href="#docker化应用" class="headerlink" title="docker化应用"></a>docker化应用</h3><ul>
-<li>google docker nodejs 得到 <a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" target="_blank" rel="noopener">Dockerizing a Node.js web app</a></li>
-<li>所有的英文都不看，直接看例子</li>
-<li>创建 Dockerfile <code>touch Dockerfile</code></li>
-<li>内容如下</li>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 注意要在项目根目录</span><br><span class="line">cd ~/app</span><br><span class="line">ln -s ~/shared/ormconfig.json</span><br></pre></td></tr></table></figure>
+<h4 id="加密密钥配置"><a href="#加密密钥配置" class="headerlink" title="加密密钥配置"></a>加密密钥配置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd ~/app</span><br><span class="line">touch .env.local</span><br><span class="line"></span><br><span class="line"># 内容如下</span><br><span class="line">SECRET=c2a85490-cc60-4f21-94e8-8dc5dd3220da</span><br></pre></td></tr></table></figure>
+<h3 id="deploy-sh"><a href="#deploy-sh" class="headerlink" title="deploy.sh"></a>deploy.sh</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;前置准备完成了，启动pg&apos;;</span><br><span class="line">docker restart my-pg-app &amp;&amp;</span><br><span class="line"># 推荐这样，因为用户名不一定都叫 blog</span><br><span class="line">cd ~/app/ &amp;&amp;</span><br><span class="line">git pull &amp;&amp;</span><br><span class="line">yarn install --production=false &amp;&amp;</span><br><span class="line">yarn build &amp;&amp;</span><br><span class="line"># 修改补丁, src/entity/User.ts 的补丁</span><br><span class="line">git apply migrate.patch;</span><br><span class="line"># 编译src/migration ,让typeorm 的ts变成 js</span><br><span class="line">yarn compile &amp;&amp;</span><br><span class="line"># 数据库迁移,创建表</span><br><span class="line">yarn m:run &amp;&amp;</span><br><span class="line"># 撤销 patch内容</span><br><span class="line">git reset --hard HEAD &amp;&amp;</span><br><span class="line"># 防止同名应用存在</span><br><span class="line">docker kill my-next-app;</span><br><span class="line">docker rm -f my-next-app;</span><br><span class="line">docker rmi -f hjx/node-web-app;</span><br><span class="line"># docker构建应用</span><br><span class="line">docker build -t hjx/node-web-app . &amp;&amp;</span><br><span class="line">docker run --name my-next-app  --network=host -d hjx/node-web-app &amp;&amp;</span><br><span class="line">echo &apos;OK!&apos;</span><br></pre></td></tr></table></figure>
+<h3 id="docker-p-参数端口映射一个重要知识点"><a href="#docker-p-参数端口映射一个重要知识点" class="headerlink" title="docker -p 参数端口映射一个重要知识点"></a>docker <code>-p</code> 参数端口映射一个重要知识点</h3><ul>
+<li>docker 容器内的localhost 不是你机器的localhost</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">FROM node:12</span><br><span class="line">#  在 linux 的 /usr/src/app 目录工作</span><br><span class="line">WORKDIR /usr/src/app</span><br><span class="line">COPY package.json ./</span><br><span class="line"># 因为我们用的是 yarn 不是 npm</span><br><span class="line">COPY yarn.lock ./</span><br><span class="line"># run 开头 代表运行 命令</span><br><span class="line">RUN yarn install</span><br><span class="line"># 这个意思是 把你项目根目录的内容 拷贝到 工作目录</span><br><span class="line">COPY . .</span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 3000</span><br><span class="line"># 最后一步你要运行的代码</span><br><span class="line">CMD [ &quot;yarn&quot;, &quot;start&quot; ]</span><br></pre></td></tr></table></figure>
+<h3 id="docker-network-host"><a href="#docker-network-host" class="headerlink" title="docker --network=host"></a>docker <code>--network=host</code></h3><ul>
+<li>意思是 你服务器的 localhost:端口 对应你的容器开放的端口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 当访问你机器的 3000 时映射到对应容器的 3000端口</span><br><span class="line">docker run --name my-next-app  -p 3000:3000 -d hjx/node-web-app</span><br><span class="line"></span><br><span class="line"># 不再指定 -p 参数</span><br><span class="line">docker run --name my-next-app  --network=host -d hjx/node-web-app</span><br></pre></td></tr></table></figure>
+<h3 id="一键部署"><a href="#一键部署" class="headerlink" title="一键部署"></a>一键部署</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 前置准备工作</span><br><span class="line">ssh blog@dev1</span><br><span class="line"># clone 我的最新代码</span><br><span class="line"># 分配执行权限</span><br><span class="line">chmod +x ~/app/bin/deploy.sh</span><br><span class="line"></span><br><span class="line"># 以后每次改了代码 push之后你就可以这样</span><br><span class="line">ssh blog@dev1 &apos;sh ~/app/bin/deploy.sh&apos;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/22/Node-web05-09-02博客系统部署最新版流程/" data-id="cklhgn2dr00apkyfyl2jwzcqo" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-07-03服务器端构建" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/22/Node-web05-07-03服务器端构建/" class="article-date">
+  <time datetime="2021-02-22T15:07:14.000Z" itemprop="datePublished">2021-02-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="克隆代码"><a href="#克隆代码" class="headerlink" title="克隆代码"></a>克隆代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># blog用户登录</span><br><span class="line">ssh blog@dev1</span><br><span class="line"></span><br><span class="line"># 进入服务器home目录</span><br><span class="line">cd ~/</span><br><span class="line"># 再次 clone代码</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git</span><br><span class="line"># 进入项目根目录</span><br><span class="line">cd next-demo-2</span><br><span class="line"></span><br><span class="line"># 切换到我那个时候的代码，以保证同步</span><br><span class="line">git checkout bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4</span><br></pre></td></tr></table></figure>
+<h3 id="项目开始运行"><a href="#项目开始运行" class="headerlink" title="项目开始运行"></a>项目开始运行</h3><ul>
+<li>切换用户<code>su - blog</code> 到你的项目目录 <code>cd ~/app/next-demo-2</code></li>
+<li>运行 <code>yarn install</code> </li>
+<li>然后 <code>yarn build</code> 结果报错了， 说缺少一个 password ，记得我们忽略的 <code>.env.local</code>吗</li>
+<li>顺带把 数据库连接信息改了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录 </span><br><span class="line">touch .env.local</span><br><span class="line"># 内容如下，注意密钥要用你的</span><br><span class="line">SECRET=c2a85490-cc60-4f21-94e8-8dc5dd3220da</span><br><span class="line"></span><br><span class="line"># 然后修改 pg数据库的配置 vi ormconfig.json </span><br><span class="line">把host 改成你机器的 pg数据库信息</span><br><span class="line"></span><br><span class="line">&quot;host&quot;: &quot;172.17.48.128&quot;, // 你机器的ip ifconfig查看</span><br><span class="line">&quot;port&quot;: 5432, // docker 启动pg设置的端口</span><br><span class="line">&quot;username&quot;: &quot;blog&quot;, // pg用户名</span><br><span class="line">&quot;password&quot;: &quot;&quot;, //  pg密码</span><br><span class="line">&quot;database&quot;: &quot;blog_production&quot;</span><br></pre></td></tr></table></figure>
+<p><strong>这也是为啥配置别用json的原因，没法改</strong><br><strong>这也是为啥配置别用json的原因，没法改</strong><br><strong>这也是为啥配置别用json的原因，没法改</strong></p>
 <ul>
-<li><p>再次创建一个忽略文件 <code>.dockerignore</code></p>
+<li>运行<code>yarn dev</code> 然后 <code>curl -L localhost:3000</code></li>
+<li>提示你 <code>QueryFailedError: relation &quot;posts&quot; does not exist</code></li>
+</ul>
+<h4 id="创建数据库表"><a href="#创建数据库表" class="headerlink" title="创建数据库表"></a>创建数据库表</h4><ul>
+<li><code>yarn typeorm:build</code></li>
+<li><code>yarn m:run</code> 报错 <code>Error: Cannot find module &#39;../../lib/getDatabaseConnection&#39;</code></li>
+<li>因为 <code>src/entity/User.ts</code> 里用了  getDatabaseConnection 要把对应的语句注释</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 13行的</span><br><span class="line">// import &#123;getDatabaseConnection&#125; from &apos;../../lib/getDatabaseConnection&apos;;</span><br><span class="line"></span><br><span class="line">// 55～59</span><br><span class="line">//const found = await (await getDatabaseConnection()).manager.find(</span><br><span class="line">    User, &#123;username: this.username&#125;);</span><br><span class="line">// if (found.length &gt; 0) &#123;</span><br><span class="line">//    this.errors.username.push(&apos;已存在，不能重复注册&apos;);</span><br><span class="line">// &#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li>同<code>.gitignore</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node_modules</span><br><span class="line">*.log</span><br></pre></td></tr></table></figure>
-</li>
+<li>继续 <code>yarn typeorm:build</code>然后<code>yarn m:run</code></li>
+<li>此时：数据库表结构创建好了,把 <code>src/entity/User.ts</code>还原</li>
+<li>运行 <code>yarn build</code> <ul>
+<li>然后 <code>yarn start</code></li>
+<li><code>curl -L localhost:3000</code> 此时页面有了但是没有数据</li>
 </ul>
 </li>
-<li><p>继续看文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 看文档</span><br><span class="line"># 构建你的 docker应用 </span><br><span class="line"># 构建成功会生成一个镜像</span><br><span class="line">docker build -t &lt;your username&gt;/node-web-app .</span><br><span class="line"></span><br><span class="line"># 如何运行镜像呢？</span><br><span class="line">docker run -p 3000:3000 -d &lt;your username&gt;/node-web-app</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>我的构建命令如下</p>
-</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
-<h3 id="构建过程出错了"><a href="#构建过程出错了" class="headerlink" title="构建过程出错了"></a>构建过程出错了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 第一个问题 yarn install 一直卡在 &quot;Fetch packages...&quot;</span><br><span class="line">yarn cache clean &amp; yarn install</span><br><span class="line"></span><br><span class="line"># 第二个问题 yarn install --verbose 显示它的进度，发现卡在这里</span><br><span class="line">Browserslist: caniuse-lite is outdated. Please run: npx browserslist@latest --update-db</span><br><span class="line"></span><br><span class="line">- 解决办法</span><br><span class="line">- 删除 node_modules 文件夹及 package-lock.json 文件</span><br><span class="line"></span><br><span class="line">结果不管事</span><br><span class="line">再次添加参数</span><br><span class="line"></span><br><span class="line">RUN  yarn cache clean &amp; yarn install --verbose --network-timeout 60000</span><br></pre></td></tr></table></figure>
+<p><strong>不能在docker里 yarn build 里面会有很多文件，很大</strong></p>
+<h4 id="docker-你的应用"><a href="#docker-你的应用" class="headerlink" title="docker 你的应用"></a>docker 你的应用</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 进入你的项目目录</span><br><span class="line">cd ~/app/next-demo-2/</span><br><span class="line"></span><br><span class="line"># 构建应用</span><br><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br><span class="line"></span><br><span class="line"># 访问我们的应用，里面报错，但是可以先不管</span><br><span class="line">curl -L localhost:3000</span><br><span class="line"></span><br><span class="line"># 查看占用端口</span><br><span class="line">lsof -i :3000</span><br><span class="line"># 杀掉进程</span><br><span class="line">kill pid</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看历史命令小技巧</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">history | grep &apos;docker run&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解决报错</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 查看我们应用的id</span><br><span class="line">docker ps -a </span><br><span class="line"># 看log</span><br><span class="line">docker logs id</span><br><span class="line"></span><br><span class="line"># log内容</span><br><span class="line">ready - started server on 0.0.0.0:3000, url: http://localhost:3000</span><br><span class="line">error: database &quot;blog_production&quot; does not exist</span><br><span class="line"></span><br><span class="line"># 数据库不存在，因为我们没有初始化数据库</span><br></pre></td></tr></table></figure>
+<h4 id="设置环境变量，服务器是-production"><a href="#设置环境变量，服务器是-production" class="headerlink" title="设置环境变量，服务器是 production"></a>设置环境变量，服务器是 production</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># root用户 登服务器</span><br><span class="line">ssh root@dev1</span><br><span class="line"># 设置环境变量</span><br><span class="line">vi ~/.bashrc</span><br><span class="line">export NODE_ENV=production</span><br><span class="line"></span><br><span class="line"># 刷新这个文件</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"># 测试是否生效</span><br><span class="line">echo $NODE_ENV</span><br></pre></td></tr></table></figure>
+<p><strong>NODE_ENV=production 后，yarn install 不会install dev的东西</strong></p>
 <ul>
-<li>历经千辛万苦，终于build成功了</li>
-<li>运行<code>docker run -p 3000:3000 -d my-node-app/node-web-app</code> 打开浏览器 <a href="http://localhost:3000/" target="_blank" rel="noopener">http://localhost:3000/</a> </li>
-<li>发现报错， 通过log看运行日志</li>
-<li>docker logs 你的应用id </li>
-<li>应该是 数据库连接问题，数据库需要一个 pg 容器，并配置好localhost</li>
-<li>修改 ormconfig.json 里的host为你的本机ip<ul>
-<li>因为 容器内的 localhost 不是你本机的 localhost</li>
+<li>你要这样 <code>yarn install --production=false</code></li>
+</ul>
+<h4 id="docker的-network-host选项"><a href="#docker的-network-host选项" class="headerlink" title="docker的--network=host选项"></a>docker的<code>--network=host</code>选项</h4><ul>
+<li>让容器共享你 阿里云机器的IP，这样就可以不做端口映射</li>
+<li>数据库连接不上问题<ul>
+<li><strong>容器的localhost 不是你本机的 localhost</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 把之前的容器都停了，然后删了  </span><br><span class="line">docker kill id</span><br><span class="line">docker rm -f id</span><br><span class="line"></span><br><span class="line"># docker重新启动 pg</span><br><span class="line">docker run --network=host -v /home/blog/blog-data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 重新构建next.js应用</span><br><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run --network=host -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
 </li>
 </ul>
-<h2 id="购买服务器"><a href="#购买服务器" class="headerlink" title="购买服务器"></a>购买服务器</h2><ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/22/Node-web05-07-03服务器端构建/" data-id="cklhgn2dp00aikyfyj63kneb2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-07-02服务器相关配置及使用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/" class="article-date">
+  <time datetime="2021-02-22T14:53:30.000Z" itemprop="datePublished">2021-02-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="阿里云机器使用"><a href="#阿里云机器使用" class="headerlink" title="阿里云机器使用"></a>阿里云机器使用</h2><h2 id="购买服务器"><a href="#购买服务器" class="headerlink" title="购买服务器"></a>购买服务器</h2><ul>
 <li>登录 <a href="https://www.aliyun.com/" target="_blank" rel="noopener">https://www.aliyun.com/</a><ul>
 <li>该登录登录，该注册注册，填好身份信息，充值110块，因为必须有超过100块才能买按时付费的服务器</li>
 </ul>
@@ -201,77 +316,262 @@
 <li>查看有木有 git <code>which git</code></li>
 <li>有就行，然后拉代码</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># blog用户登录，默认在你的 home目录</span><br><span class="line">blog@dog:~$ pwd</span><br><span class="line">/home/blog</span><br><span class="line"></span><br><span class="line"># 创建我们放代码的地方，进入这个目录</span><br><span class="line">mkdir app</span><br><span class="line">cd app</span><br><span class="line"></span><br><span class="line"># 拷贝代码，你会发现失败了，因为我们用的 ssh 方式</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git</span><br><span class="line"></span><br><span class="line"># 你需要添加ssh key 才行</span><br><span class="line">- 参考这个 https://sltrust.github.io/2017/10/05/N004_1_git%E5%85%A5%E9%97%A8/</span><br><span class="line"># 具体操作如下</span><br><span class="line">ssh-keygen -t rsa -b 4096 -C “你的邮箱”</span><br><span class="line"># 一路回车</span><br><span class="line"># 复制公钥信息</span><br><span class="line">cat ~/.ssh/id_rsa.pub </span><br><span class="line"></span><br><span class="line"># 把上面的内容 在 github 里 add key</span><br><span class="line"></span><br><span class="line"># 再次 clone代码</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git</span><br><span class="line"></span><br><span class="line"># 进入项目根目录</span><br><span class="line">cd next-demo-2</span><br><span class="line"></span><br><span class="line"># 切换到我那个时候的代码，以保证同步</span><br><span class="line">git checkout bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4</span><br></pre></td></tr></table></figure>
-<h3 id="项目运行准备工作"><a href="#项目运行准备工作" class="headerlink" title="项目运行准备工作"></a>项目运行准备工作</h3><h4 id="启动数据库：因为我们一会要连接"><a href="#启动数据库：因为我们一会要连接" class="headerlink" title="启动数据库：因为我们一会要连接"></a>启动数据库：因为我们一会要连接</h4><ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># blog用户登录，默认在你的 home目录</span><br><span class="line">blog@dog:~$ pwd</span><br><span class="line">/home/blog</span><br><span class="line"></span><br><span class="line"># 创建我们放代码的地方，进入这个目录</span><br><span class="line">mkdir app</span><br><span class="line">cd app</span><br><span class="line"></span><br><span class="line"># 拷贝代码，你会发现失败了，因为我们用的 ssh 方式</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git</span><br><span class="line"></span><br><span class="line"># 你需要添加ssh key 才行</span><br><span class="line">- 参考这个 https://sltrust.github.io/2017/10/05/N004_1_git%E5%85%A5%E9%97%A8/</span><br><span class="line"># 具体操作如下</span><br><span class="line">ssh-keygen -t rsa -b 4096 -C “你的邮箱”</span><br><span class="line"># 一路回车</span><br><span class="line"># 复制公钥信息</span><br><span class="line">cat ~/.ssh/id_rsa.pub </span><br><span class="line"></span><br><span class="line"># 把上面的内容 在 github 里 add key</span><br><span class="line"></span><br><span class="line"># 再次 clone代码</span><br><span class="line">git clone git@github.com:slTrust/next-demo-2.git</span><br><span class="line"># 代码拉取成功～</span><br></pre></td></tr></table></figure>
+<h4 id="启动数据库：因为我们一会要连接"><a href="#启动数据库：因为我们一会要连接" class="headerlink" title="启动数据库：因为我们一会要连接"></a>启动数据库：因为我们一会要连接</h4><ul>
 <li>接续上面的内容</li>
-<li>启动 pg<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># blog用户登录</span><br><span class="line">cd ~/</span><br><span class="line"># 创建 pg数据持久化目录</span><br><span class="line">mkdir blog-data</span><br><span class="line"></span><br><span class="line">cd ~/app/next-demo-2</span><br><span class="line"></span><br><span class="line"># 运行命令</span><br><span class="line">docker run -v /home/blog/blog-data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 创建数据库</span><br><span class="line"></span><br><span class="line"># 创建数据库命令模版</span><br><span class="line">CREATE DATABASE [数据库名] ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"></span><br><span class="line"># 进入数据库 </span><br><span class="line">docker exec -it id bash</span><br><span class="line"># 登录数据库</span><br><span class="line">psql -U blog -W</span><br><span class="line"># 创建我们需要的数据库，注意是生产环境的 “blog_production”</span><br><span class="line"></span><br><span class="line">CREATE DATABASE blog_production ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br></pre></td></tr></table></figure>
+<li>启动 pg<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># blog用户登录</span><br><span class="line">cd ~/</span><br><span class="line"># 创建 pg数据持久化目录</span><br><span class="line">mkdir blog-data</span><br><span class="line"></span><br><span class="line"># 运行命令</span><br><span class="line">docker run -v /home/blog/blog-data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 创建数据库</span><br><span class="line"></span><br><span class="line"># 创建数据库命令模版</span><br><span class="line">CREATE DATABASE [数据库名] ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"></span><br><span class="line"># 进入数据库 </span><br><span class="line">docker exec -it id bash</span><br><span class="line"># 登录数据库</span><br><span class="line">psql -U blog -W</span><br><span class="line"># 创建我们需要的数据库，注意是生产环境的 “blog_production”</span><br><span class="line"></span><br><span class="line">CREATE DATABASE blog_production ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h4 id="服务器上-yarn-build"><a href="#服务器上-yarn-build" class="headerlink" title="服务器上 yarn build"></a>服务器上 yarn build</h4><ul>
+<h3 id="项目运行准备工作"><a href="#项目运行准备工作" class="headerlink" title="项目运行准备工作"></a>项目运行准备工作</h3><h4 id="服务器上-yarn-build，所以需要安装node-安装node12"><a href="#服务器上-yarn-build，所以需要安装node-安装node12" class="headerlink" title="服务器上 yarn build，所以需要安装node:安装node12"></a>服务器上 yarn build，所以需要安装node:安装node12</h4><ul>
 <li>root用户登录 <code>ssh root@dev1</code> </li>
 <li>安装 node / yarn</li>
 <li>google <a href="https://nodejs.org/en/download/package-manager/" target="_blank" rel="noopener">ubuntu install nodejs</a></li>
 <li><a href="https://github.com/nodesource/distributions/blob/master/README.md" target="_blank" rel="noopener">https://github.com/nodesource/distributions/blob/master/README.md</a></li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># Using Ubuntu</span><br><span class="line">curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -</span><br><span class="line">sudo apt-get install -y nodejs</span><br><span class="line"></span><br><span class="line"># 根据提示 安装c++ / yarn</span><br><span class="line">sudo apt-get install gcc g++ make</span><br><span class="line"></span><br><span class="line">curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -</span><br><span class="line"></span><br><span class="line">echo &quot;deb https://dl.yarnpkg.com/debian/ stable main&quot; | sudo tee /etc/apt/sources.list.d/yarn.list</span><br><span class="line"></span><br><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install yarn</span><br><span class="line"># 注意为了和我一致，尽量保持 yarn的版本 是 1.22.xx版</span><br></pre></td></tr></table></figure>
-<ul>
-<li>切换用户<code>su - blog</code> 到你的项目目录 <code>cd ~/app/next-demo-2</code></li>
-<li>运行 <code>yarn install</code> </li>
-<li>然后 <code>yarn build</code> 结果报错了， 说缺少一个 password ，记得我们忽略的 <code>.env.local</code>吗</li>
-<li>顺带把 数据库连接信息改了</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录 </span><br><span class="line">touch .env.local</span><br><span class="line"># 内容如下，注意密钥要用你的</span><br><span class="line">SECRET=c2a85490-cc60-4f21-94e8-8dc5dd3220da</span><br><span class="line"></span><br><span class="line"># 然后修改 pg数据库的配置 vi ormconfig.json </span><br><span class="line">把host 改成你机器的 pg数据库信息</span><br><span class="line"></span><br><span class="line">&quot;host&quot;: &quot;172.17.48.128&quot;, // 你机器的ip ifconfig查看</span><br><span class="line">&quot;port&quot;: 5432, // docker 启动pg设置的端口</span><br><span class="line">&quot;username&quot;: &quot;blog&quot;, // pg用户名</span><br><span class="line">&quot;password&quot;: &quot;&quot;, //  pg密码</span><br><span class="line">&quot;database&quot;: &quot;blog_production&quot;</span><br></pre></td></tr></table></figure>
-<p><strong>这也是为啥配置别用json的原因，没法改</strong><br><strong>这也是为啥配置别用json的原因，没法改</strong><br><strong>这也是为啥配置别用json的原因，没法改</strong></p>
-<ul>
-<li>运行<code>yarn dev</code> 然后 <code>curl -L localhost:3000</code></li>
-<li>提示你 <code>QueryFailedError: relation &quot;posts&quot; does not exist</code></li>
-</ul>
-<h4 id="创建数据库表"><a href="#创建数据库表" class="headerlink" title="创建数据库表"></a>创建数据库表</h4><ul>
-<li><code>yarn typeorm:build</code></li>
-<li><code>yarn m:run</code> 报错 <code>Error: Cannot find module &#39;../../lib/getDatabaseConnection&#39;</code></li>
-<li>因为 <code>src/entity/User.ts</code> 里用了  getDatabaseConnection 要把对应的语句注释</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 13行的</span><br><span class="line">// import &#123;getDatabaseConnection&#125; from &apos;../../lib/getDatabaseConnection&apos;;</span><br><span class="line"></span><br><span class="line">// 55～59</span><br><span class="line">//const found = await (await getDatabaseConnection()).manager.find(</span><br><span class="line">    User, &#123;username: this.username&#125;);</span><br><span class="line">// if (found.length &gt; 0) &#123;</span><br><span class="line">//    this.errors.username.push(&apos;已存在，不能重复注册&apos;);</span><br><span class="line">// &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>继续 <code>yarn typeorm:build</code>然后<code>yarn m:run</code></li>
-<li>此时：数据库表结构创建好了,把 <code>src/entity/User.ts</code>还原</li>
-<li>运行 <code>yarn build</code> <ul>
-<li>然后 <code>yarn start</code></li>
-<li><code>curl -L localhost:3000</code> 此时页面有了但是没有数据</li>
-</ul>
-</li>
-</ul>
-<p><strong>不能在docker里 yarn build 里面会有很多文件，很大</strong></p>
-<h4 id="docker-你的应用"><a href="#docker-你的应用" class="headerlink" title="docker 你的应用"></a>docker 你的应用</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 进入你的项目目录</span><br><span class="line">cd ~/app/next-demo-2/</span><br><span class="line"></span><br><span class="line"># 构建应用</span><br><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br><span class="line"></span><br><span class="line"># 访问我们的应用，里面报错，但是可以先不管</span><br><span class="line">curl -L localhost:3000</span><br><span class="line"></span><br><span class="line"># 查看占用端口</span><br><span class="line">lsof -i :3000</span><br><span class="line"># 杀掉进程</span><br><span class="line">kill pid</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>查看历史命令小技巧</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">history | grep &apos;docker run&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>解决报错</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 查看我们应用的id</span><br><span class="line">docker ps -a </span><br><span class="line"># 看log</span><br><span class="line">docker logs id</span><br><span class="line"></span><br><span class="line"># log内容</span><br><span class="line">ready - started server on 0.0.0.0:3000, url: http://localhost:3000</span><br><span class="line">error: database &quot;blog_production&quot; does not exist</span><br><span class="line"></span><br><span class="line"># 数据库不存在，因为我们没有初始化数据库</span><br></pre></td></tr></table></figure>
-<h4 id="设置环境变量，服务器是-production"><a href="#设置环境变量，服务器是-production" class="headerlink" title="设置环境变量，服务器是 production"></a>设置环境变量，服务器是 production</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># root用户 登服务器</span><br><span class="line">ssh root@dev1</span><br><span class="line"># 设置环境变量</span><br><span class="line">vi ~/.bashrc</span><br><span class="line">export NODE_ENV=production</span><br><span class="line"></span><br><span class="line"># 刷新这个文件</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line"># 测试是否生效</span><br><span class="line">echo $NODE_ENV</span><br></pre></td></tr></table></figure>
-<p><strong>NODE_ENV=production 后，yarn install 不会install dev的东西</strong></p>
-<ul>
-<li>你要这样 <code>yarn install --production=false</code></li>
-</ul>
-<h4 id="docker的-network-host选项"><a href="#docker的-network-host选项" class="headerlink" title="docker的--network=host选项"></a>docker的<code>--network=host</code>选项</h4><ul>
-<li>让容器共享你 阿里云机器的IP，这样就可以不做端口映射</li>
-<li>数据库连接不上问题<ul>
-<li><strong>容器的localhost 不是你本机的 localhost</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 把之前的容器都停了，然后删了  </span><br><span class="line">docker kill id</span><br><span class="line">docker rm -f id</span><br><span class="line"></span><br><span class="line"># docker重新启动 pg</span><br><span class="line">docker run --network=host -v /home/blog/blog-data:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 重新构建next.js应用</span><br><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run --network=host -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="安全组设置，让我们的自己的电能能访问它"><a href="#安全组设置，让我们的自己的电能能访问它" class="headerlink" title="安全组设置，让我们的自己的电能能访问它"></a>安全组设置，让我们的自己的电能能访问它</h3><ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># Using Ubuntu</span><br><span class="line">curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -</span><br><span class="line">sudo apt-get install -y nodejs</span><br><span class="line"></span><br><span class="line"># 根据提示 安装c++ / yarn</span><br><span class="line">sudo apt-get install gcc g++ make</span><br><span class="line"></span><br><span class="line">curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -</span><br><span class="line"></span><br><span class="line">echo &quot;deb https://dl.yarnpkg.com/debian/ stable main&quot; | sudo tee /etc/apt/sources.list.d/yarn.list</span><br><span class="line"></span><br><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install yarn</span><br><span class="line"># 注意为了和我一致，尽量保持 yarn的版本 是 1.22.xx版</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">yarn config get registry</span><br><span class="line"># 淘宝</span><br><span class="line">yarn config set registry https://registry.npm.taobao.org</span><br><span class="line"># 还原</span><br><span class="line">yarn config set registry https://registry.yarnpkg.com</span><br><span class="line"></span><br><span class="line"># yarn设置镜像 参考</span><br><span class="line">https://www.cnblogs.com/momozjm/p/10635941.html</span><br></pre></td></tr></table></figure>
+<h3 id="服务器安全组设置"><a href="#服务器安全组设置" class="headerlink" title="服务器安全组设置"></a>服务器安全组设置</h3><ul>
+<li>让我们的自己的电脑能访问它</li>
 <li>找到对应机器，安全组开放3000端口</li>
 </ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-07博客系统部署/" data-id="cklcb6bg700a9wo91bt5m328p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/22/Node-web05-07-02服务器相关配置及使用/" data-id="cklhgn2do00ahkyfy468xf079" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-09-01博客统部署2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/20/Node-web05-09-01博客统部署2/" class="article-date">
+  <time datetime="2021-02-20T00:56:37.000Z" itemprop="datePublished">2021-02-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="上次部署的服务器"><a href="#上次部署的服务器" class="headerlink" title="上次部署的服务器"></a>上次部署的服务器</h3><blockquote>
+<p>我们在服务器修改了部分文件，如果直接 <code>git pull</code> 就会有问题</p>
+</blockquote>
+<h3 id="git-通灵术使用"><a href="#git-通灵术使用" class="headerlink" title="git 通灵术使用"></a>git 通灵术使用</h3><ul>
+<li><code>git status</code> 查看修改的文件状态</li>
+<li>假如我们服务器的代码 修改了 xx.txt 内容，拉取的时候不想冲突</li>
+<li>你就 <code>git stash</code> 把它存入一个地方</li>
+<li><code>git status</code> 状态就是空的了</li>
+<li>然后 <code>git pull</code> 下载最新代码</li>
+<li>恢复刚才藏起来的代码 <code>git stash pop</code></li>
+</ul>
+<h2 id="设置环境变量导致的bug"><a href="#设置环境变量导致的bug" class="headerlink" title="设置环境变量导致的bug"></a>设置环境变量导致的bug</h2><ul>
+<li>我们设置了 <code>export NODE_ENV=production</code> </li>
+<li>这样 <code>yarn install</code> 的时候 dev依赖就会被忽略</li>
+<li>解决办法是 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn install --production=false</span><br></pre></td></tr></table></figure>
+<h2 id="在服务器执行本地脚本"><a href="#在服务器执行本地脚本" class="headerlink" title="在服务器执行本地脚本"></a>在服务器执行本地脚本</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ssh blog@dev1 &quot;echo hi &gt; /tmp/xxx&quot;</span><br><span class="line"></span><br><span class="line"># 你会发现你服务器上的 多了`/tmp/xxx` 文件 内容是 hi</span><br><span class="line"></span><br><span class="line"># 项目里声明一个 deploy.sh</span><br><span class="line"># 本地的脚本在服务器端执行</span><br><span class="line">ssh blog@dev1 &quot;bash -s &lt; bin/deploy.sh&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="解决json配置两个环境不一致问题"><a href="#解决json配置两个环境不一致问题" class="headerlink" title="解决json配置两个环境不一致问题"></a>解决json配置两个环境不一致问题</h2><ul>
+<li>由于json不能改，所以这是一个痛点，因为本地和 生产环境 的配置“不一致”</li>
+<li>复制 <code>ormconfig.json</code> 内容到<code>ormconfig.sample.json</code> </li>
+<li>然后 <code>.gitignore</code>里 忽略<code>ormconfig.json</code> </li>
+</ul>
+<h2 id="解决配置文件要在git-pull-之后修改的问题"><a href="#解决配置文件要在git-pull-之后修改的问题" class="headerlink" title="解决配置文件要在git pull 之后修改的问题"></a>解决配置文件要在git pull 之后修改的问题</h2><ul>
+<li>在服务器 <code>~/shared/ormconfig.json</code>这样建立文件</li>
+<li>然后在你的项目里 通过“软链接” 来分离配置和项目代码</li>
+<li>项目目录里运行<code>ln -s ~/shared/ormconfig.json</code><ul>
+<li>这样你服务器环境的配置文件是 软链接的文件</li>
+<li>你本地开发可以自己参考 <code>ormconfig.sample.json</code> 建立dev的配置<code>ormconfig.json</code></li>
+<li>这样两边就不一致了</li>
+</ul>
+</li>
+</ul>
+<h2 id="补丁包使用"><a href="#补丁包使用" class="headerlink" title="补丁包使用"></a>补丁包使用</h2><ul>
+<li>我们的 <code>src/entity/User.ts</code> 里有数据库validate操作 <code>yarn m:run</code> 数据库迁移时会报错</li>
+<li>所以服务器和本地的时候，我们都要把对应操作注释掉执行 <code>yarn m:run</code>迁移数据库，然后在把注释恢复</li>
+<li>这样就非常的 ”蛋疼“</li>
+</ul>
+<h3 id="git-create-patch-from-diff"><a href="#git-create-patch-from-diff" class="headerlink" title="git create patch from diff"></a><a href="https://stackoverflow.com/questions/28192623/create-patch-or-diff-file-from-git-repository-and-apply-it-to-another-different" target="_blank" rel="noopener">git create patch from diff</a></h3><ul>
+<li>step01 假如数据库迁移的时候需要的xxx.js文件内容是</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aaa</span><br><span class="line">// bbb</span><br><span class="line">ccc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step02 而数据库迁移之后，我们xxx.js 的内容是这样</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aaa</span><br><span class="line">bbb</span><br><span class="line">ccc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step03 将git diff的内容 完整拷贝到 migrate.patch 文件里</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff &gt; migrate.patch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step04 然后取消掉 migration 要做的文件改动,即 xxx.js内容为</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aaa</span><br><span class="line">bbb</span><br><span class="line">ccc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step05 运行补丁，</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git apply migrate.patch</span><br><span class="line"></span><br><span class="line"># 运行后 xxx.js 内容为</span><br><span class="line">aaa</span><br><span class="line">//bbb</span><br><span class="line">ccc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step06 撤销操作<code>git reset --hard HEAD</code></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/20/Node-web05-09-01博客统部署2/" data-id="cklhgn2dq00amkyfyc03bydqt" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-08博客统页面完善" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/20/Node-web05-08博客统页面完善/" class="article-date">
+  <time datetime="2021-02-20T00:53:01.000Z" itemprop="datePublished">2021-02-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客页面美化"><a href="#博客页面美化" class="headerlink" title="博客页面美化"></a>博客页面美化</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/976df467766effca361157778e1e22dbbde87a06" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h3 id="完善功能点"><a href="#完善功能点" class="headerlink" title="完善功能点"></a>完善功能点</h3><ul>
+<li>首页/列表页/新增文章/编辑文章 CSS</li>
+<li>posts 的修改</li>
+<li>posts 的删除</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/20/Node-web05-08博客统页面完善/" data-id="cklhgn2dq00alkyfyk8ctb6a5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-07-01博客系统部署" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-07-01博客系统部署/" class="article-date">
+  <time datetime="2021-02-18T15:12:09.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-07-01博客系统部署/">Node-web05-07-01博客系统部署</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客部署阿里云"><a href="#博客部署阿里云" class="headerlink" title="博客部署阿里云"></a>博客部署阿里云</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4" target="_blank" rel="noopener">初始代码</a></li>
+</ul>
+<h3 id="我们先build代码"><a href="#我们先build代码" class="headerlink" title="我们先build代码"></a>我们先build代码</h3><ul>
+<li><code>yarn build</code> 结果报错了，说找不到 Post</li>
+<li><p>原因是 next-env.d.ts ,一旦有 import 这个声明就不是全局的了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;reference types=&quot;next&quot; /&gt;</span><br><span class="line">/// &lt;reference types=&quot;next/types/global&quot; /&gt;</span><br><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line"></span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建 custom.d.ts 在项目根目录，里面放置全局的类型声明</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">type Post = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">  htmlContent: string;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时再次 <code>yarn build</code> 构建成功</li>
+<li>去看 <code>.next/BUILD_ID</code> 这个是每次 build产生的id</li>
+<li>然后 <code>yarn start</code> 运行，部署代码也是这样运行</li>
+</ul>
+<h3 id="docker化应用"><a href="#docker化应用" class="headerlink" title="docker化应用"></a>docker化应用</h3><ul>
+<li>google docker nodejs 得到 <a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" target="_blank" rel="noopener">Dockerizing a Node.js web app</a></li>
+<li>所有的英文都不看，直接看例子</li>
+<li>创建 Dockerfile <code>touch Dockerfile</code></li>
+<li>内容如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">FROM node:12</span><br><span class="line">#  在 linux 的 /usr/src/app 目录工作</span><br><span class="line">WORKDIR /usr/src/app</span><br><span class="line">COPY package.json ./</span><br><span class="line"># 因为我们用的是 yarn 不是 npm</span><br><span class="line">COPY yarn.lock ./</span><br><span class="line"># run 开头 代表运行 命令</span><br><span class="line">RUN yarn install</span><br><span class="line"># 这个意思是 把你项目根目录的内容 拷贝到 工作目录</span><br><span class="line">COPY . .</span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 3000</span><br><span class="line"># 最后一步你要运行的代码</span><br><span class="line">CMD [ &quot;yarn&quot;, &quot;start&quot; ]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>再次创建一个忽略文件 <code>.dockerignore</code></p>
+<ul>
+<li>同<code>.gitignore</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node_modules</span><br><span class="line">*.log</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>继续看文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 看文档</span><br><span class="line"># 构建你的 docker应用 </span><br><span class="line"># 构建成功会生成一个镜像</span><br><span class="line">docker build -t &lt;your username&gt;/node-web-app .</span><br><span class="line"></span><br><span class="line"># 如何运行镜像呢？</span><br><span class="line">docker run -p 3000:3000 -d &lt;your username&gt;/node-web-app</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>我的构建命令如下</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
+<h3 id="构建过程出错了"><a href="#构建过程出错了" class="headerlink" title="构建过程出错了"></a>构建过程出错了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 第一个问题 yarn install 一直卡在 &quot;Fetch packages...&quot;</span><br><span class="line">yarn cache clean &amp; yarn install</span><br><span class="line"></span><br><span class="line"># 第二个问题 yarn install --verbose 显示它的进度，发现卡在这里</span><br><span class="line">Browserslist: caniuse-lite is outdated. Please run: npx browserslist@latest --update-db</span><br><span class="line"></span><br><span class="line">- 解决办法</span><br><span class="line">- 删除 node_modules 文件夹及 package-lock.json 文件</span><br><span class="line"></span><br><span class="line">结果不管事</span><br><span class="line">再次添加参数</span><br><span class="line"></span><br><span class="line">RUN  yarn cache clean &amp; yarn install --verbose --network-timeout 60000</span><br></pre></td></tr></table></figure>
+<ul>
+<li>历经千辛万苦，终于build成功了</li>
+<li>运行<code>docker run -p 3000:3000 -d my-node-app/node-web-app</code> 打开浏览器 <a href="http://localhost:3000/" target="_blank" rel="noopener">http://localhost:3000/</a> </li>
+<li>发现报错， 通过log看运行日志</li>
+<li>docker logs 你的应用id </li>
+<li>应该是 数据库连接问题，数据库需要一个 pg 容器，并配置好localhost</li>
+<li>修改 ormconfig.json 里的host为你的本机ip<ul>
+<li>因为 容器内的 localhost 不是你本机的 localhost</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-07-01博客系统部署/" data-id="cklhgn2dn00aekyfyujxoynce" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -348,7 +648,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-06博客系统后端分页/" data-id="cklcb6bg600a5wo91utrld4wb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-06博客系统后端分页/" data-id="cklhgn2dn00adkyfyrp6ltdub" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -410,7 +710,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-05博客系统创建博客/" data-id="cklcb6bg400a3wo91w0tgm016" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-05博客系统创建博客/" data-id="cklhgn2dm00aakyfylnbdgre4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -482,7 +782,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-04博客系统登录/" data-id="cklcb6bg300a1wo919hp7ln3g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-04博客系统登录/" data-id="cklhgn2dl00a9kyfy0axo31dz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -560,619 +860,10 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-03博客系统注册/" data-id="cklcb6bg3009zwo91xlfg4rm8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-03博客系统注册/" data-id="cklhgn2dk00a6kyfynyjishs6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-02博客系统数据显示" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-02博客系统数据显示/" class="article-date">
-  <time datetime="2021-02-18T04:50:37.000Z" itemprop="datePublished">2021-02-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-02博客系统数据显示/">Node-web05-02博客系统数据显示</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="博客系统数据显示"><a href="#博客系统数据显示" class="headerlink" title="博客系统数据显示"></a>博客系统数据显示</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">初始代码</a></li>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/1943c647ee6ec23ddc7a37e3b0e794c37026b778" target="_blank" rel="noopener">最终代码</a></li>
-</ul>
-<h3 id="在Next-js里-创建-connection"><a href="#在Next-js里-创建-connection" class="headerlink" title="在Next.js里 创建 connection"></a>在Next.js里 创建 connection</h3><ul>
-<li><code>lib/getDatabaseConnection.tsx</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    console.log(&apos;创建connection.&apos;)</span><br><span class="line">    /*</span><br><span class="line">    立即执行函数，引用的时候被执行，始终返回 promise的结果</span><br><span class="line">    1。 createConnection 是一个 返回promise的 所以想要他必须包裹在 async 的匿名函数里 代号xx</span><br><span class="line">    2。 然后立即执行 xx</span><br><span class="line">    3。 promise 这个函数就代表 我去执行 createConnection 这个异步操作</span><br><span class="line">    */</span><br><span class="line">    return await createConnection();</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    /*</span><br><span class="line">    别人引用的时候  第一次得到 connection</span><br><span class="line">    第二次依然得到 connection，因为 promise只执行了一次</span><br><span class="line">    promise 之后不管重复引入多少次都不会重新执行</span><br><span class="line">     */</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>pages/index.tsx里</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export const getServerSideProps: GetServerSideProps = async (context) =&gt; &#123;</span><br><span class="line">  const connect = await getDatabaseConnection()</span><br><span class="line">  console.log(&apos;connect&apos;);</span><br><span class="line">  const ua = context.req.headers[&apos;user-agent&apos;];</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      browser: ua</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>遇到问题了 如果是第一次运行<code>yarn dev</code> 这里连接是没问题的</li>
-<li>但是如果中途 修改代码 <code>ctrl+s</code> 后 会导致热启动，然后重新执行 <code>getDatabaseConnection()</code> 但是我们的连接已经存在过一次了。所以会报错</li>
-<li>这个问题是 next.js 本地开发 修改文件自动加载导致的</li>
-<li>只会出现在开发环境，就是你本地<code>yarn dev</code> 然后修改代码的时候触发</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Server Error</span><br><span class="line">AlreadyHasActiveConnectionError: Cannot create a new connection named &quot;default&quot;, because connection with such name already exist and it now has an active connection session.</span><br></pre></td></tr></table></figure>
-<h3 id="解决-connection-开发环境修改代码重复执行问题"><a href="#解决-connection-开发环境修改代码重复执行问题" class="headerlink" title="解决 connection 开发环境修改代码重复执行问题"></a>解决 connection 开发环境修改代码重复执行问题</h3><ul>
-<li><p>使用 <code>getConnectionManager</code></p>
-</li>
-<li><p>修改<code>lib/getDatabaseConnection.tsx</code></p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection,getConnectionManager&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return createConnection();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return createConnection();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="疑问：我们能不能自己写一个-manager"><a href="#疑问：我们能不能自己写一个-manager" class="headerlink" title="疑问：我们能不能自己写一个 manager"></a>疑问：我们能不能自己写一个 manager</h3><ul>
-<li>可以，但是会有一个问题</li>
-<li>我们的代码是在项目里，一旦引入，如果在开发环境下，还是会存在重复执行的问题</li>
-<li>而 typeorm 的 manager为啥没有被重新执行，因为他在 node_modules 里，nextjs发现 如果你的文件是 node_modules 里的就不会去刷新</li>
-</ul>
-<h3 id="复述这个问题：开发中遇到最难的bug"><a href="#复述这个问题：开发中遇到最难的bug" class="headerlink" title="复述这个问题：开发中遇到最难的bug"></a>复述这个问题：开发中遇到最难的bug</h3><ul>
-<li>一开始我们在 nextjs里 直接 getConnection 会报错，因为 还没初始化过</li>
-<li>我们用 createConnecion，为了防止执行多次</li>
-<li>我们把它放在 立即执行函数里返回，保证多次 import 都始终执行一次</li>
-<li>尝试 create + get 判空的方式<ul>
-<li>又遇到问题 <code>ctrl+s</code> 修改代码导致 重新加载 每次都触发 create,重复了</li>
-</ul>
-</li>
-<li>最后我们使用typeorm的 getConnectionManager 来管理<ul>
-<li>因为 typeorm 的代码 处于 node_modules里，nextjs修改代码保存的时候 不会重新加载</li>
-</ul>
-</li>
-<li>自己写 manager 没用，因为 nextjs 里 ctrl+s 热重启导致 你写的 manager 重新加载重新执行。即又触发了 create</li>
-</ul>
-<h3 id="获取Post内容"><a href="#获取Post内容" class="headerlink" title="获取Post内容"></a>获取Post内容</h3><ul>
-<li>前提你通过 <code>node dist/seed.js</code> 创造好数据</li>
-<li><code>pages/index.tsx</code>里获取 posts</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">export const getServerSideProps:GetServerSideProps = async (context)=&gt;&#123;</span><br><span class="line">    const connection = await getDatabaseConnection()// 第一次链接能不能用 get</span><br><span class="line">    const posts = await connection.manager.find(Post)</span><br><span class="line"></span><br><span class="line">    console.log(&apos;posts&apos;);</span><br><span class="line">    console.log(posts)</span><br><span class="line">    return &#123;</span><br><span class="line">        props: &#123;</span><br><span class="line">            aaa:&apos;aaadaa&apos;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>报错 <code>No metadata for &quot;Post&quot; was found.</code></li>
-<li>原因是 connection 是换成 js之后执行的，他不知道这个 post 有那些列<ul>
-<li>为啥 seed.js知道，因为他引入了 <code>reflect-metadata</code></li>
-<li><code>reflect-metadata</code> 可以通过你引入的 entity 类，反向推出它的元数据</li>
-<li>而我们 nextjs 里没有引入它</li>
-</ul>
-</li>
-<li>createConnecion，构造的时候可以传递参数，告知它的 entity和 config信息</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection,getConnectionManager&#125; from &apos;typeorm&apos;;</span><br><span class="line">import &apos;reflect-metadata&apos;;</span><br><span class="line">import &#123;Post&#125; from &apos;src/entity/Post&apos;;</span><br><span class="line">import &#123;User&#125; from &apos;src/entity/User&apos;;</span><br><span class="line">import &#123;Comment&#125; from &apos;src/entity/Comment&apos;;</span><br><span class="line">import config from &apos;ormconfig.json&apos;;</span><br><span class="line"></span><br><span class="line">const create = async () =&gt; &#123;</span><br><span class="line">    // @ts-ignore</span><br><span class="line">    return createConnection(&#123;</span><br><span class="line">        ...config,</span><br><span class="line">        entities: [Post, User, Comment]</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return create();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h3 id="BUG：no-metadata-for-Post-再次出现"><a href="#BUG：no-metadata-for-Post-再次出现" class="headerlink" title="BUG：no metadata for Post 再次出现"></a>BUG：no metadata for Post 再次出现</h3><ul>
-<li>我们展示 posts的时候，ctrl+s 导致一个问题</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return create();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">          // ctrl+s会走进这里，如果走进这里  no metadata for Post 就会触发</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-<ul>
-<li>修改，<code>current.isConnected</code> 就关闭连接，再次 <code>create()</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    const current = manager.has(&apos;default&apos;) &amp;&amp; manager.get(&apos;default&apos;);</span><br><span class="line">    if (current) &#123;await current.close();&#125;</span><br><span class="line">    return create()</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-02博客系统数据显示/" data-id="cklcb6bg2009xwo91lehk1d7x" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-01博客系统构建" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/17/Node-web05-01博客系统构建/" class="article-date">
-  <time datetime="2021-02-17T15:31:21.000Z" itemprop="datePublished">2021-02-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/17/Node-web05-01博客系统构建/">Node-web05-01博客系统构建</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="博客系统构建"><a href="#博客系统构建" class="headerlink" title="博客系统构建"></a>博客系统构建</h1><h2 id="CRUD最佳实践"><a href="#CRUD最佳实践" class="headerlink" title="CRUD最佳实践"></a>CRUD最佳实践</h2><ul>
-<li>CRUD小王子</li>
-<li>数据库封装员</li>
-</ul>
-<h3 id="增删改次难在哪里？"><a href="#增删改次难在哪里？" class="headerlink" title="增删改次难在哪里？"></a>增删改次难在哪里？</h3><ul>
-<li>第一： 开发效率，5年CRUD效率没有任何提升</li>
-<li>第二：代码质量<ul>
-<li>屎山</li>
-<li>单元测试技术</li>
-<li>公司以结果为导向，敏捷开发<ul>
-<li>而真正的敏捷开发最重要的就是——单元测试</li>
-</ul>
-</li>
-<li>因为他们只想敏捷，不想开发。</li>
-<li>真正的敏捷开发是，用最少的时间作出质量最高的程序<ul>
-<li>而不是需求想变就变，改了又改。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>第三：前后端联调<ul>
-<li>沟通成本</li>
-</ul>
-</li>
-<li>第四：伸缩性Scale <ul>
-<li>增删改查数据量变大了咋办</li>
-<li>100万数据 变 1亿，机器扛得住？</li>
-</ul>
-</li>
-<li>第五：高并发 C10k问题<ul>
-<li>10000个连接同时进来，怎么保证服务质量</li>
-</ul>
-</li>
-<li>第六：安全和稳定<ul>
-<li>防拖库、MD5碰撞？</li>
-<li>XSS、CSRF、Replay？</li>
-<li>怎么备份？怎么双活？</li>
-<li>经典案例：CSDN被拖库</li>
-</ul>
-</li>
-</ul>
-<h3 id="一些重要的原则"><a href="#一些重要的原则" class="headerlink" title="一些重要的原则"></a>一些重要的原则</h3><ul>
-<li>过早优化乃万恶之源<ul>
-<li>你没办法量化性能就别尝试优化</li>
-</ul>
-</li>
-<li>开发效率&gt;可读性&gt;运行效率<ul>
-<li>创业公司目标是活下去</li>
-<li>纠结 <code>++i 和 i++</code>的效率提升 有意义吗</li>
-</ul>
-</li>
-<li>可用性 &gt; 易用性 &gt; 美观<ul>
-<li>不要一开始就在易用性和美观上浪费时间</li>
-</ul>
-</li>
-<li>永远不要删除数据<ul>
-<li>软删除、删除前确认</li>
-</ul>
-</li>
-</ul>
-<h2 id="博客系统需求分析：做毁它"><a href="#博客系统需求分析：做毁它" class="headerlink" title="博客系统需求分析：做毁它"></a>博客系统需求分析：做毁它</h2><h3 id="功能点"><a href="#功能点" class="headerlink" title="功能点"></a>功能点</h3><ul>
-<li>可登录、注销，但不可以重置密码(人工解决)</li>
-<li>重置密码联系管理员</li>
-<li>用户可以对博客CRUD</li>
-<li>用户可以对博客进行“评论”，但不能修改评论(从简)</li>
-<li>用户不可以编辑用户名、密码、姓名、头像(从简)</li>
-</ul>
-<h3 id="可用性需求"><a href="#可用性需求" class="headerlink" title="可用性需求"></a>可用性需求</h3><ul>
-<li>手机上也能完成操作</li>
-</ul>
-<h3 id="其他要求"><a href="#其他要求" class="headerlink" title="其他要求"></a>其他要求</h3><ul>
-<li>对搜索引擎优化</li>
-</ul>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><blockquote>
-<p>需求</p>
-</blockquote>
-<ul>
-<li>简单CRUD</li>
-<li>三个表 users/posts/comments</li>
-</ul>
-<blockquote>
-<p>主要数据</p>
-</blockquote>
-<ul>
-<li>users(id/username/password_digest)</li>
-<li>posts(id/user_id/title/content)</li>
-<li>comments(id/user_id/post_id/content)</li>
-</ul>
-<blockquote>
-<p>其他</p>
-</blockquote>
-<ul>
-<li>手机适配：一开始就设计两套界面PC+mobile</li>
-<li>SEO：多用 SSG或者SSR,少用BSR</li>
-</ul>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7" target="_blank" rel="noopener">初始代码</a></li>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">最终代码</a></li>
-</ul>
-<h2 id="开始写代码"><a href="#开始写代码" class="headerlink" title="开始写代码"></a>开始写代码</h2><h3 id="step01-创建表"><a href="#step01-创建表" class="headerlink" title="step01 创建表"></a>step01 创建表</h3><blockquote>
-<p>代码基于这个<a href="https://github.com/slTrust/next-demo-2/tree/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">commit</a></p>
-</blockquote>
-<blockquote>
-<p>我们用的docker创建的 pgsql数据库</p>
-</blockquote>
-<ul>
-<li>自行安装docker</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录创建持久化数据目录</span><br><span class="line">mkdir blog-data</span><br><span class="line"></span><br><span class="line"># 启动pg</span><br><span class="line">docker run -v &quot;$PWD/blog-data&quot;:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 进入 pg容器 内部</span><br><span class="line">docker exec -it 容器id bash</span><br><span class="line"></span><br><span class="line"># 登陆数据库</span><br><span class="line">psql -U blog</span><br><span class="line"></span><br><span class="line"># 查看数据库</span><br><span class="line">\l</span><br><span class="line"></span><br><span class="line"># 删除数据库  </span><br><span class="line">drop database 数据库名</span><br><span class="line"></span><br><span class="line"># 创建数据库</span><br><span class="line">CREATE DATABASE blog_development ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"></span><br><span class="line"># 连接数据库</span><br><span class="line">\c 数据库名称</span><br></pre></td></tr></table></figure>
-<ul>
-<li>migration</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"># package.json里添加脚本</span><br><span class="line">&quot;m:create&quot;: &quot;typeorm migration:create&quot;,</span><br><span class="line"></span><br><span class="line"># 创建表</span><br><span class="line">yarn m:create -n CreateUsers</span><br><span class="line">这样会生成 src/migration/xxx-CreateUsers.ts</span><br><span class="line"># 修改内容</span><br><span class="line">import &#123;MigrationInterface, QueryRunner, Table&#125; from &quot;typeorm&quot;;</span><br><span class="line"></span><br><span class="line">export class CreateUsers1613578095866 implements MigrationInterface &#123;</span><br><span class="line"></span><br><span class="line">    public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">        return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">            name:&apos;users&apos;,</span><br><span class="line">            columns:[</span><br><span class="line">                &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">                &#123;name:&apos;username&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;password_digest&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">            ]</span><br><span class="line">        &#125;))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">        return await queryRunner.dropTable(&apos;users&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 然后运行 数据库表就创建好了</span><br><span class="line">yarn m:run </span><br><span class="line"></span><br><span class="line"># 同步创建 posts\comments</span><br><span class="line"></span><br><span class="line">return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">    name:&apos;posts&apos;,</span><br><span class="line">    columns:[</span><br><span class="line">        &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">        &#123;name:&apos;title&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;content&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;author_id&apos;,type:&apos;int&apos;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line">return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">    name:&apos;comments&apos;,</span><br><span class="line">    columns:[</span><br><span class="line">        &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">        &#123;name:&apos;user_id&apos;,type:&apos;int&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;post_id&apos;,type:&apos;int&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;content&apos;,type:&apos;text&apos;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line"># 我们的表需要有时间列， 那样你就得冲头修改表的结构</span><br><span class="line"># 我们再次创建一个 migration</span><br><span class="line">yarn m:create -n AddCreateAtAndUpdatedAt</span><br><span class="line"></span><br><span class="line">注意 await</span><br><span class="line">注意 await</span><br><span class="line">注意 await</span><br><span class="line"></span><br><span class="line">public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.addColumns(&apos;users&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">    await queryRunner.addColumns(&apos;posts&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">    await queryRunner.addColumns(&apos;comments&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.dropColumn(&apos;users&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;users&apos;, &apos;updatedAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;posts&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;posts&apos;, &apos;updatedAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;comments&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;comments&apos;, &apos;updatedAt&apos;);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>统一命名风格:规范列名</p>
-</blockquote>
-<ul>
-<li>驼峰</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">yarn m:create -n RenameColumns</span><br><span class="line"></span><br><span class="line">public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.renameColumn(&apos;users&apos;, &apos;password_digest&apos;, &apos;passwordDigest&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;posts&apos;, &apos;author_id&apos;, &apos;authorId&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;user_id&apos;, &apos;userId&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;post_id&apos;, &apos;postId&apos;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.renameColumn(&apos;users&apos;, &apos;passwordDigest&apos;, &apos;password_digest&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;posts&apos;, &apos;authorId&apos;, &apos;author_id&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;userId&apos;, &apos;user_id&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;postId&apos;, &apos;post_id&apos;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"># migration</span><br><span class="line">yarn m:run</span><br><span class="line"></span><br><span class="line"># 查看表结构</span><br><span class="line">\d 表名</span><br></pre></td></tr></table></figure>
-<h3 id="step02-创建关联"><a href="#step02-创建关联" class="headerlink" title="step02 创建关联"></a>step02 创建关联</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">users</span><br><span class="line">  one user has many posts</span><br><span class="line">  one has many comments</span><br><span class="line"></span><br><span class="line">posts</span><br><span class="line">  a post to one user</span><br><span class="line">  a post has many comments</span><br><span class="line"></span><br><span class="line">comments</span><br><span class="line">  a comments to one user</span><br><span class="line">  a comments to one post</span><br></pre></td></tr></table></figure>
-<ul>
-<li>修改package.json 脚本 <code>&quot;e:create&quot;: &quot;typeorm entity:create&quot;</code></li>
-<li>创建三个实体<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn e:create -n User</span><br><span class="line">yarn e:create -n Post</span><br><span class="line">yarn e:create -n Comment</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="step03-填充数据"><a href="#step03-填充数据" class="headerlink" title="step03 填充数据"></a>step03 填充数据</h3><ul>
-<li>seed尝试录入数据,修改 src/seed.ts</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;User&#125; from &quot;./entity/User&quot;;</span><br><span class="line"></span><br><span class="line">createConnection().then(async connection =&gt; &#123;</span><br><span class="line">    const &#123;manager&#125; = connection;</span><br><span class="line">    const u1 = new User();</span><br><span class="line">    u1.username = &apos;aaa&apos;;</span><br><span class="line">    u1.passwordDigest = &apos;xxx&apos;;</span><br><span class="line">    await manager.save(u1);</span><br><span class="line">    console.log(u1.id);</span><br><span class="line">&#125;).catch(error =&gt; console.log(error));</span><br></pre></td></tr></table></figure>
-<ul>
-<li>运行<code>node dist/seed.js</code> 报错</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: Column createdAt of Entity Comment does not support length property.</span><br></pre></td></tr></table></figure>
-<ul>
-<li>点击 src/entity/User 里的 <code>@CreateDateColumn</code></li>
-<li>会跳到对应的ts源码</li>
-<li>但是还看不懂 于是 webstorm 项目目录 有个 jump to source 点击 定位到位置</li>
-<li>然后 node_modules/typeorm 目录点击 findinpath 搜索 “createdAt” 发现 psql 对应会创建 timestamp</li>
-</ul>
-<h3 id="step04-创建页面"><a href="#step04-创建页面" class="headerlink" title="step04 创建页面"></a>step04 创建页面</h3><h3 id="step05-创建API"><a href="#step05-创建API" class="headerlink" title="step05 创建API"></a>step05 创建API</h3><ul>
-<li><code>/api/v1/sign_up</code></li>
-<li><code>/api/v1/sign_in</code></li>
-</ul>
-<h3 id="step06-约定前后端接口"><a href="#step06-约定前后端接口" class="headerlink" title="step06 约定前后端接口"></a>step06 约定前后端接口</h3><ul>
-<li>RESTful</li>
-<li>约定错误码</li>
-<li>约定资源格式</li>
-</ul>
-<h3 id="step07-单元测试"><a href="#step07-单元测试" class="headerlink" title="step07 单元测试"></a>step07 单元测试</h3>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/17/Node-web05-01博客系统构建/" data-id="cklcb6bg1009vwo91zp9g6stb" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web04-01TypeORM" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/14/Node-web04-01TypeORM/" class="article-date">
-  <time datetime="2021-02-14T15:18:28.000Z" itemprop="datePublished">2021-02-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/14/Node-web04-01TypeORM/">Node-web04-01TypeORM</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="TypeORM使用"><a href="#TypeORM使用" class="headerlink" title="TypeORM使用"></a>TypeORM使用</h1><ul>
-<li>基于这次<a href="https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7" target="_blank" rel="noopener">commit</a></li>
-<li>完整代码</li>
-</ul>
-<h3 id="docker容器启动-pg"><a href="#docker容器启动-pg" class="headerlink" title="docker容器启动 pg"></a>docker容器启动 pg</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 本项目根目录</span><br><span class="line">docker run -v &quot;$PWD/blog-data&quot;:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 如果需要密码 请这样设置</span><br><span class="line">替换</span><br><span class="line">-e POSTGRES_HOST_AUTH_METHOD=trust 为</span><br><span class="line">-e POSTGRES_HOST_PASSWORD=123456</span><br></pre></td></tr></table></figure>
-<ul>
-<li>其他命令</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看容器</span><br><span class="line">docker ps -a</span><br><span class="line"></span><br><span class="line"># 查看容器启动日志</span><br><span class="line">docker logs 容器id</span><br></pre></td></tr></table></figure>
-<h3 id="进入docker容器"><a href="#进入docker容器" class="headerlink" title="进入docker容器"></a>进入docker容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 容器id bash</span><br></pre></td></tr></table></figure>
-<h3 id="进入pg命令行"><a href="#进入pg命令行" class="headerlink" title="进入pg命令行"></a>进入pg命令行</h3><ul>
-<li><code>psql -U blog -W</code> 登陆数据库</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 查看有那些数据库</span><br><span class="line">\l</span><br><span class="line"></span><br><span class="line"># 连接 blog数据库</span><br><span class="line">\c blog</span><br><span class="line"></span><br><span class="line"># 查看数据库里的表</span><br><span class="line">\dt</span><br><span class="line"></span><br><span class="line"># 丢弃表</span><br><span class="line">drop table 表名</span><br></pre></td></tr></table></figure>
-<h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE [数据库名] ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"># 分别创建三个 blog_development、test、production</span><br></pre></td></tr></table></figure>
-<h3 id="安装TypeORM"><a href="#安装TypeORM" class="headerlink" title="安装TypeORM"></a>安装TypeORM</h3><ul>
-<li><a href="https://typeorm.io" target="_blank" rel="noopener">typeorm官网</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 安装如下依赖</span><br><span class="line"></span><br><span class="line">&quot;reflect-metadata&quot;: &quot;^0.1.13&quot;</span><br><span class="line">&quot;typeorm&quot;: &quot;^0.2.25&quot;</span><br><span class="line"></span><br><span class="line">devDependencies</span><br><span class="line">&quot;@types/node&quot;: &quot;^14.0.6&quot;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>tsconfig.json 里添加两个配置</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;emitDecoratorMetadata&quot;: true,</span><br><span class="line">&quot;experimentalDecorators&quot;: true,</span><br></pre></td></tr></table></figure>
-<ul>
-<li>做到这步先提交代码</li>
-</ul>
-<h3 id="typeorm使用"><a href="#typeorm使用" class="headerlink" title="typeorm使用"></a>typeorm使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">npx typeorm init --database postgres</span><br><span class="line"></span><br><span class="line"># 此时会生成很多文件，他会修改我们的一些东西</span><br><span class="line"># 因为 typeorm 推荐使用ts-node编译(没有内置)</span><br><span class="line"># babel 和 ts-node 对TS的支持并非完全一致</span><br><span class="line"># 但是 Next.js 默认用babel把ts变成js，所以 package.json的改动要撤销</span><br><span class="line"># 所以我们要统一用 babel处理</span><br><span class="line"># 还要撤销 .gitignore的改动</span><br></pre></td></tr></table></figure>
-<h3 id="babel处理-typeorm并运行"><a href="#babel处理-typeorm并运行" class="headerlink" title="babel处理 typeorm并运行"></a>babel处理 typeorm并运行</h3><p><strong>原因已经说了，typeorm需要ts-node运行，但是nextJS使用babel转译ts的，所以我们只能统一用babel</strong></p>
-<ul>
-<li><p>安装 <code>@babel/cli</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add @babel/cli</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>编译 typeorm的 ts文件</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">npx babel ./src --out-dir dist --extensions &quot;.ts,.tsx&quot;</span><br><span class="line"></span><br><span class="line"># 报错 can not found @babel/core</span><br><span class="line">yarn add @babel/core</span><br><span class="line"></span><br><span class="line"># 继续运行那个命令</span><br><span class="line"># 结果又报错了</span><br><span class="line">SyntaxError: /Users/hjx/Desktop/demo/next-demos/next-demo-2/src/entity/User.ts: Support for the experimental syntax &apos;decorators-legacy&apos; isn&apos;t currently enabled (3:1):</span><br><span class="line"></span><br><span class="line"># google 搜索 Support for the experimental syntax &apos;decorators-legacy&apos; isn&apos;t currently enabled (3:1):</span><br><span class="line"># 得到答案</span><br><span class="line">https://stackoverflow.com/questions/52262084/syntax-error-support-for-the-experimental-syntax-decorators-legacy-isnt-cur</span><br></pre></td></tr></table></figure>
-<p>新建<code>.babelrc</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;presets&quot;: [</span><br><span class="line">    &quot;next/babel&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;plugins&quot;: [</span><br><span class="line">    [</span><br><span class="line">      &quot;@babel/plugin-proposal-decorators&quot;,</span><br><span class="line">      &#123;</span><br><span class="line">        &quot;legacy&quot;: true</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="typeorm默认要-ts-node支持"><a href="#typeorm默认要-ts-node支持" class="headerlink" title="typeorm默认要 ts-node支持"></a>typeorm默认要 ts-node支持</h3><ul>
-<li>但是 nextjs 是用 babel转译 ts</li>
-<li>所以我们要统一 使用 babel</li>
-<li>所以 typeorm的文件要编译成js运行 </li>
-</ul>
-<h3 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npx babel ./src --out-dir dist --extensions &quot;.ts,.tsx&quot;</span><br><span class="line"></span><br><span class="line">node /dist/index.js</span><br></pre></td></tr></table></figure>
-<h3 id="重要步骤"><a href="#重要步骤" class="headerlink" title="重要步骤"></a>重要步骤</h3><ul>
-<li>一定一定一定要改成 false</li>
-<li>如果为true 连接数据库的时候，typeorm会自动根据 entity 目录修改数据库， <ul>
-<li>假如你改了 entity 多了一些列，就会同步到表里</li>
-<li>如果是生产环境，数据要么丢了，要么脏了，就很麻烦</li>
-</ul>
-</li>
-<li>一开始就要杜绝 sync</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 修改 ormconfig.json 的配置</span><br><span class="line">&quot;synchronize&quot;: false,</span><br></pre></td></tr></table></figure>
-<h3 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h3><ul>
-<li>创建 posts 表</li>
-<li><code>npx typeorm migration:create -n CreatePost</code><ul>
-<li>得到 <code>src/migrations/{TIMESTAMP}-CreatePost.ts</code></li>
-<li>编写对应的 up/down函数</li>
-</ul>
-</li>
-<li>运行 migration<ul>
-<li><code>npx babel .src --out-dir dist --extensions &quot;.ts,.tsx&quot;</code></li>
-<li><code>npx typeorm migration:run</code> 创建表 up操作</li>
-<li><code>npx typeorm migration:revert</code> drop表 down操作</li>
-</ul>
-</li>
-</ul>
-<h3 id="解决不同平台运行多个命令问题"><a href="#解决不同平台运行多个命令问题" class="headerlink" title="解决不同平台运行多个命令问题"></a>解决不同平台运行多个命令问题</h3><ul>
-<li>如下命令只支持 mac/linux 用户</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;dev&quot;: &quot;next dev &amp; babel -w ./src --out-dir dist --extensions .ts,.tsx&quot;</span><br></pre></td></tr></table></figure>
-<p>windwos咋办</p>
-<h4 id="concurrently"><a href="#concurrently" class="headerlink" title="concurrently"></a>concurrently</h4><ul>
-<li>支持运行多个命令，而且支持 windows</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;dev&quot;: &quot;concurrently \&quot;next dev\&quot; \&quot;babel -w ./src --out-dir dist --extensions .ts,.tsx\&quot;&quot;,</span><br></pre></td></tr></table></figure>
-<h3 id="创建实体"><a href="#创建实体" class="headerlink" title="创建实体"></a>创建实体</h3><p>package.json</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;entity:create&quot;: &quot;typeorm entity:create&quot;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>运行 <code>yarn entity:create -n Post</code></li>
-<li>会生成 <code>src/entity/Post.ts</code></li>
-<li>通过 Post 类，修改 post 表<ul>
-<li><code>@Column()</code> 修饰器 修饰对应的列，需要你自己填写</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import &#123;Column, Entity, PrimaryGeneratedColumn&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">@Entity(&apos;posts&apos;)</span><br><span class="line">export class Post &#123;</span><br><span class="line">    @PrimaryGeneratedColumn(&apos;increment&apos;)</span><br><span class="line">    id: number;</span><br><span class="line">    @Column(&apos;varchar&apos;)</span><br><span class="line">    title: string;</span><br><span class="line">    @Column(&apos;text&apos;)</span><br><span class="line">    content: string;</span><br><span class="line"></span><br><span class="line">    constructor(attributes: Partial&lt;Post&gt;) &#123;</span><br><span class="line">        Object.assign(this, attributes);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="EntityManager-API"><a href="#EntityManager-API" class="headerlink" title="EntityManager API"></a>EntityManager API</h3><ul>
-<li><a href="https://typeorm.io/#/entity-manager-api" target="_blank" rel="noopener">文档</a></li>
-<li>注意加 await</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">await connection.manager.find(User,&#123;name:&apos;查询的名字&apos;&#125;)</span><br><span class="line">await connection.manager.create(User,&#123;name:&apos;&apos;, attr...&#125;)</span><br><span class="line"></span><br><span class="line">await connection.manager.save(u1)</span><br><span class="line"></span><br><span class="line">await connection.manager.save([u1,u2,u3])</span><br><span class="line"></span><br><span class="line">await connection.manager.remove(u1)</span><br><span class="line"></span><br><span class="line">await connection.manager.update(User,1,&#123;name:&apos;xxx&apos;&#125;)</span><br><span class="line"></span><br><span class="line">await connection.manager.delete(User,1)</span><br><span class="line"></span><br><span class="line">await connection.manager.findOne(User,1)</span><br></pre></td></tr></table></figure>
-<p>实验</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;Post&#125; from &quot;./entity/Post&quot;;</span><br><span class="line"></span><br><span class="line">createConnection().then(async connection =&gt; &#123;</span><br><span class="line">    const posts = await connection.manager.find(Post)</span><br><span class="line">    console.log(posts)</span><br><span class="line">    const p = new Post();</span><br><span class="line">    p.title = &apos;Post 1&apos;</span><br><span class="line">    p.content = &apos;我的第一篇文章&apos;</span><br><span class="line">    await connection.manager.save(p);</span><br><span class="line"></span><br><span class="line">    const post2 = await connection.manager.find(Post)</span><br><span class="line">    console.log(post2)</span><br><span class="line"></span><br><span class="line">    connection.close()</span><br><span class="line">&#125;).catch(error =&gt; console.log(error));</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li>migration 用来数据库迁移</li>
-<li>entity 用 类和对象操作数据库表和行</li>
-<li>connection 数据库连接</li>
-<li>manager/repository<ul>
-<li>两种风格的API,操作实体</li>
-</ul>
-</li>
-</ul>
-<h3 id="使用-seed-填充数据"><a href="#使用-seed-填充数据" class="headerlink" title="使用 seed 填充数据"></a>使用 seed 填充数据</h3><ul>
-<li><p>前置操作 参考 01docker.md 内容，新建好容器，配置好数据库连接</p>
-</li>
-<li><p>开第一个终端 <code>yarn dev</code></p>
-<ul>
-<li>可以编译我们的 typeorm代码</li>
-</ul>
-</li>
-<li><p>开第二个终端执行数据库迁移</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 创建数据库表</span><br><span class="line">yarn migration:run</span><br><span class="line"># revert操作</span><br><span class="line">yarn migration:revert</span><br></pre></td></tr></table></figure>
-<ul>
-<li>填充数据</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录</span><br><span class="line">node dist/seed.js</span><br></pre></td></tr></table></figure>
-<ul>
-<li>进入docker容器内部查询</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from posts;</span><br></pre></td></tr></table></figure>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/tree/typeorm" target="_blank" rel="noopener">typeorm分支</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/14/Node-web04-01TypeORM/" data-id="cklcb6bg1009two9106rz00pq" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP06密码学到https流程" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/20/HTTP06密码学到https流程/" class="article-date">
-  <time datetime="2021-01-20T15:32:29.000Z" itemprop="datePublished">2021-01-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/20/HTTP06密码学到https流程/">HTTP06密码学到https流程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="密码学相关"><a href="#密码学相关" class="headerlink" title="密码学相关"></a>密码学相关</h2><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/003.png" alt></p>
-<ul>
-<li>窃听，服务器经过很多环节。每个环节都能看到报文内容</li>
-<li>篡改，插入广告。 运营商，路由器，或中间某个环节插入的</li>
-<li>伪装，用你的身份信息登录</li>
-<li>否认，做过了xx操作，死不承认</li>
-</ul>
-<h3 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h3><p>一个密钥加密解密，速度快</p>
-<ul>
-<li>DES</li>
-<li>AES </li>
-</ul>
-<h3 id="非对称"><a href="#非对称" class="headerlink" title="非对称"></a>非对称</h3><p>两个密钥。公钥加密，私钥解密；私钥加密，公钥解密； 速度慢</p>
-<ul>
-<li>RSA</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/004.png" alt></p>
-<h3 id="https加密流程"><a href="#https加密流程" class="headerlink" title="https加密流程"></a>https加密流程</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/005.png" alt></p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/006.png" alt></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/20/HTTP06密码学到https流程/" data-id="cklcb6bcb001lwo91y9h7yqbp" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP05缓存控制" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/19/HTTP05缓存控制/" class="article-date">
-  <time datetime="2021-01-19T15:32:01.000Z" itemprop="datePublished">2021-01-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/19/HTTP05缓存控制/">HTTP05缓存控制</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="缓存控制"><a href="#缓存控制" class="headerlink" title="缓存控制"></a>缓存控制</h1><h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><ul>
-<li>设置过期时间 (http1.0的东西，现在用的少了)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Wed, 30 Dec 2020 18:05:17 GMT</span><br><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br></pre></td></tr></table></figure>
-<p>存在问题是 ： 服务器时间和你客户端时间不一致。</p>
-<h2 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h2><ul>
-<li>不要缓存，每次都重新拿</li>
-<li>优先级最高，一旦设置就不会走缓存</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
-<p>当 Pragma 和 Expires同时出现， Pragma优先级高</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
-<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><ul>
-<li>设置过期时间戳<ul>
-<li>解决了 Expires 时间不一致问题</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 10s后过期</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;max-age=10&apos;)</span><br></pre></td></tr></table></figure>
-<h3 id="Cache-Control-为啥不能缓存-html"><a href="#Cache-Control-为啥不能缓存-html" class="headerlink" title="Cache-Control 为啥不能缓存 html"></a>Cache-Control 为啥不能缓存 html</h3><ul>
-<li>访问 <a href="taobao.com">taobao</a></li>
-<li>你会发现 响应首页 的其他资源能被缓存，但是 这个首页html的响应头是</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cache-control: max-age=0</span><br></pre></td></tr></table></figure>
-<ul>
-<li>这是为了 解决网站改版的情况，浏览器自己设置的，如果缓存了，但是你走缓存就无法更新页面了</li>
-</ul>
-<h3 id="Cache-Control-其他值"><a href="#Cache-Control-其他值" class="headerlink" title="Cache-Control 其他值"></a>Cache-Control 其他值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 代表不走缓存,即使浏览器里有缓存</span><br><span class="line">cache-control: no-cache</span><br><span class="line"></span><br><span class="line">// 代表不走缓存</span><br><span class="line">// 资源可能中间有很多代理服务器(告诉代理服务器不要缓存)</span><br><span class="line">cache-control: no-store</span><br></pre></td></tr></table></figure>
-<h2 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，拿到——“修改时间”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个修改时间，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">if(!req.headers[&apos;if-modified-since&apos;])&#123;</span><br><span class="line">  // mtime 是修改时间</span><br><span class="line">  res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let oldMtime = Date.parse(req.headers[&apos;if-modified-since&apos;])</span><br><span class="line">  if(mtime&gt;oldMtime)&#123;</span><br><span class="line">    // 文件修改了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>案例1</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-cache 意思是 不要从本地缓存找 每次都找我要(每次都和服务器文件的mtime比对)</span><br><span class="line">// 第一次请求的时候响应里设置 Last-Modified 和时间，并把文件返回</span><br><span class="line">// 浏览器就会把这个时间缓存下来</span><br><span class="line">// 之后的每次请求 都会带上 if-modified-since 的时间</span><br><span class="line">// 但是发现 本地缓存信息里有 no-cache 就不会直接从本地读取，</span><br><span class="line">// 而是带上 if-modified-since 和服务器文件的 mtime 比对，如果变了就重新读取，没变就走缓存 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// no-cache 等价于 max-age=0</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>案例2，设置了 no-store</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-store&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-store 意思是 </span><br><span class="line">// 你设置的 Last-Modified  响应报文不会被浏览器记录,每次都重新读取文件</span><br></pre></td></tr></table></figure>
-<h2 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h2><ul>
-<li>比如 a.css文件</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>你修改了,修改时间变了</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>你又修改了，修改时间又变了</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>但是文件内容没变。但是 Last-Modified 只看时间，ETag代表 看文件内容是否变化</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，生成——“md5值”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个 md5值，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line"></span><br><span class="line">let md5 = crypto.createHash(&apos;md5&apos;);</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">let oldETag = req.headers[&apos;if-none-match&apos;];</span><br><span class="line">if(!oldETag)&#123;</span><br><span class="line">  // 第一次请求</span><br><span class="line">  res.setHeader(&apos;Etag&apos;,md5.update(data).digest(&apos;base64&apos;))</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let newETag = md5.update(data).digest(&apos;base64&apos;)</span><br><span class="line">  if(newETag !== oldETag)&#123;</span><br><span class="line">    // 文件内容变了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Etag&apos;,newETag)</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><ul>
-<li><a href="https://imweb.io/topic/5795dcb6fb312541492eda8c" target="_blank" rel="noopener">https://imweb.io/topic/5795dcb6fb312541492eda8c</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/23299600" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/23299600</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/19/HTTP05缓存控制/" data-id="cklcb6bc8001fwo91q8ks2909" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
 
     </footer>
   </div>
@@ -1185,7 +876,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
 
   <nav id="page-nav">
     
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1209,7 +900,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1231,23 +922,23 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

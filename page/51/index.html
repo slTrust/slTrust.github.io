@@ -62,6 +62,490 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-N032_DOM事件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/01/N032_DOM事件/" class="article-date">
+  <time datetime="2017-12-01T07:39:47.000Z" itemprop="datePublished">2017-12-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/01/N032_DOM事件/">DOM事件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="事件模型应用-点击显示浮层-点击其它地方关闭浮层"><a href="#事件模型应用-点击显示浮层-点击其它地方关闭浮层" class="headerlink" title="事件模型应用 点击显示浮层 点击其它地方关闭浮层"></a>事件模型应用 点击显示浮层 点击其它地方关闭浮层</h3><blockquote>
+<p>问题1 点击按钮浮层不出现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">      浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    //点击显示浮层 </span><br><span class="line">    clickMe.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">        popover.style.display = &apos;block&apos;;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">        popover.style.display = &apos;none&apos;</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>点击按钮的时候浮层确实出现了 </p>
+</blockquote>
+<blockquote>
+<p>但是addEventListener(‘事件’,fn,布尔值) 第三个参数不传代表false 代表冒泡</p>
+</blockquote>
+<blockquote>
+<p>冒泡到document  </p>
+</blockquote>
+<blockquote>
+<p>document 发现事件队列里有 fn于是执行   popover.style.display = ‘none’</p>
+</blockquote>
+<h3 id="如何解决-gt-event-stopPropagation"><a href="#如何解决-gt-event-stopPropagation" class="headerlink" title="如何解决 ==&gt; event.stopPropagation();"></a>如何解决 ==&gt; event.stopPropagation();</h3><blockquote>
+<p>Prevents further propagation of the current event in the capturing and bubbling phases.</p>
+</blockquote>
+<blockquote>
+<p>防止当前事件在捕获和冒泡阶段的进一步传播。</p>
+</blockquote>
+<blockquote>
+<h5 id="早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃"><a href="#早一点的前端肯定会认为还有一个方法阻止冒泡-event-cancelBubble-true-不好意思-该属性已废弃" class="headerlink" title="早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃"></a>早一点的前端肯定会认为还有一个方法阻止冒泡 event.cancelBubble = true ;不好意思 该属性已废弃</h5></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//点击显示浮层 </span><br><span class="line">clickMe.addEventListener(&apos;click&apos;, function(event)&#123;</span><br><span class="line">    popover.style.display = &apos;block&apos;;</span><br><span class="line">    event.stopPropagation(); //这样冒泡阶段就被禁止了 </span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">    popover.style.display = &apos;none&apos;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失"><a href="#问题2-虽然解决了阻止冒泡-但是当你点击浮层时-浮层也会消失" class="headerlink" title="问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失"></a>问题2 虽然解决了阻止冒泡 但是当你点击浮层时  浮层也会消失</h3><blockquote>
+<p>这样就不能在按钮上阻止冒泡 因为点击浮层也会冒泡到wrapper</p>
+<ul>
+<li>因为btn会冒泡到 wrapper </li>
+<li>popover会冒泡到 wrapper</li>
+<li>所以在它们的父节点做阻止冒泡</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">        浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">clickMe.addEventListener(&apos;click&apos;, function(e)&#123;</span><br><span class="line">    popover.style.display = &apos;block&apos;;</span><br><span class="line">&#125;)</span><br><span class="line">wrapper.addEventListener(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    //解决点击浮层触发的冒泡</span><br><span class="line">    e.stopPropagation()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">document.addEventListener(&apos;click&apos;, function()&#123;</span><br><span class="line">    popover.style.display = &apos;none&apos;</span><br><span class="line">&#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题"><a href="#问题3-现在点击按钮浮层出现-点击浮层浮层浮层不消失-但是有性能问题" class="headerlink" title="问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题"></a>问题3 现在点击按钮浮层出现  点击浮层浮层浮层不消失 但是有性能问题</h3><ul>
+<li>100个浮层就是100个事件队列  10000个呢？</li>
+</ul>
+<blockquote>
+<p>现在我们先换jq来实现刚刚的效果</p>
+</blockquote>
+<blockquote>
+<h3 id="jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播"><a href="#jq提供了一个非常方便的方法-node-on-‘click’-false-第二个参数代表-阻止默认事件-和阻止传播" class="headerlink" title="jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播"></a>jq提供了一个非常方便的方法  $(node).on(‘click’,false) 第二个参数代表 阻止默认事件 和阻止传播</h3></blockquote>
+<h3 id="又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中"><a href="#又偶生出一个bug-就是-on-‘事件’-false-你在checkbox外的任何一层-阻止默认事件-这个checkbox就无法选中" class="headerlink" title="又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中"></a>又偶生出一个bug 就是.on(‘事件’,false) 你在checkbox外的任何一层 阻止默认事件 这个checkbox就无法选中</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;wrapper&quot; class=&quot;wrapper&quot;&gt;</span><br><span class="line">    &lt;button id=&quot;clickMe&quot;&gt;点我&lt;/button&gt;</span><br><span class="line">    &lt;div id=&quot;popover&quot; class=&quot;popover&quot;&gt;</span><br><span class="line">        &lt;input type=&quot;checkbox&quot;&gt;浮层</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">&#125;);</span><br><span class="line">// 这样会再次出bug就是  如果浮层里有checkbox就无法选中 因为阻止了默认事件 </span><br><span class="line">$(wrapper).on(&apos;click&apos;,false)  </span><br><span class="line"></span><br><span class="line">$(document).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).hide();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所以我们还是单独阻止传播 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">$(wrapper).on(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    e.stopPropagation(); //阻止冒泡</span><br><span class="line">&#125;);  </span><br><span class="line"></span><br><span class="line">$(document).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).hide();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="解决问题3-性能问题"><a href="#解决问题3-性能问题" class="headerlink" title="解决问题3 性能问题"></a>解决问题3 性能问题</h3><ul>
+<li>点击按钮的时候显示浮层 同时添加一个document监听</li>
+<li>为什么监听不会触发 因为 wrapper哪里阻止了 冒泡<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">    //只有显示的时候监听一次 但是不会触发  因为 wrapper上阻止了冒泡</span><br><span class="line">    //这样我只监听一次 click 同时马上干掉这个监听事件   </span><br><span class="line">    $(document).one(&apos;click&apos;,function()&#123;</span><br><span class="line">      console.log(&apos;doc&apos;)</span><br><span class="line">      $(popover).hide();</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">//所以只能这样写  单独阻止它的冒泡 不阻止默认事件</span><br><span class="line">$(wrapper).on(&apos;click&apos;,function(e)&#123;</span><br><span class="line">    e.stopPropagation(); //阻止冒泡</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示"><a href="#问题4-如果不在wrapper上不阻止冒泡-点击btn为什么浮层不显示" class="headerlink" title="问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示"></a>问题4 如果不在wrapper上不阻止冒泡 点击btn为什么浮层不显示</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$(clickMe).on(&apos;click&apos;,function()&#123;</span><br><span class="line">    $(popover).show();</span><br><span class="line">    //只有显示的时候监听一次 但是不会触发  因为 wrapper上阻止了冒泡</span><br><span class="line">    //这样我只监听一次 click 同时马上干掉这个监听事件   </span><br><span class="line">    $(document).one(&apos;click&apos;,function()&#123;</span><br><span class="line">      console.log(&apos;doc&apos;)</span><br><span class="line">      $(popover).hide();</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在你点击btn的时候它会做两件事</li>
+<li>1 浮层显示出来</li>
+<li>2 document的事件队列里 添加一个函数</li>
+<li>3 事件开始冒泡</li>
+<li>4 开始发现 document的事件队列里有一个函数</li>
+<li>5 执行 document事件队列里的函数</li>
+<li>6 浮层隐藏了</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/01/N032_DOM事件/" data-id="cklhgn2c70070kyfytlmigfjg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-N030_DOM事件初识" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/01/N030_DOM事件初识/" class="article-date">
+  <time datetime="2017-12-01T01:00:47.000Z" itemprop="datePublished">2017-12-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/01/N030_DOM事件初识/">DOM事件初识</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="DOM事件"><a href="#DOM事件" class="headerlink" title="DOM事件"></a>DOM事件</h3><p>如果你想深挖请google搜索「dom spec」 <a href="https://www.w3.org/DOM/DOMTR" target="_blank" rel="noopener">dom spec</a></p>
+<ul>
+<li>Document Object Model (DOM) Level 1 只对基本的事件进行了汇总</li>
+<li>Document Object Model (DOM) Level 2 增加了 Events 对事件的详细说明</li>
+<li>Document Object Model (DOM) Level 3 并没有增加 Events 的相关修订</li>
+<li>Document Object Model (DOM) Level 4 还在草案阶段</li>
+</ul>
+<blockquote>
+<p>结论目前我们使用事件最新最广泛的标准是  dom level 2 (2000年11月3号)</p>
+</blockquote>
+<h4 id="dom-1-的一个经典问题"><a href="#dom-1-的一个经典问题" class="headerlink" title="dom 1 的一个经典问题"></a>dom 1 的一个经典问题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">    function print()&#123;console.log(&apos;Hi&apos;)&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;button id=&quot;x&quot; onclick=&quot;print&quot;&gt;A&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;y&quot; onclick=&quot;print()&quot;&gt;B&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;z&quot; onclick=&quot;print.call()&quot;&gt;C&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    x.onclick = print;</span><br><span class="line">    y.onclick = print();</span><br><span class="line">    z.onclick = print.call();</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>当把事件写在标签上的时候那个是正确调用 「B C」</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">写在标签上的事件</span><br><span class="line">onclick=&quot;要执行的代码&quot;</span><br><span class="line">一旦用户点击，浏览器就eval(&quot;要执行的代码&quot;)</span><br></pre></td></tr></table></figure>
+<p>当把事件写在JS上的时候那个是正确调用 「x」</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">写在JS里的事件</span><br><span class="line">onclick=&quot;函数&quot;</span><br><span class="line">一旦用户点击，浏览器就 x.onclick.call(x,函数)</span><br></pre></td></tr></table></figure>
+<h4 id="dom2-事件队列"><a href="#dom2-事件队列" class="headerlink" title="dom2 事件队列"></a>dom2 事件队列</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">xxx.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>你肯定问怎么比 onclick更麻烦了</p>
+</blockquote>
+<ul>
+<li>onclick是唯一的</li>
+<li>出现两次onclick就会发生覆盖</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">xxx.onclick = function()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">&#125;</span><br><span class="line">// 第一个onclick被覆盖了  只会打印2</span><br><span class="line">xxx.onclick = function()&#123;</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="事件队列的好处-eventListeners"><a href="#事件队列的好处-eventListeners" class="headerlink" title="事件队列的好处 eventListeners"></a>事件队列的好处 eventListeners</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">xxx.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">&#125;) </span><br><span class="line">xxx.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;) </span><br><span class="line"></span><br><span class="line">当xxx被点击 打印 1 和 2</span><br></pre></td></tr></table></figure>
+<h4 id="事件的移除"><a href="#事件的移除" class="headerlink" title="事件的移除"></a>事件的移除</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function f1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">&#125;</span><br><span class="line">function f2()&#123;</span><br><span class="line">    console.log(2)</span><br><span class="line">&#125;</span><br><span class="line">xxx.addEventListener(&apos;click&apos;,f1)</span><br><span class="line">xxx.addEventListener(&apos;click&apos;,f2)</span><br><span class="line">//移除事件队列里的 f1</span><br><span class="line">xxx.removeEventListener(&apos;click&apos;,f1)</span><br><span class="line"></span><br><span class="line">点击xxx后 打印 2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如何实现只监听one一次的效果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function f1()&#123;</span><br><span class="line">    console.log(1)</span><br><span class="line">    //移除事件队列里的 f1</span><br><span class="line">    xxx.removeEventListener(&apos;click&apos;,f1)</span><br><span class="line">&#125;</span><br><span class="line">xxx.addEventListener(&apos;click&apos;,f1)</span><br></pre></td></tr></table></figure>
+<h4 id="问题1-当我点击儿子的时候，我是否点击了-爸爸和爷爷-》yes"><a href="#问题1-当我点击儿子的时候，我是否点击了-爸爸和爷爷-》yes" class="headerlink" title="问题1  当我点击儿子的时候，我是否点击了 爸爸和爷爷 ==》yes"></a>问题1  当我点击儿子的时候，我是否点击了 爸爸和爷爷 ==》yes</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;grand1&quot;&gt;</span><br><span class="line">    爷爷</span><br><span class="line">    &lt;div id=&quot;parent1&quot;&gt;</span><br><span class="line">        爸爸</span><br><span class="line">        &lt;div id=&quot;child1&quot;&gt;</span><br><span class="line">            儿子</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="问题2-当我点击儿子的时候，三个函数是否调用-gt-yes"><a href="#问题2-当我点击儿子的时候，三个函数是否调用-gt-yes" class="headerlink" title="问题2 当我点击儿子的时候，三个函数是否调用 ==&gt; yes"></a>问题2 当我点击儿子的时候，三个函数是否调用 ==&gt; yes</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">grand1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;爷爷&apos;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">parent1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;爸爸&apos;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子&apos;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="问题3-三个函数的执行顺序-gt-1-2-3-or-3-2-1-答案是都可以"><a href="#问题3-三个函数的执行顺序-gt-1-2-3-or-3-2-1-答案是都可以" class="headerlink" title="问题3 三个函数的执行顺序 ==&gt; 1 2 3 or 3 2 1 答案是都可以"></a>问题3 三个函数的执行顺序 ==&gt; 1 2 3 or 3 2 1 答案是都可以</h4><blockquote>
+<p>addEventListener(‘事件’,函数,可选参数) </p>
+</blockquote>
+<blockquote>
+<p>第三个参数是 boolean值  不传代表false : 0 NaN undefined null false ‘’</p>
+</blockquote>
+<blockquote>
+<p>false的话 顺序从内到外 儿子  爸爸  爷爷</p>
+</blockquote>
+<blockquote>
+<p>true 的话 顺序从外到内 爷爷  爸爸  儿子</p>
+</blockquote>
+<blockquote>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note032_0.png" alt="推荐"></p>
+</blockquote>
+<blockquote>
+<p>爷爷设置true 其他设置false </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">grand1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;爷爷&apos;)</span><br><span class="line">&#125;,true)</span><br><span class="line"></span><br><span class="line">parent1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;爸爸&apos;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子&apos;)</span><br><span class="line">&#125;)</span><br><span class="line">// 爷爷  儿子  爸爸</span><br></pre></td></tr></table></figure>
+<h4 id="考点-如果-儿子节点既有捕获又有冒泡执行顺序是什么"><a href="#考点-如果-儿子节点既有捕获又有冒泡执行顺序是什么" class="headerlink" title="考点 如果  儿子节点既有捕获又有冒泡执行顺序是什么"></a>考点 如果  儿子节点既有捕获又有冒泡执行顺序是什么</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子捕获&apos;)</span><br><span class="line">&#125;,true)</span><br><span class="line"></span><br><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子冒泡&apos;)</span><br><span class="line">&#125;,false)</span><br><span class="line"></span><br><span class="line">// 儿子捕获</span><br><span class="line">// 儿子冒泡</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子冒泡&apos;)</span><br><span class="line">&#125;,false)</span><br><span class="line"></span><br><span class="line">child1.addEventListener(&apos;click&apos;,function()&#123;</span><br><span class="line">  console.log(&apos;儿子捕获&apos;)</span><br><span class="line">&#125;,true)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 儿子冒泡</span><br><span class="line">// 儿子捕获</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>答案是 谁写在前面谁先触发</p>
+</blockquote>
+<p>如果触发在元素本身上是不区分捕获和冒泡的</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/01/N030_DOM事件初识/" data-id="cklhgn2c6006ykyfyzg0ndn2v" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-N029_02前端该遵守的原则" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/30/N029_02前端该遵守的原则/" class="article-date">
+  <time datetime="2017-11-30T02:27:42.000Z" itemprop="datePublished">2017-11-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/30/N029_02前端该遵守的原则/">前端的自我修养</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="HTML-CSS-JS-内容、样式和行为分离原则"><a href="#HTML-CSS-JS-内容、样式和行为分离原则" class="headerlink" title="HTML/CSS/JS 内容、样式和行为分离原则"></a>HTML/CSS/JS 内容、样式和行为分离原则</h3><p>如果你去面试可能会被问道如下问题</p>
+<blockquote>
+<h4 id="请你说一下你对前端内容样式行为分离的原则"><a href="#请你说一下你对前端内容样式行为分离的原则" class="headerlink" title="请你说一下你对前端内容样式行为分离的原则?"></a>请你说一下你对前端内容样式行为分离的原则?</h4></blockquote>
+<blockquote>
+<p>如果你初出茅庐可能会这样回答 html负责内容css负责样式js负责行为</p>
+</blockquote>
+<p>但是这是大家都认可的真理，我为什么要解释原因呢！</p>
+<blockquote>
+<h4 id="正确做法！！！-你该这样用初中几何常用套路「反证法」"><a href="#正确做法！！！-你该这样用初中几何常用套路「反证法」" class="headerlink" title="正确做法！！！ 你该这样用初中几何常用套路「反证法」"></a>正确做法！！！ 你该这样用初中几何常用套路「反证法」</h4></blockquote>
+<p>请看解题思路(如果你是程序员这就是「伪代码」)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">问：人类为什么吃饭</span><br><span class="line">答: 如果不吃饭人类就会死，所以人类需要吃饭</span><br></pre></td></tr></table></figure>
+<p>你该这样回答</p>
+<ol>
+<li>如果html负责样式</li>
+</ol>
+<ul>
+<li>会让html变得很复杂</li>
+<li>很难区分这些标签的逻辑结构</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;body bgcolor=red&gt;</span><br><span class="line">    &lt;center&gt;</span><br><span class="line">        &lt;font color=red&gt;你好&lt;/font&gt;</span><br><span class="line">    &lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>用css表示内容</li>
+</ol>
+<ul>
+<li>人类选不中</li>
+<li>JS取不到  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">    div::after&#123;content:&apos;你好你好你好&apos;&#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div id=&quot;xxx&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">        console.log(xxx.innerText) // 啥都没</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>用JS控制样式</li>
+</ol>
+<blockquote>
+<p>你该避免使用jQuery的 show/hide方法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div id=&quot;xxx&quot;&gt;&lt;/div&gt;</span><br><span class="line">     &lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">    &lt;script&gt;</span><br><span class="line">       </span><br><span class="line">       $(&quot;#xxx&quot;).hide() // display:none; 隐藏没有任何问题</span><br><span class="line"></span><br><span class="line">       $(&quot;#xxx&quot;).show() // 但是 show就有问题了</span><br><span class="line">       /*</span><br><span class="line">       display:inline-block;</span><br><span class="line">       display:flex;</span><br><span class="line">       display:inline;</span><br><span class="line">       */</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>show()之后你很难定位 div隐藏之前是什么 可能是flex也可能是 block</p>
+</blockquote>
+<p>因为jQuery为了让你使用它的库，就特殊处理了</p>
+<ul>
+<li>在你hide的时候把display这个值存起来</li>
+<li>当你show的时候把display这个值赋回去</li>
+</ul>
+<blockquote>
+<h4 id="问题来了，如果div一开始display-none"><a href="#问题来了，如果div一开始display-none" class="headerlink" title="问题来了，如果div一开始display:none"></a>问题来了，如果div一开始display:none</h4></blockquote>
+<p>show() 之后会是什么呢？ 经过测试竟然是block<br>凭啥?凭啥?凭啥?</p>
+<h4 id="JS该这样使用"><a href="#JS该这样使用" class="headerlink" title="JS该这样使用"></a>JS该这样使用</h4><blockquote>
+<p>通过class样式 来表示不同的状态去切换</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&quot;xxx&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">$(&quot;#xxx&quot;).addClass(&apos;active&apos;)</span><br><span class="line">$(&quot;#xxx&quot;).removeClass(&apos;active&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="人在江湖"><a href="#人在江湖" class="headerlink" title="人在江湖"></a>人在江湖</h4><p>有的时候需要你迫不得已的用JS去操作样式，那就只能违反原则，但是你不该总是违反原则</p>
+<blockquote>
+<p>追溯到故事情节：天龙八部有一集阿紫被打伤乔峰各种救，去寻医，但是药店伙计告诉他没救了，此时突然一个地主家伙计来了说他家老爷不行了有没有办法，老掌柜的说快去拿“人参”，而此时纵是大侠气概的乔峰也「迫不得已」抢走了人参</p>
+</blockquote>
+<h3 id="基本的职业素养"><a href="#基本的职业素养" class="headerlink" title="基本的职业素养"></a>基本的职业素养</h3><h4 id="不要让「img」变形"><a href="#不要让「img」变形" class="headerlink" title="不要让「img」变形"></a>不要让「img」变形</h4><ul>
+<li>你可以指定宽高,或者强行要求UI给你指定尺寸的图</li>
+</ul>
+<h4 id="关于「img」的坑"><a href="#关于「img」的坑" class="headerlink" title="关于「img」的坑"></a>关于「img」的坑</h4><p>因为「img」是一个可替换元素,所以当图片下载失败的时候就会显示alt里的内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=&quot;xxx.jpg&quot;  alt=&quot;图片1&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>由于你没有指定宽高，假如是三个并排的img(不出意外是float或者flex-start)</p>
+<p>由于第一张图加载速度慢，后面的img就不得不挤过来，直到图1 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">正常加载</span><br><span class="line">|--------| |--------||--------|</span><br><span class="line">|--------| |--------||--------|</span><br><span class="line">|   图1  | |   图2  ||   图3   |</span><br><span class="line">|--------| |--------||--------|</span><br><span class="line"></span><br><span class="line">图1还没加载过来 没指定宽高导致后面的img补位</span><br><span class="line">|图1||--------||--------|</span><br><span class="line">     |--------||--------|</span><br><span class="line">     |   图2  ||   图3   |</span><br><span class="line">     |--------||--------|</span><br><span class="line">图1回来了</span><br><span class="line">|--------| |--------||--------|</span><br><span class="line">|--------| |--------||--------|</span><br><span class="line">|   图1  | |   图2  ||   图3   |</span><br><span class="line">|--------| |--------||--------|</span><br></pre></td></tr></table></figure>
+<p>就是因为你没有指定宽高所以在图片没回来的时候占据很小的空间，而当图1正常加载后 图2图3就必须给图1退出位置</p>
+<blockquote>
+<p>这样的结果就会导致「重排」</p>
+</blockquote>
+<blockquote>
+<h4 id="重排是很耗性能的，页面性能优化的注意点就是"><a href="#重排是很耗性能的，页面性能优化的注意点就是" class="headerlink" title="重排是很耗性能的，页面性能优化的注意点就是"></a>重排是很耗性能的，页面性能优化的注意点就是</h4></blockquote>
+<p>如果你已知图片的宽高你最好写在上面避免图片未加载的「让位」(腾地)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/30/N029_02前端该遵守的原则/" data-id="cklhgn2c5006vkyfyj0ftem79" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-N029_01_JS避免相互影响之作用域" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/30/N029_01_JS避免相互影响之作用域/" class="article-date">
+  <time datetime="2017-11-30T01:27:42.000Z" itemprop="datePublished">2017-11-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/30/N029_01_JS避免相互影响之作用域/">JS之使用局部变量</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="全局变量的危害"><a href="#全局变量的危害" class="headerlink" title="全局变量的危害"></a>全局变量的危害</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">html里有一个id=&quot;parent&quot;的div</span><br><span class="line">&lt;div id=&quot;xxx&quot;&gt;&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    //这句已经有问题了  你无意之间把window.parent覆盖了</span><br><span class="line">    console.log(parent)  //现在parent已经是那个id=&quot;xxx&quot;的div了</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>所以你应该避免使用全局变量，使用局部变量</p>
+<h4 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h4><blockquote>
+<p>JS里的var声明只有在函数内才有块级作用域</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function x()&#123;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    console.log(parent) //这里的是 id=&quot;xxx&quot;的div</span><br><span class="line">&#125;</span><br><span class="line">x.call();</span><br><span class="line">console.log(parent) //这里的parent是window的属性</span><br></pre></td></tr></table></figure>
+<h4 id="立即调用函数"><a href="#立即调用函数" class="headerlink" title="立即调用函数"></a>立即调用函数</h4><blockquote>
+<p>如上节代码所示，立即调用函数就是声明一个函数然后立刻调用</p>
+</blockquote>
+<p>因为避免使用全局变量所以你不该声明这个「x」的函数，因为这样已经产生了一个全局变量「x」</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function()&#123;</span><br><span class="line">    var parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    console.log(parent) //这里的是 id=&quot;xxx&quot;的div</span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>但是这样会报错，原因是如果你直接声明一个「匿名函数 」并调用，浏览器里会直接报错说语法错误</p>
+</blockquote>
+<p>我们可以使用如下小技巧</p>
+<ol>
+<li><p>直接把匿名函数加调用的整体用 「括号」括起来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line">    function()&#123;</span><br><span class="line">        //相关处理</span><br><span class="line">    &#125;()</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>直接把匿名函数用「括号」括起来，然后再调用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(function()&#123;</span><br><span class="line">        //相关处理    </span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>加减号或者取反(「+」「-」「!」「~」)</p>
+</li>
+</ol>
+<p>这些运算符是告诉浏览器我不是再声明一个函数而是在求值，但是这个值我不关心(爱是多少是多少)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">-function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">!function()&#123;&#125;()</span><br><span class="line"></span><br><span class="line">~function()&#123;&#125;()</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>因为这个局部变量问题的使用太过麻烦,ES6终于狠心给JS升级了</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    let parent = document.getElementById(&apos;xxx&apos;);</span><br><span class="line">    let a = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent) // 全局变量的window的parent属性</span><br><span class="line">console.log(a) //报错  因为 a是局部变量</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>{ } 左大括号右大括号之内的内容代表块级作用域，但是你不能用var</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    var parent = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent)  // 1 又把window.parent给覆盖了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>因为var会变量提升，所以实际的代码是这个效果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var parent; //变量提升</span><br><span class="line">&#123;</span><br><span class="line">    parent = 1;</span><br><span class="line">&#125;</span><br><span class="line">console.log(parent)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所以在ES6出来之前也就是2015年以前如果你想用局部变量就要这样</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~function()&#123;&#125;()</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/30/N029_01_JS避免相互影响之作用域/" data-id="cklhgn2c4006tkyfygaqj8u8j" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-N028_自己实现一个jQuery" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/29/N028_自己实现一个jQuery/" class="article-date">
+  <time datetime="2017-11-29T07:27:42.000Z" itemprop="datePublished">2017-11-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/29/N028_自己实现一个jQuery/">自己实现一个jQuery</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="What-is-jQuery"><a href="#What-is-jQuery" class="headerlink" title="What is jQuery?"></a>What is jQuery?</h1><blockquote>
+<p>核心就是一句话 The Write Less,Do More（写更少，做更多）  ， ok ， let’s go！</p>
+</blockquote>
+<ul>
+<li>addClass( )功能  （最渣版）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;ul&gt;</span><br><span class="line">    &lt;li id=&quot;item1&quot;&gt;选项1&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item2&quot;&gt;选项2&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item3&quot;&gt;选项3&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item4&quot;&gt;选项4&lt;/li&gt;</span><br><span class="line">    &lt;li id=&quot;item5&quot;&gt;选项5&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如何给id=”item3” 添加样式</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function addClass(node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        node.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// item3 通过id名可以直接获取元素</span><br><span class="line">addClass(item3,[&apos;red&apos;]); </span><br><span class="line">// 你也可以这样</span><br><span class="line">addClass(document.getElementById(&apos;item4&apos;),[&apos;red&apos;])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：通过id获取元素不是100%没问题的，你要是非 id=”parent”  这样就不好使,你可以打印看看parent是啥</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>这样只是初步封装了方法,但是方法是还在全局作用域,你叫addClass 到时候别人也叫addClass 你可能就被覆盖了  我们是有版权的   来来来 来个帅气签名！</p>
+</blockquote>
+<h3 id="addClass-签名版"><a href="#addClass-签名版" class="headerlink" title="addClass( ) (签名版)"></a>addClass( ) (签名版)</h3><blockquote>
+<p>命名空间：给全局对象挂载一个对象 window.myDom = { }<br>然后在你挂载的myDom 对象上挂载你的属性 、方法</p>
+</blockquote>
+<blockquote>
+<p>这比之前好在哪里？</p>
+</blockquote>
+<blockquote>
+<p>好在有“从属”关系而不是“零散“的变量<br>（至少在阿里没落前）我是阿里的前端  相比 我是一个前端 那个更有份量呢？ </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">window.myDom = &#123;&#125;;</span><br><span class="line">myDom.addClass = function (node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        node.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">myDom.addClass(item3,[&apos;red&apos;]);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你肯定会不爽因为还不如之前用着爽了  每次还得加命名前缀<br>  myDom.fn(param)<br>  myDom.fn2(param)<br>  直接 item3.addClass([‘red’]) 才爽 有需求就会有改进</li>
+</ul>
+<h3 id="反正都是Node的api-我直接改原型不就好了-于是乎！你又挖了个坑"><a href="#反正都是Node的api-我直接改原型不就好了-于是乎！你又挖了个坑" class="headerlink" title="反正都是Node的api 我直接改原型不就好了 于是乎！你又挖了个坑"></a>反正都是Node的api 我直接改原型不就好了 于是乎！你又挖了个坑</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Node.prototype.addClass =  function (node,classArr)&#123;</span><br><span class="line">    var len = classArr.length;</span><br><span class="line">    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">        this.classList.add(classArr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> item3.addClass([&apos;red&apos;]);  //你遂了心意了</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这样的后果是别人也这样改原型，而且也添加个addClass<br>是不是心好累！  为啥？此乃优良传统<br>山寨一下 改改加点“我想出”的功能 我就敢说我的比你好！ （王者荣耀 与 dota ）<br>why?你用上了爱迪生的电灯泡 我就问你，你是自己发明一个还是在借鉴他？<br>看得远是因为我站在巨人的肩膀上！</li>
+</ul>
+<h3 id="我们是讲版权的我的就是我的"><a href="#我们是讲版权的我的就是我的" class="headerlink" title="我们是讲版权的我的就是我的"></a>我们是讲版权的我的就是我的</h3><h4 id="我自创一个Node2行不行-以后可能还有Node3"><a href="#我自创一个Node2行不行-以后可能还有Node3" class="headerlink" title="我自创一个Node2行不行 以后可能还有Node3"></a>我自创一个Node2行不行 以后可能还有Node3</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">window.Node2 = function(node)&#123;</span><br><span class="line">            return &#123;</span><br><span class="line">                addClass:function(classArr)&#123;</span><br><span class="line">                    var len = classArr.length;</span><br><span class="line">                    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">                        node.classList.add(classArr[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">var node2 = Node2(item4);</span><br><span class="line">node2.addClass([&apos;red&apos;]);  //完美</span><br><span class="line">// Node2(item5).addClass([&apos;red&apos;])   是不是有种似曾相识的感觉</span><br></pre></td></tr></table></figure>
+<h3 id="说好的jQuery呢？-你把Node2替换成jQuery-在试试"><a href="#说好的jQuery呢？-你把Node2替换成jQuery-在试试" class="headerlink" title="说好的jQuery呢？ 你把Node2替换成jQuery  在试试"></a>说好的jQuery呢？ 你把Node2替换成jQuery  在试试</h3><blockquote>
+<p>是不是有点感觉了   这是最简单版  以后会慢慢高大上的</p>
+</blockquote>
+<h3 id="jQuery最强大的莫过于选择器-Selector"><a href="#jQuery最强大的莫过于选择器-Selector" class="headerlink" title="jQuery最强大的莫过于选择器 Selector"></a>jQuery最强大的莫过于选择器 Selector</h3><blockquote>
+<p>你肯定听说过一句话  “选择大于能力” (啊！没听过？  现在听过了！)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">window.jQyery = function(nodeOrSelector)&#123;</span><br><span class="line">            let node ; </span><br><span class="line">            if(typeof nodeOrSelector ===&apos;string&apos;)&#123;</span><br><span class="line">                node = document.querySelector(nodeOrSelector);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                node = nodeOrSelector;</span><br><span class="line">            &#125;</span><br><span class="line">            return &#123;</span><br><span class="line">                addClass:function(classArr)&#123;</span><br><span class="line">                    var len = classArr.length;</span><br><span class="line">                    for(let i = 0 ;i &lt; len ; i++)&#123;</span><br><span class="line">                        node.classList.add(classArr[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">var jqyery = jQyery(item4);</span><br><span class="line">jqyery.addClass([&apos;red&apos;]);</span><br></pre></td></tr></table></figure>
+<h3 id="如果用过的人肯定知道jQuery选择器返回的是个伪数组才对"><a href="#如果用过的人肯定知道jQuery选择器返回的是个伪数组才对" class="headerlink" title="如果用过的人肯定知道jQuery选择器返回的是个伪数组才对"></a>如果用过的人肯定知道jQuery选择器返回的是个伪数组才对</h3><blockquote>
+<p>我们使用querySelectorAll()它返回的是一个节点数组（伪数组）</p>
+</blockquote>
+<blockquote>
+<p>然后给我们内部声明的 nodes 复制获取的每个节点</p>
+</blockquote>
+<blockquote>
+<p>如果是节点数组就挨个拷贝  如果是一个 我也把你搞成伪数组哪怕就一个甚至没有<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">window.jQyery = function(nodeOrSelector)&#123;</span><br><span class="line">            let nodes = &#123;&#125;; </span><br><span class="line">            if(typeof nodeOrSelector ===&apos;string&apos;)&#123;</span><br><span class="line">                let temp = document.querySelectorAll(nodeOrSelector);</span><br><span class="line">                for(let i=0;i&lt;temp.length;i++)&#123;</span><br><span class="line">                    nodes[i] = temp[i];</span><br><span class="line">                &#125;   </span><br><span class="line">                nodes.length = temp.length;</span><br><span class="line">            &#125;else if(nodeOrSelector instanceof Node)&#123;</span><br><span class="line">                nodes = &#123;</span><br><span class="line">                    0:nodeOrSelector,</span><br><span class="line">                    length:1</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            nodes.addClass = function(classes)&#123;</span><br><span class="line">                for(let i=0;i&lt;classes.length;i++)&#123;</span><br><span class="line">                    for(let j=0;j&lt;nodes.length;j++)&#123;</span><br><span class="line">                        nodes[j].classList.add(classes[i]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                return nodes;</span><br><span class="line">            &#125; </span><br><span class="line">            return nodes;</span><br><span class="line">        &#125;</span><br><span class="line">//这样我们就可以用$(选择器)调用了</span><br><span class="line">window.$ = jQyery;</span><br><span class="line">//$(item3).addClass([&apos;red&apos;]);</span><br><span class="line">$(&apos;ul li&apos;).addClass([&apos;red&apos;])</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="你肯定会疑惑-为啥每次都-return-nodes-gt-答案就是链式操作"><a href="#你肯定会疑惑-为啥每次都-return-nodes-gt-答案就是链式操作" class="headerlink" title="你肯定会疑惑 为啥每次都 return nodes ==&gt; 答案就是链式操作"></a>你肯定会疑惑 为啥每次都 return nodes ==&gt; 答案就是链式操作</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(&apos;ul li&apos;).addClass([&apos;red&apos;]).Text(&apos;hi&apos;); //Text 我们还没有实现  ok 马上开始</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在内部继续挂载方法   Text( ) 你传递参数就代表设置text你不传递就代表get</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">nodes.Text = function (text)&#123;</span><br><span class="line">    if(text === undefined)&#123;</span><br><span class="line">        var texts = [];</span><br><span class="line">        for(let i=0;i&lt;nodes.length;i++)&#123;</span><br><span class="line">            texts.push(nodes[i].textContent);</span><br><span class="line">        &#125;</span><br><span class="line">        return texts;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        for(let i=0;i&lt;nodes.length;i++)&#123;</span><br><span class="line">            nodes[i].textContent = text;</span><br><span class="line">        &#125;</span><br><span class="line">        return nodes;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>欢迎批评指正！ </p>
+</blockquote>
+<h3 id="END"><a href="#END" class="headerlink" title="END"></a>END</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/29/N028_自己实现一个jQuery/" data-id="cklhgn2c3006qkyfyxxhbr6s1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-N027_DOM_API" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/11/27/N027_DOM_API/" class="article-date">
@@ -236,7 +720,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/27/N027_DOM_API/" data-id="cklcb6bew0078wo910g2z9u6c" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/11/27/N027_DOM_API/" data-id="cklhgn2c2006okyfyutcku974" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
@@ -310,7 +794,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/25/N026_JS里的Function/" data-id="cklcb6beo006pwo91dssqe1by" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/11/25/N026_JS里的Function/" data-id="cklhgn2c1006lkyfy69j8nnrt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
@@ -412,7 +896,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/23/N025_JS里的Array/" data-id="cklcb6beq006swo910zf84eoc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/11/23/N025_JS里的Array/" data-id="cklhgn2c1006kkyfyzje4qrzw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
@@ -492,7 +976,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/21/N022_JS里的对象/" data-id="cklcb6beu0074wo91g1hgsy7h" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/11/21/N022_JS里的对象/" data-id="cklhgn2c0006hkyfygvx2fk03" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
@@ -595,550 +1079,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/19/N021_JS里的类型/" data-id="cklcb6beo006nwo91z8q4mdm8" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-N020_JS里的数据" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/11/17/N020_JS里的数据/" class="article-date">
-  <time datetime="2017-11-17T06:55:55.000Z" itemprop="datePublished">2017-11-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/17/N020_JS里的数据/">JS里的数据</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="JS如何学习"><a href="#JS如何学习" class="headerlink" title="JS如何学习"></a>JS如何学习</h3><h4 id="JS作者的评价"><a href="#JS作者的评价" class="headerlink" title="JS作者的评价"></a>JS作者的评价</h4><ul>
-<li>原创之处并不优秀</li>
-<li>优秀之处并非原创</li>
-</ul>
-<blockquote>
-<p>从简单到复杂<br><img src="https://sltrust.github.io/note/img/note020_1.png" alt="示意图"><br><img src="https://sltrust.github.io/note/img/note020_2.png" alt="示意图"></p>
-</blockquote>
-<h3 id="ES6一图概括（90-）"><a href="#ES6一图概括（90-）" class="headerlink" title="ES6一图概括（90%）"></a>ES6一图概括（90%）</h3><p><img src="https://github.com/slTrust/note/raw/master/img/note020_3.png" alt="示意图"></p>
-<h3 id="期待纳入规范的方法"><a href="#期待纳入规范的方法" class="headerlink" title="期待纳入规范的方法"></a>期待纳入规范的方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">obj.a.b.c.name</span><br><span class="line">//如果 obj.a 是 undefined</span><br><span class="line">// obj.a.b  &lt;==&gt; undefined.b ==&gt;报错</span><br><span class="line">//更何况 obj.a.b.c呢？</span><br><span class="line">//现在的js是怎样写的</span><br><span class="line">if(obj.a!==undefined&amp;&amp;obj.a.b!==undefined&amp;&amp;obj.a.b.c!==undefined&amp;&amp;obj.a.b.c.name!==undefined)&#123;</span><br><span class="line">  //终于无错的打印了变量</span><br><span class="line"> console.log(obj.a.b.c.name);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//optional chain语法</span><br><span class="line">obj?.a?.b?.c?.name </span><br><span class="line">//如果 obj.a是undefined就不往下走了 之间返回 undefined 写法也简洁很多</span><br></pre></td></tr></table></figure>
-<h3 id="7种数据类型"><a href="#7种数据类型" class="headerlink" title="7种数据类型"></a>7种数据类型</h3><table>
-<thead>
-<tr>
-<th>Number</th>
-<th>boolean</th>
-<th>string</th>
-<th>symbol</th>
-<th>undefined</th>
-<th>null</th>
-<th>object</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><img src="https://github.com/slTrust/note/raw/master/img/note020_4.png" alt="示意图"></p>
-<h3 id="Number"><a href="#Number" class="headerlink" title="Number"></a>Number</h3><p><img src="https://github.com/slTrust/note/raw/master/img/note020_5.png" alt="示意图"></p>
-<h3 id="String"><a href="#String" class="headerlink" title="String"></a>String</h3><p><img src="https://github.com/slTrust/note/raw/master/img/note020_6.png" alt="示意图"></p>
-<blockquote>
-<p>处理字符串折行问题</p>
-<ol>
-<li>“\”转义 但是后面必须是”回车” 但是如果是 空格  你也看不出来 容易出错</li>
-<li>‘1233’ +<br>‘456’</li>
-<li>ES6 反引号” ` “ 换行要顶头写<br><img src="https://github.com/slTrust/note/raw/master/img/note020_7.png" alt="示意图"></li>
-</ol>
-</blockquote>
-<h3 id="boolean-两个值-true-false"><a href="#boolean-两个值-true-false" class="headerlink" title="boolean 两个值 true | false"></a>boolean 两个值 true | false</h3><table>
-<thead>
-<tr>
-<th>布尔</th>
-<th>true</th>
-<th>false</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td>真</td>
-<td>假</td>
-</tr>
-</tbody>
-</table>
-<h4 id="amp-amp-与-或-运算"><a href="#amp-amp-与-或-运算" class="headerlink" title="&amp;&amp; 与  || 或 运算"></a>&amp;&amp; 与  || 或 运算</h4><blockquote>
-<p>a&amp;&amp;b</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>a\b</th>
-<th>真</th>
-<th>假</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>真</td>
-<td>√</td>
-<td>×</td>
-</tr>
-<tr>
-<td>假</td>
-<td>×</td>
-<td>×</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>a||b</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>a\b</th>
-<th>真</th>
-<th>假</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>真</td>
-<td>√</td>
-<td>√</td>
-</tr>
-<tr>
-<td>假</td>
-<td>√</td>
-<td>×</td>
-</tr>
-</tbody>
-</table>
-<h4 id="symbol-略过-…"><a href="#symbol-略过-…" class="headerlink" title="symbol 略过 …"></a>symbol 略过 …</h4><blockquote>
-<p>null  （只有一个值 null）</p>
-</blockquote>
-<blockquote>
-<p>undefined (只有一个值 undefined )</p>
-</blockquote>
-<p>都表示什么也没有 （JS之父的bug）</p>
-<h4 id="null和-undefined的区别"><a href="#null和-undefined的区别" class="headerlink" title="null和 undefined的区别"></a>null和 undefined的区别</h4><blockquote>
-<p>1.一个变量没有赋值 ==&gt; undefined<br>2.我想有一个对象 obj 但是现在还不想给值 所以推荐给他一个 null值 &lt;==&gt;空对象<br>有一个非对象 不想给值  undefined &lt;==&gt; 空非对象<img src="https://github.com/slTrust/note/raw/master/img/note020_8.png" alt="示意图"></p>
-</blockquote>
-<h4 id="什么是object"><a href="#什么是object" class="headerlink" title="什么是object"></a>什么是object</h4><blockquote>
-<p>就是由基本类型组成的复杂类型<br><img src="https://github.com/slTrust/note/raw/master/img/note020_9.png" alt="示意图"></p>
-</blockquote>
-<h4 id="person-name-’hjx’-age-18-self-person-可以吗？"><a href="#person-name-’hjx’-age-18-self-person-可以吗？" class="headerlink" title="person = {name:’hjx’,age:18,self:person}可以吗？"></a>person = {name:’hjx’,age:18,self:person}可以吗？</h4><blockquote>
-<p>对象还没有初始化完成就自己指向自己<br>这样是对的  但是 person.self = undefined<br><img src="https://github.com/slTrust/note/raw/master/img/note020_10.png" alt="示意图"></p>
-</blockquote>
-<h4 id="key的值可以是-‘’空字符吗？"><a href="#key的值可以是-‘’空字符吗？" class="headerlink" title="key的值可以是 ‘’空字符吗？"></a>key的值可以是 ‘’空字符吗？</h4><p><img src="https://github.com/slTrust/note/raw/master/img/note020_11.png" alt="示意图"></p>
-<h4 id="delete-amp-amp-for-in"><a href="#delete-amp-amp-for-in" class="headerlink" title="delete &amp;&amp; for in"></a>delete &amp;&amp; for in</h4><p><img src="https://github.com/slTrust/note/raw/master/img/note020_12.png" alt="示意图"></p>
-<h4 id="typeof-amp-amp-BUG"><a href="#typeof-amp-amp-BUG" class="headerlink" title="typeof &amp;&amp; BUG"></a>typeof &amp;&amp; BUG</h4><p><img src="https://github.com/slTrust/note/raw/master/img/note020_13.png" alt="示意图"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/17/N020_JS里的数据/" data-id="cklcb6ben006kwo91ng8w327r" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-N017代码优化技巧" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/11/01/N017代码优化技巧/" class="article-date">
-  <time datetime="2017-11-01T14:44:20.000Z" itemprop="datePublished">2017-11-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/01/N017代码优化技巧/">代码封装的技巧</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="代码封装的技巧"><a href="#代码封装的技巧" class="headerlink" title="代码封装的技巧"></a>代码封装的技巧</h3><h4 id="拷贝一坨代码起个名字法"><a href="#拷贝一坨代码起个名字法" class="headerlink" title="拷贝一坨代码起个名字法"></a>拷贝一坨代码起个名字法</h4><blockquote>
-<p>如下代码，明显是线性的(面向过程的)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$(function()&#123;</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        url:&apos;xxxx&apos;,</span><br><span class="line">        data:&#123;farmId:&apos;xxxx&apos;&#125;,</span><br><span class="line">        success:function(res)&#123;</span><br><span class="line">            // 假设 res = [1,2,3,4,5]</span><br><span class="line">            //数据处理  如生成列表</span><br><span class="line">            var arr = res;</span><br><span class="line">            var oUl = document.createElement(&apos;ul&apos;);</span><br><span class="line">            for(var i=0;i&lt;arr.length;i++)&#123;</span><br><span class="line">                var oLi =document.createElement(&apos;li&apos;);</span><br><span class="line">                oLi.textContent = arr[i];</span><br><span class="line">                //监听点击事件</span><br><span class="line">                oLi.onclick = function()&#123;</span><br><span class="line">                    alert(this.textContent)</span><br><span class="line">                &#125;</span><br><span class="line">                oUl.appendChild(oLi)</span><br><span class="line">            &#125;</span><br><span class="line">            document.body.appendChild(oUl)</span><br><span class="line"></span><br><span class="line">        &#125;,</span><br><span class="line">        error:function()&#123;</span><br><span class="line">            alert(&apos;error&apos;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>优化后如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">//1.请求数据</span><br><span class="line"> getData(fnSucc,fnFail);</span><br><span class="line">//2.事件监听(委托)</span><br><span class="line">libindEvent();</span><br><span class="line"></span><br><span class="line">//获取请求数据</span><br><span class="line">function getData(fnSucc,fnFail)&#123;</span><br><span class="line">  $.ajax(&#123;</span><br><span class="line">    url:&apos;xxx&apos;,</span><br><span class="line">    success:fnSucc,</span><br><span class="line">    error:fnFail</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function fnSucc(res)&#123;</span><br><span class="line">    //假设 res = [1,2,3,4,5]</span><br><span class="line">    var oUl = createTag(&apos;ul&apos;);</span><br><span class="line">    for(var i=0;i&lt;res.length;i++)&#123;</span><br><span class="line">        var oLi = createLiAndSetText(res[i]);</span><br><span class="line">        oUl.appendChild(oLi);</span><br><span class="line">    &#125;</span><br><span class="line">    document.body.appendChild(oUl)</span><br><span class="line">&#125;</span><br><span class="line">function fnFail(err)&#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//创建标签</span><br><span class="line">function createTag(tagName)&#123;</span><br><span class="line">    var tag = document.createElement(tagName);</span><br><span class="line">    return tag;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//创建li并设置 文本</span><br><span class="line">function createLiAndSetText(text)&#123;</span><br><span class="line">    var oLi = createTag(&apos;li&apos;);</span><br><span class="line">    oLi.textContent = text;</span><br><span class="line">    return oLi;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//li点击事件监听</span><br><span class="line">function libindEvent()&#123;</span><br><span class="line">    document.onclick = function(e)&#123;</span><br><span class="line">        var target = e.target;</span><br><span class="line">        if(target.tagName===&apos;LI&apos;)&#123;</span><br><span class="line">            alert(target.tagName)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>改良后的代码为树状的(分层的)</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note017_01.png" alt></p>
-<ol>
-<li>当出现错误的时候我们只需要看请求是否正确</li>
-<li>当没有出现li的时候,我们先去看数据是否回来,再去看创建li是否成功，不需要关心li的事件监听</li>
-<li>当li点击事件出现问题时,我们只需要查看事件监听的代码</li>
-</ol>
-<p>代码从线型的转换为树形结构，即使出现了bug只需要查看对应节点的代码</p>
-<blockquote>
-<h5 id="仔细回想二分排序算法-它每次都会帮我们筛掉一半的数据-以上代码就是很好的实现"><a href="#仔细回想二分排序算法-它每次都会帮我们筛掉一半的数据-以上代码就是很好的实现" class="headerlink" title="仔细回想二分排序算法,它每次都会帮我们筛掉一半的数据,以上代码就是很好的实现"></a>仔细回想二分排序算法,它每次都会帮我们筛掉一半的数据,以上代码就是很好的实现</h5></blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/11/01/N017代码优化技巧/" data-id="cklcb6bel006iwo91nqjmxs0p" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-N012_02_CSS常见布局和居中" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/10/24/N012_02_CSS常见布局和居中/" class="article-date">
-  <time datetime="2017-10-24T04:11:20.000Z" itemprop="datePublished">2017-10-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/10/24/N012_02_CSS常见布局和居中/">CSS常见布局及各种居中</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="左右布局"><a href="#左右布局" class="headerlink" title="左右布局"></a>左右布局</h3><blockquote>
-<p>左侧固定，右侧自适应</p>
-</blockquote>
-<p><a href="http://js.jirengu.com/yifunusogi/1/edit" target="_blank" rel="noopener">预览链接</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">/* css*/</span><br><span class="line">.left &#123;</span><br><span class="line">    float: left;</span><br><span class="line">    width: 300px;</span><br><span class="line">    height: 300px;</span><br><span class="line">    background-color: gray;</span><br><span class="line">    margin-right: -100%;</span><br><span class="line">&#125;</span><br><span class="line">.right &#123;</span><br><span class="line">    float: left;</span><br><span class="line">    width: 100%;</span><br><span class="line">&#125;</span><br><span class="line">.right-content &#123;</span><br><span class="line">    height: 300px;</span><br><span class="line">    margin-left: 310px;</span><br><span class="line">    background-color: black;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*html*/</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div class=&quot;left&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;right&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;right-content&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="左中右布局"><a href="#左中右布局" class="headerlink" title="左中右布局"></a>左中右布局</h3><blockquote>
-<p>左右固定，中间自适应</p>
-</blockquote>
-<p><a href="http://js.jirengu.com/wijucoqivu/1/edit?html,output" target="_blank" rel="noopener">预览链接</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">/*css*/</span><br><span class="line"></span><br><span class="line">#container&#123;  </span><br><span class="line">    position:relative;  </span><br><span class="line">    margin:20px;  </span><br><span class="line">    height:400px;  </span><br><span class="line">&#125;  </span><br><span class="line">#left_side&#123;  </span><br><span class="line">    position:absolute;  </span><br><span class="line">    top:0px;  </span><br><span class="line">    left:0px;  </span><br><span class="line">    border:solid 1px #0000FF;  </span><br><span class="line">    width:170px;  </span><br><span class="line">    height:100%;  </span><br><span class="line">&#125;  </span><br><span class="line">#content&#123;  </span><br><span class="line">    margin:0px 190px 0px 190px;  </span><br><span class="line">    border:solid 1px #0000FF;  </span><br><span class="line">    height:100%;  </span><br><span class="line">&#125;  </span><br><span class="line">#right_side&#123;  </span><br><span class="line">    position:absolute;  </span><br><span class="line">    top:0px;  </span><br><span class="line">    right:0px;  </span><br><span class="line">    border:solid 1px #0000FF;  </span><br><span class="line">    width:170px;  </span><br><span class="line">    height:100%;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*html*/</span><br><span class="line">&lt;div id=&quot;container&quot;&gt;  </span><br><span class="line">    &lt;div id=&quot;left_side&quot;&gt;left_side&lt;/div&gt;  </span><br><span class="line">    &lt;div id=&quot;content&quot;&gt;content&lt;/div&gt;  </span><br><span class="line">    &lt;div id=&quot;right_side&quot;&gt;right-side&lt;/div&gt;  </span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="水平居中"><a href="#水平居中" class="headerlink" title="水平居中"></a>水平居中</h3><ul>
-<li>块级元素</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">margin:0 auto;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>行内元素</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text-align:center</span><br></pre></td></tr></table></figure>
-<h3 id="垂直居中"><a href="#垂直居中" class="headerlink" title="垂直居中"></a>垂直居中</h3><ul>
-<li>行内元素</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.box &#123;</span><br><span class="line">  padding-top: 30px;</span><br><span class="line">  padding-bottom: 30px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="等其他小技巧"><a href="#等其他小技巧" class="headerlink" title="等其他小技巧"></a>等其他小技巧</h3><blockquote>
-<p>各种居中请搜索google 关键字 css center tricks</p>
-</blockquote>
-<p>你会得到这个链接 <a href="https://css-tricks.com/centering-css-complete-guide/" target="_blank" rel="noopener">各种居中的解决方案</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/10/24/N012_02_CSS常见布局和居中/" data-id="cklcb6bei006fwo91srq7h6wf" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-N012_01_CSS伪元素和技巧" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/10/23/N012_01_CSS伪元素和技巧/" class="article-date">
-  <time datetime="2017-10-23T14:44:20.000Z" itemprop="datePublished">2017-10-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/10/23/N012_01_CSS伪元素和技巧/">CSS伪元素和技巧</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="什么是伪元素"><a href="#什么是伪元素" class="headerlink" title="什么是伪元素"></a>什么是伪元素</h3><p>如果有一个div</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;hi&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">div::before&#123;content:&apos;「&apos;&#125;</span><br><span class="line">dis::after&#123;content:&apos;」&apos;&#125;</span><br></pre></td></tr></table></figure>
-<p>添加如下css,你会发现生成为 「hi」，这就是伪元素，你也可以改变伪元素的display为block那样它就变成了一个块元素</p>
-<h3 id="用CSS实现各种图形"><a href="#用CSS实现各种图形" class="headerlink" title="用CSS实现各种图形"></a>用CSS实现各种图形</h3><blockquote>
-<p>如果你会用google就搜索「css tricks shape」</p>
-</blockquote>
-<p><a href="https://css-tricks.com/examples/ShapesOfCSS/" target="_blank" rel="noopener">css tricks shape</a></p>
-<h3 id="如何实现颜色渐变"><a href="#如何实现颜色渐变" class="headerlink" title="如何实现颜色渐变"></a>如何实现颜色渐变</h3><blockquote>
-<p>如果你会用google就搜索「css3 linear gradient generator」</p>
-</blockquote>
-<p><a href="http://www.colorzilla.com/gradient-editor/" target="_blank" rel="noopener">css线性渐变生成器</a></p>
-<h3 id="生成动画"><a href="#生成动画" class="headerlink" title="生成动画"></a>生成动画</h3><blockquote>
-<p>如果你会用google就搜索「css3 animation generator」</p>
-</blockquote>
-<blockquote>
-<p>可能你没搜到那就搜索「anmiation mdn」肯定有代码给你抄</p>
-</blockquote>
-<h3 id="生成阴影"><a href="#生成阴影" class="headerlink" title="生成阴影"></a>生成阴影</h3><blockquote>
-<p>如果你会用google就搜索「css shadow generator」</p>
-</blockquote>
-<p><a href="https://www.cssmatic.com/box-shadow" target="_blank" rel="noopener">css阴影生成器</a></p>
-<h3 id="画出太极"><a href="#画出太极" class="headerlink" title="画出太极"></a>画出太极</h3><p>如果你第一次画肯定是这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#taiji&#123;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    height: 200px;</span><br><span class="line">    width: 200px;</span><br><span class="line">    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(0,0,0,1) 50%,rgba(0,0,0,1) 100%); </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#taiji .lbox,#taiji .rbox&#123;</span><br><span class="line">    float:left;</span><br><span class="line">    width:100px;</span><br><span class="line">    height: 100px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #fff;</span><br><span class="line">    margin-top:50px;</span><br><span class="line">&#125; </span><br><span class="line">#taiji .rbox&#123;</span><br><span class="line">    float:left;</span><br><span class="line">    background: black;</span><br><span class="line">&#125;</span><br><span class="line">#taiji .lson,#taiji .rson&#123;</span><br><span class="line">    height: 30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    background: #000;</span><br><span class="line">    margin:35px auto;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">&#125;</span><br><span class="line">#taiji .rson&#123;</span><br><span class="line">    background:#fff;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;taiji&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;lbox&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;lson&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;rbox&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;rson&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<p>如果你喜欢深挖css</p>
-<p>预览我做的 <a href="https://sltrust.github.io/learnCss/taiji3.html" target="_blank" rel="noopener">https://sltrust.github.io/learnCss/taiji3.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#taiji&#123;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    height: 200px;</span><br><span class="line">    width: 200px;</span><br><span class="line">    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 50%,rgba(0,0,0,1) 50%,rgba(0,0,0,1) 100%); </span><br><span class="line">    position: relative;</span><br><span class="line">    animation-duration:3s;</span><br><span class="line">    animation-name:circlearount;</span><br><span class="line">    animation-iteration-count: infinite;</span><br><span class="line">    animation-timing-function: linear;</span><br><span class="line">&#125;</span><br><span class="line">@keyframes circlearount&#123;</span><br><span class="line">    from&#123;</span><br><span class="line">        transform: rotate(0deg);</span><br><span class="line">    &#125;</span><br><span class="line">    to&#123;</span><br><span class="line">        transform: rotate(360deg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">div#taiji::before&#123;</span><br><span class="line">    content:&apos;&apos;;</span><br><span class="line">    position: absolute;</span><br><span class="line">    height:  30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #fff;</span><br><span class="line">    border:35px solid #000;</span><br><span class="line">    top:50px;</span><br><span class="line">    left:0;</span><br><span class="line">&#125;</span><br><span class="line">div#taiji::after&#123;</span><br><span class="line">    content:&apos;&apos;;</span><br><span class="line">    position: absolute;</span><br><span class="line">    height: 30px;</span><br><span class="line">    width: 30px;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    background: #000;</span><br><span class="line">    border:35px solid #fff;</span><br><span class="line">    top:50px;</span><br><span class="line">    right:0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;taiji&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/10/23/N012_01_CSS伪元素和技巧/" data-id="cklcb6beg006dwo919hrhne3u" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-N011CSS布局与定位" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/10/22/N011CSS布局与定位/" class="article-date">
-  <time datetime="2017-10-22T14:44:20.000Z" itemprop="datePublished">2017-10-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/10/22/N011CSS布局与定位/">CSS布局与定位</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="CSS布局与定位"><a href="#CSS布局与定位" class="headerlink" title="CSS布局与定位"></a>CSS布局与定位</h2><p>题外话如果你想要一个高清的背景图你可以去 <a href="https://alpha.wallhaven.cc/" target="_blank" rel="noopener">wallhaven</a></p>
-<h4 id="div的高度由谁决定-核心知识点"><a href="#div的高度由谁决定-核心知识点" class="headerlink" title="div的高度由谁决定(核心知识点)"></a>div的高度由谁决定(核心知识点)</h4><blockquote>
-<p>div的高度由其内部文档流元素的高度总和决定</p>
-</blockquote>
-<h4 id="文档流是什么-核心知识点"><a href="#文档流是什么-核心知识点" class="headerlink" title="文档流是什么(核心知识点)"></a>文档流是什么(核心知识点)</h4><blockquote>
-<p>文档内元素的流动方向</p>
-</blockquote>
-<ol>
-<li>如果你是一个内联元素,就是从左往右流动,如果宽度不够(流动遇到阻碍,它就换行继续从左往右)</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">...</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br><span class="line">&lt;span&gt;文字&lt;/span&gt;</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>如果你是一个块级元素,就是从上往下,每个块级元素另起一行</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">...</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br><span class="line">&lt;div&gt;文字&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<p>如图</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_01.png" alt></p>
-<h4 id="热干面的笑话"><a href="#热干面的笑话" class="headerlink" title="热干面的笑话"></a>热干面的笑话</h4><p>外语认为单词的不可分割性导致 老外学中文 “热干面” 他会连续的把字向英语单词一样读出来</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_02.png" alt></p>
-<p>答案是因为文化差异「haaaaaaaaaaaaaaaaa」 会被当作一个单词而不像汉字一样可以分开</p>
-<blockquote>
-<p>你想分开它怎么办</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">span&#123;word-break:break-all&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="inline-block"><a href="#inline-block" class="headerlink" title="inline-block"></a>inline-block</h4><p>想要块级元素 变成一行 </p>
-<blockquote>
-<p>本来可以float实现,但是很多人不会于是css3推出 inline-block</p>
-</blockquote>
-<p>但是这是个触发很多问题的属性,会导致很多恶心的问题(建议float)</p>
-<h4 id="内联元素的高度由什么决定-很难很难的知识点"><a href="#内联元素的高度由什么决定-很难很难的知识点" class="headerlink" title="内联元素的高度由什么决定(很难很难的知识点)"></a>内联元素的高度由什么决定(很难很难的知识点)</h4><p>这要从与前端不相关的问题说起</p>
-<blockquote>
-<p>回忆起你上小学学汉语拼音的时候「四线谱」</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_03.png" alt></p>
-<blockquote>
-<p>你写汉字会中线对齐吗？ 明显不会<br>你写第二行的时候你会紧贴着第一行吗？明显也不会(多少都会留一些空隙表示分割)</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_04.png" alt></p>
-<blockquote>
-<p>即使在我们知道了字有「建议行高」的存在，但是内联元素的高度仍然是不确定的</p>
-</blockquote>
-<ul>
-<li>因为不同字体设计的建议行高不同 </li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_05.png" alt></p>
-<blockquote>
-<h4 id="结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定"><a href="#结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定" class="headerlink" title="结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定"></a>结论就是：多个span在一起的时候，它的高度由字体建议行高最高的那个span决定</h4></blockquote>
-<h4 id="我们怎么避免内联元素这些奇怪的问题"><a href="#我们怎么避免内联元素这些奇怪的问题" class="headerlink" title="我们怎么避免内联元素这些奇怪的问题"></a>我们怎么避免内联元素这些奇怪的问题</h4><p>假设需求是 span 16px 高度40px</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">    span&#123;font-size:16px;&#125;</span><br><span class="line">    div&#123;</span><br><span class="line">        line-height:24px;</span><br><span class="line">        padding:6px 0;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line"></span><br><span class="line">&lt;div&gt;</span><br><span class="line">    &lt;span&gt;你好&lt;/span&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>在font-size比较小的时候，可以用line-height控制</li>
-<li>建议设置的行高稍大于字体的大小</li>
-</ul>
-<h4 id="迫不得已的-height-最容易出bug的属性"><a href="#迫不得已的-height-最容易出bug的属性" class="headerlink" title="迫不得已的 height (最容易出bug的属性)"></a>迫不得已的 height (最容易出bug的属性)</h4><blockquote>
-<p>初学前端的你是不是经常看到设计图之后立刻一个 height:300px;</p>
-</blockquote>
-<ul>
-<li>一定不要写height,我们刚已经说了div的高度由其内部文档流元素的高度总和决定</li>
-<li><p>你上来一个 height:300px; 万一div里面文档流高度301你怎么办？</p>
-</li>
-<li><p>不到情非得已千万不要写高度</p>
-</li>
-</ul>
-<h4 id="脱离文档流"><a href="#脱离文档流" class="headerlink" title="脱离文档流"></a>脱离文档流</h4><blockquote>
-<p>请问 .main的高度是多少？ 300px</p>
-</blockquote>
-<ol>
-<li>div1 脱离了文档流</li>
-<li>.main的高度由其内部文档流元素的高度总和决定</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如果一个元素它是fixed定位，它的宽度就不会向外扩展</p>
-</blockquote>
-<ul>
-<li>如果你fixed的元素原来是宽度占满的，通常要设置 width:100%;</li>
-</ul>
-<h4 id="width-100-bug的根源"><a href="#width-100-bug的根源" class="headerlink" title="width:100%(bug的根源)"></a>width:100%(bug的根源)</h4><ul>
-<li>如果你没什么事，千万不要加width:100%;</li>
-</ul>
-<blockquote>
-<p>如果你fixed定位的元素有padding:20px; 再加上width:100%;那么它就比它爸爸的宽度还要大</p>
-</blockquote>
-<p>div1的宽度已经比 main大了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;padding:20px;width:100%&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>套路</p>
-</blockquote>
-<ul>
-<li>移除fixed元素的padding</li>
-<li>在fixed元素内部在包含一个div,让这个div有padding</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;main&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;div1&quot; style=&quot;position:fixed;height:40px;width:100%&quot;&gt;</span><br><span class="line">        &lt;div style=&quot;padding:20px;&quot;&gt;222&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;div2&quot; style=&quot;height:300px&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="背景图自适应"><a href="#背景图自适应" class="headerlink" title="背景图自适应"></a>背景图自适应</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    background-img:url(./img/aa.png);</span><br><span class="line">    background-position:center center;</span><br><span class="line">    background-size:cover;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="宽度自适应"><a href="#宽度自适应" class="headerlink" title="宽度自适应"></a>宽度自适应</h4><ul>
-<li>不要写 width:1000px 这样你怎么拖拽网页它都是1000px</li>
-</ul>
-<blockquote>
-<p>max-width:940px; 网页宽度小于940的时候它也跟着缩小</p>
-</blockquote>
-<h4 id="div水平居中的套路"><a href="#div水平居中的套路" class="headerlink" title="div水平居中的套路"></a>div水平居中的套路</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    margin-left:auto;</span><br><span class="line">    margin-right:auto;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="不接受宽高设置的-span"><a href="#不接受宽高设置的-span" class="headerlink" title="不接受宽高设置的 span"></a>不接受宽高设置的 span</h4><ul>
-<li>因为span是内联元素(display:inline)设置宽高是无效的</li>
-<li>通常你要设置 display:inline-block</li>
-</ul>
-<blockquote>
-<p>需求一个span 内容是 hello 宽70 高30你会怎么办</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/*新手*/</span><br><span class="line">span&#123;</span><br><span class="line">    display:inline-block;</span><br><span class="line">    height:30px;</span><br><span class="line">    width:70px;</span><br><span class="line">    line-height:30px;</span><br><span class="line">    text-align:center;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*老司机   </span><br><span class="line">1.先看不设置样式时hello会占据多少的宽高</span><br><span class="line">2.经发现宽38px高22px</span><br><span class="line">3.设置line-height:22px因为不同机器上字体表现的高度有所差异</span><br><span class="line">*/</span><br><span class="line">span&#123;</span><br><span class="line">    display:inline-block;</span><br><span class="line">    padding:4px 16px;</span><br><span class="line">    line-height:22px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="css画三角形"><a href="#css画三角形" class="headerlink" title="css画三角形"></a>css画三角形</h4><ul>
-<li>border属性的使用</li>
-</ul>
-<ol>
-<li><p>先画个带边框的盒子</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:50px;</span><br><span class="line">    width:50px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>给四个边框四个颜色</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:50px;</span><br><span class="line">    width:50px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>把div高度和宽度设置为0，四个三角出现了</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将上边框宽度设置为0</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid red;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-top-color:black;</span><br><span class="line">    border-right-color:red;</span><br><span class="line">    border-bottom-color:green;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">    border-top-width:0px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>将其他方向的border颜色设置为透明</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">div&#123;</span><br><span class="line">    border:10px solid transparent;</span><br><span class="line">    height:0px;</span><br><span class="line">    width:0px;</span><br><span class="line">    border-left-color:blue;</span><br><span class="line">    border-top-width:0px;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="iconfont-字体图标的使用"><a href="#iconfont-字体图标的使用" class="headerlink" title="iconfont 字体图标的使用"></a>iconfont 字体图标的使用</h4><p><a href="http://www.iconfont.cn/" target="_blank" rel="noopener">iconfont</a></p>
-<ol>
-<li>建议你先登录一下，有好几种那种都可以</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_06.png" alt></p>
-<ol start="2">
-<li>搜搜你需要的图标然后添加购物车</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_07.png" alt></p>
-<ol start="3">
-<li>点击购物车,添加新项目.如xxx</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_08.png" alt></p>
-<ol start="4">
-<li>添加项目成功后,你可以看到如下内容</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_09.png" alt></p>
-<ol start="5">
-<li>点击查看在线链接然后生成文件,然后引入到项目中,然后点击使用帮助对着文档抄</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_10.png" alt></p>
-<ol start="6">
-<li>以下是步骤</li>
-</ol>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/note011_11.png" alt></p>
-<blockquote>
-<p>以上步骤后你就可以使用 svg了</p>
-</blockquote>
-<ul>
-<li>如何控制svg的大小 height/width</li>
-<li>如何控制svg的背景色 fill</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">svg&#123;</span><br><span class="line">    height:30px;</span><br><span class="line">    width:30px;</span><br><span class="line">    fill:#0089e1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/10/22/N011CSS布局与定位/" data-id="cklcb6bee0068wo91uusrxsgu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/11/19/N021_JS里的类型/" data-id="cklhgn2bz006gkyfylu0zgw8l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
@@ -1154,7 +1095,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/50/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/49/">49</a><a class="page-number" href="/page/50/">50</a><span class="page-number current">51</span><a class="page-number" href="/page/52/">52</a><a class="page-number" href="/page/53/">53</a><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/52/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/50/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/49/">49</a><a class="page-number" href="/page/50/">50</a><span class="page-number current">51</span><a class="page-number" href="/page/52/">52</a><a class="page-number" href="/page/53/">53</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/52/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1178,7 +1119,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1200,23 +1141,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

@@ -62,6 +62,315 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Python011模块" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/18/Python011模块/" class="article-date">
+  <time datetime="2018-06-18T07:26:49.000Z" itemprop="datePublished">2018-06-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/18/Python011模块/">Python011模块</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import 模块名</span><br><span class="line"># 引入模块</span><br><span class="line">import random</span><br><span class="line">random.randint(0,2)</span><br></pre></td></tr></table></figure>
+<h4 id="自定义模块"><a href="#自定义模块" class="headerlink" title="自定义模块"></a>自定义模块</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># test.py内容如下</span><br><span class="line"></span><br><span class="line">def test:</span><br><span class="line">    print(&apos;test&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 在你的模块里引入并使用</span><br><span class="line">import test</span><br><span class="line">test.test()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>导入模块的过程实际就是把模块里的内容执行一遍</p>
+</blockquote>
+<p>你的模块需要自测，但是不想在被引入的地方调用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">__name__  代表模块的名字 test.py</span><br><span class="line"></span><br><span class="line">单独执行test.py  </span><br><span class="line">print(__name__)  # __main__</span><br><span class="line">在其他模块里导入 test.py</span><br><span class="line">会打印  __test__</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>实现自测才调用的效果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    print(&apos;haha&apos;)</span><br><span class="line"></span><br><span class="line">#测试</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    print(__name__)</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+<h3 id="模块导入路径问题"><a href="#模块导入路径问题" class="headerlink" title="模块导入路径问题"></a>模块导入路径问题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import random </span><br><span class="line">random.randint(1,3)</span><br><span class="line"># 每次都有random命名空间是不是很不爽</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 太极端会把random里所有方法导入进来</span><br><span class="line">from random import *</span><br><span class="line">randint(1,3)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 单独导入一个</span><br><span class="line">from random import randint</span><br><span class="line">randint(1,3)</span><br><span class="line"></span><br><span class="line"># 导入多个</span><br><span class="line">from random import randint,randrange</span><br></pre></td></tr></table></figure>
+<h3 id="定位模块"><a href="#定位模块" class="headerlink" title="定位模块"></a>定位模块</h3><blockquote>
+<p>如果第三方模块在当前执行目录则没有关系，如果模块拆的比较碎同时不在同一目录，就会有路径问题</p>
+</blockquote>
+<ol>
+<li>当前目录</li>
+<li>如果不在当前目录，搜索shell改变了pythonpath下的每个目录</li>
+<li>如果不在以上目录，python会查看默认路径 UNIX下默认路径为/usr/local/lib/python</li>
+<li>模块搜索路径存储在system模块的sys.path变量里。它是一个列表，包含以上目录</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import sys</span><br><span class="line"># 将你的模块路径插入到最前面</span><br><span class="line">sys.path.insert(0,&quot;test.py的路径&quot;) </span><br><span class="line"># 将你的模块路径插入到最后， 如果加载失败一定是 sys.path里有同名的test模块覆盖了你的test</span><br><span class="line"># sys.path.append(&quot;test.py的路径&quot;) </span><br><span class="line">def test():</span><br><span class="line">    print(&apos;haha&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="all变量"><a href="#all变量" class="headerlink" title="all变量"></a>all变量</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">模块中的__all__</span><br></pre></td></tr></table></figure>
+<p>当你有test.py文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class Test(object):</span><br><span class="line">    def test(def):</span><br><span class="line">        print(&quot;class defined method&quot;)</span><br><span class="line"></span><br><span class="line">def test1():</span><br><span class="line">    print(&quot;test1&quot;)</span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    print(&quot;test2&quot;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">from test import *</span><br><span class="line">这时你可以调用test模块所有东西</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在test.py里添加如下内容后</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__all__ = [&quot;Test&quot;,&quot;test1&quot;]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from test import *</span><br><span class="line">这时你可以调用test模块里的 Test类 和 test1 </span><br><span class="line">调用 test2报错</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>all仅仅影响的是 from test import <em> 里的 「</em>」</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from test import *</span><br><span class="line">from test from test2</span><br><span class="line">test1 ()</span><br><span class="line">test2() #不报错</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/18/Python011模块/" data-id="cklhgn2it00mekyfyridarw1g" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Python010异常" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/18/Python010异常/" class="article-date">
+  <time datetime="2018-06-18T06:59:50.000Z" itemprop="datePublished">2018-06-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/18/Python010异常/">Python010异常</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><blockquote>
+<p>try … except…</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(a) #a没有定义直接打印报错</span><br><span class="line">except:</span><br><span class="line">    print(&apos;hahahaha&apos;)</span><br><span class="line"></span><br><span class="line"># 打印 hahahaha</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>异常有多种应该怎样捕获</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    xxxxxxxxxx1</span><br><span class="line">    xxxxxxxxxx2</span><br><span class="line">    xxxxxxxxxx3</span><br><span class="line">    xxxxxxxxxx4</span><br><span class="line">except 车胎扎了:</span><br><span class="line">    补胎</span><br><span class="line">except 链子掉了:</span><br><span class="line">    挂上</span><br><span class="line">except 闸坏了:</span><br><span class="line">    换车闸</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一次捕获多个异常</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    xxxxxxxxxx1</span><br><span class="line">    xxxxxxxxxx2</span><br><span class="line">    xxxxxxxxxx3</span><br><span class="line">    xxxxxxxxxx4</span><br><span class="line">except (车胎扎了,链子掉了,闸坏了):</span><br><span class="line">    处理</span><br><span class="line"></span><br><span class="line"># python2 里不用加括号</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>打印错误的基本信息</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(a)</span><br><span class="line">except NameError as ffff:</span><br><span class="line">    print(&apos;产生了一个异常%s&apos;%ffff)</span><br><span class="line"></span><br><span class="line"># 多种异常</span><br><span class="line">try:</span><br><span class="line">    print(a)</span><br><span class="line">except (NameError,FileNotFoundError) as ffff:</span><br><span class="line">    print(&apos;产生了一个异常%s&apos;%ffff)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>捕获所有异常</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(a)</span><br><span class="line">except:</span><br><span class="line">    print(&apos;产生了一个异常&apos;)</span><br><span class="line"></span><br><span class="line">try:</span><br><span class="line">    print(a)</span><br><span class="line">except Exception as ffff:</span><br><span class="line">    print(&apos;产生了一个异常%s&apos;%ffff)</span><br></pre></td></tr></table></figure>
+<h4 id="异常之else"><a href="#异常之else" class="headerlink" title="异常之else"></a>异常之else</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    #如果产生了一个异常，但是except没有捕获，那么就会按照这个异常默认的处理方式进行</span><br><span class="line">    open(&quot;aaa.txt&quot;)</span><br><span class="line">    a = 100</span><br><span class="line">    print(a)</span><br><span class="line">except NameError:</span><br><span class="line">    #如果在try中的代码产生了一个NameError时，才会执行的异常处理</span><br><span class="line">    print(&quot;捕获到了一个异常&quot;)</span><br><span class="line">else:</span><br><span class="line">    #在try中的代码都没有产生异常的时候，才会执行的代码</span><br><span class="line">    print(&quot;-----1-----&quot;)</span><br></pre></td></tr></table></figure>
+<h4 id="异常之finally"><a href="#异常之finally" class="headerlink" title="异常之finally"></a>异常之finally</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    #如果产生了一个异常，但是except没有捕获，那么就会按照这个异常默认的处理方式进行</span><br><span class="line">    open(&quot;aaa.txt&quot;)</span><br><span class="line">    a = 100</span><br><span class="line">    print(a)</span><br><span class="line">except NameError:</span><br><span class="line">    #如果在try中的代码产生了一个NameError时，才会执行的异常处理</span><br><span class="line">    print(&quot;捕获到了一个异常&quot;)</span><br><span class="line">else:</span><br><span class="line">    #在try中的代码都没有产生异常的时候，才会执行的代码</span><br><span class="line">    print(&quot;-----1-----&quot;)</span><br><span class="line">finally:</span><br><span class="line">    print(&quot;-----最后执行的实行-0----&quot;)</span><br></pre></td></tr></table></figure>
+<h4 id="异常的传递"><a href="#异常的传递" class="headerlink" title="异常的传递"></a>异常的传递</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def test1():</span><br><span class="line">    print(&quot;------1-1------&quot;)</span><br><span class="line">    print(num)</span><br><span class="line">    print(&quot;------1-2------&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    print(&quot;------2-1------&quot;)</span><br><span class="line">    test1()</span><br><span class="line">    print(&quot;------2-2------&quot;)</span><br><span class="line"></span><br><span class="line">def test3():</span><br><span class="line">    try:</span><br><span class="line">        print(&quot;------2-1------&quot;)</span><br><span class="line">        test1()</span><br><span class="line">        print(&quot;------2-2------&quot;)</span><br><span class="line">    except Exception as result:</span><br><span class="line">        print(&quot;捕获到了异常:%s&quot;%result)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">test3()</span><br></pre></td></tr></table></figure>
+<h4 id="自定义异常"><a href="#自定义异常" class="headerlink" title="自定义异常"></a>自定义异常</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Test(Exception):</span><br><span class="line">    def __init__(self, length, atleast):</span><br><span class="line">        self.length =  length</span><br><span class="line">        self.atleast = atleast</span><br><span class="line"></span><br><span class="line">try:</span><br><span class="line">    raise Test(1,2)</span><br><span class="line">except Test as result:</span><br><span class="line">    print(&quot;---f-f-f-f-f----&quot;)</span><br><span class="line">    print(result.length)</span><br><span class="line">    print(result.atleast)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/18/Python010异常/" data-id="cklhgn2iv00mikyfyobpsynml" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Python009单例模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/18/Python009单例模式/" class="article-date">
+  <time datetime="2018-06-18T06:58:16.000Z" itemprop="datePublished">2018-06-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/18/Python009单例模式/">Python009单例模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="待更新"><a href="#待更新" class="headerlink" title="待更新"></a>待更新</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/18/Python009单例模式/" data-id="cklhgn2is00mckyfycbcxfl7c" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Python008类属性实例属性静态方法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/17/Python008类属性实例属性静态方法/" class="article-date">
+  <time datetime="2018-06-17T05:50:27.000Z" itemprop="datePublished">2018-06-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/17/Python008类属性实例属性静态方法/">Python008类属性实例属性静态方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="类属性"><a href="#类属性" class="headerlink" title="类属性"></a>类属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class 士兵:</span><br><span class="line">    #类属性</span><br><span class="line">    血量 = 100</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">            self.name = name</span><br><span class="line">    #方法</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;士兵奔跑&apos;)    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a = 士兵(&apos;a&apos;)</span><br><span class="line">b = 士兵(&apos;b&apos;)</span><br><span class="line"></span><br><span class="line">a.血量  # 100</span><br><span class="line">b.血量  # 100</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果实例属性里定义了 血量 属性</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class 士兵:</span><br><span class="line">    #类属性</span><br><span class="line">    血量 = 100</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">            self.name = name</span><br><span class="line">            self.血量 = 200</span><br><span class="line">    #方法</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;士兵奔跑&apos;)    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a = 士兵(&apos;a&apos;)</span><br><span class="line">a.血量 # 200</span><br></pre></td></tr></table></figure>
+<h3 id="类方法"><a href="#类方法" class="headerlink" title="类方法"></a>类方法</h3><blockquote>
+<p>要用修饰器 @classmethod来标识</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">class Test:</span><br><span class="line">    #类属性</span><br><span class="line">    num = 0</span><br><span class="line">    def __init__(self):</span><br><span class="line">        #实例属性</span><br><span class="line">        self.age = 20</span><br><span class="line">    @classmethod</span><br><span class="line">    def setNum(cls,newNum):</span><br><span class="line">        cls.num = newNum</span><br><span class="line"></span><br><span class="line">a = Test()</span><br><span class="line">print(Test.num) # 0</span><br><span class="line"></span><br><span class="line">Test.setNum(100) </span><br><span class="line">print(Test.num) # 100</span><br><span class="line"></span><br><span class="line">a.setNum(200)</span><br><span class="line">print(Test.num) # 200</span><br><span class="line"></span><br><span class="line"># 类方法既可以通过 类调用 也可以通过 实例对象</span><br></pre></td></tr></table></figure>
+<h3 id="静态方法"><a href="#静态方法" class="headerlink" title="静态方法"></a>静态方法</h3><blockquote>
+<p>要用修饰器 @staticmethod来标识</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Test:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        #实例属性</span><br><span class="line">        self.age = 20</span><br><span class="line"></span><br><span class="line">    @staticmethod</span><br><span class="line">    def test():</span><br><span class="line">        print(&apos;我是Test类的静态方法&apos;)</span><br><span class="line"></span><br><span class="line">a = Test()</span><br><span class="line">a.test()</span><br><span class="line">Test.test()</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/17/Python008类属性实例属性静态方法/" data-id="cklhgn2ir00makyfy678mqqql" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Python007继承和多态" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/17/Python007继承和多态/" class="article-date">
+  <time datetime="2018-06-17T04:15:42.000Z" itemprop="datePublished">2018-06-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/17/Python007继承和多态/">Python007继承和多态</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>记得有句经典话，你可以使用你爸的抽屉，但你只有使用权，而没有抽屉所有权，因为抽屉是你爸的</p>
+<blockquote>
+<p>所有类默认继承 object(object是所有类的基类)</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class Cat:</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">class Cat(object):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">#两种方式一样 默认继承object</span><br></pre></td></tr></table></figure>
+<h4 id="单继承"><a href="#单继承" class="headerlink" title="单继承"></a>单继承</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Cat:</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;----run---&apos;)</span><br><span class="line"></span><br><span class="line">class Bosi(Cat):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">class Jiafei(Cat):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">bosi = Bosi()</span><br><span class="line">bosi.run()</span><br><span class="line"></span><br><span class="line">jf = Jiafei()</span><br><span class="line">jf.run()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>继承的注意点，后代无法使用父类的私有属性和方法</p>
+</blockquote>
+<p>你的牙刷和你爸的牙刷属于私有的</p>
+<blockquote>
+<p>重写的应用</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class Cat:</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;----run---&apos;)</span><br><span class="line"></span><br><span class="line">class Bosi(Cat):</span><br><span class="line">     def run(self):</span><br><span class="line">        print(&apos;----run RUN RUN---&apos;)</span><br><span class="line"></span><br><span class="line"># 波斯猫的run方法跟父类不一致的时候可以自行定义行为——重写</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如果想要在重写的方法里调用父类的方法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Cat:</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;----run---&apos;)</span><br><span class="line"></span><br><span class="line">class Bosi(Cat):</span><br><span class="line">     def run(self):</span><br><span class="line">        super().run()</span><br><span class="line">        print(&apos;----run RUN RUN---&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="多继承"><a href="#多继承" class="headerlink" title="多继承"></a>多继承</h4><ul>
+<li>马驴骡子实例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Ma(object):</span><br><span class="line">    def pao(self):</span><br><span class="line">        print(&apos;----100km/h  跑----&apos;)</span><br><span class="line"></span><br><span class="line">class Lv(object):</span><br><span class="line">    def tuowupin(self):</span><br><span class="line">        print(&apos;----托物品----&apos;)</span><br><span class="line"></span><br><span class="line"># 多继承</span><br><span class="line">class Luozi(Ma,Lv):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">luozi = Luozi()</span><br><span class="line">luozi.pao()</span><br><span class="line">luozi.tuowupin()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意点：如果马和驴都有 jiao()骡子继承谁的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Ma(object):</span><br><span class="line">    def pao(self):</span><br><span class="line">        print(&apos;----100km/h  跑----&apos;)</span><br><span class="line">    def jiao(self):</span><br><span class="line">        print(&apos;----马在叫----&apos;)</span><br><span class="line"></span><br><span class="line">class Lv(object):</span><br><span class="line">    def tuowupin(self):</span><br><span class="line">        print(&apos;----托物品----&apos;)</span><br><span class="line">    def jiao(self):</span><br><span class="line">        print(&apos;----驴在叫----&apos;)</span><br><span class="line"># 多继承</span><br><span class="line">class Luozi(Ma,Lv):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">luozi = Luozi()</span><br><span class="line">luozi.jiao() #是谁的？</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="如果继承多个类，每个类都有同名方法"><a href="#如果继承多个类，每个类都有同名方法" class="headerlink" title="如果继承多个类，每个类都有同名方法"></a>如果继承多个类，每个类都有同名方法</h4></blockquote>
+<ul>
+<li>如果是平行关系，则继承写在第一个继承的类</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 继承Ma的jiao</span><br><span class="line">class Luozi(Ma,Lv):</span><br><span class="line"></span><br><span class="line"># 继承Lv的jiao</span><br><span class="line">class Luozi(Lv,Ma):</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果继承的有多重嵌套关系，而且又特别复杂</li>
+</ul>
+<p>它有一个mro算法,不在本次总结范围之内</p>
+<p>但是你看有查看调用类的先后顺序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(Luozi.__mro__)</span><br><span class="line"># 打印出继承类的先后顺序</span><br><span class="line"># 继承时寻找方法会从头往后找，使用最先找到的</span><br></pre></td></tr></table></figure>
+<h3 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h3><p>地下城与勇士实例,以下是伪代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class 勇士:</span><br><span class="line">    def 攻击(self):</span><br><span class="line">        print(&apos;按X  XX XXX&apos;)</span><br><span class="line"></span><br><span class="line">class 法师(勇士):</span><br><span class="line">    def 攻击(self):</span><br><span class="line">        print(&apos;魔法星弹。。。。&apos;)</span><br><span class="line"></span><br><span class="line">class 鬼剑士(勇士):</span><br><span class="line">    def 攻击(self):</span><br><span class="line">        print(&apos;拔刀斩。。。。&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 这是一个函数</span><br><span class="line">def fight(obj):</span><br><span class="line">    obj.攻击()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fight(勇士()) # &apos;按X  XX XXX&apos;</span><br><span class="line">fight(法师()) # &apos;魔法星弹。。。。&apos;</span><br><span class="line">fight(鬼剑士()) # &apos;拔刀斩。。。。&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>同样的方法表现方式不一样</li>
+</ul>
+<blockquote>
+<p>不是勇士的子类可不可以调用fight？</p>
+</blockquote>
+<p>可以，但是你要保证你自身有 「攻击( )」</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class 喷火龙:</span><br><span class="line">    def 攻击(self):</span><br><span class="line">        print(&quot;喷出火焰。。。。&quot;)</span><br><span class="line"></span><br><span class="line">fight(喷火龙())</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/17/Python007继承和多态/" data-id="cklhgn2iq00m8kyfy9zpsrak0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Python006面向对象之我不是异教徒" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/16/Python006面向对象之我不是异教徒/" class="article-date">
@@ -168,7 +477,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python006面向对象之我不是异教徒/" data-id="cklcb6bkx00m5wo915ulofs21" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/16/Python006面向对象之我不是异教徒/" data-id="cklhgn2ip00m6kyfyo42vf2e1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -277,7 +586,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python005文件操作/" data-id="cklcb6bkw00m2wo91vhcss9ew" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/16/Python005文件操作/" data-id="cklhgn2io00m4kyfyeudanxnm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -402,7 +711,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python004函数/" data-id="cklcb6bku00m0wo91aedqrx23" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/16/Python004函数/" data-id="cklhgn2in00m2kyfysok9d6bc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -551,7 +860,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python003列表和元组和字典/" data-id="cklcb6bks00ltwo91oc9i1nzx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/16/Python003列表和元组和字典/" data-id="cklhgn2im00m0kyfywc06gchn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -650,424 +959,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python002字符串/" data-id="cklcb6bku00lywo91unlqalhz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/16/Python002字符串/" data-id="cklhgn2il00lykyfyi97qzmid" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python001基础" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/16/Python001基础/" class="article-date">
-  <time datetime="2018-06-16T05:27:34.000Z" itemprop="datePublished">2018-06-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/16/Python001基础/">Python001基础</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="学习仪式-hello-world"><a href="#学习仪式-hello-world" class="headerlink" title="学习仪式 hello world"></a>学习仪式 hello world</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">print(&apos;hello world&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#!/usr/bin/env python 在linux里代表查找系统环境变量的 python命令路径 </span><br><span class="line"> 但是linux里默认的是2.x版本 而你自己安装的3.x版本python在 usr/local/bin</span><br><span class="line">#!/usr/bin/python</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>python2 解释器在加载 .py 文件中的代码时，会对内容进行编码（默认ascill）如果有中文就会报错</p>
-</blockquote>
-<p>你应该指定编码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">print(&quot;你好，世界&quot;)</span><br></pre></td></tr></table></figure>
-<h3 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 单行注释</span><br><span class="line"># 我是注释</span><br><span class="line"># 我是注释</span><br><span class="line"># 我是注释</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;文档注释&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">dd</span><br><span class="line">dd  多行注释</span><br><span class="line">dd</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<h3 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 与js类似 动态类型具体有那些自行百度</span><br><span class="line"></span><br><span class="line">注意布尔值为 True / False</span><br></pre></td></tr></table></figure>
-<h3 id="基本类型转换方法"><a href="#基本类型转换方法" class="headerlink" title="基本类型转换方法"></a>基本类型转换方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = 1;</span><br><span class="line">str(a)  &apos;1&apos;</span><br><span class="line">b = &apos;2&apos;</span><br><span class="line">int(b)  2</span><br></pre></td></tr></table></figure>
-<h3 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"># 格式化输出</span><br><span class="line"></span><br><span class="line"># \n换行</span><br><span class="line"># \t tab制表</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">name = &quot;hjx&quot;</span><br><span class="line">age = 18</span><br><span class="line">height = 199</span><br><span class="line"># print(name+age) 报错  因为 name 和 age类型不一样 相加报错</span><br><span class="line"># print(name+str(age))  要把age 转换为字符串</span><br><span class="line"></span><br><span class="line">print(&quot;========================&quot;)</span><br><span class="line">print(&quot;我叫%s&quot;%name)</span><br><span class="line">print(&quot;我叫%s,今年%d岁,身高%dcm&quot;%(name,age,height))</span><br><span class="line">print(&quot;========================&quot;)</span><br><span class="line"># 检查类型</span><br><span class="line">print(type(name))</span><br><span class="line">print(type(age))</span><br><span class="line">print(&quot;========================&quot;)</span><br><span class="line"># 输出字符</span><br><span class="line">char1 = 65</span><br><span class="line">char2 = 98</span><br><span class="line"></span><br><span class="line">print(&quot;%c&quot;%char1)</span><br><span class="line">print(&quot;%c&quot;%char2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#如果我想输出 %</span><br><span class="line">print(&quot;%&quot;) #  这样会报错的，因为在格式化输出里，你出现%默认为就是占位符的%</span><br><span class="line">print(&quot;%%&quot;) # 第一个%是对第二个%的转译，告诉Python解释器这只是一个单纯的%，而不是占位符。</span><br><span class="line"></span><br><span class="line">print(&quot;========================&quot;)</span><br><span class="line"></span><br><span class="line"># 帮助文档</span><br><span class="line"></span><br><span class="line">help(print)</span><br></pre></td></tr></table></figure>
-<h3 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">+ 懒得说</span><br><span class="line">- 懒得说</span><br><span class="line">* 懒得说</span><br><span class="line">/ 懒得说</span><br><span class="line">// 取整除  商</span><br><span class="line"></span><br><span class="line">11/2     5</span><br><span class="line">11.0/2   5.5</span><br><span class="line"></span><br><span class="line">11//2    5</span><br><span class="line">2**2  4</span><br><span class="line">3**3  27</span><br><span class="line">a = 100</span><br><span class="line">b = 111</span><br><span class="line">交换a b的值</span><br><span class="line">a,b = b,a</span><br></pre></td></tr></table></figure>
-<h3 id="条件判断if"><a href="#条件判断if" class="headerlink" title="条件判断if"></a>条件判断if</h3><p>多重嵌套if使用 tab缩进</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if a &gt;10 and a &lt;20 :</span><br><span class="line">    if a == 15 :</span><br><span class="line">        print(&quot;满足条件&quot;)</span><br></pre></td></tr></table></figure>
-<h3 id="或且非"><a href="#或且非" class="headerlink" title="或且非"></a>或且非</h3><ul>
-<li>and</li>
-<li>or </li>
-<li>not</li>
-</ul>
-<p>猜拳游戏</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import random</span><br><span class="line">com = random.randint(0,2)</span><br><span class="line">user = int(input(&quot;猜拳：0剪刀 1石头 2布&quot;))</span><br><span class="line"></span><br><span class="line">if (com==0 and user ==1) or (com==1 and user ==2) or (com==2 and user ==0):</span><br><span class="line">    print(&apos;算你厉害&apos;)</span><br><span class="line">elif com == user:</span><br><span class="line">    print(&apos;平&apos;)</span><br><span class="line">else:</span><br><span class="line">    print(&quot;输了&quot;)</span><br></pre></td></tr></table></figure>
-<h3 id="in-not-in"><a href="#in-not-in" class="headerlink" title="in,not in"></a>in,not in</h3><p>判断子元素是否在原字符串（字典，列表，集合）中：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#print(&apos;喜欢&apos; in &apos;dkfljadklf喜欢hfjdkas&apos;)</span><br><span class="line">#print(&apos;a&apos; in &apos;bcvd&apos;)</span><br><span class="line">#print(&apos;y&apos; not in &apos;ofkjdslaf&apos;)</span><br></pre></td></tr></table></figure>
-<h3 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">i = 1</span><br><span class="line">while i&lt;=9:</span><br><span class="line">    j = 1</span><br><span class="line">    while j&lt;=i:</span><br><span class="line">        print(&quot;%d*%d=%d&quot;%(j,i,i*j),end=&quot;&quot;)</span><br><span class="line">        j+=1</span><br><span class="line">    print(&quot;&quot;)</span><br><span class="line">    i+=1</span><br></pre></td></tr></table></figure>
-<h4 id="while-else"><a href="#while-else" class="headerlink" title="while else"></a>while else</h4><blockquote>
-<p>与其它语言else 一般只与if 搭配不同，在Python 中还有个while …else 语句</p>
-</blockquote>
-<blockquote>
-<p>while 后面的else 作用是指，当while 循环正常执行完，中间没有被break 中止的话，就会执行else后面的语句</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">count = 0</span><br><span class="line">while count &lt;= 5 :</span><br><span class="line">    count += 1</span><br><span class="line">    print(&quot;Loop&quot;,count)</span><br><span class="line"></span><br><span class="line">else:</span><br><span class="line">    print(&quot;循环正常执行完啦&quot;)</span><br><span class="line">print(&quot;-----out of while loop ------&quot;)</span><br><span class="line"></span><br><span class="line">输出如下：</span><br><span class="line"></span><br><span class="line">Loop 1</span><br><span class="line">Loop 2</span><br><span class="line">Loop 3</span><br><span class="line">Loop 4</span><br><span class="line">Loop 5</span><br><span class="line">Loop 6</span><br><span class="line">循环正常执行完啦</span><br><span class="line">-----out of while loop ------</span><br></pre></td></tr></table></figure>
-<p>如果执行过程中被break啦，就不会执行else的语句啦</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">count = 0</span><br><span class="line">while count &lt;= 5 :</span><br><span class="line">    count += 1</span><br><span class="line">    if count == 3:break</span><br><span class="line">    print(&quot;Loop&quot;,count)</span><br><span class="line"></span><br><span class="line">else:</span><br><span class="line">    print(&quot;循环正常执行完啦&quot;)</span><br><span class="line">print(&quot;-----out of while loop ------&quot;)</span><br><span class="line"></span><br><span class="line">输出如下：</span><br><span class="line"></span><br><span class="line">Loop 1</span><br><span class="line">Loop 2</span><br><span class="line">-----out of while loop ------</span><br></pre></td></tr></table></figure>
-<h3 id="for-循环"><a href="#for-循环" class="headerlink" title="for 循环"></a>for 循环</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;abcdef&apos;</span><br><span class="line">for temp in name</span><br><span class="line">    print(temp)</span><br></pre></td></tr></table></figure>
-<h3 id="下标"><a href="#下标" class="headerlink" title="下标"></a>下标</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;abcdef&apos;</span><br><span class="line">name[0]   &apos;a&apos;</span><br><span class="line">name[1]   &apos;b&apos;</span><br><span class="line">name[2]   &apos;c&apos;</span><br><span class="line">name[3]   &apos;d&apos;</span><br><span class="line">name[4]   &apos;e&apos;</span><br><span class="line">name[5]   &apos;f&apos;</span><br></pre></td></tr></table></figure>
-<h3 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;abcdef&apos;</span><br><span class="line"></span><br><span class="line">name[0]  &apos;a&apos;</span><br><span class="line"></span><br><span class="line">#注意切片来了 ,口诀包头不包尾</span><br><span class="line"></span><br><span class="line">name[0:4] &apos;abcd&apos;</span><br><span class="line">name[1:4] &apos;bcd&apos;</span><br><span class="line"></span><br><span class="line">#超过字符串长度咋办？</span><br><span class="line">name[0:70] &apos;abcdef&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>获取字符长度之len</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#js里  &apos;abc&apos;.length = 3 </span><br><span class="line">#python里 </span><br><span class="line">name = &apos;abcdef&apos;</span><br><span class="line"># 获取字符串长度</span><br><span class="line">len(name)  # 6</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>想要切片返回当前字符串的内容</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;fasfasdfl;kfdl;askfl;daskl;fkasl;&apos;</span><br><span class="line">length = len(name)</span><br><span class="line">name[0:length]</span><br><span class="line"></span><br><span class="line">#简洁写法 都可以获取整个字符串</span><br><span class="line">name[0:]</span><br><span class="line">name[:]</span><br><span class="line">name[::]</span><br><span class="line"></span><br><span class="line"># name[]报错</span><br></pre></td></tr></table></figure>
-<h4 id="切片之炮打隔一子"><a href="#切片之炮打隔一子" class="headerlink" title="切片之炮打隔一子"></a>切片之炮打隔一子</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;ababababab&apos;</span><br><span class="line">name[::2]  &apos;aaaaa&apos;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name[起始位置:结束位置:步长]</span><br></pre></td></tr></table></figure>
-<h4 id="切片之反序"><a href="#切片之反序" class="headerlink" title="切片之反序"></a>切片之反序</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;123456789&apos;</span><br><span class="line">name[::-1]  &apos;987654321&apos;</span><br></pre></td></tr></table></figure>
-<h4 id="切片其他用法"><a href="#切片其他用法" class="headerlink" title="切片其他用法"></a>切片其他用法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">name = &apos;abcdef&apos;</span><br><span class="line">name[-1] &apos;f&apos;</span><br><span class="line">name[-2] &apos;e&apos;</span><br><span class="line"></span><br><span class="line">name[0:-1]  &apos;abcde&apos;</span><br><span class="line"></span><br><span class="line">name[0:0] &apos;&apos;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/16/Python001基础/" data-id="cklcb6bkt00lvwo91waexxcxo" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Vim001编辑器使用" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/14/Vim001编辑器使用/" class="article-date">
-  <time datetime="2018-06-14T14:53:10.000Z" itemprop="datePublished">2018-06-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/14/Vim001编辑器使用/">Vim001编辑器使用</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><p>一种编辑器详情自行百度</p>
-<blockquote>
-<p>它有三种模式</p>
-</blockquote>
-<ul>
-<li>命令模式</li>
-<li>编辑模式</li>
-<li>末行模式</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">当你 vi 1.txt后 是命令模式</span><br><span class="line">切换到编辑模式 </span><br><span class="line">1. i 当前光标左边插入</span><br><span class="line">2. o 当前光标下一行插入</span><br><span class="line">3. a 当前光标右边插入</span><br><span class="line">4. I 当前光标行首插入</span><br><span class="line">5. A 当前光标行尾插入</span><br><span class="line">切换到命令模式 「esc」</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">从编辑模式按了「esc」再输入一个冒号 「:」就会进入末行模式</span><br><span class="line">1. wq 保存退出</span><br><span class="line">2. q! 不保存退出</span><br><span class="line">3. x 保存退出</span><br><span class="line">4. q 退出</span><br></pre></td></tr></table></figure>
-<h3 id="vim里的智能提示功能"><a href="#vim里的智能提示功能" class="headerlink" title="vim里的智能提示功能"></a>vim里的智能提示功能</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">myname = &apos;sssss&apos;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">此时你又输了一个m</span><br><span class="line">m </span><br><span class="line"></span><br><span class="line">你想再次输入 myname不想手敲  「ctrl+n」</span><br></pre></td></tr></table></figure>
-<h4 id="进入命令模式"><a href="#进入命令模式" class="headerlink" title="进入命令模式"></a>进入命令模式</h4><p>移动光标</p>
-<ul>
-<li>h 左</li>
-<li>j 下</li>
-<li>k 上</li>
-<li>l 右</li>
-<li>M 光标移动到行中间行</li>
-<li>L 定位到屏幕最后一行行首</li>
-<li>G 移动到指定行，行号  15G 跳到15行</li>
-<li>gg 跳到第一行</li>
-<li>yy 复制  8yy 表示从当前光标所在行开始复制 只输入yy代表当前行</li>
-<li>p 粘贴</li>
-<li>dd 剪切 8dd 表示从当前光标所在行开始剪切  只输入dd代表当前行</li>
-<li>u 撤销</li>
-<li>ctrl + r 反撤销</li>
-<li>w 向后移动一个字</li>
-<li>b 向前移动一个字</li>
-<li>{ 按段移动上移</li>
-<li>} 按段移动下移</li>
-<li>ctrl + d 翻半屏</li>
-<li>ctrl + u 翻半屏</li>
-<li>crrl + f 下翻一屏</li>
-<li>crrl + b 上翻一屏</li>
-</ul>
-<p>命令模式</p>
-<ul>
-<li>x 删除当前光标后边的字母</li>
-<li>X 删除当前光标前边的字母</li>
-<li>D 当前光标删除到行尾</li>
-<li>d0 当前光标删除到行首</li>
-<li><p>dw 删除一个词 光标所在位置</p>
-</li>
-<li><p>&lt;&lt; 文本左移</p>
-</li>
-<li><blockquote>
-<blockquote>
-<p>文本右移</p>
-</blockquote>
-</blockquote>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/14/Vim001编辑器使用/" data-id="cklcb6bno00quwo91q92dwtv1" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/">vim</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Linux003多用户多任务操作" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/14/Linux003多用户多任务操作/" class="article-date">
-  <time datetime="2018-06-14T13:33:48.000Z" itemprop="datePublished">2018-06-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/14/Linux003多用户多任务操作/">Linux003多用户多任务操作</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="多用户"><a href="#多用户" class="headerlink" title="多用户"></a>多用户</h3><p>一个电脑多个用户可以同时登录</p>
-<h3 id="多任务"><a href="#多任务" class="headerlink" title="多任务"></a>多任务</h3><p>一个电脑可以跑很多程序 QQ 微信 浏览器 QQ音乐</p>
-<h3 id="ifconfig"><a href="#ifconfig" class="headerlink" title="ifconfig"></a>ifconfig</h3><p>查看网卡信息(一般能看到俩个代表你的虚拟机能上网了)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig | grep &apos;192&apos; 查找一大堆文档中的关键字</span><br></pre></td></tr></table></figure>
-<h4 id="vmware虚拟机的网络设置"><a href="#vmware虚拟机的网络设置" class="headerlink" title="vmware虚拟机的网络设置"></a>vmware虚拟机的网络设置</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NAT模式  比如你的window能上网，你想让虚拟机借助它上网(对于交换机来说它只看到一台电脑window)</span><br><span class="line">桥接模式  你想让window上网，而且虚拟机也能上网而不是间接的通过window就用这个(对于交换机它看到了两台电脑)</span><br><span class="line">仅主机模式 在没有网的情况下和windows进行通讯</span><br></pre></td></tr></table></figure>
-<h3 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h3><p>测试是否能通信</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping 192.168.2.123</span><br></pre></td></tr></table></figure>
-<h3 id="ssh远程登录"><a href="#ssh远程登录" class="headerlink" title="ssh远程登录"></a>ssh远程登录</h3><p>比如阿里云服务器跟这效果一样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ssh hjx@192.168.17.76 代表远程登录服务器</span><br><span class="line"></span><br><span class="line">如果你第一次登录会让你确认是否连接  ==&gt; yes</span><br><span class="line">然后让你输入密码如果成功了就能远程登录 并且对系统进行远程操作</span><br></pre></td></tr></table></figure>
-<h3 id="who命令"><a href="#who命令" class="headerlink" title="who命令"></a>who命令</h3><p>查看当前登录的用户信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如果你的电脑被攻击了</span><br><span class="line">who可以查看当前谁登录了</span><br></pre></td></tr></table></figure>
-<p>whoami当前终端的用户</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whoami</span><br></pre></td></tr></table></figure>
-<p>exit退出登录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">exit</span><br></pre></td></tr></table></figure>
-<h3 id="添加用户账号useradd"><a href="#添加用户账号useradd" class="headerlink" title="添加用户账号useradd"></a>添加用户账号useradd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-m 自动创建家目录</span><br><span class="line">-d 路径  指定家目录 </span><br><span class="line">useradd aaa -m -d /home/aaa</span><br><span class="line">创建用户 aaa 同时指定家目录为 aaa</span><br><span class="line">通常提示你权限不够</span><br><span class="line"></span><br><span class="line">sudo useradd aaa -m -d /home/aaa</span><br><span class="line">会提示你输入这个用户的密码</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>修改密码passwd</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">passwd aaa</span><br><span class="line">可能会提示权限不够</span><br><span class="line"></span><br><span class="line">sudo passwd aaa</span><br><span class="line">请输入新密码</span><br></pre></td></tr></table></figure>
-<h3 id="su切换用户"><a href="#su切换用户" class="headerlink" title="su切换用户"></a>su切换用户</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su aaa </span><br><span class="line">输入密码</span><br><span class="line">su hjx</span><br><span class="line">输入密码</span><br></pre></td></tr></table></figure>
-<p>问题 如果你切换了多个用户然后exit会怎样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">su aaa</span><br><span class="line">su bbb</span><br><span class="line">su ccc</span><br><span class="line">su ddd</span><br><span class="line"></span><br><span class="line">你当前在 ddd用户 然后输入exit 退出会在 ccc用户</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">su aaa 切换后你当前目录在哪还在哪</span><br><span class="line">su - aaa 切换后跳到家目录</span><br></pre></td></tr></table></figure>
-<h3 id="userdel删除用户"><a href="#userdel删除用户" class="headerlink" title="userdel删除用户"></a>userdel删除用户</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">userdel abc 删除abc用户但不删除用户的主目录 (一般删除这个)</span><br><span class="line">userdel -r abc 删除abc用户同时删除用户的主目录</span><br></pre></td></tr></table></figure>
-<h3 id="sudo添加权限"><a href="#sudo添加权限" class="headerlink" title="sudo添加权限"></a>sudo添加权限</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo -s 一段时间内不询问你密码(最高权限)</span><br><span class="line"></span><br><span class="line">以$结尾代表普通用户</span><br><span class="line">以#结尾代表root用户</span><br></pre></td></tr></table></figure>
-<h3 id="用户组的查看"><a href="#用户组的查看" class="headerlink" title="用户组的查看"></a>用户组的查看</h3><ol>
-<li>cat etc/group</li>
-<li>groupmod + 三次tab键</li>
-</ol>
-<p>什么是用户组</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">比如你输入 ls -al后显示如下信息</span><br><span class="line">-rw-r--r-- root root </span><br><span class="line">第一个root代表用户</span><br><span class="line">第二个root代表用户组</span><br><span class="line">如果其他用户也在 root用户组那他就有 root用户的权限</span><br></pre></td></tr></table></figure>
-<h4 id="添加用户组"><a href="#添加用户组" class="headerlink" title="添加用户组"></a>添加用户组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">groupadd YYY</span><br><span class="line">groupdel YYY</span><br><span class="line"></span><br><span class="line">权限不够请加sudo</span><br></pre></td></tr></table></figure>
-<h4 id="修改用户所在用户组"><a href="#修改用户所在用户组" class="headerlink" title="修改用户所在用户组"></a>修改用户所在用户组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-g 代表你将来默认的组(主组)</span><br><span class="line">-G 代表向其他组添加用户</span><br><span class="line"></span><br><span class="line">usermod -g 用户组 用户名 </span><br><span class="line"></span><br><span class="line">usermod -g aaa bbb 把bbb用户修改到aaa用户组里</span><br></pre></td></tr></table></figure>
-<p>一个用户可以有多个用户组</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo usermod -a -G XXX bbb 将 bbb添加到 XXX组里</span><br></pre></td></tr></table></figure>
-<h3 id="chmod修改文件权限"><a href="#chmod修改文件权限" class="headerlink" title="chmod修改文件权限"></a>chmod修改文件权限</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">drwxrwxrwx </span><br><span class="line">第一个rwx代表文件拥有者(用户)的权限</span><br><span class="line">第二个rwx代表同组者里的(用户)的权限</span><br><span class="line">第三个rwx代表其他人的权限</span><br><span class="line"></span><br><span class="line">r代表读</span><br><span class="line">w代表写</span><br><span class="line">x代表执行</span><br><span class="line">-代表没有权限</span><br></pre></td></tr></table></figure>
-<p>chmod的选项</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">u 代表该文件的所有者user</span><br><span class="line">g 代表用户组的用户group</span><br><span class="line">o 代表其他 other</span><br><span class="line">a 代表所有人 all</span><br><span class="line">+ 增加权限</span><br><span class="line">- 减少权限</span><br><span class="line">= 把当前权限改为现在的权限   =左边是u/g/o/a =右边是 r/w/x</span><br></pre></td></tr></table></figure>
-<p>示例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">chmod u+x 1.txt 用户增加执行权限</span><br><span class="line">chmod g-w 1.txt 同组者去掉写入权限</span><br><span class="line">chmod u=rwx 1.txt</span><br></pre></td></tr></table></figure>
-<h4 id="数字代表权限"><a href="#数字代表权限" class="headerlink" title="数字代表权限"></a>数字代表权限</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">r读 ==&gt; 对应数字4</span><br><span class="line">w写 ==&gt; 对应数字2</span><br><span class="line">x执行 ==&gt; 对应数字1</span><br><span class="line"></span><br><span class="line">chmod 444  1.txt 可读权限</span><br><span class="line">chmod 761 1.txt 用户=可读可写可执行 用户组=可读可写 其他用户=可执行权限</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">chmod 777 aa 只会修改aa文件夹的权限</span><br><span class="line">chmod 777 aa -R aa目录里的东西全部权限</span><br></pre></td></tr></table></figure>
-<h3 id="cal和date查看时间（自行百度）"><a href="#cal和date查看时间（自行百度）" class="headerlink" title="cal和date查看时间（自行百度）"></a>cal和date查看时间（自行百度）</h3><h3 id="ps查看进程"><a href="#ps查看进程" class="headerlink" title="ps查看进程"></a>ps查看进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ps</span><br><span class="line">ps -aux 显示全部信息</span><br><span class="line"></span><br><span class="line">PID代表程序运行的进程号</span><br></pre></td></tr></table></figure>
-<h3 id="kill终止进程"><a href="#kill终止进程" class="headerlink" title="kill终止进程"></a>kill终止进程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kill pid</span><br><span class="line">kill 进程号</span><br></pre></td></tr></table></figure>
-<h4 id="关机重启"><a href="#关机重启" class="headerlink" title="关机重启"></a>关机重启</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">reboot 重启</span><br><span class="line">shutdown -r now 重启 但是会给用户提示</span><br><span class="line">shutdown -h now 立刻关机</span><br><span class="line">shutdown -h 20:25 系统在 20:25关机</span><br><span class="line">shutdown -h +10 10分钟后关机</span><br></pre></td></tr></table></figure>
-<h3 id="查看磁盘占用-du"><a href="#查看磁盘占用-du" class="headerlink" title="查看磁盘占用 du"></a>查看磁盘占用 du</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">du -h</span><br></pre></td></tr></table></figure>
-<h3 id="用文本编辑器gedit"><a href="#用文本编辑器gedit" class="headerlink" title="用文本编辑器gedit"></a>用文本编辑器gedit</h3>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/14/Linux003多用户多任务操作/" data-id="cklcb6bdi004awo91gseztiby" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Linux002难点命令" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/13/Linux002难点命令/" class="article-date">
-  <time datetime="2018-06-13T15:07:48.000Z" itemprop="datePublished">2018-06-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/13/Linux002难点命令/">Linux002难点命令</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="ln软链接和硬链接"><a href="#ln软链接和硬链接" class="headerlink" title="ln软链接和硬链接"></a>ln软链接和硬链接</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 软链接，就是快捷方式  (源文件没了，现在的链接文件都不好使)</span><br><span class="line"># 修改源文件或链接文件操作的都是一个文件</span><br><span class="line">ln -s 源文件 链接文件 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 硬连接，就算删除了源文件不会影响硬链接的查看</span><br><span class="line"># 修改源文件或链接文件操作的都是一个文件</span><br><span class="line">ln 源文件 链接文件</span><br></pre></td></tr></table></figure>
-<h3 id="cat-查看文件的内容"><a href="#cat-查看文件的内容" class="headerlink" title="cat 查看文件的内容"></a>cat 查看文件的内容</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat 1.txt</span><br></pre></td></tr></table></figure>
-<p>将一个文件的内容填充到一个文件里</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat 1.txt &gt; 2.txt</span><br><span class="line"></span><br><span class="line"># step1 cat 1.txt 复制 1.txt的内容</span><br><span class="line"># step2 将1.txt的内容复制到 2.txt</span><br></pre></td></tr></table></figure>
-<p>复制多个文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat 1.txt 2.txt &gt; 3.txt 将 1.txt和2.txt的内容复制到 3.txt</span><br></pre></td></tr></table></figure>
-<h3 id="grep-文本搜索"><a href="#grep-文本搜索" class="headerlink" title="grep 文本搜索"></a>grep 文本搜索</h3><p>从文件中搜索内容</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 如1.txt的内容</span><br><span class="line">abcdefg</span><br><span class="line">Abcdefg</span><br><span class="line">------1----m</span><br><span class="line">------2----n</span><br><span class="line">------3----m</span><br><span class="line">alown</span><br><span class="line">txt</span><br><span class="line">txt</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-v显示不包含匹配文本的所有行</span><br><span class="line">-n代表匹配内容的行号</span><br><span class="line">-i 忽略大小写</span><br><span class="line"></span><br><span class="line">grep -n &apos;a&apos; 1.txt 打印所有带a的打印出来</span><br><span class="line"></span><br><span class="line">grep -n &apos;^a&apos; 1.txt 打印所有以a开头的打印出来</span><br><span class="line"></span><br><span class="line">grep -n &apos;a$&apos; 1.txt 打印所有以a结尾的打印出来</span><br></pre></td></tr></table></figure>
-<h3 id="help"><a href="#help" class="headerlink" title="help"></a>help</h3><p>查看帮助文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls --help</span><br></pre></td></tr></table></figure>
-<h3 id="man"><a href="#man" class="headerlink" title="man"></a>man</h3><p>是linux提供的手册</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man ls</span><br></pre></td></tr></table></figure>
-<h3 id="历史命令"><a href="#历史命令" class="headerlink" title="历史命令"></a>历史命令</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">按上键</span><br><span class="line">或者 history</span><br><span class="line">history将历史命令列举出来</span><br></pre></td></tr></table></figure>
-<h3 id="find查找文件"><a href="#find查找文件" class="headerlink" title="find查找文件"></a>find查找文件</h3><p>从指定路径查找文件名(条件同样支持正则)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">find ./ -name test.sh 查找当前目录下所有名为 test.sh的文件</span><br><span class="line">find ./ -name .sh 查找当前目录下所有后缀为 .sh的文件</span><br><span class="line">find ./ -name &quot;[A-Z]&quot; 查找当前目录下所有以[A-Z]大写字母开头的文件</span><br><span class="line">find  /tmp -size 2M  查找/tmp目录下所有等于2M的文件</span><br><span class="line">find  /tmp -size +2M  查找/tmp目录下所有大于2M的文件</span><br><span class="line">find  /tmp -size -2M  查找/tmp目录下所有小于2M的文件</span><br><span class="line">find  ./ -size +4k -size -5M  查找当前目录下所有大于4k小于5m的文件</span><br><span class="line">find  ./  -perm 0777  查找当前目录下权限为777文件或目录</span><br></pre></td></tr></table></figure>
-<h3 id="cp-拷贝文件-mv剪切文件"><a href="#cp-拷贝文件-mv剪切文件" class="headerlink" title="cp 拷贝文件 mv剪切文件"></a>cp 拷贝文件 mv剪切文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cp 源文件  目标文件</span><br><span class="line"></span><br><span class="line">选项</span><br><span class="line">-v 显示进度</span><br><span class="line">-r 递归的复制</span><br><span class="line">-i 交互式复制（你确认复制吗？）</span><br><span class="line">-f 强制复制</span><br><span class="line">-a 在复制目录时使用，保留链接/文件属性并递归的复制目录，保留文件原有的属性</span><br><span class="line">(比如失效的软链接文件也会被复制)</span><br><span class="line"></span><br><span class="line">递归的赋值目录</span><br><span class="line">cp -r 源文件目录  目标文件目录</span><br><span class="line"></span><br><span class="line">cp a b</span><br><span class="line">cp a/* b</span><br><span class="line"></span><br><span class="line">mv a b</span><br><span class="line">mv a/* b</span><br></pre></td></tr></table></figure>
-<h3 id="压缩和解压缩"><a href="#压缩和解压缩" class="headerlink" title="压缩和解压缩"></a>压缩和解压缩</h3><p>tar打包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-c 生成档案文件，创建打包文件</span><br><span class="line">-v 代表进度</span><br><span class="line">-f 指定档案文件名称f后面一定是.tar文件</span><br><span class="line"></span><br><span class="line">tar -cvf test.tar * 把当前路径所有东西打包到 test.tar里</span><br></pre></td></tr></table></figure>
-<p>tar打包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf test.tar 把打包文件还原</span><br></pre></td></tr></table></figure>
-<p>gzip 对已经打包的文件进行压缩</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gzip test.tar </span><br><span class="line">就会产生 test.tar.gz 文件(打包压缩后的)</span><br><span class="line"></span><br><span class="line">gzip  test.tar test.tar.gz 跟上面的一样效果(麻烦)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">gzip -d test.tar.gz 解压缩  ==&gt; test.tar</span><br></pre></td></tr></table></figure>
-<p>简单的方式打包压缩</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -zcvf test.tar.gz * 把当前目录的东西 打包压缩到 test.tar.gz文件里</span><br><span class="line"></span><br><span class="line">tar -zxvf test.tar.gz  把test.tar.gz文件解压缩并且解除打包</span><br></pre></td></tr></table></figure>
-<p>bzip2压缩解压</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -jcvf aa.tar.bz2 *</span><br><span class="line">tar -jxvf aa.tar.bz2</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意：这几种压缩解压不能混用，即gzip压缩后只能用gzip解压缩</p>
-</blockquote>
-<p>zip 压缩解压</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zip  aa.tar.bz2 *</span><br><span class="line">unzip  aa.tar.bz2</span><br></pre></td></tr></table></figure>
-<h3 id="which查看命令位置"><a href="#which查看命令位置" class="headerlink" title="which查看命令位置"></a>which查看命令位置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">which ls</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/13/Linux002难点命令/" data-id="cklcb6bdh0046wo915rnd0ydd" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Linux001基本命令" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/13/Linux001基本命令/" class="article-date">
-  <time datetime="2018-06-13T13:41:57.000Z" itemprop="datePublished">2018-06-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/13/Linux001基本命令/">Linux001基本命令</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="linux的文件目录"><a href="#linux的文件目录" class="headerlink" title="linux的文件目录"></a>linux的文件目录</h3><blockquote>
-<p>linux里没有盘符的概念(也就是没有windows里的cdef盘)它不分盘</p>
-</blockquote>
-<ul>
-<li>它有一个顶层目录叫做根目录 「/」斜杠</li>
-<li>它的目录像一棵树</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-|/</span><br><span class="line">-|/bin</span><br><span class="line">-|/sbin</span><br><span class="line">-|/usr</span><br><span class="line">-|/usr/bin</span><br><span class="line">-|/usr/local</span><br><span class="line">-|/usr/local/include</span><br><span class="line">-|/usr/lib</span><br><span class="line">-|/lib</span><br><span class="line">-|/...</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd / </span><br><span class="line">linux中  / 代表根目录</span><br><span class="line"></span><br><span class="line">cd ~</span><br><span class="line">linux中 ~代表用户名录</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>linux里常用的文件夹</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/home 系统默认的用户家目录(也就是你可以随意操作的目录)最常用的目录</span><br><span class="line"></span><br><span class="line">/home 下的每一个文件夹代表的用户</span><br><span class="line">如 </span><br><span class="line">/home/xxx    张三目录</span><br><span class="line">/home/yyy    李四目录</span><br><span class="line"></span><br><span class="line">/home/xxx/   又会有一些文件夹 </span><br><span class="line">如 </span><br><span class="line">Desktop(桌面) </span><br><span class="line">Downloads(下载相关的)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/bin 不要随意操作(可运行命令的执行环境)</span><br><span class="line">/usr/bin 也不要随意操作(可运行命令的执行环境)</span><br><span class="line">/usr 存放用户的应用程序</span><br><span class="line">/tmp 临时性的文件(比如垃圾文件)</span><br><span class="line">/dev  和设备相关的(比如你插的U盘)</span><br></pre></td></tr></table></figure>
-<h3 id="linux常用命令"><a href="#linux常用命令" class="headerlink" title="linux常用命令"></a>linux常用命令</h3><h4 id="ls-显示当前路径下的东西"><a href="#ls-显示当前路径下的东西" class="headerlink" title="ls 显示当前路径下的东西"></a>ls 显示当前路径下的东西</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">ls -l 按行显示文件及目录(不包含隐藏文件)</span><br><span class="line">ls -a 显示所有文件(包含隐藏的文件)</span><br><span class="line">ls -al 按行显示所有文件及详细信息</span><br><span class="line">ls -h 代表文件大小(多少k)</span><br><span class="line"></span><br><span class="line">-l后显示形如</span><br><span class="line">drwxr-xr-x 1 hjx hjx 197121     0 Apr  9 23:35 public</span><br><span class="line">-rw-r--r-- 1 hjx hjx 197121 76850 Mar 23 22:23 </span><br><span class="line">yarn.lock</span><br><span class="line"></span><br><span class="line">drwxr-xr-x  代表 一共十位  从第二位开始 后九个代表权限 </span><br><span class="line">-rw-r--r--  代表 一共十位  从第二位开始 后九个代表权限</span><br><span class="line"></span><br><span class="line">第一个字母代表文件</span><br><span class="line">第一个字母</span><br><span class="line">d 代表目录</span><br><span class="line">- 代表普通文件</span><br><span class="line"></span><br><span class="line">1      代表链接数</span><br><span class="line">第一个 hjx代表当前用户</span><br><span class="line">第二个 hjx代表用户组</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>查看 Desktop目录里的东西</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 大前提是你在 Desktop的父目录</span><br><span class="line">ls Desktop</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>区分绝对路径和相对路径</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">绝对路径 cd /home/aaa</span><br><span class="line">相对路径 cd Desktop    </span><br><span class="line"></span><br><span class="line">. 表示当前路径</span><br><span class="line">.. 表示当前路径的上一层</span><br><span class="line">../.. 表示当前路径的上一层的上一层</span><br><span class="line">cd ..</span><br><span class="line"></span><br><span class="line">cd - 跳转到上一次所在的路径(只在最近两次的目录直接进行直接跳转)</span><br><span class="line"></span><br><span class="line">cd Music 等价于  cd ./Music</span><br></pre></td></tr></table></figure>
-<h4 id="cd-切换目录"><a href="#cd-切换目录" class="headerlink" title="cd 切换目录"></a>cd 切换目录</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd 「跳转的目录」</span><br><span class="line">cd ~ 切换到当前用户目录</span><br><span class="line">cd / 切换到根目录</span><br><span class="line">cd .. 回到上一级目录(父目录)</span><br></pre></td></tr></table></figure>
-<h4 id="pwd-显示当前路径-从头到尾"><a href="#pwd-显示当前路径-从头到尾" class="headerlink" title="pwd 显示当前路径(从头到尾)"></a>pwd 显示当前路径(从头到尾)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwd 当前目录的绝对路径从头到尾</span><br></pre></td></tr></table></figure>
-<h4 id="clear-清屏"><a href="#clear-清屏" class="headerlink" title="clear 清屏"></a>clear 清屏</h4><h4 id="tab自动补全"><a href="#tab自动补全" class="headerlink" title="tab自动补全"></a>tab自动补全</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 比如你在你的用户目录   里面有 Desktop 和 Downloads</span><br><span class="line"></span><br><span class="line">cd D 按tab 不会进行自动补全(因为存在两个开头一样的D目录)</span><br><span class="line"></span><br><span class="line">cd De 按 tab 就能自动补全</span><br></pre></td></tr></table></figure>
-<h4 id="touch创建文件"><a href="#touch创建文件" class="headerlink" title="touch创建文件"></a>touch创建文件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch 1.txt</span><br></pre></td></tr></table></figure>
-<h4 id="正则相关的操作"><a href="#正则相关的操作" class="headerlink" title="正则相关的操作"></a>正则相关的操作</h4><blockquote>
-<p>问题1 显示当前路径下所有的 .txt文件</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls *.txt</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>问题2 显示当前目录下有.txt .tnt .tst</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls *.t?t</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>问题3 显示 当前目录下的 .txt .tnt文件</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls *.t[nx]t</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">? 代表一个字符有且仅有,不能没有</span><br><span class="line">[xn] 代表括号里任意一个字符</span><br><span class="line">[abcdef] 可以写为 [a-f] 表示a到f的任意字符</span><br><span class="line"></span><br><span class="line">如果有以下文件恰好叫 1a 2a 3a *a</span><br><span class="line">ls *a就会有歧义  会显示  1a 2a 3a *a</span><br><span class="line">ls \*a 转义  会显示 *a</span><br></pre></td></tr></table></figure>
-<h4 id="重定向-gt"><a href="#重定向-gt" class="headerlink" title="重定向 &gt;"></a>重定向 &gt;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ls &gt; 1.txt  文件不存在就创建，清空1.txt的内容 把ls显示的内容填充到1.txt里</span><br><span class="line"></span><br><span class="line">ls &gt;&gt; 1.txt 文件不存在就创建，不清空1.txt的内容 把ls的内容追加到1.txt</span><br></pre></td></tr></table></figure>
-<h4 id="分屏-more"><a href="#分屏-more" class="headerlink" title="分屏 more"></a>分屏 more</h4><p>用命令查看文件的内容</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">more 1.txt  如果文件内容超过一屏显示  就按当前内容所占比例显示在下方   按空格进行查看其余内容</span><br></pre></td></tr></table></figure>
-<h4 id="管道"><a href="#管道" class="headerlink" title="管道 |"></a>管道 |</h4><p>一行里写多个命令通常不好使此时就需要使用管道了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -alh | more</span><br></pre></td></tr></table></figure>
-<h4 id="mkdir创建目录"><a href="#mkdir创建目录" class="headerlink" title="mkdir创建目录"></a>mkdir创建目录</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 当前目录创建一个demo文件夹</span><br><span class="line">mkdir demo </span><br><span class="line"></span><br><span class="line"># 当前目录创建 a/b/c 嵌套目录的文件夹  需要添加 -p</span><br><span class="line">mkdir -p a/b/c</span><br></pre></td></tr></table></figure>
-<h4 id="tree-以目录树的方式显示目录结构"><a href="#tree-以目录树的方式显示目录结构" class="headerlink" title="tree 以目录树的方式显示目录结构"></a>tree 以目录树的方式显示目录结构</h4><h4 id="rmdir删除目录"><a href="#rmdir删除目录" class="headerlink" title="rmdir删除目录"></a>rmdir删除目录</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rmdir demo</span><br><span class="line"></span><br><span class="line"># 无法删除嵌套目录 如 demo/a/b</span><br></pre></td></tr></table></figure>
-<h4 id="rm-删除文件-慎用"><a href="#rm-删除文件-慎用" class="headerlink" title="rm 删除文件(慎用)"></a>rm 删除文件(慎用)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rm / 千万不要用,你就完蛋了从根目录开始删</span><br><span class="line">rm / 千万不要用,你就完蛋了从根目录开始删</span><br><span class="line">rm / 千万不要用,你就完蛋了从根目录开始删</span><br><span class="line"></span><br><span class="line">rm 文件名</span><br><span class="line">rm -f 强制删除,也就是不提示(你确认删除吗？)</span><br><span class="line">rm -r 目录 递归的删除目录(每删除一个文件问你一次 你确认删除吗？)</span><br><span class="line">rm -rf 递归的删除目录(没有任何提示)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/13/Linux001基本命令/" data-id="cklcb6bdf0041wo91hjnfy439" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
 
     </footer>
   </div>
@@ -1080,7 +975,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/45/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/44/">44</a><a class="page-number" href="/page/45/">45</a><span class="page-number current">46</span><a class="page-number" href="/page/47/">47</a><a class="page-number" href="/page/48/">48</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/47/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/45/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/44/">44</a><a class="page-number" href="/page/45/">45</a><span class="page-number current">46</span><a class="page-number" href="/page/47/">47</a><a class="page-number" href="/page/48/">48</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/47/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1104,7 +999,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1126,23 +1021,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

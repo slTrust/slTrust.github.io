@@ -62,6 +62,1124 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-MySQL005关联" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/24/MySQL005关联/" class="article-date">
+  <time datetime="2018-06-24T07:28:16.000Z" itemprop="datePublished">2018-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/24/MySQL005关联/">MySQL005关系</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="关联"><a href="#关联" class="headerlink" title="关联"></a>关联</h3><blockquote>
+<p>查询男生的姓名，总分</p>
+</blockquote>
+<p>为啥不以姓名分组，因为有同名的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select name,sum(score)</span><br><span class="line">from students </span><br><span class="line">inner join scores on students.id=scores.stuid</span><br><span class="line">where gender=1</span><br><span class="line">group by students.id;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询科目的名称，平均分</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select subjects.title,avg(scores.score)</span><br><span class="line">from scores </span><br><span class="line">inner join subjects on scores.subid=subjects.id</span><br><span class="line">group by subjects.title;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询未删除科目的名称，最高分、平均分</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select subjects.title,avg(scores.score),max(scores.score)</span><br><span class="line">from scores </span><br><span class="line">inner join subjects on scores.subid=subjects.id</span><br><span class="line">where subjects.isdelete=0</span><br><span class="line">group by subjects.title;</span><br></pre></td></tr></table></figure>
+<h3 id="自关联"><a href="#自关联" class="headerlink" title="自关联"></a>自关联</h3><p>省市区</p>
+<table>
+<thead>
+<tr>
+<th>省</th>
+<th style="text-align:center">市</th>
+<th style="text-align:right">区</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td style="text-align:center">id</td>
+<td style="text-align:right">id</td>
+</tr>
+<tr>
+<td>name</td>
+<td style="text-align:center">name</td>
+<td style="text-align:right">name</td>
+</tr>
+<tr>
+<td>-</td>
+<td style="text-align:center">pid省的引用</td>
+<td style="text-align:right">pid市的引用</td>
+</tr>
+</tbody>
+</table>
+<p>我们知道中国36个省，但是这样就创建了一个表显然很浪费</p>
+<p>我们假设</p>
+<ul>
+<li>省 36</li>
+<li>市 1万</li>
+<li>区 10万</li>
+</ul>
+<blockquote>
+<p>没有必要建立三张表去存这些数据,如果我们能建立一张表把这些数据存起来</p>
+</blockquote>
+<p>每建一张表对数据库的开销是很大的</p>
+<ol>
+<li>我们能不能给省加一个pid</li>
+<li>给省的pid为null</li>
+<li>合成了一个表外键还是需要的引谁呢？ 市引用省，区引用市</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th style="text-align:center">name</th>
+<th style="text-align:right">pid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align:center">河南省</td>
+<td style="text-align:right">null</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">郑州市</td>
+<td style="text-align:right">1</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>自引用,自关联</p>
+</blockquote>
+<ul>
+<li>不用增加新表的开销</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">create table areas(</span><br><span class="line">    aid int primary key auto_increment not null,</span><br><span class="line">    name varchar(20),</span><br><span class="line">    pid int,</span><br><span class="line">    foreign key(pid) references areas(id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>自关联查询山西省的市</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">select sheng.aid as sid,sheng.name as sname,</span><br><span class="line">shi.aid as shiid,shi.name as shiname</span><br><span class="line">from areas as sheng</span><br><span class="line">inner join areas as shi on sheng.aid=shi.aid</span><br><span class="line">where sheng.pid is null and sheng.name=&apos;山西省&apos;</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/24/MySQL005关联/" data-id="cklhgn2bc0051kyfyki4cgrla" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-MySQL004关系" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/24/MySQL004关系/" class="article-date">
+  <time datetime="2018-06-24T03:28:16.000Z" itemprop="datePublished">2018-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/24/MySQL004关系/">MySQL004关系</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h3><ul>
+<li>实体与实体之间有3种对应关系，这些关系也需要存储下来</li>
+<li>在开发中需要对存储的数据进行一些处理，用到内置的一些函数</li>
+<li>视图用于完成查询语句的封装</li>
+<li>事务可以保证复杂的增删改操作有</li>
+</ul>
+<blockquote>
+<p>请看如下情况</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>学生表</th>
+<th style="text-align:center">成绩表</th>
+<th style="text-align:right">科目表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td style="text-align:center">id</td>
+<td style="text-align:right">id</td>
+</tr>
+<tr>
+<td>name</td>
+<td style="text-align:center">score</td>
+<td style="text-align:right">title</td>
+</tr>
+<tr>
+<td>-</td>
+<td style="text-align:center">学生的引用</td>
+<td style="text-align:right">-</td>
+</tr>
+<tr>
+<td>-</td>
+<td style="text-align:center">科目的引用</td>
+<td style="text-align:right">-</td>
+</tr>
+</tbody>
+</table>
+<p>学生列的数据不是在scores表里建立的,而应该从学生表引用过来,关系也是一条数据;根据范式,应该存储学生的唯一编号(id),而不是学生的姓名或其他信息,同理科目表也是关系列</p>
+<blockquote>
+<p>创建表如下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">create table scores (</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    stuid int,</span><br><span class="line">    subid int,</span><br><span class="line">    score decimal(5,2)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h4 id="外键约束"><a href="#外键约束" class="headerlink" title="外键约束"></a>外键约束</h4><table>
+<thead>
+<tr>
+<th>班级表</th>
+<th style="text-align:center">学生表 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td style="text-align:center">id</td>
+</tr>
+<tr>
+<td>name</td>
+<td style="text-align:center">name</td>
+</tr>
+<tr>
+<td>-</td>
+<td style="text-align:center">班级的引用</td>
+</tr>
+</tbody>
+</table>
+<p>假如有班级表只有三个班</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">学生添加的时候如果添加班级4如何去验证班级是否存在？</span><br><span class="line"></span><br><span class="line">此时就会有外键约束</span><br></pre></td></tr></table></figure>
+<ul>
+<li>必须是班级表中存在的数据,可以通过外键约束进行数据的有效性验证</li>
+<li>为classid添加外键约束</li>
+</ul>
+<blockquote>
+<p>为刚刚的分数表添加外键约束</p>
+</blockquote>
+<p>此时插入或修改数据时,如果stuid的值在students表里不存在就会报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">create table scores (</span><br><span class="line">    id int primary key auto_increment,</span><br><span class="line">    stuid int,</span><br><span class="line">    subid int,</span><br><span class="line">    score decimal(5,2),</span><br><span class="line">    foreign key(stuid) references students(id),</span><br><span class="line">    foreign key(subid) references subjects(id),</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>已经建表了再进行添加约束</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alter table scores add constraint stu_score foreign key(stuid) references students(id);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">stu_score 代表约束名字(语法要求)</span><br></pre></td></tr></table></figure>
+<h4 id="外键的级联操作"><a href="#外键的级联操作" class="headerlink" title="外键的级联操作"></a>外键的级联操作</h4><ul>
+<li>在删除students表的数据时，如果这个id值在scores中已经存在，则会抛异常</li>
+<li>推荐使用逻辑删除，还可以解决这个问题</li>
+<li>可以创建表时指定级联操作，也可以在创建表后再修改外键的级联操作</li>
+</ul>
+<blockquote>
+<p>语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter table scores add constraint stu_sco foreign key(stuid) references students(id) on delete cascade;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>级联操作的类型包括：</p>
+</blockquote>
+<ul>
+<li>restrict（限制）：默认值，抛异常</li>
+<li>cascade（级联）：如果主表的记录删掉，则从表中相关联的记录都将被删除</li>
+<li>set null：将外键设置为空</li>
+<li>no action：什么都不做</li>
+</ul>
+<h3 id="连接查询"><a href="#连接查询" class="headerlink" title="连接查询"></a>连接查询</h3><p>分数表查询后是如下结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from scores;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th style="text-align:center">score</th>
+<th style="text-align:center">stuid</th>
+<th>subid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align:center">60</td>
+<td style="text-align:center">2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align:center">30</td>
+<td style="text-align:center">3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>但是这样根本看不出谁是谁啊</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select students.name,subjects.title,scores.score    </span><br><span class="line">from scores</span><br><span class="line">inner join students on scores.stuid=students.id</span><br><span class="line">inner join subjects on scores.subid=subjects.id</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>inner join 后的表先写谁后写谁没关系</li>
+<li>但是inner join subjects on之后的 scores.subid必须和subjects有关系</li>
+</ul>
+<h4 id="连接查询的分类"><a href="#连接查询的分类" class="headerlink" title="连接查询的分类"></a>连接查询的分类</h4><ul>
+<li>内连接</li>
+</ul>
+<p>连接表的数据都能对应才会出现(都匹配才出现，即如有学生黄药师但是他没有成绩，就不会查出来) </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * </span><br><span class="line">from scores</span><br><span class="line">inner join  students on students.id=scores.stuid</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th style="text-align:center">score</th>
+<th style="text-align:center">stuid</th>
+<th style="text-align:center">subid</th>
+<th style="text-align:center">name</th>
+<th style="text-align:center">gender</th>
+<th style="text-align:center">birthday</th>
+<th>isDelete</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>6</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>左连接代表以 from后的 表名为准的数据全查出来 连接的表数据没有就用null填充</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * </span><br><span class="line">from students</span><br><span class="line">left join scores on students.id=scores.stuid</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th style="text-align:center">name</th>
+<th style="text-align:center">gender</th>
+<th style="text-align:center">birthday</th>
+<th style="text-align:center">isDelete</th>
+<th style="text-align:center">id1</th>
+<th style="text-align:center">score</th>
+<th style="text-align:center">stuid</th>
+<th>subid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">1</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">1</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">2</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align:center">黄药师</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td>null</td>
+<td>null</td>
+</tr>
+<tr>
+<td>6</td>
+<td style="text-align:center">郭襄</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td>null</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>右连接 跟左连接类似</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * </span><br><span class="line">from scores </span><br><span class="line">left join students on students.id=scores.stuid</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>id1</th>
+<th style="text-align:center">score</th>
+<th style="text-align:center">stuid</th>
+<th style="text-align:center">subid</th>
+<th style="text-align:center">id</th>
+<th style="text-align:center">name</th>
+<th style="text-align:center">gender</th>
+<th style="text-align:center">birthday</th>
+<th>isDelete</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">黄蓉</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align:center">100</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align:center">99</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">郭靖</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">杨过</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align:center">78</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">小龙女</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">黄药师</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">null</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">郭襄</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1990-02-11 00:00:00</td>
+<td>0</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="查询平均分"><a href="#查询平均分" class="headerlink" title="查询平均分"></a>查询平均分</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select name,ave(scores) as avg1 from scores</span><br><span class="line">inner join students on scores.stuid=students.id</span><br><span class="line">group by stuid</span><br><span class="line">order by avg1</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/24/MySQL004关系/" data-id="cklhgn2bc0053kyfyk30z3nt3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-MySQL003查询强化" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/23/MySQL003查询强化/" class="article-date">
+  <time datetime="2018-06-23T14:58:16.000Z" itemprop="datePublished">2018-06-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/23/MySQL003查询强化/">MySQL003查询强化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><blockquote>
+<p>占据90%的业务</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 ;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>from关键字后面写表名，表示数据来源于是这张表</li>
+<li>select后面写表中的列名，如果是*表示在结果中显示表中所有列</li>
+<li>在select后面的列名部分，可以使用as为列起别名，这个别名出现在结果集中</li>
+<li>如果要查询多个列，之间使用逗号分隔</li>
+</ul>
+<blockquote>
+<p>查询所有</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">select * from students;</span><br><span class="line">##########################################################</span><br><span class="line">| id | name | birthday              | gender | isDelete |</span><br><span class="line">##########################################################</span><br><span class="line">  1    郭靖   2017-01-01 00:00:00       1</span><br><span class="line">  2    黄蓉   2017-01-01 00:00:00       0</span><br><span class="line">  3    郭芙   2017-01-01 00:00:00       0</span><br><span class="line">  4    杨过   2017-01-01 00:00:00       1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询 id和name列</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select id,name from students;</span><br><span class="line">##########################################################</span><br><span class="line">  id   name</span><br><span class="line">  1    郭靖  </span><br><span class="line">  2    黄蓉   </span><br><span class="line">  3    郭芙   </span><br><span class="line">  4    杨过</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询gender</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select gender from students;</span><br><span class="line">##########################################################</span><br><span class="line">gender</span><br><span class="line">1</span><br><span class="line">0</span><br><span class="line">0</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>想看gender有多少种(去重复)</p>
+</blockquote>
+<ul>
+<li>distinct消除重复的行</li>
+<li>如果是多列比较的整个一行的每列进行去重复(如果你查了id肯定没法去重)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select distinct gender from students;</span><br><span class="line">##########################################################</span><br><span class="line">gender</span><br><span class="line">1</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+<h4 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 where 条件;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>where之后的内容为条件，它是对行进行筛选</p>
+</blockquote>
+<h5 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id=3;</span><br><span class="line">select * from students where id&gt;3;</span><br><span class="line">select * from students where id&gt;=3;</span><br><span class="line">select * from students where id&lt;3;</span><br><span class="line">select * from students where id&lt;=3;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询名字为「黄蓉」和的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name=&apos;黄蓉&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询名字不为「黄蓉」和的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name!=&apos;黄蓉&apos;;</span><br></pre></td></tr></table></figure>
+<h5 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h5><ul>
+<li>and</li>
+<li>or</li>
+<li>not</li>
+</ul>
+<blockquote>
+<p>学号大于3的女同学</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id&gt;3 and gender=0;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>编号小于4或没被删除的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id&lt;4 or isdelete=0;</span><br></pre></td></tr></table></figure>
+<h5 id="模糊查询"><a href="#模糊查询" class="headerlink" title="模糊查询"></a>模糊查询</h5><ul>
+<li>like</li>
+<li>%任意个字符</li>
+<li>_一个任意字符</li>
+</ul>
+<blockquote>
+<p>查询姓黄的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄%&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄且总共两个字的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄_&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄且总共三个字的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄__&apos;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询姓名为黄或者叫靖的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where name like &apos;黄%&apos; or name like &apos;%靖&apos;;</span><br></pre></td></tr></table></figure>
+<h5 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h5><ul>
+<li>连续的范围</li>
+<li>不连续的范围</li>
+</ul>
+<blockquote>
+<p>in表示不连续的范围</p>
+</blockquote>
+<p>查询编号是1,3,8的学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id in(1,3,8);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>between … and …表示连续的范围</p>
+</blockquote>
+<p>查询编号是3-8的学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id between 3 and 8;</span><br></pre></td></tr></table></figure>
+<p>查询编号是3-8的「男」学生</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where id between 3 and 8 and gender=1;</span><br></pre></td></tr></table></figure>
+<h5 id="空判断"><a href="#空判断" class="headerlink" title="空判断"></a>空判断</h5><ul>
+<li>null与’’是不同的</li>
+<li>判空is null</li>
+</ul>
+<blockquote>
+<p>查询没写地址的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is null;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询写了地址的学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is not null;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查询写了地址的女学生</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from students where address is not null and gender=0;</span><br></pre></td></tr></table></figure>
+<h5 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h5><ul>
+<li>小括号,not,比较运算符,逻辑运算符</li>
+<li>and比or先运算，如果同时出现并希望先算or,需要使用()</li>
+</ul>
+<h3 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h3><p>将现有的多行数据进行统计，统计的结果是你看不到任何原始数据了，只看到结果</p>
+<ul>
+<li>count</li>
+<li>max</li>
+<li>min</li>
+<li>sum</li>
+<li>avg</li>
+</ul>
+<blockquote>
+<p>count(*)表示计算总行数，括号中写星与列名，结果是相同的</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">查询学生总数</span><br><span class="line">select count(*) from students;</span><br><span class="line"></span><br><span class="line">查询学生总数未被删除的</span><br><span class="line">select count(*) from students where isdelete=0;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>max(列)表示求此列的最大值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询女生的编号最大值</span><br><span class="line">select max(id) from students where gender=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>min(列)表示求此列的最小值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询未删除的学生最小编号</span><br><span class="line">select min(id) from students where isdelete=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>sum(列)表示求此列的和<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询男生的编号之后</span><br><span class="line">select sum(id) from students where gender=1;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>avg(列)表示求此列的平均值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查询未删除女生的编号平均值</span><br><span class="line">select avg(id) from students where isdelete=0 and gender=0;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">查询最小编号的学生信息  ————子查询</span><br><span class="line">select * from students where id =(</span><br><span class="line">    select min(id) from students where isdelete=0</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><ul>
+<li>按照字段分组，表示此字段相同的数据会被放到一个组中</li>
+<li>分组后，只能查询出相同的数据列，对于有差异的数据列无法出现在结果集中</li>
+<li>可以对分组后的数据进行统计，做聚合运算</li>
+</ul>
+<p>语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select 列1,列2,聚合... from 表名 group by 列1,列2,列3...</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>查询男女生总数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select gender as 性别,count(*)</span><br><span class="line">from students</span><br><span class="line">group by gender;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>查询各城市人数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select hometown as 家乡,count(*)</span><br><span class="line">from students</span><br><span class="line">group by hometown;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="分组后筛选"><a href="#分组后筛选" class="headerlink" title="分组后筛选"></a>分组后筛选</h4><p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select 列1,列2,聚合... from 表名</span><br><span class="line">group by 列1,列2,列3...</span><br><span class="line">having 列1,...聚合...</span><br></pre></td></tr></table></figure>
+<ul>
+<li>having后面的条件运算符与where的相同</li>
+</ul>
+<blockquote>
+<p>查询男生总人数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">方案一</span><br><span class="line">select count(*)</span><br><span class="line">from students</span><br><span class="line">where gender=1;</span><br><span class="line">-----------------------------------</span><br><span class="line">方案二：</span><br><span class="line">select gender as 性别,count(*)</span><br><span class="line">from students</span><br><span class="line">group by gender</span><br><span class="line">having gender=1;</span><br></pre></td></tr></table></figure>
+<h4 id="对比where与having"><a href="#对比where与having" class="headerlink" title="对比where与having"></a>对比where与having</h4><ul>
+<li>where是对from后面指定的表进行数据筛选，属于对原始数据的筛选</li>
+<li>having是对group by的结果进行筛选</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">原始集合——&gt;where——&gt;结果集——&gt;分组&gt;结果集——&gt;having——&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><blockquote>
+<p>为了方便查看数据，可以对数据进行排序</p>
+</blockquote>
+<p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名</span><br><span class="line">order by 列1 asc|desc,列2 asc|desc,...</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将行数据按照列1进行排序，如果某些行列1的值相同时，则按照列2排序，以此类推</li>
+<li>默认按照列值从小到大排列</li>
+<li>asc从小到大排列，即升序</li>
+<li>desc从大到小排序，即降序</li>
+</ul>
+<blockquote>
+<p>查询未删除男生学生信息，按学号降序<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from students</span><br><span class="line">where gender=1 and isdelete=0</span><br><span class="line">order by id desc;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>查询未删除科目信息，按名称升序<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from subject</span><br><span class="line">where isdelete=0</span><br><span class="line">order by stitle;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="分页"><a href="#分页" class="headerlink" title="分页"></a>分页</h3><p>获取部分行</p>
+<blockquote>
+<p>当数据量过大时，在一页中查看数据是一件非常麻烦的事情</p>
+</blockquote>
+<p>语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名 limit start,count;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>从start开始，获取count条数据</li>
+<li>start索引从0开始</li>
+</ul>
+<h5 id="示例：分页"><a href="#示例：分页" class="headerlink" title="示例：分页"></a>示例：分页</h5><blockquote>
+<p>已知：每页显示m条数据，当前显示第n页</p>
+</blockquote>
+<blockquote>
+<p>求总页数：此段逻辑后面会在python中实现</p>
+</blockquote>
+<ul>
+<li>查询总条数p1</li>
+<li>使用p1除以m得到p2</li>
+<li>如果整除则p2为总数页</li>
+<li>如果不整除则p2+1为总页数</li>
+</ul>
+<p>求第n页的数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select * from students</span><br><span class="line">where isdelete=0</span><br><span class="line">limit (n-1)*m,m</span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
+<p>完整的select语句</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名</span><br><span class="line">where ...</span><br><span class="line">group by ... having ...</span><br><span class="line">order by ...</span><br><span class="line">limit start,count</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>执行顺序</p>
+</blockquote>
+<ul>
+<li>from 表名</li>
+<li>where 条件</li>
+<li>group by 列名</li>
+<li>select distinct *</li>
+<li>having …</li>
+<li>order by …</li>
+<li>limit start,count</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/23/MySQL003查询强化/" data-id="cklhgn2bb004zkyfyp1pnn6i3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-MySQL002增删查改" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/23/MySQL002增删查改/" class="article-date">
+  <time datetime="2018-06-23T11:58:16.000Z" itemprop="datePublished">2018-06-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/23/MySQL002增删查改/">MySQL002CRUD</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="CRUD"><a href="#CRUD" class="headerlink" title="CRUD"></a>CRUD</h3><h4 id="查"><a href="#查" class="headerlink" title="查"></a>查</h4><p>查所有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from 表名</span><br></pre></td></tr></table></figure>
+<h4 id="增加"><a href="#增加" class="headerlink" title="增加"></a>增加</h4><ul>
+<li>全列插入 insert into 表名 values(…);</li>
+<li>缺省插入 insert into 表名(列1,列2) values(值1,值2);</li>
+<li>同时插入多条数据 insert into 表名 values(…),(…);<br>或者  insert into 表名(列1,列2) values(值1,值2),(值1,值2),(值1,值2);</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 全列</span><br><span class="line">insert into students values(0,&apos;八戒&apos;,1,&apos;1990-1-1&apos;,0);</span><br><span class="line"># 缺省插入</span><br><span class="line">insert into students(name) values(&apos;唐僧&apos;);</span><br><span class="line"></span><br><span class="line">#批量</span><br><span class="line">insert into students values(1,&apos;aaa&apos;,1,&apos;1990-1-1&apos;,0),(2,&apos;bbb&apos;,1,&apos;1990-1-1&apos;,0),(3,&apos;ccc&apos;,1,&apos;1990-1-1&apos;,0);</span><br><span class="line"></span><br><span class="line">insert into students(name) values(&apos;唐僧&apos;),(&apos;八戒&apos;),(&apos;悟空&apos;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>主键列是自动增长，但是在全列插入的时候要占位，通常使用0，插入成功后以实际数据为准</li>
+</ul>
+<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 对满足条件的行修改</span><br><span class="line">update 表名 set 列1=值,... where条件 </span><br><span class="line"></span><br><span class="line">如</span><br><span class="line"># 把id=2的 生日修改了</span><br><span class="line">update students set birthday=&apos;1990-1-1&apos; where id=2; </span><br><span class="line"></span><br><span class="line"># 不写条件就是全部改</span><br><span class="line">update students set gender=0,birthday=&apos;2018-6-23&apos; where id=6;</span><br></pre></td></tr></table></figure>
+<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><p>物理删除，数据真的没了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete from 表名 where 条件</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>逻辑删除表里设计这样一个字段 isDelete 默认为0，当值为1时代表删除了，查询的时候只取isDelete=0的</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/23/MySQL002增删查改/" data-id="cklhgn2ba004xkyfyxaal46sp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-MySQL001基本概念" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/23/MySQL001基本概念/" class="article-date">
+  <time datetime="2018-06-23T11:08:16.000Z" itemprop="datePublished">2018-06-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/23/MySQL001基本概念/">MySQL001基本概念</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><h4 id="数据库三范式"><a href="#数据库三范式" class="headerlink" title="数据库三范式"></a>数据库三范式</h4><ol>
+<li>列不可拆分</li>
+<li>唯一标识</li>
+<li>引用主键</li>
+</ol>
+<p>每一个范式都是在前一个范式基础上建立的</p>
+<h4 id="字段类型"><a href="#字段类型" class="headerlink" title="字段类型"></a>字段类型</h4><p>类型有很多，这里列出常用的</p>
+<ul>
+<li>数字 int, decimal</li>
+<li>字符串 char,varchar,text</li>
+<li>日期 datetime</li>
+<li>布尔 bit</li>
+</ul>
+<h4 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h4><ul>
+<li>主键primary key</li>
+<li>非空 not null</li>
+<li>唯一 unique</li>
+<li>默认 default</li>
+<li>外键 foreign key </li>
+</ul>
+<blockquote>
+<p>创建数据库</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create database 数据库名 charset=utf-8;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>删除数据库</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drop database 数据库名;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>切换数据库</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use 数据库名;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看当前数据库</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select database();</span><br></pre></td></tr></table></figure>
+<h3 id="表操作"><a href="#表操作" class="headerlink" title="表操作"></a>表操作</h3><blockquote>
+<p>查看表</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show tables;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建表</li>
+<li>auto_increment表示自增长</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">create table 表名(列及类型);</span><br><span class="line">如</span><br><span class="line">create table students2 (</span><br><span class="line">    id int auto_increment primary key,</span><br><span class="line">    sname varchar(10) not null</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看表设计</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">desc 表名;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改表 alter</p>
+</blockquote>
+<ul>
+<li>修改列的时候列名是不能改的</li>
+<li>如果已经有数据了在进行增加列，容易出错</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">alter table 表名 add|change|drop 列名 类型;</span><br><span class="line"></span><br><span class="line">alter table students add birthday datetime;</span><br><span class="line"></span><br><span class="line">###############################逻辑删除，数据还在只是 isDelete状态变成1</span><br><span class="line">alter table students add isDelete bit default 0;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>删除表</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drop table 表名;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>更改表名</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rename table 原名 to 现名</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看建表语句</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show create table 表名</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/23/MySQL001基本概念/" data-id="cklhgn2b9004vkyfyb56vwfgm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Python033gc垃圾回收之三" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/23/Python033gc垃圾回收之三/" class="article-date">
@@ -89,7 +1207,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/23/Python033gc垃圾回收之三/" data-id="cklcb6blf00nawo91e4hameyz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/23/Python033gc垃圾回收之三/" data-id="cklhgn2j600nakyfyde1oguw5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -128,7 +1246,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/23/Python032gc垃圾回收之二/" data-id="cklcb6ble00n8wo91kjhmzrh0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/23/Python032gc垃圾回收之二/" data-id="cklhgn2j500n8kyfyyhsry2yn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -194,7 +1312,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/23/Python030元类/" data-id="cklcb6blc00n2wo911ue9qqfk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/23/Python030元类/" data-id="cklhgn2j400n4kyfy47o28xfx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -276,7 +1394,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/23/Python031gc垃圾回收之一/" data-id="cklcb6bld00n6wo91fro27phw" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/23/Python031gc垃圾回收之一/" data-id="cklhgn2j500n6kyfyy0kqk36f" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -322,348 +1440,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/23/Python029类装饰器/" data-id="cklcb6blb00n0wo91ot9sxgho" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python028生成器" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/22/Python028生成器/" class="article-date">
-  <time datetime="2018-06-22T10:10:16.000Z" itemprop="datePublished">2018-06-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/22/Python028生成器/">Python028生成器</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><blockquote>
-<p>根据规则生成你要的东西，在你实际需要的时候生成</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = [x*2 for x in range(10)]</span><br><span class="line"># [0,2,4,6,8,10,12,14,16,18]</span><br></pre></td></tr></table></figure>
-<p>有的时候你需要一个很大的列表这样内存就会需要很多，但是不希望现在就生成，而是使用其中某些个</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 基本会死掉</span><br><span class="line">a = [x*2 for x in range(100000000000000000)]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>生成器如何表达</p>
-</blockquote>
-<h4 id="生成器生成方式一"><a href="#生成器生成方式一" class="headerlink" title="生成器生成方式一"></a>生成器生成方式一</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">原来的方式(列表生成式)</span><br><span class="line">a = [x*2 for x in range(10)]</span><br><span class="line"># [0,2,4,6,8,10,12,14,16,18]</span><br><span class="line"></span><br><span class="line">生成器的方式  ==&gt; 将列表生成式的[]改成 ()</span><br><span class="line">b = (x*2 for x in range(10))</span><br><span class="line"># &lt;generator object &lt;genexpr&gt; at 0x79898312312&gt;</span><br></pre></td></tr></table></figure>
-<p>如何使用生成器里的值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">next(b) # 0</span><br><span class="line">next(b) # 2</span><br><span class="line">next(b) # 4</span><br><span class="line">next(b) # 6</span><br><span class="line">next(b) # 8</span><br><span class="line">next(b) # 10</span><br><span class="line">next(b) # 12</span><br><span class="line">next(b) # 14</span><br><span class="line">next(b) # 16</span><br><span class="line">next(b) # 18</span><br><span class="line">next(b) # 异常 如果生成器已经到了最后一个值就罢工了。。。直接异常了</span><br></pre></td></tr></table></figure>
-<h4 id="生成器生成方式二"><a href="#生成器生成方式二" class="headerlink" title="生成器生成方式二"></a>生成器生成方式二</h4><ul>
-<li>yield 执行到它的时候,creatNum执行就结束了,返回 yield 后的值</li>
-</ul>
-<blockquote>
-<p>如果一个函数里有yield那么 它返回的就是生成器对象</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def creatNum():</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    for i in range(5)</span><br><span class="line">        yield b</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    print(&apos;stop&apos;)</span><br><span class="line"></span><br><span class="line"># 创建了一个生成器对象   creatNum()已经不像函数了，而是一个生成器对象</span><br><span class="line">a = creatNum()</span><br><span class="line"></span><br><span class="line"># 第一种方式：使用循环执行迭代器</span><br><span class="line">for num in a:</span><br><span class="line">    print(num)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">第二种方式：</span><br><span class="line">两种next方式执行生成器 前提是你要指定生成的次数</span><br><span class="line">res = a.__next__()</span><br><span class="line">res =  next(a)</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>详解 yield</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">def creatNum():</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    for i in range(5)</span><br><span class="line">        yield b</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    print(&apos;stop&apos;)</span><br><span class="line"></span><br><span class="line">a =  creatNum() # 生成器对象</span><br><span class="line"></span><br><span class="line">next(a)</span><br><span class="line"># 此时 a是生成器对象  但是是第一次执行 所以就会执行</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    初始化部分</span><br><span class="line">    print(&apos;start&apos;)</span><br><span class="line">    a,b = 0,1</span><br><span class="line">    然后执行循环第一次  返回yield 后的值 b (b = 1)</span><br><span class="line">    函数停止在 yield</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"># 第二次调用 next</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    会从上次停止的地方执行 也就是 yield b (b = 1) 开始</span><br><span class="line">    a,b = b,a+b</span><br><span class="line">    然后根据循环条件看是否继续循环</span><br><span class="line">    发现yield b (b = 1)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">next(a)</span><br><span class="line"></span><br><span class="line"># 第三次同第二次的结果 。。。</span><br><span class="line"># 第四次同第二次的结果 。。。</span><br><span class="line"># 第五次同第二次的结果 。。。 由于循环已经结束 所以最后会打印 stop</span><br></pre></td></tr></table></figure>
-<h4 id="send"><a href="#send" class="headerlink" title="send"></a>send</h4><p>先看如下程序</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line"></span><br><span class="line">a = next(t) #  a为0</span><br><span class="line"></span><br><span class="line">a = next(t) #  打印 None ,a为1 </span><br><span class="line"></span><br><span class="line">a = next(t) #  打印 None ,a为2</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>为啥是None</p>
-</blockquote>
-<ul>
-<li>如果 yield 前有如下形式 temp = yield i,并不是把 yield值给了temp 而是在下一次执行生成器的时候给它传递一个值</li>
-<li>之所以为None 因为 yield i 的时候函数就停止了 temp没有执行到<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">temp = yield i </span><br><span class="line">要看为两部分  左边 temp  和右边 yield i </span><br><span class="line">程序执行的时候会从右往左</span><br><span class="line">但是yield i的时候就结束返回了</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p>再看</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line">a = next(t) #  a为0</span><br><span class="line">a = next(t) #  打印 None ,a为1 </span><br><span class="line">a = t.send(&apos;haha&apos;) # 打印 haha ,a 为2</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">t.send(&apos;haha&apos;) 是把 haha 作为 yield i 的返回结果赋值为temp</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<h5 id="send-和-next的区别"><a href="#send-和-next的区别" class="headerlink" title="send 和 next的区别"></a>send 和 next的区别</h5><ul>
-<li>相同点：都可以让生成器向下走一步</li>
-<li>异同点： send可以给一个值，这个值作为 yield i 的整体的结果</li>
-</ul>
-<h5 id="使用send的注意点"><a href="#使用send的注意点" class="headerlink" title="使用send的注意点"></a>使用send的注意点</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        temp = yield i</span><br><span class="line">        print(temp)</span><br><span class="line">        i += 1</span><br><span class="line"></span><br><span class="line">t = test()</span><br><span class="line"></span><br><span class="line">t.send(&apos;haha&apos;) # 报错</span><br><span class="line"></span><br><span class="line">##########################################</span><br><span class="line">因为第一次从程序开头执行</span><br><span class="line">即i = 0执行 但是 send(&apos;haha&apos;)是把值给 yield i的整体的返回结果</span><br><span class="line"></span><br><span class="line">解决方式就是 第一次先调用 一次 t.next() 然后在 t.send(&apos;haha&apos;)</span><br><span class="line"></span><br><span class="line">第二种方式 if/else</span><br><span class="line"></span><br><span class="line">def test():</span><br><span class="line">    i = 0</span><br><span class="line">    while i&lt;5:</span><br><span class="line">        if i == 0:</span><br><span class="line">            temp = yield i</span><br><span class="line">        else:</span><br><span class="line">            yield i</span><br><span class="line">        i += 1</span><br></pre></td></tr></table></figure>
-<h4 id="生成器的应用"><a href="#生成器的应用" class="headerlink" title="生成器的应用"></a>生成器的应用</h4><p>相当于一起执行(就像单核的CPU进程里时间片的概念看上去执行多个应用实际上是假象)</p>
-<blockquote>
-<p>多任务应用</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">def test1():</span><br><span class="line">    while True:</span><br><span class="line">        print(&apos;--1--&apos;)</span><br><span class="line">        yield None</span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    while True:</span><br><span class="line">        print(&apos;--2--&apos;)</span><br><span class="line">        yield None</span><br><span class="line"></span><br><span class="line">t1 = test1()</span><br><span class="line">t2 = test2()</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    t1.__next__()</span><br><span class="line">    t2.__next__()</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/22/Python028生成器/" data-id="cklcb6blc00n4wo9162y1xmq2" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python027动态添加属性及方法" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/22/Python027动态添加属性及方法/" class="article-date">
-  <time datetime="2018-06-22T09:10:16.000Z" itemprop="datePublished">2018-06-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/22/Python027动态添加属性及方法/">Python027动态添加属性及方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="动态添加属性"><a href="#动态添加属性" class="headerlink" title="动态添加属性"></a>动态添加属性</h3><ul>
-<li>给实例对象添加</li>
-<li>给类添加</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class Person(object):</span><br><span class="line">    def __init__:(self,name,age)</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a1 = Person(&quot;a1&quot;,100)</span><br><span class="line">print(a1.name)</span><br><span class="line">print(a1.age)</span><br><span class="line"># 给a1添加属性</span><br><span class="line">a1.addr = &apos;beijing&apos;</span><br><span class="line">print(a1.addr)</span><br><span class="line"></span><br><span class="line">b1 = Person(&quot;b1&quot;,1000)</span><br><span class="line">print(b1.name)</span><br><span class="line">print(b1.age)</span><br><span class="line"></span><br><span class="line"># print(b1.addr) 报错 因为 addr是a1对象动态添加的属性，仅跟对象绑定</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 类属性</span><br><span class="line">Person.num = 100</span><br><span class="line"></span><br><span class="line">print(a1.num) #100</span><br><span class="line">print(b1.num) #100</span><br></pre></td></tr></table></figure>
-<h3 id="动态添加方法"><a href="#动态添加方法" class="headerlink" title="动态添加方法"></a>动态添加方法</h3><ul>
-<li>实例方法</li>
-<li>静态方法</li>
-<li>类方法</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class Person(object):</span><br><span class="line">    def __init__:(self,name,age)</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">    def eat(self):</span><br><span class="line">        print(&quot;%s正在吃&quot;%self.name)</span><br><span class="line"></span><br><span class="line"># run不在 Person类中定义</span><br><span class="line">def run(self):</span><br><span class="line">     print(&quot;--------%s正在跑-----&quot;%self.name)</span><br><span class="line"></span><br><span class="line">p1 = Person(&apos;p1&apos;,10)</span><br><span class="line">p1.eat()</span><br><span class="line"></span><br><span class="line">#错误方式1</span><br><span class="line"># p1.run()  报错</span><br><span class="line"></span><br><span class="line">#错误方式2 (把方法地址传递给 p1.run属性)</span><br><span class="line">#虽然p1对象中，run属性已经指向了 外部 run方法的地址</span><br><span class="line">#因为run属性指向的函数是后来添加的,执行p1.run()的时候,并没有把p1当作第一个参数,所以在调用的时候出现却缺少参数</span><br><span class="line"># p1.run = run</span><br></pre></td></tr></table></figure>
-<p>正确的做法是</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import types</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">types.MethodType(method,instance) </span><br><span class="line">可以实现对对象添加动态方法</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">p1.run = types.MethodType(run,p1) </span><br><span class="line">p1.run() # 不报错 ！！！</span><br><span class="line"># p1正在吃</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>types.MethodType深入</p>
-</blockquote>
-<p>如果我们这样发现可以直接调用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">xxxx = types.MethodType(run,p1) </span><br><span class="line">xxxx()</span><br><span class="line"># p1正在吃</span><br></pre></td></tr></table></figure>
-<ol>
-<li>types.MethodType(run,p1) 实际是把实例对象传递到普通方法run里缺少的self参数</li>
-<li>types.MethodType(run,p1) 返回的实际就是那个传递了参数的run方法的引用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def run(self):</span><br><span class="line">    print(self.name)</span><br><span class="line"></span><br><span class="line"> def run(p1):</span><br><span class="line">    print(p1.name)</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="静态方法添加"><a href="#静态方法添加" class="headerlink" title="静态方法添加"></a>静态方法添加</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@staticMethod</span><br><span class="line">def test():</span><br><span class="line">    print(&apos;-----static method ------&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 静态方法可以直接添加因为没有self参数</span><br><span class="line">Person.test = test;</span><br><span class="line"></span><br><span class="line">Person.test()</span><br></pre></td></tr></table></figure>
-<h4 id="类方法"><a href="#类方法" class="headerlink" title="类方法"></a>类方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@classMethod</span><br><span class="line">def test2(cls):</span><br><span class="line">    print(&apos;-----class method ------&apos;)</span><br><span class="line"></span><br><span class="line">Person.test2 = test2</span><br><span class="line"></span><br><span class="line">Person.test2()</span><br></pre></td></tr></table></figure>
-<h3 id="slots作用"><a href="#slots作用" class="headerlink" title="slots作用"></a>slots作用</h3><p>因为python是动态语言所以在实例生成之后仍然可以额外添加属性</p>
-<blockquote>
-<p>如何做到让它添加指定的属性呢</p>
-</blockquote>
-<p>slots</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class Person(object):</span><br><span class="line">    __slots__ = (&quot;name&quot;,&quot;age&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p1 = Person()</span><br><span class="line">p1.name = &apos;aa&apos; # 正常</span><br><span class="line">p1.age = 20 # 正常</span><br><span class="line">p1.num =1000 # 报错</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/22/Python027动态添加属性及方法/" data-id="cklcb6bla00mywo91tnxg2tcu" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python026作用域" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/22/Python026作用域/" class="article-date">
-  <time datetime="2018-06-22T08:10:16.000Z" itemprop="datePublished">2018-06-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/22/Python026作用域/">Python026作用域</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h3><ul>
-<li>globals() 全局的一些东西</li>
-<li>locals()</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def test():</span><br><span class="line">    a = 11</span><br><span class="line">    b = 22</span><br><span class="line">    print(locals())</span><br><span class="line"></span><br><span class="line">test()</span><br><span class="line"></span><br><span class="line"># &#123;a:11,b:22&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="LEGB规则"><a href="#LEGB规则" class="headerlink" title="LEGB规则"></a>LEGB规则</h3><blockquote>
-<p>就是既有全局又有局部的时候变量使用问题(就近原则)</p>
-</blockquote>
-<ul>
-<li>locals 当前所在命名空间(函数，闭包)，函数的参数也属于命名空间内的变量</li>
-<li><p>enclosing 外部嵌套函数的命名空间(闭包中常见)</p>
-</li>
-<li><p>global</p>
-</li>
-<li>builtins</li>
-</ul>
-<p>查找变量的顺序</p>
-<p>locals&gt;enclosing&gt;global&gt;builtins</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/22/Python026作用域/" data-id="cklcb6bl900mwwo91e68vc3m8" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python025装饰器" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/22/Python025装饰器/" class="article-date">
-  <time datetime="2018-06-22T06:58:16.000Z" itemprop="datePublished">2018-06-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/22/Python025装饰器/">Python025装饰器</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="装饰器"><a href="#装饰器" class="headerlink" title="装饰器"></a>装饰器</h3><blockquote>
-<p>不影响你正常工作写代码，但是应试的时候如果你不会就代表你不深入python</p>
-</blockquote>
-<p>先看下面一段代码，(理解函数的覆盖)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">def t():</span><br><span class="line">    print(1)</span><br><span class="line"></span><br><span class="line">def t():</span><br><span class="line">    print(2)</span><br><span class="line"></span><br><span class="line">t # 代表函数t的内存地址</span><br><span class="line"></span><br><span class="line">t() # 执行函数  打印 2</span><br><span class="line"></span><br><span class="line">################################################</span><br><span class="line"></span><br><span class="line">def xxx(a):</span><br><span class="line">    print(a)</span><br><span class="line"></span><br><span class="line">xxx = lambda x:x+1</span><br><span class="line"></span><br><span class="line">xxx(1) # 打印2 被匿名函数覆盖</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>重现公司场景</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">############基础平台提供功能############################</span><br><span class="line">def f1():</span><br><span class="line">    print(1)</span><br><span class="line">def f2():</span><br><span class="line">    print(2)</span><br><span class="line">def f3():</span><br><span class="line">    print(3)</span><br><span class="line">def f4():</span><br><span class="line">    print(4)</span><br><span class="line">#############业务部门A###########################</span><br><span class="line">f1()</span><br><span class="line">f2()</span><br><span class="line">f3()</span><br><span class="line">f4()</span><br><span class="line">#############业务部门B###########################</span><br><span class="line">f1()</span><br><span class="line">f2()</span><br><span class="line">f3()</span><br><span class="line">f4()</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>公司发展后发现需要职责分离每个部门分配的功能调用不一样</p>
-</blockquote>
-<ul>
-<li>如A部门只能调用 f1 f2</li>
-<li>如B部门只能调用 f3 f4</li>
-</ul>
-<p>然后交给你实现一个鉴权功能,你修改后如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">def check_login():</span><br><span class="line">    #验证1</span><br><span class="line">    #验证2</span><br><span class="line">    #验证3</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">def f1():</span><br><span class="line">    check_login()</span><br><span class="line">    print(1)</span><br><span class="line">def f2():</span><br><span class="line">    check_login()</span><br><span class="line">    print(2)</span><br><span class="line">def f3():</span><br><span class="line">    check_login()</span><br><span class="line">    print(3)</span><br><span class="line">def f4():</span><br><span class="line">    check_login()</span><br><span class="line">    print(4)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>最后部门老大说要遵循「开放封闭」原则，最后给了一个代码的实现</p>
-</blockquote>
-<ul>
-<li>封闭：已实现的功能(不该进行更改功能代码的内部)</li>
-<li>开放：对扩展开发(改外面)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner():</span><br><span class="line">        #验证1</span><br><span class="line">        #验证2</span><br><span class="line">        #验证3</span><br><span class="line">        func()</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1():</span><br><span class="line">    print(1)</span><br><span class="line">@w1</span><br><span class="line">def f2():</span><br><span class="line">    print(2)</span><br><span class="line">@w1    </span><br><span class="line">def f3():</span><br><span class="line">    print(3)</span><br><span class="line">@w1</span><br><span class="line">def f4():</span><br><span class="line">    print(4)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">##########################################</span><br><span class="line">@w1是一个语法糖</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1():</span><br><span class="line">    print(1)</span><br><span class="line">实际上代码是这样</span><br><span class="line">def w1(func):</span><br><span class="line">    def inner():</span><br><span class="line">        print(&apos;鉴权通过&apos;)</span><br><span class="line">        func()</span><br><span class="line">    return inner</span><br><span class="line">程序执行到 @w1的时候 </span><br><span class="line">##########################################</span><br><span class="line">#第一步理解</span><br><span class="line">innerFunc = w1(f1)</span><br><span class="line">innerFunc()</span><br><span class="line">##########################################</span><br><span class="line">#第二步理解——原理</span><br><span class="line">f1 = w1(f1)</span><br><span class="line">f1()</span><br></pre></td></tr></table></figure>
-<h4 id="装饰器的应用"><a href="#装饰器的应用" class="headerlink" title="装饰器的应用"></a>装饰器的应用</h4><blockquote>
-<p>包裹数据给字符串加上 b标签</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#定义函数：完成包裹数据</span><br><span class="line">def makeBold(fn):</span><br><span class="line">    def wrapped():</span><br><span class="line">        print(&quot;----1---&quot;)</span><br><span class="line">        return &quot;&lt;b&gt;&quot; + fn() + &quot;&lt;/b&gt;&quot;</span><br><span class="line">    return wrapped</span><br><span class="line"></span><br><span class="line">@makeBold</span><br><span class="line">def test3():</span><br><span class="line">    print(&quot;----3---&quot;)</span><br><span class="line">    return &quot;hello world-3&quot;</span><br><span class="line"></span><br><span class="line">ret = test3()</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>思考？多个装饰器的会如何处理</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#定义函数：完成包裹数据</span><br><span class="line">def makeBold(fn):</span><br><span class="line">    def wrapped():</span><br><span class="line">        print(&quot;----1---&quot;)</span><br><span class="line">        return &quot;&lt;b&gt;&quot; + fn() + &quot;&lt;/b&gt;&quot;</span><br><span class="line">    return wrapped</span><br><span class="line"></span><br><span class="line">#定义函数：完成包裹数据</span><br><span class="line">def makeItalic(fn):</span><br><span class="line">    def wrapped():</span><br><span class="line">        print(&quot;----2---&quot;)</span><br><span class="line">        return &quot;&lt;i&gt;&quot; + fn() + &quot;&lt;/i&gt;&quot;</span><br><span class="line">    return wrapped</span><br><span class="line"></span><br><span class="line">@makeBold</span><br><span class="line">@makeItalic</span><br><span class="line">def test3():</span><br><span class="line">    print(&quot;----3---&quot;)</span><br><span class="line">    return &quot;hello world-3&quot;</span><br><span class="line"></span><br><span class="line">ret = test3()</span><br><span class="line">print(ret) # &lt;b&gt;&lt;i&gt;hello world-3&lt;/i&gt;&lt;/b&gt;</span><br><span class="line"></span><br><span class="line">###########原理############</span><br><span class="line">1.因为此时还存在装饰器所以不会立刻执行test3的返回结果  return &quot;hello world-3&quot;</span><br><span class="line">2.此时返回的是</span><br><span class="line">    def wrapped():</span><br><span class="line">            print(&quot;----1---&quot;)</span><br><span class="line">            return &quot;&lt;b&gt;&quot; + fn() + &quot;&lt;/b&gt;&quot;</span><br><span class="line">test3 = makeBold(test3)</span><br><span class="line">发现可以把  wrapped 返回了</span><br><span class="line">test3 = makeItalic(test3)</span><br></pre></td></tr></table></figure>
-<h4 id="装饰器执行顺序"><a href="#装饰器执行顺序" class="headerlink" title="装饰器执行顺序"></a>装饰器执行顺序</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner():</span><br><span class="line">        #验证1</span><br><span class="line">        #验证2</span><br><span class="line">        #验证3</span><br><span class="line">        func()</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1():</span><br><span class="line">    print(1)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p> @w1这一行的时候 只要python解释器执行到这里，就自动进行装饰，而不是等调用的时候才装饰</p>
-</blockquote>
-<blockquote>
-<p>如果是多个装饰器</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@w1</span><br><span class="line">@w2</span><br><span class="line">实际是</span><br><span class="line">1.w2包装了一下</span><br><span class="line">2.w1继续包装了一下</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">调用的时候</span><br><span class="line">先拆开w1</span><br><span class="line">再拆开w2</span><br></pre></td></tr></table></figure>
-<h4 id="装饰器对带有参数的函数的处理"><a href="#装饰器对带有参数的函数的处理" class="headerlink" title="装饰器对带有参数的函数的处理"></a>装饰器对带有参数的函数的处理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner(a,b):</span><br><span class="line">        func(a,b)</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1(a,b):</span><br><span class="line">    print(a+b)</span><br><span class="line"></span><br><span class="line">f1(1,2) # 实际调的是inner(1,2)</span><br></pre></td></tr></table></figure>
-<p>如何做到接受任意参数的函数的装饰器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner(*args,**kwargs):</span><br><span class="line">        func(*args,**kwargs)</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1(a,b):</span><br><span class="line">    print(a+b)</span><br></pre></td></tr></table></figure>
-<h4 id="带返回值的装饰器"><a href="#带返回值的装饰器" class="headerlink" title="带返回值的装饰器"></a>带返回值的装饰器</h4><blockquote>
-<p>又来了一个坑如果f1带有返回值装饰器返回的是什么</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner():</span><br><span class="line">        func()</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1():</span><br><span class="line">    print(&apos;test&apos;)</span><br><span class="line">    return &apos;haha&apos;</span><br><span class="line"></span><br><span class="line">f1() # None</span><br></pre></td></tr></table></figure>
-<p>再看</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner():</span><br><span class="line">        print(&apos;1&apos;)</span><br><span class="line">        x = func() # 保存返回值 &apos;haha&apos;</span><br><span class="line">        print(&apos;2&apos;)</span><br><span class="line">        return x</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1():</span><br><span class="line">    print(&apos;test&apos;)</span><br><span class="line">    return &apos;haha&apos;</span><br><span class="line"></span><br><span class="line">f1() # None</span><br></pre></td></tr></table></figure>
-<h4 id="通用装饰器"><a href="#通用装饰器" class="headerlink" title="通用装饰器"></a>通用装饰器</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def w1(func):</span><br><span class="line">    def inner(*args,**kwargs):</span><br><span class="line">        x =func(*args,**kwargs)</span><br><span class="line">        return x</span><br><span class="line">    return inner</span><br><span class="line"></span><br><span class="line">@w1</span><br><span class="line">def f1(a,b):</span><br><span class="line">    return a+b</span><br></pre></td></tr></table></figure>
-<h4 id="带参数装饰器"><a href="#带参数装饰器" class="headerlink" title="带参数装饰器"></a>带参数装饰器</h4><blockquote>
-<p>装饰器是一次闭包，如果装饰器带参就在进行一次闭包</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def func_arg(arg):</span><br><span class="line">    def func(functionName):</span><br><span class="line">        def func_in():</span><br><span class="line">            print(&quot;---记录日志-arg=%s--&quot;%arg)</span><br><span class="line">            if arg==&quot;heihei&quot;:</span><br><span class="line">                functionName()</span><br><span class="line">                functionName()</span><br><span class="line">            else:</span><br><span class="line">                functionName()</span><br><span class="line">        return func_in</span><br><span class="line">    return func</span><br><span class="line"></span><br><span class="line">#1. 先执行func_arg(&quot;heihei&quot;)函数,这个函数return 的结果是func这个函数的引用</span><br><span class="line">#2. @func</span><br><span class="line">#3. 使用@func对test进行装饰</span><br><span class="line">@func_arg(&quot;heihei&quot;)</span><br><span class="line">def test():</span><br><span class="line">    print(&quot;--test--&quot;)</span><br><span class="line"></span><br><span class="line">#带有参数的装饰器,能够起到在运行时,有不同的功能</span><br><span class="line">@func_arg(&quot;haha&quot;)</span><br><span class="line">def test2():</span><br><span class="line">    print(&quot;--test2--&quot;)</span><br><span class="line"></span><br><span class="line">test()</span><br><span class="line">test2()</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/22/Python025装饰器/" data-id="cklcb6bl800muwo91obu1row1" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Python024闭包" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/06/22/Python024闭包/" class="article-date">
-  <time datetime="2018-06-22T05:58:16.000Z" itemprop="datePublished">2018-06-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/22/Python024闭包/">Python024闭包</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def test(number):</span><br><span class="line">    # 内部函数调用访问number</span><br><span class="line">    def test_in():</span><br><span class="line">        print(number)</span><br><span class="line">    # 将内部函数返回</span><br><span class="line">    return test_in</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">xxx = test(100)</span><br><span class="line">print(&quot;-&quot;*30)</span><br><span class="line">xxx(1)</span><br><span class="line">xxx(100)</span><br><span class="line">xxx(200)</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/22/Python024闭包/" data-id="cklcb6bl800mswo91cnzhaj1p" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/23/Python029类装饰器/" data-id="cklhgn2j300n2kyfy8k7giomw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
@@ -679,7 +1456,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/page/43/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="page-number" href="/page/43/">43</a><span class="page-number current">44</span><a class="page-number" href="/page/45/">45</a><a class="page-number" href="/page/46/">46</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/45/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/43/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="page-number" href="/page/43/">43</a><span class="page-number current">44</span><a class="page-number" href="/page/45/">45</a><a class="page-number" href="/page/46/">46</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/45/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -703,7 +1480,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -725,23 +1502,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>

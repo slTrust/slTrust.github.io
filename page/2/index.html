@@ -62,6 +62,615 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node-web05-02博客系统数据显示" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-02博客系统数据显示/" class="article-date">
+  <time datetime="2021-02-18T04:50:37.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-02博客系统数据显示/">Node-web05-02博客系统数据显示</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客系统数据显示"><a href="#博客系统数据显示" class="headerlink" title="博客系统数据显示"></a>博客系统数据显示</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/1943c647ee6ec23ddc7a37e3b0e794c37026b778" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h3 id="在Next-js里-创建-connection"><a href="#在Next-js里-创建-connection" class="headerlink" title="在Next.js里 创建 connection"></a>在Next.js里 创建 connection</h3><ul>
+<li><code>lib/getDatabaseConnection.tsx</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    console.log(&apos;创建connection.&apos;)</span><br><span class="line">    /*</span><br><span class="line">    立即执行函数，引用的时候被执行，始终返回 promise的结果</span><br><span class="line">    1。 createConnection 是一个 返回promise的 所以想要他必须包裹在 async 的匿名函数里 代号xx</span><br><span class="line">    2。 然后立即执行 xx</span><br><span class="line">    3。 promise 这个函数就代表 我去执行 createConnection 这个异步操作</span><br><span class="line">    */</span><br><span class="line">    return await createConnection();</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    /*</span><br><span class="line">    别人引用的时候  第一次得到 connection</span><br><span class="line">    第二次依然得到 connection，因为 promise只执行了一次</span><br><span class="line">    promise 之后不管重复引入多少次都不会重新执行</span><br><span class="line">     */</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>pages/index.tsx里</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export const getServerSideProps: GetServerSideProps = async (context) =&gt; &#123;</span><br><span class="line">  const connect = await getDatabaseConnection()</span><br><span class="line">  console.log(&apos;connect&apos;);</span><br><span class="line">  const ua = context.req.headers[&apos;user-agent&apos;];</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      browser: ua</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>遇到问题了 如果是第一次运行<code>yarn dev</code> 这里连接是没问题的</li>
+<li>但是如果中途 修改代码 <code>ctrl+s</code> 后 会导致热启动，然后重新执行 <code>getDatabaseConnection()</code> 但是我们的连接已经存在过一次了。所以会报错</li>
+<li>这个问题是 next.js 本地开发 修改文件自动加载导致的</li>
+<li>只会出现在开发环境，就是你本地<code>yarn dev</code> 然后修改代码的时候触发</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Server Error</span><br><span class="line">AlreadyHasActiveConnectionError: Cannot create a new connection named &quot;default&quot;, because connection with such name already exist and it now has an active connection session.</span><br></pre></td></tr></table></figure>
+<h3 id="解决-connection-开发环境修改代码重复执行问题"><a href="#解决-connection-开发环境修改代码重复执行问题" class="headerlink" title="解决 connection 开发环境修改代码重复执行问题"></a>解决 connection 开发环境修改代码重复执行问题</h3><ul>
+<li><p>使用 <code>getConnectionManager</code></p>
+</li>
+<li><p>修改<code>lib/getDatabaseConnection.tsx</code></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection,getConnectionManager&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return createConnection();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return createConnection();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="疑问：我们能不能自己写一个-manager"><a href="#疑问：我们能不能自己写一个-manager" class="headerlink" title="疑问：我们能不能自己写一个 manager"></a>疑问：我们能不能自己写一个 manager</h3><ul>
+<li>可以，但是会有一个问题</li>
+<li>我们的代码是在项目里，一旦引入，如果在开发环境下，还是会存在重复执行的问题</li>
+<li>而 typeorm 的 manager为啥没有被重新执行，因为他在 node_modules 里，nextjs发现 如果你的文件是 node_modules 里的就不会去刷新</li>
+</ul>
+<h3 id="复述这个问题：开发中遇到最难的bug"><a href="#复述这个问题：开发中遇到最难的bug" class="headerlink" title="复述这个问题：开发中遇到最难的bug"></a>复述这个问题：开发中遇到最难的bug</h3><ul>
+<li>一开始我们在 nextjs里 直接 getConnection 会报错，因为 还没初始化过</li>
+<li>我们用 createConnecion，为了防止执行多次</li>
+<li>我们把它放在 立即执行函数里返回，保证多次 import 都始终执行一次</li>
+<li>尝试 create + get 判空的方式<ul>
+<li>又遇到问题 <code>ctrl+s</code> 修改代码导致 重新加载 每次都触发 create,重复了</li>
+</ul>
+</li>
+<li>最后我们使用typeorm的 getConnectionManager 来管理<ul>
+<li>因为 typeorm 的代码 处于 node_modules里，nextjs修改代码保存的时候 不会重新加载</li>
+</ul>
+</li>
+<li>自己写 manager 没用，因为 nextjs 里 ctrl+s 热重启导致 你写的 manager 重新加载重新执行。即又触发了 create</li>
+</ul>
+<h3 id="获取Post内容"><a href="#获取Post内容" class="headerlink" title="获取Post内容"></a>获取Post内容</h3><ul>
+<li>前提你通过 <code>node dist/seed.js</code> 创造好数据</li>
+<li><code>pages/index.tsx</code>里获取 posts</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">export const getServerSideProps:GetServerSideProps = async (context)=&gt;&#123;</span><br><span class="line">    const connection = await getDatabaseConnection()// 第一次链接能不能用 get</span><br><span class="line">    const posts = await connection.manager.find(Post)</span><br><span class="line"></span><br><span class="line">    console.log(&apos;posts&apos;);</span><br><span class="line">    console.log(posts)</span><br><span class="line">    return &#123;</span><br><span class="line">        props: &#123;</span><br><span class="line">            aaa:&apos;aaadaa&apos;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>报错 <code>No metadata for &quot;Post&quot; was found.</code></li>
+<li>原因是 connection 是换成 js之后执行的，他不知道这个 post 有那些列<ul>
+<li>为啥 seed.js知道，因为他引入了 <code>reflect-metadata</code></li>
+<li><code>reflect-metadata</code> 可以通过你引入的 entity 类，反向推出它的元数据</li>
+<li>而我们 nextjs 里没有引入它</li>
+</ul>
+</li>
+<li>createConnecion，构造的时候可以传递参数，告知它的 entity和 config信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import &#123;createConnection,getConnectionManager&#125; from &apos;typeorm&apos;;</span><br><span class="line">import &apos;reflect-metadata&apos;;</span><br><span class="line">import &#123;Post&#125; from &apos;src/entity/Post&apos;;</span><br><span class="line">import &#123;User&#125; from &apos;src/entity/User&apos;;</span><br><span class="line">import &#123;Comment&#125; from &apos;src/entity/Comment&apos;;</span><br><span class="line">import config from &apos;ormconfig.json&apos;;</span><br><span class="line"></span><br><span class="line">const create = async () =&gt; &#123;</span><br><span class="line">    // @ts-ignore</span><br><span class="line">    return createConnection(&#123;</span><br><span class="line">        ...config,</span><br><span class="line">        entities: [Post, User, Comment]</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return create();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export const getDatabaseConnection = async () =&gt; &#123;</span><br><span class="line">    return promise;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="BUG：no-metadata-for-Post-再次出现"><a href="#BUG：no-metadata-for-Post-再次出现" class="headerlink" title="BUG：no metadata for Post 再次出现"></a>BUG：no metadata for Post 再次出现</h3><ul>
+<li>我们展示 posts的时候，ctrl+s 导致一个问题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    if (!manager.has(&apos;default&apos;)) &#123;</span><br><span class="line">        return create();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        const current = manager.get(&apos;default&apos;);</span><br><span class="line">        if(current.isConnected)&#123;</span><br><span class="line">          // ctrl+s会走进这里，如果走进这里  no metadata for Post 就会触发</span><br><span class="line">            return current</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            return create();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改，<code>current.isConnected</code> 就关闭连接，再次 <code>create()</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const promise = (async function () &#123;</span><br><span class="line">    const manager = getConnectionManager();</span><br><span class="line">    const current = manager.has(&apos;default&apos;) &amp;&amp; manager.get(&apos;default&apos;);</span><br><span class="line">    if (current) &#123;await current.close();&#125;</span><br><span class="line">    return create()</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-02博客系统数据显示/" data-id="cklhgn2dj00a5kyfy6gvq79w8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-01博客系统构建" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/17/Node-web05-01博客系统构建/" class="article-date">
+  <time datetime="2021-02-17T15:31:21.000Z" itemprop="datePublished">2021-02-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/17/Node-web05-01博客系统构建/">Node-web05-01博客系统构建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客系统构建"><a href="#博客系统构建" class="headerlink" title="博客系统构建"></a>博客系统构建</h1><h2 id="CRUD最佳实践"><a href="#CRUD最佳实践" class="headerlink" title="CRUD最佳实践"></a>CRUD最佳实践</h2><ul>
+<li>CRUD小王子</li>
+<li>数据库封装员</li>
+</ul>
+<h3 id="增删改次难在哪里？"><a href="#增删改次难在哪里？" class="headerlink" title="增删改次难在哪里？"></a>增删改次难在哪里？</h3><ul>
+<li>第一： 开发效率，5年CRUD效率没有任何提升</li>
+<li>第二：代码质量<ul>
+<li>屎山</li>
+<li>单元测试技术</li>
+<li>公司以结果为导向，敏捷开发<ul>
+<li>而真正的敏捷开发最重要的就是——单元测试</li>
+</ul>
+</li>
+<li>因为他们只想敏捷，不想开发。</li>
+<li>真正的敏捷开发是，用最少的时间作出质量最高的程序<ul>
+<li>而不是需求想变就变，改了又改。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>第三：前后端联调<ul>
+<li>沟通成本</li>
+</ul>
+</li>
+<li>第四：伸缩性Scale <ul>
+<li>增删改查数据量变大了咋办</li>
+<li>100万数据 变 1亿，机器扛得住？</li>
+</ul>
+</li>
+<li>第五：高并发 C10k问题<ul>
+<li>10000个连接同时进来，怎么保证服务质量</li>
+</ul>
+</li>
+<li>第六：安全和稳定<ul>
+<li>防拖库、MD5碰撞？</li>
+<li>XSS、CSRF、Replay？</li>
+<li>怎么备份？怎么双活？</li>
+<li>经典案例：CSDN被拖库</li>
+</ul>
+</li>
+</ul>
+<h3 id="一些重要的原则"><a href="#一些重要的原则" class="headerlink" title="一些重要的原则"></a>一些重要的原则</h3><ul>
+<li>过早优化乃万恶之源<ul>
+<li>你没办法量化性能就别尝试优化</li>
+</ul>
+</li>
+<li>开发效率&gt;可读性&gt;运行效率<ul>
+<li>创业公司目标是活下去</li>
+<li>纠结 <code>++i 和 i++</code>的效率提升 有意义吗</li>
+</ul>
+</li>
+<li>可用性 &gt; 易用性 &gt; 美观<ul>
+<li>不要一开始就在易用性和美观上浪费时间</li>
+</ul>
+</li>
+<li>永远不要删除数据<ul>
+<li>软删除、删除前确认</li>
+</ul>
+</li>
+</ul>
+<h2 id="博客系统需求分析：做毁它"><a href="#博客系统需求分析：做毁它" class="headerlink" title="博客系统需求分析：做毁它"></a>博客系统需求分析：做毁它</h2><h3 id="功能点"><a href="#功能点" class="headerlink" title="功能点"></a>功能点</h3><ul>
+<li>可登录、注销，但不可以重置密码(人工解决)</li>
+<li>重置密码联系管理员</li>
+<li>用户可以对博客CRUD</li>
+<li>用户可以对博客进行“评论”，但不能修改评论(从简)</li>
+<li>用户不可以编辑用户名、密码、姓名、头像(从简)</li>
+</ul>
+<h3 id="可用性需求"><a href="#可用性需求" class="headerlink" title="可用性需求"></a>可用性需求</h3><ul>
+<li>手机上也能完成操作</li>
+</ul>
+<h3 id="其他要求"><a href="#其他要求" class="headerlink" title="其他要求"></a>其他要求</h3><ul>
+<li>对搜索引擎优化</li>
+</ul>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><blockquote>
+<p>需求</p>
+</blockquote>
+<ul>
+<li>简单CRUD</li>
+<li>三个表 users/posts/comments</li>
+</ul>
+<blockquote>
+<p>主要数据</p>
+</blockquote>
+<ul>
+<li>users(id/username/password_digest)</li>
+<li>posts(id/user_id/title/content)</li>
+<li>comments(id/user_id/post_id/content)</li>
+</ul>
+<blockquote>
+<p>其他</p>
+</blockquote>
+<ul>
+<li>手机适配：一开始就设计两套界面PC+mobile</li>
+<li>SEO：多用 SSG或者SSR,少用BSR</li>
+</ul>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h2 id="开始写代码"><a href="#开始写代码" class="headerlink" title="开始写代码"></a>开始写代码</h2><h3 id="step01-创建表"><a href="#step01-创建表" class="headerlink" title="step01 创建表"></a>step01 创建表</h3><blockquote>
+<p>代码基于这个<a href="https://github.com/slTrust/next-demo-2/tree/101f6fc8f8ac5613555caa6a9d2343bf4a8e4ec1" target="_blank" rel="noopener">commit</a></p>
+</blockquote>
+<blockquote>
+<p>我们用的docker创建的 pgsql数据库</p>
+</blockquote>
+<ul>
+<li>自行安装docker</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录创建持久化数据目录</span><br><span class="line">mkdir blog-data</span><br><span class="line"></span><br><span class="line"># 启动pg</span><br><span class="line">docker run -v &quot;$PWD/blog-data&quot;:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 进入 pg容器 内部</span><br><span class="line">docker exec -it 容器id bash</span><br><span class="line"></span><br><span class="line"># 登陆数据库</span><br><span class="line">psql -U blog</span><br><span class="line"></span><br><span class="line"># 查看数据库</span><br><span class="line">\l</span><br><span class="line"></span><br><span class="line"># 删除数据库  </span><br><span class="line">drop database 数据库名</span><br><span class="line"></span><br><span class="line"># 创建数据库</span><br><span class="line">CREATE DATABASE blog_development ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"></span><br><span class="line"># 连接数据库</span><br><span class="line">\c 数据库名称</span><br></pre></td></tr></table></figure>
+<ul>
+<li>migration</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"># package.json里添加脚本</span><br><span class="line">&quot;m:create&quot;: &quot;typeorm migration:create&quot;,</span><br><span class="line"></span><br><span class="line"># 创建表</span><br><span class="line">yarn m:create -n CreateUsers</span><br><span class="line">这样会生成 src/migration/xxx-CreateUsers.ts</span><br><span class="line"># 修改内容</span><br><span class="line">import &#123;MigrationInterface, QueryRunner, Table&#125; from &quot;typeorm&quot;;</span><br><span class="line"></span><br><span class="line">export class CreateUsers1613578095866 implements MigrationInterface &#123;</span><br><span class="line"></span><br><span class="line">    public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">        return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">            name:&apos;users&apos;,</span><br><span class="line">            columns:[</span><br><span class="line">                &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">                &#123;name:&apos;username&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">                &#123;name:&apos;password_digest&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">            ]</span><br><span class="line">        &#125;))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">        return await queryRunner.dropTable(&apos;users&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 然后运行 数据库表就创建好了</span><br><span class="line">yarn m:run </span><br><span class="line"></span><br><span class="line"># 同步创建 posts\comments</span><br><span class="line"></span><br><span class="line">return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">    name:&apos;posts&apos;,</span><br><span class="line">    columns:[</span><br><span class="line">        &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">        &#123;name:&apos;title&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;content&apos;,type:&apos;varchar&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;author_id&apos;,type:&apos;int&apos;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line">return await queryRunner.createTable(new Table(&#123;</span><br><span class="line">    name:&apos;comments&apos;,</span><br><span class="line">    columns:[</span><br><span class="line">        &#123;name:&apos;id&apos;,isGenerated:true,type:&apos;int&apos;,generationStrategy:&apos;increment&apos;,isPrimary:true&#125;,</span><br><span class="line">        &#123;name:&apos;user_id&apos;,type:&apos;int&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;post_id&apos;,type:&apos;int&apos;&#125;,</span><br><span class="line">        &#123;name:&apos;content&apos;,type:&apos;text&apos;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line"># 我们的表需要有时间列， 那样你就得冲头修改表的结构</span><br><span class="line"># 我们再次创建一个 migration</span><br><span class="line">yarn m:create -n AddCreateAtAndUpdatedAt</span><br><span class="line"></span><br><span class="line">注意 await</span><br><span class="line">注意 await</span><br><span class="line">注意 await</span><br><span class="line"></span><br><span class="line">public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.addColumns(&apos;users&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">    await queryRunner.addColumns(&apos;posts&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">    await queryRunner.addColumns(&apos;comments&apos;, [</span><br><span class="line">      new TableColumn(&#123;name: &apos;createdAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;),</span><br><span class="line">      new TableColumn(&#123;name: &apos;updatedAt&apos;, type: &apos;time&apos;, isNullable: false, default: &apos;now()&apos;&#125;)</span><br><span class="line">    ]);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.dropColumn(&apos;users&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;users&apos;, &apos;updatedAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;posts&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;posts&apos;, &apos;updatedAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;comments&apos;, &apos;createdAt&apos;);</span><br><span class="line">    await queryRunner.dropColumn(&apos;comments&apos;, &apos;updatedAt&apos;);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>统一命名风格:规范列名</p>
+</blockquote>
+<ul>
+<li>驼峰</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">yarn m:create -n RenameColumns</span><br><span class="line"></span><br><span class="line">public async up(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.renameColumn(&apos;users&apos;, &apos;password_digest&apos;, &apos;passwordDigest&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;posts&apos;, &apos;author_id&apos;, &apos;authorId&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;user_id&apos;, &apos;userId&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;post_id&apos;, &apos;postId&apos;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public async down(queryRunner: QueryRunner): Promise&lt;void&gt; &#123;</span><br><span class="line">    await queryRunner.renameColumn(&apos;users&apos;, &apos;passwordDigest&apos;, &apos;password_digest&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;posts&apos;, &apos;authorId&apos;, &apos;author_id&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;userId&apos;, &apos;user_id&apos;);</span><br><span class="line">    await queryRunner.renameColumn(&apos;comments&apos;, &apos;postId&apos;, &apos;post_id&apos;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"># migration</span><br><span class="line">yarn m:run</span><br><span class="line"></span><br><span class="line"># 查看表结构</span><br><span class="line">\d 表名</span><br></pre></td></tr></table></figure>
+<h3 id="step02-创建关联"><a href="#step02-创建关联" class="headerlink" title="step02 创建关联"></a>step02 创建关联</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">users</span><br><span class="line">  one user has many posts</span><br><span class="line">  one has many comments</span><br><span class="line"></span><br><span class="line">posts</span><br><span class="line">  a post to one user</span><br><span class="line">  a post has many comments</span><br><span class="line"></span><br><span class="line">comments</span><br><span class="line">  a comments to one user</span><br><span class="line">  a comments to one post</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改package.json 脚本 <code>&quot;e:create&quot;: &quot;typeorm entity:create&quot;</code></li>
+<li>创建三个实体<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn e:create -n User</span><br><span class="line">yarn e:create -n Post</span><br><span class="line">yarn e:create -n Comment</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="step03-填充数据"><a href="#step03-填充数据" class="headerlink" title="step03 填充数据"></a>step03 填充数据</h3><ul>
+<li>seed尝试录入数据,修改 src/seed.ts</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;User&#125; from &quot;./entity/User&quot;;</span><br><span class="line"></span><br><span class="line">createConnection().then(async connection =&gt; &#123;</span><br><span class="line">    const &#123;manager&#125; = connection;</span><br><span class="line">    const u1 = new User();</span><br><span class="line">    u1.username = &apos;aaa&apos;;</span><br><span class="line">    u1.passwordDigest = &apos;xxx&apos;;</span><br><span class="line">    await manager.save(u1);</span><br><span class="line">    console.log(u1.id);</span><br><span class="line">&#125;).catch(error =&gt; console.log(error));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>运行<code>node dist/seed.js</code> 报错</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: Column createdAt of Entity Comment does not support length property.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>点击 src/entity/User 里的 <code>@CreateDateColumn</code></li>
+<li>会跳到对应的ts源码</li>
+<li>但是还看不懂 于是 webstorm 项目目录 有个 jump to source 点击 定位到位置</li>
+<li>然后 node_modules/typeorm 目录点击 findinpath 搜索 “createdAt” 发现 psql 对应会创建 timestamp</li>
+</ul>
+<h3 id="step04-创建页面"><a href="#step04-创建页面" class="headerlink" title="step04 创建页面"></a>step04 创建页面</h3><h3 id="step05-创建API"><a href="#step05-创建API" class="headerlink" title="step05 创建API"></a>step05 创建API</h3><ul>
+<li><code>/api/v1/sign_up</code></li>
+<li><code>/api/v1/sign_in</code></li>
+</ul>
+<h3 id="step06-约定前后端接口"><a href="#step06-约定前后端接口" class="headerlink" title="step06 约定前后端接口"></a>step06 约定前后端接口</h3><ul>
+<li>RESTful</li>
+<li>约定错误码</li>
+<li>约定资源格式</li>
+</ul>
+<h3 id="step07-单元测试"><a href="#step07-单元测试" class="headerlink" title="step07 单元测试"></a>step07 单元测试</h3>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/17/Node-web05-01博客系统构建/" data-id="cklhgn2di00a2kyfyvln3r2py" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web04-01TypeORM" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/14/Node-web04-01TypeORM/" class="article-date">
+  <time datetime="2021-02-14T15:18:28.000Z" itemprop="datePublished">2021-02-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/14/Node-web04-01TypeORM/">Node-web04-01TypeORM</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="TypeORM使用"><a href="#TypeORM使用" class="headerlink" title="TypeORM使用"></a>TypeORM使用</h1><ul>
+<li>基于这次<a href="https://github.com/slTrust/next-demo-2/commit/6ca25cd3c6d941dc7370c03e7b16f61cee908cc7" target="_blank" rel="noopener">commit</a></li>
+<li>完整代码</li>
+</ul>
+<h3 id="docker容器启动-pg"><a href="#docker容器启动-pg" class="headerlink" title="docker容器启动 pg"></a>docker容器启动 pg</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 本项目根目录</span><br><span class="line">docker run -v &quot;$PWD/blog-data&quot;:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_USER=blog -e POSTGRES_HOST_AUTH_METHOD=trust -d postgres:12.2</span><br><span class="line"></span><br><span class="line"># 如果需要密码 请这样设置</span><br><span class="line">替换</span><br><span class="line">-e POSTGRES_HOST_AUTH_METHOD=trust 为</span><br><span class="line">-e POSTGRES_HOST_PASSWORD=123456</span><br></pre></td></tr></table></figure>
+<ul>
+<li>其他命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看容器</span><br><span class="line">docker ps -a</span><br><span class="line"></span><br><span class="line"># 查看容器启动日志</span><br><span class="line">docker logs 容器id</span><br></pre></td></tr></table></figure>
+<h3 id="进入docker容器"><a href="#进入docker容器" class="headerlink" title="进入docker容器"></a>进入docker容器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it 容器id bash</span><br></pre></td></tr></table></figure>
+<h3 id="进入pg命令行"><a href="#进入pg命令行" class="headerlink" title="进入pg命令行"></a>进入pg命令行</h3><ul>
+<li><code>psql -U blog -W</code> 登陆数据库</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 查看有那些数据库</span><br><span class="line">\l</span><br><span class="line"></span><br><span class="line"># 连接 blog数据库</span><br><span class="line">\c blog</span><br><span class="line"></span><br><span class="line"># 查看数据库里的表</span><br><span class="line">\dt</span><br><span class="line"></span><br><span class="line"># 丢弃表</span><br><span class="line">drop table 表名</span><br></pre></td></tr></table></figure>
+<h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE [数据库名] ENCODING &apos;UTF8&apos; LC_COLLATE &apos;en_US.utf8&apos; LC_CTYPE &apos;en_US.utf8&apos;;</span><br><span class="line"># 分别创建三个 blog_development、test、production</span><br></pre></td></tr></table></figure>
+<h3 id="安装TypeORM"><a href="#安装TypeORM" class="headerlink" title="安装TypeORM"></a>安装TypeORM</h3><ul>
+<li><a href="https://typeorm.io" target="_blank" rel="noopener">typeorm官网</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 安装如下依赖</span><br><span class="line"></span><br><span class="line">&quot;reflect-metadata&quot;: &quot;^0.1.13&quot;</span><br><span class="line">&quot;typeorm&quot;: &quot;^0.2.25&quot;</span><br><span class="line"></span><br><span class="line">devDependencies</span><br><span class="line">&quot;@types/node&quot;: &quot;^14.0.6&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>tsconfig.json 里添加两个配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;emitDecoratorMetadata&quot;: true,</span><br><span class="line">&quot;experimentalDecorators&quot;: true,</span><br></pre></td></tr></table></figure>
+<ul>
+<li>做到这步先提交代码</li>
+</ul>
+<h3 id="typeorm使用"><a href="#typeorm使用" class="headerlink" title="typeorm使用"></a>typeorm使用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">npx typeorm init --database postgres</span><br><span class="line"></span><br><span class="line"># 此时会生成很多文件，他会修改我们的一些东西</span><br><span class="line"># 因为 typeorm 推荐使用ts-node编译(没有内置)</span><br><span class="line"># babel 和 ts-node 对TS的支持并非完全一致</span><br><span class="line"># 但是 Next.js 默认用babel把ts变成js，所以 package.json的改动要撤销</span><br><span class="line"># 所以我们要统一用 babel处理</span><br><span class="line"># 还要撤销 .gitignore的改动</span><br></pre></td></tr></table></figure>
+<h3 id="babel处理-typeorm并运行"><a href="#babel处理-typeorm并运行" class="headerlink" title="babel处理 typeorm并运行"></a>babel处理 typeorm并运行</h3><p><strong>原因已经说了，typeorm需要ts-node运行，但是nextJS使用babel转译ts的，所以我们只能统一用babel</strong></p>
+<ul>
+<li><p>安装 <code>@babel/cli</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add @babel/cli</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译 typeorm的 ts文件</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">npx babel ./src --out-dir dist --extensions &quot;.ts,.tsx&quot;</span><br><span class="line"></span><br><span class="line"># 报错 can not found @babel/core</span><br><span class="line">yarn add @babel/core</span><br><span class="line"></span><br><span class="line"># 继续运行那个命令</span><br><span class="line"># 结果又报错了</span><br><span class="line">SyntaxError: /Users/hjx/Desktop/demo/next-demos/next-demo-2/src/entity/User.ts: Support for the experimental syntax &apos;decorators-legacy&apos; isn&apos;t currently enabled (3:1):</span><br><span class="line"></span><br><span class="line"># google 搜索 Support for the experimental syntax &apos;decorators-legacy&apos; isn&apos;t currently enabled (3:1):</span><br><span class="line"># 得到答案</span><br><span class="line">https://stackoverflow.com/questions/52262084/syntax-error-support-for-the-experimental-syntax-decorators-legacy-isnt-cur</span><br></pre></td></tr></table></figure>
+<p>新建<code>.babelrc</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;presets&quot;: [</span><br><span class="line">    &quot;next/babel&quot;</span><br><span class="line">  ],</span><br><span class="line">  &quot;plugins&quot;: [</span><br><span class="line">    [</span><br><span class="line">      &quot;@babel/plugin-proposal-decorators&quot;,</span><br><span class="line">      &#123;</span><br><span class="line">        &quot;legacy&quot;: true</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="typeorm默认要-ts-node支持"><a href="#typeorm默认要-ts-node支持" class="headerlink" title="typeorm默认要 ts-node支持"></a>typeorm默认要 ts-node支持</h3><ul>
+<li>但是 nextjs 是用 babel转译 ts</li>
+<li>所以我们要统一 使用 babel</li>
+<li>所以 typeorm的文件要编译成js运行 </li>
+</ul>
+<h3 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npx babel ./src --out-dir dist --extensions &quot;.ts,.tsx&quot;</span><br><span class="line"></span><br><span class="line">node /dist/index.js</span><br></pre></td></tr></table></figure>
+<h3 id="重要步骤"><a href="#重要步骤" class="headerlink" title="重要步骤"></a>重要步骤</h3><ul>
+<li>一定一定一定要改成 false</li>
+<li>如果为true 连接数据库的时候，typeorm会自动根据 entity 目录修改数据库， <ul>
+<li>假如你改了 entity 多了一些列，就会同步到表里</li>
+<li>如果是生产环境，数据要么丢了，要么脏了，就很麻烦</li>
+</ul>
+</li>
+<li>一开始就要杜绝 sync</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 修改 ormconfig.json 的配置</span><br><span class="line">&quot;synchronize&quot;: false,</span><br></pre></td></tr></table></figure>
+<h3 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h3><ul>
+<li>创建 posts 表</li>
+<li><code>npx typeorm migration:create -n CreatePost</code><ul>
+<li>得到 <code>src/migrations/{TIMESTAMP}-CreatePost.ts</code></li>
+<li>编写对应的 up/down函数</li>
+</ul>
+</li>
+<li>运行 migration<ul>
+<li><code>npx babel .src --out-dir dist --extensions &quot;.ts,.tsx&quot;</code></li>
+<li><code>npx typeorm migration:run</code> 创建表 up操作</li>
+<li><code>npx typeorm migration:revert</code> drop表 down操作</li>
+</ul>
+</li>
+</ul>
+<h3 id="解决不同平台运行多个命令问题"><a href="#解决不同平台运行多个命令问题" class="headerlink" title="解决不同平台运行多个命令问题"></a>解决不同平台运行多个命令问题</h3><ul>
+<li>如下命令只支持 mac/linux 用户</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;dev&quot;: &quot;next dev &amp; babel -w ./src --out-dir dist --extensions .ts,.tsx&quot;</span><br></pre></td></tr></table></figure>
+<p>windwos咋办</p>
+<h4 id="concurrently"><a href="#concurrently" class="headerlink" title="concurrently"></a>concurrently</h4><ul>
+<li>支持运行多个命令，而且支持 windows</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;dev&quot;: &quot;concurrently \&quot;next dev\&quot; \&quot;babel -w ./src --out-dir dist --extensions .ts,.tsx\&quot;&quot;,</span><br></pre></td></tr></table></figure>
+<h3 id="创建实体"><a href="#创建实体" class="headerlink" title="创建实体"></a>创建实体</h3><p>package.json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;entity:create&quot;: &quot;typeorm entity:create&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>运行 <code>yarn entity:create -n Post</code></li>
+<li>会生成 <code>src/entity/Post.ts</code></li>
+<li>通过 Post 类，修改 post 表<ul>
+<li><code>@Column()</code> 修饰器 修饰对应的列，需要你自己填写</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import &#123;Column, Entity, PrimaryGeneratedColumn&#125; from &apos;typeorm&apos;;</span><br><span class="line"></span><br><span class="line">@Entity(&apos;posts&apos;)</span><br><span class="line">export class Post &#123;</span><br><span class="line">    @PrimaryGeneratedColumn(&apos;increment&apos;)</span><br><span class="line">    id: number;</span><br><span class="line">    @Column(&apos;varchar&apos;)</span><br><span class="line">    title: string;</span><br><span class="line">    @Column(&apos;text&apos;)</span><br><span class="line">    content: string;</span><br><span class="line"></span><br><span class="line">    constructor(attributes: Partial&lt;Post&gt;) &#123;</span><br><span class="line">        Object.assign(this, attributes);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="EntityManager-API"><a href="#EntityManager-API" class="headerlink" title="EntityManager API"></a>EntityManager API</h3><ul>
+<li><a href="https://typeorm.io/#/entity-manager-api" target="_blank" rel="noopener">文档</a></li>
+<li>注意加 await</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">await connection.manager.find(User,&#123;name:&apos;查询的名字&apos;&#125;)</span><br><span class="line">await connection.manager.create(User,&#123;name:&apos;&apos;, attr...&#125;)</span><br><span class="line"></span><br><span class="line">await connection.manager.save(u1)</span><br><span class="line"></span><br><span class="line">await connection.manager.save([u1,u2,u3])</span><br><span class="line"></span><br><span class="line">await connection.manager.remove(u1)</span><br><span class="line"></span><br><span class="line">await connection.manager.update(User,1,&#123;name:&apos;xxx&apos;&#125;)</span><br><span class="line"></span><br><span class="line">await connection.manager.delete(User,1)</span><br><span class="line"></span><br><span class="line">await connection.manager.findOne(User,1)</span><br></pre></td></tr></table></figure>
+<p>实验</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import &quot;reflect-metadata&quot;;</span><br><span class="line">import &#123;createConnection&#125; from &quot;typeorm&quot;;</span><br><span class="line">import &#123;Post&#125; from &quot;./entity/Post&quot;;</span><br><span class="line"></span><br><span class="line">createConnection().then(async connection =&gt; &#123;</span><br><span class="line">    const posts = await connection.manager.find(Post)</span><br><span class="line">    console.log(posts)</span><br><span class="line">    const p = new Post();</span><br><span class="line">    p.title = &apos;Post 1&apos;</span><br><span class="line">    p.content = &apos;我的第一篇文章&apos;</span><br><span class="line">    await connection.manager.save(p);</span><br><span class="line"></span><br><span class="line">    const post2 = await connection.manager.find(Post)</span><br><span class="line">    console.log(post2)</span><br><span class="line"></span><br><span class="line">    connection.close()</span><br><span class="line">&#125;).catch(error =&gt; console.log(error));</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>migration 用来数据库迁移</li>
+<li>entity 用 类和对象操作数据库表和行</li>
+<li>connection 数据库连接</li>
+<li>manager/repository<ul>
+<li>两种风格的API,操作实体</li>
+</ul>
+</li>
+</ul>
+<h3 id="使用-seed-填充数据"><a href="#使用-seed-填充数据" class="headerlink" title="使用 seed 填充数据"></a>使用 seed 填充数据</h3><ul>
+<li><p>前置操作 参考 01docker.md 内容，新建好容器，配置好数据库连接</p>
+</li>
+<li><p>开第一个终端 <code>yarn dev</code></p>
+<ul>
+<li>可以编译我们的 typeorm代码</li>
+</ul>
+</li>
+<li><p>开第二个终端执行数据库迁移</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 创建数据库表</span><br><span class="line">yarn migration:run</span><br><span class="line"># revert操作</span><br><span class="line">yarn migration:revert</span><br></pre></td></tr></table></figure>
+<ul>
+<li>填充数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 项目根目录</span><br><span class="line">node dist/seed.js</span><br></pre></td></tr></table></figure>
+<ul>
+<li>进入docker容器内部查询</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from posts;</span><br></pre></td></tr></table></figure>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/tree/typeorm" target="_blank" rel="noopener">typeorm分支</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/14/Node-web04-01TypeORM/" data-id="cklhgn2di00a1kyfyzmldzcn6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-HTTP06密码学到https流程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/01/20/HTTP06密码学到https流程/" class="article-date">
+  <time datetime="2021-01-20T15:32:29.000Z" itemprop="datePublished">2021-01-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/20/HTTP06密码学到https流程/">HTTP06密码学到https流程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="密码学相关"><a href="#密码学相关" class="headerlink" title="密码学相关"></a>密码学相关</h2><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/003.png" alt></p>
+<ul>
+<li>窃听，服务器经过很多环节。每个环节都能看到报文内容</li>
+<li>篡改，插入广告。 运营商，路由器，或中间某个环节插入的</li>
+<li>伪装，用你的身份信息登录</li>
+<li>否认，做过了xx操作，死不承认</li>
+</ul>
+<h3 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h3><p>一个密钥加密解密，速度快</p>
+<ul>
+<li>DES</li>
+<li>AES </li>
+</ul>
+<h3 id="非对称"><a href="#非对称" class="headerlink" title="非对称"></a>非对称</h3><p>两个密钥。公钥加密，私钥解密；私钥加密，公钥解密； 速度慢</p>
+<ul>
+<li>RSA</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/004.png" alt></p>
+<h3 id="https加密流程"><a href="#https加密流程" class="headerlink" title="https加密流程"></a>https加密流程</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/005.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/006.png" alt></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/01/20/HTTP06密码学到https流程/" data-id="cklhgn29w001ikyfy3m1iq2ee" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-HTTP05缓存控制" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/01/19/HTTP05缓存控制/" class="article-date">
+  <time datetime="2021-01-19T15:32:01.000Z" itemprop="datePublished">2021-01-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/19/HTTP05缓存控制/">HTTP05缓存控制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="缓存控制"><a href="#缓存控制" class="headerlink" title="缓存控制"></a>缓存控制</h1><h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><ul>
+<li>设置过期时间 (http1.0的东西，现在用的少了)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Wed, 30 Dec 2020 18:05:17 GMT</span><br><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br></pre></td></tr></table></figure>
+<p>存在问题是 ： 服务器时间和你客户端时间不一致。</p>
+<h2 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h2><ul>
+<li>不要缓存，每次都重新拿</li>
+<li>优先级最高，一旦设置就不会走缓存</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<p>当 Pragma 和 Expires同时出现， Pragma优先级高</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><ul>
+<li>设置过期时间戳<ul>
+<li>解决了 Expires 时间不一致问题</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 10s后过期</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;max-age=10&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="Cache-Control-为啥不能缓存-html"><a href="#Cache-Control-为啥不能缓存-html" class="headerlink" title="Cache-Control 为啥不能缓存 html"></a>Cache-Control 为啥不能缓存 html</h3><ul>
+<li>访问 <a href="taobao.com">taobao</a></li>
+<li>你会发现 响应首页 的其他资源能被缓存，但是 这个首页html的响应头是</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cache-control: max-age=0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这是为了 解决网站改版的情况，浏览器自己设置的，如果缓存了，但是你走缓存就无法更新页面了</li>
+</ul>
+<h3 id="Cache-Control-其他值"><a href="#Cache-Control-其他值" class="headerlink" title="Cache-Control 其他值"></a>Cache-Control 其他值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 代表不走缓存,即使浏览器里有缓存</span><br><span class="line">cache-control: no-cache</span><br><span class="line"></span><br><span class="line">// 代表不走缓存</span><br><span class="line">// 资源可能中间有很多代理服务器(告诉代理服务器不要缓存)</span><br><span class="line">cache-control: no-store</span><br></pre></td></tr></table></figure>
+<h2 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，拿到——“修改时间”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个修改时间，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">if(!req.headers[&apos;if-modified-since&apos;])&#123;</span><br><span class="line">  // mtime 是修改时间</span><br><span class="line">  res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let oldMtime = Date.parse(req.headers[&apos;if-modified-since&apos;])</span><br><span class="line">  if(mtime&gt;oldMtime)&#123;</span><br><span class="line">    // 文件修改了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例1</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-cache 意思是 不要从本地缓存找 每次都找我要(每次都和服务器文件的mtime比对)</span><br><span class="line">// 第一次请求的时候响应里设置 Last-Modified 和时间，并把文件返回</span><br><span class="line">// 浏览器就会把这个时间缓存下来</span><br><span class="line">// 之后的每次请求 都会带上 if-modified-since 的时间</span><br><span class="line">// 但是发现 本地缓存信息里有 no-cache 就不会直接从本地读取，</span><br><span class="line">// 而是带上 if-modified-since 和服务器文件的 mtime 比对，如果变了就重新读取，没变就走缓存 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// no-cache 等价于 max-age=0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例2，设置了 no-store</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-store&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-store 意思是 </span><br><span class="line">// 你设置的 Last-Modified  响应报文不会被浏览器记录,每次都重新读取文件</span><br></pre></td></tr></table></figure>
+<h2 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h2><ul>
+<li>比如 a.css文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你修改了,修改时间变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你又修改了，修改时间又变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是文件内容没变。但是 Last-Modified 只看时间，ETag代表 看文件内容是否变化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，生成——“md5值”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个 md5值，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line"></span><br><span class="line">let md5 = crypto.createHash(&apos;md5&apos;);</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">let oldETag = req.headers[&apos;if-none-match&apos;];</span><br><span class="line">if(!oldETag)&#123;</span><br><span class="line">  // 第一次请求</span><br><span class="line">  res.setHeader(&apos;Etag&apos;,md5.update(data).digest(&apos;base64&apos;))</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let newETag = md5.update(data).digest(&apos;base64&apos;)</span><br><span class="line">  if(newETag !== oldETag)&#123;</span><br><span class="line">    // 文件内容变了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Etag&apos;,newETag)</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><ul>
+<li><a href="https://imweb.io/topic/5795dcb6fb312541492eda8c" target="_blank" rel="noopener">https://imweb.io/topic/5795dcb6fb312541492eda8c</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/23299600" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/23299600</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/01/19/HTTP05缓存控制/" data-id="cklhgn29u001fkyfyluwgtdr7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-HTTP04报文和http状态码" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/01/18/HTTP04报文和http状态码/" class="article-date">
@@ -134,7 +743,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/18/HTTP04报文和http状态码/" data-id="cklcb6bc5001bwo9172ednior" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/18/HTTP04报文和http状态码/" data-id="cklhgn29t001dkyfy6f4a82bq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -224,7 +833,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/17/HTTP03http常用方法/" data-id="cklcb6bc40019wo910mifbill" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/17/HTTP03http常用方法/" data-id="cklhgn29s0018kyfys5hmv926" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -308,7 +917,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/16/HTTP02三次握手四度挥手/" data-id="cklcb6bc10012wo91zhh87n6y" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/16/HTTP02三次握手四度挥手/" data-id="cklhgn29s001bkyfygu2jx5d8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -449,7 +1058,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-id="cklcb6bc9001hwo91cxymn6g8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-id="cklhgn29q0016kyfy4pg1ugt0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -550,472 +1159,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-004-移动端常见问题/" data-id="cklcb6bq300vxwo91t0g614mo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/移动端-004-移动端常见问题/" data-id="cklhgn2mn00vdkyfy0i6x2hez" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-移动端-003-移动端适配方案" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/移动端-003-移动端适配方案/" class="article-date">
-  <time datetime="2020-10-12T12:02:26.000Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/移动端-003-移动端适配方案/">移动端-003-移动端适配方案</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="移动端适配方案"><a href="#移动端适配方案" class="headerlink" title="移动端适配方案"></a>移动端适配方案</h1><h2 id="viewport-缩放适配"><a href="#viewport-缩放适配" class="headerlink" title="viewport 缩放适配"></a>viewport 缩放适配</h2><p>假设你做移动端，公司UI给了你一个750px宽的 设计稿</p>
-<p>你直接按照标注写样式，如果只关注iphone6 就只需要这样即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iphone的设备独立像素为 375 刚好是 750设计稿的一半</span><br><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=750, initial-scale=0.5&quot;</span><br></pre></td></tr></table></figure>
-<h3 id="改善"><a href="#改善" class="headerlink" title="改善"></a>改善</h3><p>我们不可能只处理 iphone6，因为还有 ipad，iphone5,android呢</p>
-<p>所以需要动态设置缩放比例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750;</span><br><span class="line">    let mobileAdapter = ()=&gt;&#123;</span><br><span class="line">      let scale = screen.width/WIDTH</span><br><span class="line">      let content = `width=$&#123;WIDTH&#125;, user-scalable=no, initial-scale=$&#123;scale&#125;, maximum-scale=$&#123;scale&#125;, minimum-scale=$&#123;scale&#125;`</span><br><span class="line">      let meta = document.querySelector(&apos;meta[name=viewport]&apos;);</span><br><span class="line">      if(!meta)&#123;</span><br><span class="line">        meta = document.creatElement(&apos;meta&apos;)</span><br><span class="line">        meta.setAttribute(&apos;name&apos;,viewport)</span><br><span class="line">        document.head.appendChild(meta)</span><br><span class="line">      &#125;</span><br><span class="line">      meta.setAttribute(&apos;content&apos;,content)</span><br><span class="line">    &#125;</span><br><span class="line">    mobileAdapter()</span><br><span class="line">    // 当屏幕翻转的时候再次执行这个函数</span><br><span class="line">    window.onorientationchange = mobileAdapter</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .btn &#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:98px</span><br><span class="line">    &#125;</span><br><span class="line">    .btn2&#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:100%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  </span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;btn&quot;&gt;98px&lt;/div&gt;</span><br><span class="line">  &lt;hr&gt;</span><br><span class="line">  &lt;div class=&quot;btn2&quot;&gt;100%&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="缺陷"><a href="#缺陷" class="headerlink" title="缺陷"></a>缺陷</h3><ul>
-<li>边框线可能在大屏幕会变粗</li>
-</ul>
-<h2 id="vw适配方案"><a href="#vw适配方案" class="headerlink" title="vw适配方案"></a>vw适配方案</h2><h3 id="开发流程"><a href="#开发流程" class="headerlink" title="开发流程"></a>开发流程</h3><p>1、拿到设计稿（假设为750px）</p>
-<p>2、开始开发，对设计稿的标注进行转换，把px换成vw。比如页面元素字体标注的大小是32px，换成vw为 (100/750)*32 vw</p>
-<p>3、对于需要等比缩放的元素，CSS使用转换后的单位</p>
-<p>4、对于不需要缩放的元素，比如边框阴影，使用固定单位px</p>
-<h3 id="代码编写"><a href="#代码编写" class="headerlink" title="代码编写"></a>代码编写</h3><p>1、viewport设置 <code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</code> 。把layout viewport 宽度设置为设备宽度，不需要缩放</p>
-<p>2、用js定义css的自定义属性–width，对应的是把设计稿分成100份，每份的像素数。</p>
-<p>3、根据设计稿标注设置样式， 比如标注稿里元素宽度为20px。这这里设置 calc(20px * var(–width))</p>
-<p>4、对于不需要等比缩放的元素，比如边框，可以直接使用固定单位px即可。比如border-bottom: 1px solid #ccc</p>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750</span><br><span class="line">    document.documentElement.style.setProperty(&apos;--width&apos;, (100/WIDTH));</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;span class=&quot;active&quot; target=&quot;hot&quot;&gt;热门&lt;/span&gt;</span><br><span class="line">    &lt;span target=&quot;focus&quot;&gt;关注&lt;/span&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    :root &#123;</span><br><span class="line">      --color: red; </span><br><span class="line">    &#125;</span><br><span class="line">    body, figure &#123;</span><br><span class="line">      margin: 0;</span><br><span class="line">    &#125;</span><br><span class="line">    body &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      background: #888;</span><br><span class="line">      background-size: cover;</span><br><span class="line">      min-height: 100vh;</span><br><span class="line">    &#125;</span><br><span class="line">    header &#123;</span><br><span class="line">      font-size: calc(28vw * var(--width));</span><br><span class="line">      display: flex;</span><br><span class="line">      padding: 0 calc(20vw * var(--width));</span><br><span class="line">      text-align: center;</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span &#123;</span><br><span class="line">      flex: 1;</span><br><span class="line">      line-height: calc(84vw * var(--width));</span><br><span class="line">      color: rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span.active &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      border-bottom: 2px solid rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="REM方式"><a href="#REM方式" class="headerlink" title="REM方式"></a>REM方式</h2><h3 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h3><p>1、viewport设置 <code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</code> 。把layout viewport 宽度设置为设备宽度，不需要缩放</p>
-<p>2、用js定义html的fontSize。假设设计稿的宽度和屏幕宽度相同，我们设置html的fontSize为100px，对应设计稿的20px即为0.2rem。若设计稿的尺寸和屏幕尺寸不同，那让html的fontSize为 100*屏幕宽度/设计稿宽度，此时设计稿中的20px仍然对应0.2rem。</p>
-<p>3、对于不需要等比缩放的元素，比如边框，可以直接使用固定单位px即可。比如border-bottom: 1px solid #ccc</p>
-<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1&quot;&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    const WIDTH = 750  //设计稿尺寸</span><br><span class="line">    const setView = () =&gt; &#123;</span><br><span class="line">      console.log(screen.width)</span><br><span class="line">      document.documentElement.style.fontSize = (100*screen.width/WIDTH) + &apos;px&apos;</span><br><span class="line">    &#125;</span><br><span class="line">    window.onorientationchange = setView</span><br><span class="line">    setView()</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;header&gt;</span><br><span class="line">    &lt;span class=&quot;active&quot; target=&quot;hot&quot;&gt;热门&lt;/span&gt;</span><br><span class="line">    &lt;span target=&quot;focus&quot;&gt;关注&lt;/span&gt;</span><br><span class="line">  &lt;/header&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    &#125;</span><br><span class="line">    html &#123;</span><br><span class="line">      /*font-size: 100 * window.innerWidth / 750*/</span><br><span class="line">    &#125;</span><br><span class="line">    body, figure &#123;</span><br><span class="line">      margin: 0;</span><br><span class="line">    &#125;</span><br><span class="line">    body &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      background: #888;</span><br><span class="line">      background-size: cover;</span><br><span class="line">      min-height: 100vh;</span><br><span class="line">    &#125;</span><br><span class="line">    header &#123;</span><br><span class="line">      font-size: .28rem;</span><br><span class="line">      display: flex;</span><br><span class="line">      padding: 0 .20rem;</span><br><span class="line">      text-align: center;</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span &#123;</span><br><span class="line">      flex: 1;</span><br><span class="line">      line-height: .80rem;</span><br><span class="line">      color: rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">    header &gt; span.active &#123;</span><br><span class="line">      color: #fff;</span><br><span class="line">      border-bottom: 2px solid rgba(255, 255, 255, 0.3);</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="弹性盒适配方案"><a href="#弹性盒适配方案" class="headerlink" title="弹性盒适配方案"></a>弹性盒适配方案</h2><ul>
-<li>不需要等比缩放，页面元素使用固定单位。使用弹性盒(flex)做布局，可结合媒体查询调整文字大小。</li>
-</ul>
-<p>针对上面的适配方案，都是等比例缩小</p>
-<p>但是某些场景 一段文字介绍 在手机到ipad上我们不需要变大，字体还是跟手机上一样即可</p>
-<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;jirengu.com&lt;/title&gt;</span><br><span class="line">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;aaa&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;aaaaaa&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;bbb&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;bbbbbbb&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;section&gt;</span><br><span class="line">      &lt;div class=&quot;img&quot;&gt;&lt;/div&gt;</span><br><span class="line">      &lt;div class=&quot;detail&quot;&gt;</span><br><span class="line">        &lt;h2&gt;ccc&lt;/h2&gt;</span><br><span class="line">        &lt;p&gt;cccccccc&lt;/p&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line"></span><br><span class="line">    &lt;style&gt;</span><br><span class="line"></span><br><span class="line">      section &#123;</span><br><span class="line">        display: flex;</span><br><span class="line">        padding: 10px 0;</span><br><span class="line">        margin: 10px;</span><br><span class="line">        border-bottom: 1px solid #ccc;</span><br><span class="line">        background: #fff;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section &gt; .img &#123;</span><br><span class="line">        background:red;</span><br><span class="line">        width: 60px;</span><br><span class="line">        height: 60px;</span><br><span class="line">        border-radius: 50%;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail &#123;</span><br><span class="line">        margin-left: 10px;</span><br><span class="line">        flex: 1;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail h2 &#123;</span><br><span class="line">        font-size: 20px;</span><br><span class="line">        margin-top: 10px;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      section .detail p &#123;</span><br><span class="line">        font-size: 14px;</span><br><span class="line">        color: #676767;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-003-移动端适配方案/" data-id="cklcb6bq200vuwo91lxxt9o7u" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-移动端-002-viewport" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/移动端-002-viewport/" class="article-date">
-  <time datetime="2020-10-12T11:10:44.000Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/移动端-002-viewport/">移动端-002-viewport</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="viewport"><a href="#viewport" class="headerlink" title="viewport"></a>viewport</h1><h2 id="尺寸的区别"><a href="#尺寸的区别" class="headerlink" title="尺寸的区别"></a>尺寸的区别</h2><h3 id="屏幕的尺寸"><a href="#屏幕的尺寸" class="headerlink" title="屏幕的尺寸"></a>屏幕的尺寸</h3><ul>
-<li>就是电脑设置的分辨率<ul>
-<li>mac pro 默认 screen.width 为 1440</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">screen.width</span><br><span class="line">screen.height</span><br></pre></td></tr></table></figure>
-<h3 id="窗口的尺寸"><a href="#窗口的尺寸" class="headerlink" title="窗口的尺寸"></a>窗口的尺寸</h3><ul>
-<li>浏览器窗口的大小</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">window.innerHeight</span><br><span class="line">window.innerWidth</span><br></pre></td></tr></table></figure>
-<h3 id="viewport的概念"><a href="#viewport的概念" class="headerlink" title="viewport的概念"></a>viewport的概念</h3><p>对于页面一个div的宽度，我们设置width:10%; 这是 10%是相对于谁？最终是多宽</p>
-<ul>
-<li>div宽度首先是相对于父亲 也就是 body的 10%</li>
-<li>body的宽度，因为它是撑满html的，所以它应该和 html等宽，注意 body是有 margin的 ，清除margin 后html和body的宽度就都一致了</li>
-<li>html的宽度是多少呢？ <strong>html和窗口等宽</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .aaa&#123;</span><br><span class="line">      height: 300px;</span><br><span class="line">      width: 10%;</span><br><span class="line">      background:red;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;aaa&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="测试viewport"><a href="#测试viewport" class="headerlink" title="测试viewport"></a>测试viewport</h3><p>document.documentElement.clientWidth 和 document.documentElement.clientHeight 测试视窗宽高</p>
-<h4 id="document-documentElement-clientWidth-和-window-innerWidth-的区别"><a href="#document-documentElement-clientWidth-和-window-innerWidth-的区别" class="headerlink" title="document.documentElement.clientWidth 和 window.innerWidth 的区别"></a>document.documentElement.clientWidth 和 window.innerWidth 的区别</h4><p><strong>当页面出现滚动条的时候</strong></p>
-<ul>
-<li>document.documentElement.clientWidth 不包含滚动条</li>
-<li>window.innerWidth 包含滚动条</li>
-</ul>
-<h3 id="测量html的宽高"><a href="#测量html的宽高" class="headerlink" title="测量html的宽高"></a>测量html的宽高</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">document.documentElement.offsetHeight </span><br><span class="line">document.documentElement.offsetWidth</span><br></pre></td></tr></table></figure>
-<h2 id="移动端的-viewport"><a href="#移动端的-viewport" class="headerlink" title="移动端的 viewport"></a>移动端的 viewport</h2><p>差异：屏幕太窄了，基本没有宽度超过400px的</p>
-<p>此时有个网站 设置<code>min-width:1000px</code>比如有个侧栏 宽度为10% 那么 在PC没有问题，到了手机就会有问题，因为手机总共不超过 400px 宽度 ，这就导致了一个侧栏就占了屏幕的三分之一</p>
-<p>为了解决这个问题 手机浏览器的厂商就提出了 两个概念 visual viewport 和 layout viewport</p>
-<h3 id="visual-viewport-和-layout-viewport"><a href="#visual-viewport-和-layout-viewport" class="headerlink" title="visual viewport 和 layout viewport"></a>visual viewport 和 layout viewport</h3><ul>
-<li>visual viewport 可视窗口：移动端视窗的设备独立像素</li>
-<li>layout viewport 用于布局的窗口：页面渲染时参考的宽高</li>
-</ul>
-<p>在移动端，页面渲染以 layout viewport 宽度作为计算标准。以iphone 为例，其 layout viewport 是980px,页面渲染时就认为窗口为 980px。 一些老网站（没做移动端适配） 在手机打开的时候就会按照 980的宽度计算 相当于 把980px的宽度内容缩小到手机上显示。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .btn &#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:98px;</span><br><span class="line">    &#125;</span><br><span class="line">    .btn2&#123;</span><br><span class="line">      background:red;</span><br><span class="line">      width:100%;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;btn&quot;&gt;98px&lt;/div&gt;</span><br><span class="line">  &lt;hr&gt;</span><br><span class="line">  &lt;div class=&quot;btn2&quot;&gt;100%&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>手机端显示 98px的按钮就被缩小了<ul>
-<li>而且 document.documentElement.clientWidth 一取是 980px，你就懵逼了。</li>
-</ul>
-</li>
-<li>PC端显示 98px就很正常</li>
-</ul>
-<p><strong>总结</strong></p>
-<p>移动端渲染的时候不去管你窗口是多大，他就认为我的宽度是980，然后按照980去渲染这个页面,同样的内容 你看到PC在看手机 感觉手机上的内容缩小了。</p>
-<h3 id="现在做唯一的修改"><a href="#现在做唯一的修改" class="headerlink" title="现在做唯一的修改"></a>现在做唯一的修改</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line"></span><br><span class="line">快捷键是输入 meta:vp + tab键</span><br><span class="line"></span><br><span class="line">效果就是 </span><br><span class="line">layout viewport 的宽度 = device width</span><br><span class="line"></span><br><span class="line">此时再去做布局的时候，缩放比就为1:1，就达到 你写100px 在手机上也显示为 100px</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-002-viewport/" data-id="cklcb6bq100vswo91cxhems6w" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-移动端-001-像素单位" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/移动端-001-像素单位/" class="article-date">
-  <time datetime="2020-10-12T09:56:38.000Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/移动端-001-像素单位/">移动端-001-像素单位</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="像素"><a href="#像素" class="headerlink" title="像素"></a>像素</h1><h3 id="设备像素-device-pixels"><a href="#设备像素-device-pixels" class="headerlink" title="设备像素 device pixels"></a>设备像素 device pixels</h3><ul>
-<li>物理像素,屏幕上一个点。</li>
-<li>这个点，实际是由RGB三原色排列组成。</li>
-<li>想想霓虹灯(物理像素)由红绿蓝小灯组成，三盏灯不同的亮度混合出各种彩色</li>
-</ul>
-<h3 id="设备独立像素-device-independent-pixels"><a href="#设备独立像素-device-independent-pixels" class="headerlink" title="设备独立像素(device independent pixels)"></a>设备独立像素(device independent pixels)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可以通过 api 查看 </span><br><span class="line">window.screen.width</span><br><span class="line">window.screen.height</span><br></pre></td></tr></table></figure>
-<ul>
-<li>iphone6 的 375x812指的是设备独立像素</li>
-<li>chrome调试移动端不同手机型号的尺寸也是设备独立像素</li>
-</ul>
-<p>概念</p>
-<p><strong>一个设备独立像素里可能包含1个或多个物理像素点，包含的越多看起来越清晰</strong></p>
-<blockquote>
-<p>参考普通屏的mac air 和 mac pro</p>
-</blockquote>
-<ul>
-<li>很明显 mac pro的看起来更清晰，因为 mac pro 一个设备独立像素包含的物理像素点更多</li>
-</ul>
-<h3 id="像素分辨率"><a href="#像素分辨率" class="headerlink" title="像素分辨率"></a>像素分辨率</h3><p>以 iphone手机为例它的像素分辨率是 1125x2436 指的是横向能显示1125个物理像素点，纵向能显示2436个物理像素点。</p>
-<p>现在的4K屏就是 4096x2160s</p>
-<h3 id="PPI-pix-per-inch"><a href="#PPI-pix-per-inch" class="headerlink" title="PPI(pix per inch)"></a>PPI(pix per inch)</h3><p>每英寸的像素数。如5.8寸 iphone为例。</p>
-<ul>
-<li>手机屏幕对角线长度就是 英寸数</li>
-<li>分辨率为1125x2436</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ppi = Math.sqrt(1125*1125 + 2436*2436) / 5.8 = 463ppi</span><br></pre></td></tr></table></figure>
-<h3 id="CSS像素"><a href="#CSS像素" class="headerlink" title="CSS像素"></a>CSS像素</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">div&#123;width:100px;&#125;</span><br><span class="line">在页面 缩放比为1:1情况下， 1个CSS像素=1个设备独立像素。</span><br><span class="line"></span><br><span class="line">假设当前屏幕分辨率是 1440，如果给元素设置宽度720px，则视觉上宽度是屏幕的一半。 这也解释了为什么分辨率跳高后感觉网页文字变小了。</span><br></pre></td></tr></table></figure>
-<h3 id="devicePixelRatio"><a href="#devicePixelRatio" class="headerlink" title="devicePixelRatio"></a>devicePixelRatio</h3><p>window.devicePixelRatio指的是设备物理像素和设备独立像素（device-independent pixels, dips）的比例。window.devicePixelRatio = 物理像素 / 设备独立像素（dips） 。经计算， iphonex的 devicePixelRatio 是3。</p>
-<h3 id="为啥普通电脑上的图片放到-mac-pro-变模糊了？"><a href="#为啥普通电脑上的图片放到-mac-pro-变模糊了？" class="headerlink" title="为啥普通电脑上的图片放到 mac pro 变模糊了？"></a>为啥普通电脑上的图片放到 mac pro 变模糊了？</h3><ul>
-<li>参考芯片的制程，分别有28nm、7nm、5nm。</li>
-<li>假设在<code>1厘米x1厘米</code>的空间很明显 5nm能放置更多的晶体管</li>
-</ul>
-<p>高清屏实际就是1个设备独立像素能容纳更多的 物理像素</p>
-<p>一张图 假设宽高100px 的图片普通电脑可能就是 100x100 = 10000个物理像素点</p>
-<p>而在高清屏的时候 100px 的图片 可能是 400*400 = 160000 个物理像素点</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-001-像素单位/" data-id="cklcb6bq000vqwo91t4fnwl38" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-010-动态REM" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/12/CSS-010-动态REM/" class="article-date">
-  <time datetime="2020-10-12T06:32:17.000Z" itemprop="datePublished">2020-10-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/12/CSS-010-动态REM/">CSS-010-动态REM</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="动态REM"><a href="#动态REM" class="headerlink" title="动态REM"></a>动态REM</h1><p>手机专用的自适应方案</p>
-<h2 id="REM是什么"><a href="#REM是什么" class="headerlink" title="REM是什么"></a>REM是什么</h2><blockquote>
-<p>常见单位</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">px 像素</span><br><span class="line">em 一个字母的宽度 、一个汉子的宽度？</span><br><span class="line">rem root em 根元素的 font-size</span><br><span class="line">vh viewport height 100vh = 视口高度</span><br><span class="line">vw viewport width 100vw = 视口宽度</span><br></pre></td></tr></table></figure>
-<p><strong>网页的默认font-size是 16px</strong></p>
-<p>chrome有设置最小字号是12px，此时你就算写出 font-size:6px 也会变成 12px</p>
-<blockquote>
-<p>问题1: font-size:1rem 是多少像素</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16</span><br><span class="line"></span><br><span class="line">body&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 16px,因为根元素font-size是16, html才是根元素</span><br><span class="line"></span><br><span class="line">html&#123;font-size:20px;&#125;</span><br><span class="line">p&#123;font-size:1rem;&#125;</span><br><span class="line">答案是 20px,因为根元素font-size是20</span><br></pre></td></tr></table></figure>
-<h2 id="REM和-EM区别"><a href="#REM和-EM区别" class="headerlink" title="REM和 EM区别"></a>REM和 EM区别</h2><blockquote>
-<p>p 的高度是多少</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>经过浏览器检查发现是 32px</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    p&#123;</span><br><span class="line">      height:2em;</span><br><span class="line">      font-size:30px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;p&gt;回答&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>经过浏览器检查发现是 60px,结论：<strong>1em就是自身元素 font-size的像素值</strong></p>
-<p><strong>REM是根元素的font-size,em是自身元素的font-size</strong></p>
-<h2 id="动态REM-1"><a href="#动态REM-1" class="headerlink" title="动态REM"></a>动态REM</h2><blockquote>
-<p>移动端写页面的演进</p>
-</blockquote>
-<ul>
-<li>百分比布局，只能保证水平方向没问题，但是高度呢？<ul>
-<li>要求高度是宽度的1半，就很难做到，因为 height是不会按照父容器的宽度来定的</li>
-</ul>
-</li>
-<li><p>动态REM</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">当屏幕 640px的时候 banner为 320*320</span><br><span class="line"></span><br><span class="line">当屏幕 320px的时候 banner为 160*160</span><br><span class="line"></span><br><span class="line">当屏幕 414px的时候 banner为 212*212</span><br></pre></td></tr></table></figure>
-<ul>
-<li>一切单位以“宽度”为基准，等比例缩放</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height: 0.2rem;</span><br><span class="line">      width: 0.4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.05rem 0.05rem;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="对REM进行微调"><a href="#对REM进行微调" class="headerlink" title="对REM进行微调"></a>对REM进行微调</h2><ul>
-<li>border:1px问题，无法在小的情况</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0&quot;&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    *&#123;margin:0;padding:0;&#125;</span><br><span class="line">    *&#123;box-sizing:border-box;&#125;</span><br><span class="line">    body&#123;</span><br><span class="line">      font-size:16px;</span><br><span class="line">    &#125;</span><br><span class="line">    .child&#123;</span><br><span class="line">      background:#ddd;</span><br><span class="line">      height:2rem;</span><br><span class="line">      width: 4rem;</span><br><span class="line">      float:left;</span><br><span class="line">      margin:0.5rem 0.5rem;</span><br><span class="line">      /* 当像素特别小的时候就用1px因为网页最小1px */</span><br><span class="line">      border:1px solid red;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .clearfix::after&#123;</span><br><span class="line">      content:&apos;&apos;;</span><br><span class="line">      display:block;</span><br><span class="line">      clear:both;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">    var pageWidth = window.innerWidth;</span><br><span class="line">   document.write(&apos;&lt;style&gt;html&#123;font-size:&apos;+pageWidth/10+&apos;px;&#125;&lt;/style&gt;&apos;);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;parent clearfix&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;  </span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/CSS-010-动态REM/" data-id="cklcb6bbo000fwo91lm09yvuc" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-009-BFC" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/11/CSS-009-BFC/" class="article-date">
-  <time datetime="2020-10-11T15:56:55.000Z" itemprop="datePublished">2020-10-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/11/CSS-009-BFC/">CSS-009-BFC</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="BFC"><a href="#BFC" class="headerlink" title="BFC"></a>BFC</h1><blockquote>
-<p>Block Formatting Context</p>
-</blockquote>
-<p>块格式化上下文</p>
-<h3 id="CSS规范中对-BFC-的描述"><a href="#CSS规范中对-BFC-的描述" class="headerlink" title="CSS规范中对 BFC 的描述"></a>CSS规范中对 BFC 的描述</h3><blockquote>
-<p>9.4.1 块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>浮动，绝对定位元素，非块盒的块容器（例如，inline-blocks，table-cells和table-captions）和’overflow’不为’visible’的块盒会为它们的内容建立一个新的块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，盒在竖直方向一个接一个地放置，从包含块的顶部开始。两个兄弟盒之间的竖直距离由’margin’属性决定。同一个块格式化上下文中的相邻块级盒之间的竖直margin会合并</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，每个盒的left外边（left outer edge）挨着包含块的left边（对于从右向左的格式化，right边挨着）。即使存在浮动（尽管一个盒的行盒可能会因为浮动收缩），这也成立。除非该盒建立了一个新的块格式化上下文（这种情况下，该盒自身可能会因为浮动变窄）</p>
-</blockquote>
-<h3 id="MDN-对-BFC-的描述"><a href="#MDN-对-BFC-的描述" class="headerlink" title="MDN 对 BFC 的描述"></a>MDN 对 BFC 的描述</h3><blockquote>
-<p>一个块格式化上下文（block formatting context） 是Web页面的可视化CSS渲染出的一部分。它是块级盒布局出现的区域，也是浮动层元素进行交互的区域。</p>
-</blockquote>
-<blockquote>
-<p>一个块格式化上下文由以下之一创建：</p>
-</blockquote>
-<ul>
-<li>根元素或其它包含它的元素</li>
-<li>浮动元素 (元素的 float 不是 none)</li>
-<li>绝对定位元素 (元素具有 position 为 absolute 或 fixed)</li>
-<li>内联块 (元素具有 display: inline-block)</li>
-<li>表格单元格 (元素具有 display: table-cell，HTML表格单元格默认属性)</li>
-<li>表格标题 (元素具有 display: table-caption, HTML表格标题默认属性)</li>
-<li>具有overflow 且值不是 visible 的块元素，</li>
-<li>display: flow-root <strong>触发BFC</strong></li>
-<li>column-span: all 应当总是会创建一个新的格式化上下文，即便具有 column-span: all 的元素并不被包裹在一个多列容器中。</li>
-</ul>
-<blockquote>
-<p>一个块格式化上下文包括创建它的元素内部所有内容，除了被包含于创建新的块级格式化上下文的后代元素内的元素。</p>
-</blockquote>
-<blockquote>
-<p>块格式化上下文对于定位 (参见 float) 与清除浮动 (参见 clear) 很重要。定位和清除浮动的样式规则只适用于处于同一块格式化上下文内的元素。浮动不会影响其它块格式化上下文中元素的布局，并且清除浮动只能清除同一块格式化上下文中在它前面的元素的浮动。</p>
-</blockquote>
-<h3 id="张鑫旭对-BFC-的描述"><a href="#张鑫旭对-BFC-的描述" class="headerlink" title="张鑫旭对 BFC 的描述"></a>张鑫旭对 BFC 的描述</h3><p><a href="http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/" target="_blank" rel="noopener">http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/</a></p>
-<blockquote>
-<p>BFC全称”Block Formatting Context”, 中文为“块级格式化上下文”。啪啦啪啦特性什么的，一言难尽，大家可以自行去查找，我这里不详述，免得乱了主次，总之，记住这么一句话：BFC元素特性表现原则就是，内部子元素再怎么翻江倒海，翻云覆雨都不会影响外部的元素。所以，避免margin穿透啊，清除浮动什么的也好理解了。</p>
-</blockquote>
-<h3 id="BFC-到底是什么？"><a href="#BFC-到底是什么？" class="headerlink" title="BFC 到底是什么？"></a>BFC 到底是什么？</h3><p>先思考一个问题：</p>
-<p>请问：什么是色情？</p>
-<p>联邦最高法院大法官斯图尔特更有一句名言</p>
-<blockquote>
-<p>我不知道什么是色情，不过，我看了之后，就能知道</p>
-</blockquote>
-<p><code>I know it when I see it</code></p>
-<p>类似地：</p>
-<p>1、我不知道什么是 BFC<br>2、但是你写出样式，我就知道这是不是 BFC</p>
-<p>BFC 就是这样的东西（堆叠上下文也是）</p>
-<p>1、它没有定义<br>2、它只有特性/功能</p>
-<h3 id="功能1：爸爸管儿子"><a href="#功能1：爸爸管儿子" class="headerlink" title="功能1：爸爸管儿子"></a>功能1：爸爸管儿子</h3><p>用 BFC 包住浮动元素。(这不是清除浮动，.clearfix 才是清除浮动）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      float:left; /* 浮动就会脱离文档流 ，导致 baba 的高度塌陷 */</span><br><span class="line">      width: 300px;</span><br><span class="line">      height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如何触发BFC</p>
-</blockquote>
-<ul>
-<li>父级 浮动、定位、或者 <code>display = inline-block\table-cell\table-caption</code> 或者 display不是block的值的容器、 overflow 不为 visible的<ul>
-<li>overflow:auto</li>
-<li>overflow:hidden 会引发副作用，如果内部元素，超出内容不会显示</li>
-<li>display:inline-block</li>
-<li>display:table-cell</li>
-<li>display:flow-root <strong>让当前元素触发BFC，CSS3新出的属性，兼容性不太好</strong></li>
-</ul>
-</li>
-</ul>
-<h3 id="解释BFC内部元素-margin融合问题"><a href="#解释BFC内部元素-margin融合问题" class="headerlink" title="解释BFC内部元素 margin融合问题"></a>解释BFC内部元素 margin融合问题</h3><ul>
-<li>如果两个div没有浮动，它们在一个div中，它们的竖直margin会合并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"><a href="#一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的" class="headerlink" title="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"></a>一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的</h3><blockquote>
-<p>通俗理解</p>
-</blockquote>
-<ul>
-<li>baba是BFC</li>
-<li>erzi是 baba的子元素，同时也是BFC</li>
-<li>sunzi 是 erzi的子元素，它的内容就不会被 baba包含</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      width:500px;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display:flow-root;</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">      float:left; /* 触发BFC */</span><br><span class="line">      margin-top:100px; /* 由于父级 触发BFC所以 这个距离会被包含进 baba里*/</span><br><span class="line">    &#125;</span><br><span class="line">    .sunzi&#123;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 400px;</span><br><span class="line">      margin-top:200px; /* 由于 sunzi被 BFC元素 erzi罩着， 所以无法被包含进 baba内 */</span><br><span class="line">      background:blue; </span><br><span class="line">      /* 由于 erzi在带sunzi，所以baba 就不管这个sunzi了 */</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;sunzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="功能2：兄弟之间划清界限"><a href="#功能2：兄弟之间划清界限" class="headerlink" title="功能2：兄弟之间划清界限"></a>功能2：兄弟之间划清界限</h3><p>用 float + div 做左右自适应布局</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .gege&#123;</span><br><span class="line">  width: 100px;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 3px solid red;</span><br><span class="line">  float: left;</span><br><span class="line">  margin-right: 20px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.didi&#123;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 5px solid green;</span><br><span class="line">  overflow:auto; </span><br><span class="line">  /* display:flow-root; */</span><br><span class="line">&#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;gege&quot;&gt;gege&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;didi&quot;&gt;1234&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>第一个方式就是 overflow:auto</li>
-<li>第二个方式就是 display:flow-root;</li>
-</ul>
-<h3 id="如何回答面试官"><a href="#如何回答面试官" class="headerlink" title="如何回答面试官"></a>如何回答面试官</h3><p>千万别解释什么是 BFC，一解释就错<br>用上面的例子回答什么是 BFC</p>
-<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><blockquote>
-<p>BFC和文档流有什么关系</p>
-</blockquote>
-<ul>
-<li>BFC说的是一个div有一些属性后(float:left 或position:absolute)它自己就是BFC。BFC说的是这个 div 的特性，说的是这个div会包住它里面，它里面的内容是不会变得</li>
-<li>文档流是 内联元素从左到右，块级元素从上到下排列</li>
-<li>BFC影响一个元素的宽高，文档流影响是排列顺序</li>
-</ul>
-<blockquote>
-<p>BFC使用场景</p>
-</blockquote>
-<ul>
-<li>爸爸管儿子(参考上面的功能1)，注意这不是清除浮动，这是BFC让爸爸管儿子<ul>
-<li>BFC可以模拟清除浮动的效果，但是我可以直接 clearfix，那么BFC就没意义了，BFC会导致副作用 如 overflow:hidden;的时候，但是clearfix不会有副作用，除非所有浏览器都支持<code>display:flow-root</code></li>
-<li><strong>不要用BFC清除浮动</strong></li>
-</ul>
-</li>
-<li>兄弟之间划清界限(参考上面的功能2)<ul>
-<li>也就是以前的左右布局</li>
-<li>同样也可以不用它，用flex解决这些问题</li>
-<li>BFC是时代的产物</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>margin穿透</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .baba&#123;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .erzi&#123;</span><br><span class="line">    height: 100px;</span><br><span class="line">    margin-top:100px;</span><br><span class="line">    background:green;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>现在 erzi 的 margin会穿过 baba </li>
-<li>给 baba 添加 <code>overflow:hidden</code> 就能触发BFC,不让 erzi穿出来，但是有副作用就是 erzi内如果有定位元素超出容易会被隐藏</li>
-<li>所以 你只能给 baba 加 <code>display:flow-root</code> 或者 <code>borer</code></li>
-</ul>
-<blockquote>
-<p>什么情况下一定要BFC呢？</p>
-</blockquote>
-<p>没有任何情况一定要BFC，所有的场景都可以不用BFC实现</p>
-<p><strong>面试一定要搞懂BFC</strong></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-009-BFC/" data-id="cklcb6bbn000dwo91nvdinxwo" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
 
     </footer>
   </div>
@@ -1028,7 +1175,7 @@
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/54/">54</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1052,7 +1199,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15.42px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 14.58px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.42px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 15px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
     </div>
   </div>
 
@@ -1074,23 +1221,23 @@
       <ul>
         
           <li>
-            <a href="/2021/02/18/Node-web05-07博客系统部署/">Node-web05-07博客系统部署</a>
+            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+            <a href="/2021/02/22/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+            <a href="/2021/02/22/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
           </li>
         
           <li>
-            <a href="/2021/02/18/Node-web05-03博客系统注册/">Node-web05-03博客系统注册</a>
+            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
           </li>
         
       </ul>
