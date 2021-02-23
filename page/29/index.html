@@ -62,6 +62,91 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py007-02-05scrapy多个url爬取" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/02/Py007-02-05scrapy多个url爬取/" class="article-date">
+  <time datetime="2018-12-02T05:51:40.000Z" itemprop="datePublished">2018-12-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/02/Py007-02-05scrapy多个url爬取/">Py007-02-05scrapy多个url爬取</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="爬取多个页面url数据"><a href="#爬取多个页面url数据" class="headerlink" title="爬取多个页面url数据"></a>爬取多个页面url数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 糗事百科  文字标签页面的数据   它有13页</span><br><span class="line">https://www.qiushibaike.com/text/</span><br></pre></td></tr></table></figure>
+<h4 id="项目实战"><a href="#项目实战" class="headerlink" title="项目实战"></a>项目实战</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 切换到桌面</span><br><span class="line">cd ~/Desktop </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建项目</span><br><span class="line">scarpy startproject qiubaiByPages</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建成功后进入该目录</span><br><span class="line">cd qiubaiByPages/</span><br><span class="line"></span><br><span class="line"># 创建spider 爬虫应用</span><br><span class="line">scrapy genspider qiubai www.qiushibaike.com/text</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="第一步-修改spiders-qiubai-py"><a href="#第一步-修改spiders-qiubai-py" class="headerlink" title="第一步 修改spiders/qiubai.py"></a>第一步 修改spiders/qiubai.py</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class QiubaiSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;qiubai&apos;</span><br><span class="line">    allowed_domains = [&apos;www.qiushibaike.com/text&apos;]</span><br><span class="line">    start_urls = [&apos;https://www.qiushibaike.com/text/&apos;]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        div_list = response.xpath(&apos;//*[@id=&quot;content-left&quot;]/div&apos;)</span><br><span class="line"></span><br><span class="line">        for div in div_list:</span><br><span class="line">            author = div.xpath(&apos;./div[@class=&quot;author clearfix&quot;]/a[2]/h2/text()&apos;).extract_first()</span><br><span class="line">            content = div.xpath(&apos;.//div[@class=&quot;content&quot;]/span/text()&apos;).extract_first()</span><br><span class="line"></span><br><span class="line">            # 创建items对象，将解析内容存储到items对象里</span><br><span class="line"></span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="第二步-创建items对象-items-py"><a href="#第二步-创建items对象-items-py" class="headerlink" title="第二步 创建items对象  items.py"></a>第二步 创建items对象  items.py</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class QiubaibypagesItem(scrapy.Item):</span><br><span class="line">    author = scrapy.Field()</span><br><span class="line">    content = scrapy.Field()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="第三步-在spiders-qiubai-py里导入items-并把item数据提交给管道文件"><a href="#第三步-在spiders-qiubai-py里导入items-并把item数据提交给管道文件" class="headerlink" title="第三步 在spiders/qiubai.py里导入items,并把item数据提交给管道文件"></a>第三步 在spiders/qiubai.py里导入items,并把item数据提交给管道文件</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line">from qiubaiByPages.items import QiubaibypagesItem</span><br><span class="line"></span><br><span class="line">class QiubaiSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;qiubai&apos;</span><br><span class="line">    # 建议注释掉 allowed_domains 图片的资源域名可能与此不一致</span><br><span class="line">    # allowed_domains = [&apos;www.qiushibaike.com/text&apos;]</span><br><span class="line">    start_urls = [&apos;https://www.qiushibaike.com/text/&apos;]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        div_list = response.xpath(&apos;//*[@id=&quot;content-left&quot;]/div&apos;)</span><br><span class="line"></span><br><span class="line">        for div in div_list:</span><br><span class="line">            author = div.xpath(&apos;./div[@class=&quot;author clearfix&quot;]/a[2]/h2/text()&apos;).extract_first()</span><br><span class="line">            content = div.xpath(&apos;.//div[@class=&quot;content&quot;]/span/text()&apos;).extract_first()</span><br><span class="line"></span><br><span class="line">            # 创建items对象，将解析内容存储到items对象里</span><br><span class="line">            item = QiubaibypagesItem()</span><br><span class="line">            item[&apos;author&apos;] = author</span><br><span class="line">            item[&apos;content&apos;] = content</span><br><span class="line"></span><br><span class="line">            # 将item对象提交给管道文件</span><br><span class="line">            yield item</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改管道文件pipelines.py</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">class QiubaibypagesPipeline(object):</span><br><span class="line">    fp = None</span><br><span class="line">    def open_spider(self,spider):</span><br><span class="line">        print(&apos;开始爬虫&apos;)</span><br><span class="line">        self.fp = open(&apos;./qiubai.txt&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line"></span><br><span class="line">    def close_spider(self,spider):</span><br><span class="line">        print(&apos;结束爬虫&apos;)</span><br><span class="line">        self.fp.close()</span><br><span class="line"></span><br><span class="line">    def process_item(self, item, spider):</span><br><span class="line">        self.fp.write(item[&apos;author&apos;]+&apos;:&apos;+item[&apos;content&apos;]+&apos;\n\n\n&apos;)</span><br><span class="line">        return item</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="第四步-修改配置文件settings-py"><a href="#第四步-修改配置文件settings-py" class="headerlink" title="第四步 修改配置文件settings.py"></a>第四步 修改配置文件settings.py</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 伪装请求载体身份</span><br><span class="line">19行：USER_AGENT = &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36&apos; </span><br><span class="line"></span><br><span class="line">22行：ROBOTSTXT_OBEY = False  #可以忽略或者不遵守robots协议</span><br><span class="line"># 不遵守robots协议</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 解开注释 管道操作配置</span><br><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">   &apos;qiubaiByPages.pipelines.QiubaibypagesPipeline&apos;: 300,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="最后-回到刚刚的命令行-执行爬虫命令"><a href="#最后-回到刚刚的命令行-执行爬虫命令" class="headerlink" title="最后 回到刚刚的命令行 执行爬虫命令"></a>最后 回到刚刚的命令行 执行爬虫命令</h4></blockquote>
+<p>把基础的流程跑通</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl qiubai --nolog</span><br></pre></td></tr></table></figure>
+<h3 id="第二部分"><a href="#第二部分" class="headerlink" title="第二部分"></a>第二部分</h3><ul>
+<li>上述流程跑通后，仅仅是一页的数据而</li>
+<li>我们的需求是它的所有分页数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 该url的分页数据</span><br><span class="line">https://www.qiushibaike.com/text/</span><br></pre></td></tr></table></figure>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ul>
+<li>请求的手动发送</li>
+</ul>
+<blockquote>
+<p>分析spiders/qiubai.py</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def parse(self, response):</span><br><span class="line">    ...</span><br><span class="line">    # 将item对象提交给管道文件</span><br><span class="line">    yield item</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">当yield item都执行完毕  意味着：</span><br><span class="line"></span><br><span class="line">https://www.qiushibaike.com/text/</span><br><span class="line">这一页面的数据爬取完毕</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>手动处理下一次请求(仅仅以第二页数据为例)理解版本的parse函数修改</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">def parse(self, response):</span><br><span class="line">    div_list = response.xpath(&apos;//*[@id=&quot;content-left&quot;]/div&apos;)</span><br><span class="line"></span><br><span class="line">    for div in div_list:</span><br><span class="line">        author = div.xpath(&apos;./div[@class=&quot;author clearfix&quot;]/a[2]/h2/text()&apos;).extract_first()</span><br><span class="line">        content = div.xpath(&apos;.//div[@class=&quot;content&quot;]/span/text()&apos;).extract_first()</span><br><span class="line"></span><br><span class="line">        # 创建items对象，将解析内容存储到items对象里</span><br><span class="line">        item = QiubaibypagesItem()</span><br><span class="line">        item[&apos;author&apos;] = author</span><br><span class="line">        item[&apos;content&apos;] = content</span><br><span class="line"></span><br><span class="line">        # 将item对象提交给管道文件</span><br><span class="line">        yield item</span><br><span class="line"></span><br><span class="line">    # 请求的手动发送</span><br><span class="line">    url = &apos;https://www.qiushibaike.com/text/page/2&apos;</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    url代表下一次请求的 url</span><br><span class="line">    callback代表将请求到的页面数据进行解析  而这个解析函数正是我们这里的parse函数</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    yield scrapy.Request(url=url,callback=self.parse)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h5 id="注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。"><a href="#注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。" class="headerlink" title="注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。"></a>注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。</h5></blockquote>
+<blockquote>
+<h5 id="注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。-1"><a href="#注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。-1" class="headerlink" title="注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。"></a>注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。</h5></blockquote>
+<blockquote>
+<h5 id="注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。-2"><a href="#注意-这个版本-手动发送请求属于递归调用-由于没有结束条件所以会一直递归下去。。。。。-2" class="headerlink" title="注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。"></a>注意 这个版本 手动发送请求属于递归调用 由于没有结束条件所以会一直递归下去。。。。。</h5></blockquote>
+<blockquote>
+<h4 id="完整版的qiubai-py文件"><a href="#完整版的qiubai-py文件" class="headerlink" title="完整版的qiubai.py文件"></a>完整版的qiubai.py文件</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line">from qiubaiByPages.items import QiubaibypagesItem</span><br><span class="line"></span><br><span class="line">class QiubaiSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;qiubai&apos;</span><br><span class="line">    # 注视掉这个 allowed_domains</span><br><span class="line">    # allowed_domains = [&apos;www.qiushibaike.com/text&apos;]</span><br><span class="line">    start_urls = [&apos;https://www.qiushibaike.com/text/&apos;]</span><br><span class="line"></span><br><span class="line">    # 设计通用的url模版</span><br><span class="line">    url = &apos;https://www.qiushibaike.com/text/page/%d&apos;</span><br><span class="line">    pageNum = 1</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        div_list = response.xpath(&apos;//*[@id=&quot;content-left&quot;]/div&apos;)</span><br><span class="line"></span><br><span class="line">        for div in div_list:</span><br><span class="line">            author = div.xpath(&apos;./div[@class=&quot;author clearfix&quot;]/a[2]/h2/text()&apos;).extract_first()</span><br><span class="line">            content = div.xpath(&apos;.//div[@class=&quot;content&quot;]/span/text()&apos;).extract_first()</span><br><span class="line"></span><br><span class="line">            # 创建items对象，将解析内容存储到items对象里</span><br><span class="line">            item = QiubaibypagesItem()</span><br><span class="line">            item[&apos;author&apos;] = author</span><br><span class="line">            item[&apos;content&apos;] = content</span><br><span class="line"></span><br><span class="line">            # 将item对象提交给管道文件</span><br><span class="line">            yield item</span><br><span class="line"></span><br><span class="line">        # 请求的手动发送</span><br><span class="line">        if self.pageNum &lt; 13: # 13表示是最后一页的页码</span><br><span class="line">            print(&apos;爬取到了第%d的页面数据&apos;%self.pageNum)</span><br><span class="line">            self.pageNum += 1 # 页码增加</span><br><span class="line">            new_url = format(self.url%self.pageNum)</span><br><span class="line">            yield scrapy.Request(url=new_url,callback=self.parse)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/02/Py007-02-05scrapy多个url爬取/" data-id="cklhjlfhq00jsoyfyk5z2jafp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py007-02-04scrapy管道高级操作" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/01/Py007-02-04scrapy管道高级操作/" class="article-date">
@@ -101,7 +186,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-02-04scrapy管道高级操作/" data-id="cklhgt2u800k8q1fyigqazows" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-02-04scrapy管道高级操作/" data-id="cklhjlfhq00jroyfyav0y67zu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -174,7 +259,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-02-03redis安装以及使用/" data-id="cklhgt2u700k6q1fybzmdkch2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-02-03redis安装以及使用/" data-id="cklhjlfhp00jooyfyzh24960i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -279,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-02-02scrapy持久化存储/" data-id="cklhgt2u600k4q1fybc81u0v9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-02-02scrapy持久化存储/" data-id="cklhjlfho00jnoyfybg6cfefa" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -380,7 +465,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-02-01scrapy简介/" data-id="cklhgt2u500k2q1fy46kcok57" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-02-01scrapy简介/" data-id="cklhjlfhn00jkoyfyz25a4aww" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -456,7 +541,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-01-12selenium和phantomJs使用/" data-id="cklhgt2u500k0q1fy6hnshge4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-01-12selenium和phantomJs使用/" data-id="cklhjlfhn00jjoyfynaumvh3v" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -514,7 +599,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/01/Py007-01-11bs4使用/" data-id="cklhgt2u400jyq1fybu39i9yy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/01/Py007-01-11bs4使用/" data-id="cklhjlfhm00jgoyfy0rjhejpw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -567,7 +652,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/Py007-01-10xpath使用/" data-id="cklhgt2u300jwq1fydn2n96yp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/30/Py007-01-10xpath使用/" data-id="cklhjlfhl00jfoyfy2e8jrros" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -628,7 +713,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/Py007-01-09爬虫之数据解析以及re操作/" data-id="cklhgt2u200juq1fy1axm4cvt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/30/Py007-01-09爬虫之数据解析以及re操作/" data-id="cklhjlfhk00jcoyfydvvfhvfi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -666,120 +751,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/Py007-01-08requests处理验证码/" data-id="cklhgt2u000jpq1fysgpa1ff5" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-01-07requests高级操作cookie和代理" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/30/Py007-01-07requests高级操作cookie和代理/" class="article-date">
-  <time datetime="2018-11-30T13:27:14.000Z" itemprop="datePublished">2018-11-30</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/30/Py007-01-07requests高级操作cookie和代理/">Py007-01-07requests高级操作cookie和代理</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="requests模块高级："><a href="#requests模块高级：" class="headerlink" title="requests模块高级："></a>requests模块高级：</h3><h4 id="cookie："><a href="#cookie：" class="headerlink" title="cookie："></a>cookie：</h4><blockquote>
-<p>基于用户的用户数据</p>
-<ul>
-<li>需求：爬取张三用户的豆瓣网的个人主页页面数据</li>
-</ul>
-</blockquote>
-<ul>
-<li>在没有登录的情况下浏览器访问 <a href="https://www.douban.com/people/185687620/" target="_blank" rel="noopener">https://www.douban.com/people/185687620/</a></li>
-<li>发现不是对应主页信息而是要求你登录的页面</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#问题：没有获取个人主页的页面数据</span><br><span class="line">#原因：爬虫程序没有严格遵从浏览器的请求流程</span><br><span class="line">import requests</span><br><span class="line"></span><br><span class="line">#1.指定url</span><br><span class="line">url = &apos;https://www.douban.com/people/185687620/&apos;</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">    &#125;</span><br><span class="line">#2.发起请求</span><br><span class="line">response = requests.get(url=url,headers=headers)</span><br><span class="line"></span><br><span class="line">#3.获取页面数据</span><br><span class="line">page_text = response.text</span><br><span class="line"></span><br><span class="line">#4.持久化存储</span><br><span class="line">with open(&apos;./douban.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(page_text)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="无法访问对应页码的成因"><a href="#无法访问对应页码的成因" class="headerlink" title="无法访问对应页码的成因"></a>无法访问对应页码的成因</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">结果发现，写入到文件中的数据，不是张三个人页面的数据，而是豆瓣登陆的首页面，why？首先我们来回顾下cookie的相关概念及作用：</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>cookie概念：当用户通过浏览器首次访问一个域名时，访问的web服务器会给客户端发送数据，以保持web服务器与客户端之间的状态保持，这些数据就是cookie。</p>
-</li>
-<li><p>cookie作用：我们在浏览器中，经常涉及到数据的交换，比如你登录邮箱，登录一个页面。我们经常会在此时设置30天内记住我，或者自动登录选项。那么它们是怎么记录信息的呢，答案就是今天的主角cookie了，Cookie是由HTTP服务器设置的，保存在浏览器中，但HTTP协议是一种无状态协议，在数据交换完毕后，服务器端和客户端的链接就会关闭，每次交换数据都需要建立新的链接。就像我们去超市买东西，没有积分卡的情况下，我们买完东西之后，超市没有我们的任何消费信息，但我们办了积分卡之后，超市就有了我们的消费信息。cookie就像是积分卡，可以保存积分，商品就是我们的信息，超市的系统就像服务器后台，http协议就是交易的过程。</p>
-</li>
-<li><p>经过cookie的相关介绍，其实你已经知道了为什么上述案例中爬取到的不是张三个人信息页，而是登录页面。那应该如何抓取到张三的个人信息页呢？</p>
-</li>
-</ul>
-<blockquote>
-<p>思路：</p>
-</blockquote>
-<ol>
-<li>我们需要使用爬虫程序对豆瓣的登录时的请求进行一次抓取，获取请求中的cookie数据</li>
-<li>在使用个人信息页的url进行请求时，该请求需要携带 1 中的cookie，只有携带了cookie后，服务器才可识别这次请求的用户信息，方可响应回指定的用户信息页数据</li>
-</ol>
-<h4 id="cookie作用：服务器端使用cookie来记录客户端的状态信息。"><a href="#cookie作用：服务器端使用cookie来记录客户端的状态信息。" class="headerlink" title="cookie作用：服务器端使用cookie来记录客户端的状态信息。"></a>cookie作用：服务器端使用cookie来记录客户端的状态信息。</h4><blockquote>
-<p>实现流程：</p>
-</blockquote>
-<ol>
-<li>执行登录操作（获取cookie）</li>
-<li>在发起个人主页请求时，需要将cookie携带到该请求中</li>
-</ol>
-<p>注意：session对象：发送请求（会将cookie对象进行自动存储）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">session = requests.session()</span><br><span class="line">#1.发起登录请求：将cookie获取，切存储到session对象中</span><br><span class="line">login_url = &apos;https://accounts.douban.com/login&apos;</span><br><span class="line">data = &#123;</span><br><span class="line">    &quot;source&quot;: &quot;None&quot;,</span><br><span class="line">    &quot;redir&quot;: &quot;https://www.douban.com/people/185687620/&quot;,</span><br><span class="line">    &quot;form_email&quot;: &quot;15027900535&quot;,</span><br><span class="line">    &quot;form_password&quot;: &quot;bobo@15027900535&quot;,</span><br><span class="line">    &quot;login&quot;: &quot;登录&quot;,</span><br><span class="line">&#125;</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line">#使用session发起post请求</span><br><span class="line">login_response = session.post(url=login_url,data=data,headers=headers)</span><br><span class="line"></span><br><span class="line">#2.对个人主页发起请求（session（cookie）），获取响应页面数据</span><br><span class="line">url = &apos;https://www.douban.com/people/185687620/&apos;</span><br><span class="line">response = session.get(url=url,headers=headers)</span><br><span class="line">page_text = response.text</span><br><span class="line"></span><br><span class="line">with open(&apos;./douban110.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(page_text)</span><br></pre></td></tr></table></figure>
-<h4 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h4><blockquote>
-<p>基于requests模块的代理操作</p>
-</blockquote>
-<ul>
-<li>什么是代理</li>
-</ul>
-<p>代理就是第三方代替本体处理相关事务。例如：生活中的代理：代购，中介，微商……</p>
-<ul>
-<li>爬虫中为什么需要使用代理</li>
-</ul>
-<p>一些网站会有相应的反爬虫措施，例如很多网站会检测某一段时间某个IP的访问次数，如果访问频率太快以至于看起来不像正常访客，它可能就会会禁止这个IP的访问。所以我们需要设置一些代理IP，每隔一段时间换一个代理IP，就算IP被禁止，依然可以换个IP继续爬取。</p>
-<ul>
-<li>代理的分类：</li>
-</ul>
-<p>正向代理：代理客户端获取数据。正向代理是为了保护客户端防止被追究责任。</p>
-<p>反向代理：代理服务器提供数据。反向代理是为了保护服务器或负责负载均衡。</p>
-<ul>
-<li>免费代理ip提供网站</li>
-</ul>
-<ol>
-<li><p><a href="http://www.goubanjia.com/" target="_blank" rel="noopener">http://www.goubanjia.com/</a> (推荐)</p>
-</li>
-<li><p>西祠代理</p>
-</li>
-<li><p>快代理</p>
-</li>
-</ol>
-<blockquote>
-<p>代理实例</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">url = &apos;https://www.baidu.com/s?ie=utf-8&amp;wd=ip&apos;</span><br><span class="line"></span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#将代理ip封装到字典</span><br><span class="line">proxy = &#123;</span><br><span class="line">    &apos;http&apos;:&apos;77.73.69.120:3128&apos;,</span><br><span class="line">   # &apos;https&apos;:&apos;xxxx&apos; 也可以是https</span><br><span class="line">&#125;</span><br><span class="line">#更换网路IP</span><br><span class="line">response = requests.get(url=url,proxies=proxy,headers=headers)</span><br><span class="line"></span><br><span class="line">with open(&apos;./daili.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(response.text)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意点</p>
-</blockquote>
-<ul>
-<li>请求的协议要与代理ip的协议统一</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/Py007-01-07requests高级操作cookie和代理/" data-id="cklhgt2u100jsq1fyex27gmxb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/30/Py007-01-08requests处理验证码/" data-id="cklhjlfhj00jboyfyw02onfgq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -819,7 +791,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -841,6 +813,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -854,10 +830,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

@@ -62,6 +62,101 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py002-02-05常用模块四(序列化相关)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/21/Py002-02-05常用模块四(序列化相关)/" class="article-date">
+  <time datetime="2018-08-21T12:31:17.000Z" itemprop="datePublished">2018-08-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/21/Py002-02-05常用模块四(序列化相关)/">Py002-02-05常用模块四(序列化相关)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="序列化模块"><a href="#序列化模块" class="headerlink" title="序列化模块"></a>序列化模块</h3><ul>
+<li>序列化——将内存数据转换为字符串</li>
+<li>反序列化——将字符串转换为内存数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 序列化</span><br><span class="line">data = &#123;</span><br><span class="line">    &quot;infos&quot;:[</span><br><span class="line">        &#123;&quot;name&quot;:&quot;张飞&quot;,&quot;life&quot;:100,&quot;arm&quot;:&quot;丈八蛇矛&quot;&#125;,</span><br><span class="line">        &#123;&quot;name&quot;:&quot;关羽&quot;,&quot;life&quot;:110,&quot;arm&quot;:&quot;青龙偃月刀&quot;&#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">f = open(&quot;info.txt&quot;,mode=&quot;w&quot;,encoding=&quot;utf-8&quot;)</span><br><span class="line">f.write(str(data))</span><br><span class="line"></span><br><span class="line"># ----------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"># 反序列化</span><br><span class="line">f = open(&quot;info.txt&quot;,mode=&quot;r&quot;,encoding=&quot;utf-8&quot;)</span><br><span class="line">strinfo = f.read()</span><br><span class="line">info = eval(strinfo)</span><br><span class="line">print(info)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>常用模块</p>
+</blockquote>
+<ul>
+<li>pickle</li>
+<li>json</li>
+</ul>
+<p><a href="https://sltrust.github.io/2018/07/29/P020_01_python%E5%BA%8F%E5%88%97%E5%8C%96%E6%A8%A1%E5%9D%97/" target="_blank" rel="noopener">序列化模块知识点总结</a></p>
+<h3 id="json-模块"><a href="#json-模块" class="headerlink" title="json 模块"></a>json 模块</h3><ul>
+<li>json.dumps(序列化对象：如字典)</li>
+<li>json.loads(字符串)</li>
+<li>json.dump(数据类型,文件)</li>
+<li>json.load(文件)</li>
+</ul>
+<blockquote>
+<p>注意点</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f = open(&apos;fff&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line">res = json.load(f)</span><br><span class="line">res = json.load(f)</span><br><span class="line">f.close()</span><br><span class="line"></span><br><span class="line"># 不要尝试多次 dump或者 多次load</span><br></pre></td></tr></table></figure>
+<ul>
+<li>python2中多次dump文件里会帮你自动换行</li>
+<li>python3里直接禁止了你多次调用dump/load这些方法</li>
+</ul>
+<p>结论：无论何时都不要多次调用在一个文件句柄里多次调用 dump和load</p>
+<h3 id="pickle-模块"><a href="#pickle-模块" class="headerlink" title="pickle 模块"></a>pickle 模块</h3><ul>
+<li>pickle.dumps(序列化对象：如字典)</li>
+<li>pickle.loads(字符串)</li>
+<li>pickle.dump(数据类型,文件)</li>
+<li>pickle.load(文件)</li>
+</ul>
+<p>它与json方法差不多，唯一区别就是序列化的内容是bytes你看不懂的内容(二进制的)</p>
+<h4 id="json-模块和-pickle-模块区别"><a href="#json-模块和-pickle-模块区别" class="headerlink" title="json 模块和 pickle 模块区别"></a>json 模块和 pickle 模块区别</h4><ul>
+<li>json 仅支持序列化 str / int / tuple / list / dict</li>
+<li>pickle 支持python里所有数据类型(只能在python里)</li>
+<li>load dump 都仅能用一次</li>
+</ul>
+<h3 id="shelve-模块"><a href="#shelve-模块" class="headerlink" title="shelve 模块"></a>shelve 模块</h3><p>跟前俩模块的区别就是：json、pickle只能load /dump 一次，但是shelve支持多次</p>
+<ul>
+<li>原理是对pickle进行了封装，python里独有的，并且顺序不会出错</li>
+<li>核心就是key/value</li>
+</ul>
+<blockquote>
+<p>序列化到文件里</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import shelve</span><br><span class="line">f = shelve.open(&apos;shelve_file&apos;)</span><br><span class="line">f[&apos;key&apos;] = &#123;&apos;int&apos;:10, &apos;float&apos;:9.5, &apos;string&apos;:&apos;Sample data&apos;&#125;  #直接对文件句柄操作，就可以存入数据</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>反序列化</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import shelve</span><br><span class="line">f1 = shelve.open(&apos;shelve_file&apos;)</span><br><span class="line">existing = f1[&apos;key&apos;]  #取出数据的时候也只需要直接用key获取即可，但是如果key不存在会报错</span><br><span class="line"># 推荐使用 get()获取字段 这样如果key不存在返回 None</span><br><span class="line">xx = f1[&apos;xxx&apos;]</span><br><span class="line">print(xx) # None</span><br><span class="line"></span><br><span class="line">f1.close()</span><br><span class="line">print(existing)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>关于修改你肯定会这样遇到问题？为啥修改不了</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import shelve</span><br><span class="line">f1 = shelve.open(&apos;shelve_file&apos;)</span><br><span class="line">f1[&apos;names&apos;] = [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;]</span><br><span class="line">f1[&apos;names&apos;][2] = &quot;ccc&quot;</span><br><span class="line">f1.close()</span><br><span class="line"></span><br><span class="line">f2 = shelve.open(&apos;shelve_file&apos;)</span><br><span class="line">print(f2[&quot;names&quot;])</span><br><span class="line"></span><br><span class="line">--------------------------</span><br><span class="line">正确答案是 整体修改</span><br><span class="line">--------------------------</span><br><span class="line"></span><br><span class="line">f1[&apos;names&apos;] = [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;d&quot;,&quot;e&quot;]</span><br><span class="line"># f1[&apos;names&apos;][2] = &quot;ccc&quot;</span><br><span class="line">f1[&apos;names&apos;] = [&quot;a&quot;,&quot;b&quot;,&quot;ccc&quot;,&quot;d&quot;,&quot;e&quot;]</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/21/Py002-02-05常用模块四(序列化相关)/" data-id="cklhjlffh00eloyfydhhotjv7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py002-02-04常用模块三(shutil)" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/21/Py002-02-04常用模块三(shutil)/" class="article-date">
@@ -110,7 +205,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/21/Py002-02-04常用模块三(shutil)/" data-id="cklhgt2s000elq1fydnnyzjai" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/21/Py002-02-04常用模块三(shutil)/" data-id="cklhjlfff00ehoyfykorocdn4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -172,7 +267,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/21/Py002-02-03常用模块二(random,str,sys,os)/" data-id="cklhgt2rz00ejq1fye8fazpgj" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/21/Py002-02-03常用模块二(random,str,sys,os)/" data-id="cklhjlffe00efoyfyrkipj6oe" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -217,7 +312,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/20/Py002-02-02常用模块一(时间相关)/" data-id="cklhgt2ry00egq1fyib723p1t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/20/Py002-02-02常用模块一(时间相关)/" data-id="cklhjlffe00edoyfydivyxp0v" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -319,7 +414,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/20/Py002-02-01模块和包/" data-id="cklhgt2rw00ebq1fytx1maysg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/20/Py002-02-01模块和包/" data-id="cklhjlffd00eboyfyc8nnb80c" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -361,7 +456,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/16/Py002-01-06内置方法/" data-id="cklhgt2rx00eeq1fy83rhyxww" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/16/Py002-01-06内置方法/" data-id="cklhjlffc00e9oyfyemjzbwjg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -426,7 +521,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/16/Py002-01-05递归/" data-id="cklhgt2rv00e9q1fyvydkpxx1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/16/Py002-01-05递归/" data-id="cklhjlffb00e7oyfyufeh0g5j" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -539,7 +634,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/16/Py002-01-04函数/" data-id="cklhgt2ru00e4q1fy81e2gc69" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/16/Py002-01-04函数/" data-id="cklhjlffa00e5oyfyi1y1f9ge" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -668,7 +763,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/15/Py002-01-03文件操作/" data-id="cklhgt2rt00e2q1fy1t40ix5k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/15/Py002-01-03文件操作/" data-id="cklhjlff900e3oyfya4k354yw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -711,68 +806,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/15/Py002-01-02三元运算/" data-id="cklhgt2ru00e7q1fy8vbqkinf" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py002_01_01人丑就该多读书" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/08/15/Py002_01_01人丑就该多读书/" class="article-date">
-  <time datetime="2018-08-15T04:18:03.000Z" itemprop="datePublished">2018-08-15</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/08/15/Py002_01_01人丑就该多读书/">Py002_01_01人丑就该多读书</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="据国家统计"><a href="#据国家统计" class="headerlink" title="据国家统计"></a>据国家统计</h3><blockquote>
-<p>一年中读书统计</p>
-</blockquote>
-<ul>
-<li>中国人均阅读量4.35本；</li>
-<li>日本40本</li>
-<li>韩国11本</li>
-<li>法国20本</li>
-<li>以色列60本</li>
-</ul>
-<h3 id="如果你迷茫了"><a href="#如果你迷茫了" class="headerlink" title="如果你迷茫了"></a>如果你迷茫了</h3><blockquote>
-<p>想法太多，读书太少</p>
-</blockquote>
-<h3 id="如果你想升华"><a href="#如果你想升华" class="headerlink" title="如果你想升华"></a>如果你想升华</h3><ul>
-<li>多读书</li>
-</ul>
-<h3 id="推荐书籍"><a href="#推荐书籍" class="headerlink" title="推荐书籍"></a>推荐书籍</h3><ul>
-<li>追风筝的人</li>
-<li>白鹿原</li>
-</ul>
-<blockquote>
-<p>金句：肾虚就该少看片，人丑就该多读书</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/08/15/Py002_01_01人丑就该多读书/" data-id="cklhgt2s800f8q1fyqxqd4mx6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/08/15/Py002-01-02三元运算/" data-id="cklhjlff800e1oyfy7kgomvcm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M02/">M02</a></li></ul>
@@ -812,7 +846,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -834,6 +868,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -847,10 +885,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

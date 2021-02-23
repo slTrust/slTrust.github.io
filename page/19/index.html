@@ -62,6 +62,260 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Java-026-sql范式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/06/11/Java-026-sql范式/" class="article-date">
+  <time datetime="2019-06-11T06:34:58.000Z" itemprop="datePublished">2019-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/11/Java-026-sql范式/">Java-026-sql范式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="关系数据库范式"><a href="#关系数据库范式" class="headerlink" title="关系数据库范式"></a>关系数据库范式</h3><h4 id="数据库表设计"><a href="#数据库表设计" class="headerlink" title="数据库表设计"></a>数据库表设计</h4><p>需求 –&gt; API, 数据库 (数据库的表) –&gt; 实现功能代码和操作数据!</p>
+<ul>
+<li>应该有什么表? 用户表, 商品表, 订单表, 购物车表 –&gt; RESTful API的资源所对应, Session表</li>
+<li>每个表应该有什么的字段! 范式!</li>
+<li>定义对数据库的SQL操作, 查询, 更新, 插入, 删除</li>
+<li>建立Index索引, 对什么样的数据建立索引, 建立什么样的索引!</li>
+</ul>
+<p>过度优化的边界: 是否真正理解了业务需求, 了解了瓶颈!</p>
+<blockquote>
+<h4 id="参考示例"><a href="#参考示例" class="headerlink" title="参考示例"></a>参考示例</h4></blockquote>
+<p>用户表 user:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>type</th>
+<th>password</th>
+<th>content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Alex</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is the first</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Alice</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is thhe first user</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Alex</td>
+<td>vip</td>
+<td>password</td>
+<td>Here is the second Alex</td>
+</tr>
+</tbody>
+</table>
+<p>订单表 order:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>5</td>
+<td>203231232</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>15</td>
+<td>1</td>
+<td>324324234</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>213213219</td>
+</tr>
+</tbody>
+</table>
+<h4 id="第一范式-1NF"><a href="#第一范式-1NF" class="headerlink" title="第一范式 1NF"></a>第一范式 1NF</h4><p>每一个字段都是不可分的数据项, 即字段的原子性.</p>
+<h5 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>有主键, 且主键不能为空, 主键不能重复</li>
+<li>字段必须不能再分, 字段必须是原子的</li>
+</ul>
+<h5 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h5><p>用户表和订单表都包含主键 – id.</p>
+<p>然后每一个字段都只包含单一不可分的数据内容项, 比如说, name就是只有name的意思, 不能够拆分.</p>
+<blockquote>
+<p>一个常见的错误例子是, 比如用户表, 有一个项叫做信息项, 然后把相关的电话, 地址信息都放到这个信息项里, 这样就破坏了字段的原子性.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>type</th>
+<th>password</th>
+<th>content</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Alex</td>
+<td>normal</td>
+<td>123456</td>
+<td>Here is the first</td>
+<td>{“phone”:”13311122211”,”city”:”北京”,”email”:”<a href="mailto:xx@xx.com" target="_blank" rel="noopener">xx@xx.com</a>“}</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<h5 id="坑"><a href="#坑" class="headerlink" title="坑:"></a>坑:</h5></blockquote>
+<h5 id="没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息"><a href="#没办法严格控制查询的粒度-比如说-如果只需要用户电话的时候-就必须把所有信息内容查询出来-然后再提取电话-这样就造成了查询冗余-影响性能-同时也没办法通过使用电话这个信息-在其他表里面查询相关信息-例如电话的位置信息" class="headerlink" title="没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息."></a>没办法严格控制查询的粒度, 比如说, 如果只需要用户电话的时候, 就必须把所有信息内容查询出来, 然后再提取电话, 这样就造成了查询冗余, 影响性能. 同时也没办法通过使用电话这个信息, 在其他表里面查询相关信息, 例如电话的位置信息.</h5><ul>
+<li>查 phone 要查询整个 info</li>
+<li>查 email 要查询整个 info</li>
+<li>查 city 要查询整个 info</li>
+<li>而且造成了性能瓶颈</li>
+<li>还有单独更新 phone/email/city 时候数据更新的问题,很容易造成数据被无意间更改</li>
+</ul>
+<h5 id="正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段"><a href="#正确做法-设计表的时候-尽量每一个信息都用单独的字段-比如电话字段-地址信息字段" class="headerlink" title="正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段"></a>正确做法: 设计表的时候, 尽量每一个信息都用单独的字段, 比如电话字段, 地址信息字段</h5><p>而如果 单独 phone/email/city 成为一列</p>
+<blockquote>
+<p>查询仅需要 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select phone from user;   </span><br><span class="line">select email from user;   </span><br><span class="line">select phone from city;</span><br></pre></td></tr></table></figure>
+<h4 id="第二范式-2NF"><a href="#第二范式-2NF" class="headerlink" title="第二范式 2NF"></a>第二范式 2NF</h4><p>在第一范式得基础上, 且每一个非主属性完全函数依赖于码.</p>
+<h5 id="要求-1"><a href="#要求-1" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>满足第一范例</li>
+<li>表中得每一个非主键属性, 必须完全依赖于本表码, 码可以是主键, 或者多个字段组成的主键</li>
+</ul>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h5><p>在订单表中, 一个订单由用户, 产品和订单时间确定. 那这三个属性就可以称之为码: (用户, 产品, 订单时间).</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>5</td>
+<td>20001000</td>
+</tr>
+</tbody>
+</table>
+<p>这样, 如果相同用户, 相同产品, 相同订单时间就应该能够确定查询到其订单中产品数量, 而不允许有相同的用户, 相同产品, 相同订单时间, 但是订单数量不一样的数据产生.</p>
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>product_id</th>
+<th>quantity</th>
+<th>timestamp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 0</td>
+<td>15</td>
+<td>5</td>
+<td>20001000</td>
+</tr>
+<tr>
+<td> 0</td>
+<td>15</td>
+<td>9</td>
+<td>20001000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="同一用户-同一时间-同一商品-不该存在-quantity-两种状态"><a href="#同一用户-同一时间-同一商品-不该存在-quantity-两种状态" class="headerlink" title="同一用户,同一时间,同一商品 不该存在 quantity 两种状态"></a>同一用户,同一时间,同一商品 不该存在 quantity 两种状态</h5><p>如果添加其他的内容, 比如订单状态, 这个订单状态也应该完全依赖于码: (用户, 产品, 订单时间)</p>
+<h4 id="第三范式-3NF"><a href="#第三范式-3NF" class="headerlink" title="第三范式 3NF"></a>第三范式 3NF</h4><p>满足第二范式的基础上, 除了主键外没有冗余数据</p>
+<h5 id="要求-2"><a href="#要求-2" class="headerlink" title="要求"></a>要求</h5><ul>
+<li>数据没有冗余</li>
+</ul>
+<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h5><p>在用户表中, 主键是id, 然后包含用户名name字段, 这样在订单表中就不应该重复存储用户名, 只需要存储用户id (主键), 需要用到用户名等其他信息时候, 通过用户id (主键) 在用户表中查询.</p>
+<h5 id="反例"><a href="#反例" class="headerlink" title="反例"></a>反例</h5><p>用户表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id	name	type	password	content</span><br></pre></td></tr></table></figure>
+<p>订单表 里有用户名<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id	user_id user_name	product_id	quantity	timestamp</span><br></pre></td></tr></table></figure></p>
+<p>其他表里也有用户名 user_name</p>
+<p><strong>这样就导致了冗余</strong></p>
+<blockquote>
+<p>当你进行更新 user_name 的时候呢？ </p>
+</blockquote>
+<p>你要同时维护多张表。而且更新 user_name 要对每个出现的表检查是否更新</p>
+<ul>
+<li>这样 问题出现的时候就会呈现指数型增长。</li>
+<li>因为你不确定～ 那张表里有这个 user_name</li>
+<li>要cover所有情况</li>
+</ul>
+<p><strong>正确做法就是 不要用 user_name</strong></p>
+<p>而应该使用 <strong>user_id</strong></p>
+<ul>
+<li>因为 主键是无法更改的</li>
+<li>你用的时候连表就行了</li>
+</ul>
+<h5 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h5><p><strong>消除冗余数据</strong>: 一个数据只出现在同一地方, 同样保证了, 我们在维护一个数据时候, 只需要维护好一个地方的数据就好了! 不用去思考到底还有没有其他地方需要同时维护.</p>
+<p><strong>坑</strong>: 例如在用户表中有用户名, 在订单表中也有一份用户名, 则我们更改用户表用户名的时候, 就得同时更新订单表里的用户名!</p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<p><strong>在代码和数据的世界里, 重复是万恶之源</strong></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>范式主要是我们在设计数据库结构和字段时候需要遵循的一些规则, 用来避免出现的一些坑.</p>
+<p>在设计或者Review数据库表的过程中, 需要对照范式来看是否出现反范式的情况.</p>
+<p>但是既然不是硬语法规定, 那就是在实际应用中, 在需求, 性能或者特例的考量下, 可以根据实际情况进行妥协, 使用一些反范式的设计, 但是对这些特例需要有特别的关注.</p>
+<p>一个原则永远记在心中: <strong>重复是万恶之源, 在关系数据库里, 数据冗余是万恶之源</strong></p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><ul>
+<li><a href="https://www.zhihu.com/question/24696366/answer/29189700" target="_blank" rel="noopener">如何解释关系数据库的第一第二第三范式</a></li>
+<li><a href="https://book.douban.com/subject/4024318/" target="_blank" rel="noopener">Head First SQL (中文版)</a></li>
+</ul>
+<h4 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a><a href="https://github.com/slTrust/java_026_crud" target="_blank" rel="noopener">代码链接</a></h4>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/06/11/Java-026-sql范式/" data-id="cklhjlfan003toyfynt9zqebj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Java-025-sql进阶" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/06/11/Java-025-sql进阶/" class="article-date">
@@ -227,7 +481,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-025-sql进阶/" data-id="cklhgt2nk003rq1fye9u4y3ae" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/11/Java-025-sql进阶/" data-id="cklhjlfam003royfyzpeiudj6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -398,7 +652,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/11/Java-024-数据库和jdbc/" data-id="cklhgt2nj003pq1fyzr3w9fj8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/11/Java-024-数据库和jdbc/" data-id="cklhjlfal003poyfypukbu9e3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -472,7 +726,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/" data-id="cklhgt2ni003nq1fyrjpv6sak" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/09/Java-022-控制反转和依赖注入/" data-id="cklhjlfak003noyfymox1ormb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -567,7 +821,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/08/Java-021-单元测试/" data-id="cklhgt2nh003lq1fylu865hhu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/08/Java-021-单元测试/" data-id="cklhjlfaj003loyfykgy6kwta" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -767,7 +1021,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/07/Java-020-RESTful/" data-id="cklhgt2ng003jq1fynoo6r7yd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/07/Java-020-RESTful/" data-id="cklhjlfai003joyfyxycfv9bv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -883,7 +1137,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/06/Java-019-HTTP/" data-id="cklhgt2nf003hq1fy1r0y6ipq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/06/Java-019-HTTP/" data-id="cklhjlfah003hoyfypzr3iebx" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -1008,7 +1262,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/06/Java-018-springboot入门/" data-id="cklhgt2nf003fq1fy5ceumnnt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/06/Java-018-springboot入门/" data-id="cklhjlfag003foyfy696zj1s8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -1172,7 +1426,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用二/" data-id="cklhgt2nd003aq1fyu4spjxol" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用二/" data-id="cklhjlfae003aoyfyj1e9jyct" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -1268,99 +1522,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用一/" data-id="cklhgt2ne003dq1fy2dtxzt93" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java-015-英语学习" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/05/20/Java-015-英语学习/" class="article-date">
-  <time datetime="2019-05-20T14:09:51.000Z" itemprop="datePublished">2019-05-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/05/20/Java-015-英语学习/">Java-015-英语学习</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="英语学习"><a href="#英语学习" class="headerlink" title="英语学习"></a>英语学习</h1><h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ul>
-<li>阅读文档的能力! 逻辑能力</li>
-<li>写的能力! 逻辑能力</li>
-<li>听! 听公开课, 听美剧, 听歌</li>
-<li>说!</li>
-</ul>
-<blockquote>
-<h3 id="学习英语一定要有环境-环境不应该成为一个前提"><a href="#学习英语一定要有环境-环境不应该成为一个前提" class="headerlink" title="学习英语一定要有环境? 环境不应该成为一个前提!"></a>学习英语一定要有环境? 环境不应该成为一个前提!</h3></blockquote>
-<ul>
-<li>大量的英语内容输入!</li>
-</ul>
-<h3 id="单词"><a href="#单词" class="headerlink" title="单词!"></a>单词!</h3><blockquote>
-<p>只有一种方法: 背</p>
-</blockquote>
-<ul>
-<li>抄写, 读</li>
-</ul>
-<p>随便找一本单词书, 然后就读和抄写</p>
-<p>音标</p>
-<p>推荐 托福单词书 (3000个词)</p>
-<p>每天固定1个小时, 比如晚饭后, 午饭后.</p>
-<p>词典的发音</p>
-<p>短期突击 –&gt; 形成习惯! 打破从0到1的门槛!<br>保持大量的输入 (阅读) –&gt; 总结不懂的单词 –&gt; 抄写, 背诵<br>短期突击 –&gt; 背另外一本单词书, 托福 (10000个词)</p>
-<h3 id="阅读"><a href="#阅读" class="headerlink" title="阅读"></a>阅读</h3><ul>
-<li>技术文档</li>
-<li>英文入门读物 (动物农场, 哈利波特)</li>
-<li>英文的技术书籍</li>
-</ul>
-<p>摘抄, 记单词</p>
-<p>推断单词的意思. 一页书, 只查2个单词, 查过就直接添加到有道单词本. 然后零碎时间背诵</p>
-<p>训练你的眼睛和脑子, 快速识别出单词和句型</p>
-<how to read a book>
-
-<h3 id="听力和口语"><a href="#听力和口语" class="headerlink" title="听力和口语"></a>听力和口语</h3><ul>
-<li>跟读! 找一些跟读材料, 听一句, 模仿着读一句!</li>
-<li>训练你的肌肉, 熟悉英语的节奏!</li>
-</ul>
-<h3 id="语法和句型"><a href="#语法和句型" class="headerlink" title="语法和句型"></a>语法和句型</h3><p>训练! 训练你的眼睛和脑子, 快速识别出单词和句型</p>
-<p>写作<br>基础还是读, 足够量的输入!</p>
-<p>背经典的句型, 经典的语句, 诗句!</p>
-<the process of composition>
-
-<p><on writing well></on></p>
-<elements of style>
-
-<h3 id="心法"><a href="#心法" class="headerlink" title="心法"></a>心法</h3><ol>
-<li><h4 id="慢就是快"><a href="#慢就是快" class="headerlink" title="慢就是快"></a>慢就是快</h4></li>
-<li><h4 id="少就是多"><a href="#少就是多" class="headerlink" title="少就是多"></a>少就是多</h4></li>
-<li><h4 id="不断重复。"><a href="#不断重复。" class="headerlink" title="不断重复。"></a>不断重复。</h4></li>
-</ol>
-<h3 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h3><ol>
-<li><h4 id="背单词是短期突击-从0到1，让你先认识一篇文章的大概其"><a href="#背单词是短期突击-从0到1，让你先认识一篇文章的大概其" class="headerlink" title="背单词是短期突击,从0到1，让你先认识一篇文章的大概其"></a>背单词是短期突击,从0到1，让你先认识一篇文章的大概其</h4></li>
-<li><h4 id="大量输入，持续学习-从1到2-。。。-从1到100"><a href="#大量输入，持续学习-从1到2-。。。-从1到100" class="headerlink" title="大量输入，持续学习 从1到2 。。。 从1到100"></a>大量输入，持续学习 从1到2 。。。 从1到100</h4></li>
-</ol>
-</elements></the></how>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/05/20/Java-015-英语学习/" data-id="cklhgt2nb0038q1fyk8xsgrx0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/06/05/Java-017-linux使用一/" data-id="cklhjlfac0038oyfycdc9kvkh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
@@ -1400,7 +1562,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1422,6 +1584,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -1435,10 +1601,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

@@ -62,6 +62,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node-JS专精10-02在浏览器支持nextTick" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/" class="article-date">
+  <time datetime="2020-03-03T14:41:09.000Z" itemprop="datePublished">2020-03-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/">Node-JS专精10_02在浏览器支持nextTick</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="代码仓库"><a href="#代码仓库" class="headerlink" title="代码仓库"></a><a href="https://github.com/slTrust/promise-2/tree/58a31c016d2f5e6d38cf763c5db98ea0cd061b79" target="_blank" rel="noopener">代码仓库</a></h3><blockquote>
+<h4 id="我们使用了-process-nextTick-代替-setTimeout"><a href="#我们使用了-process-nextTick-代替-setTimeout" class="headerlink" title="我们使用了 process.nextTick 代替 setTimeout"></a>我们使用了 process.nextTick 代替 setTimeout</h4></blockquote>
+<ul>
+<li>浏览器不支持 nextTick</li>
+<li>如果你用过vue, 你知道vue提供了一个 nextTick,那么 vue是如何做到即支持 node又支持 浏览器呢？<ul>
+<li><a href="https://juejin.im/entry/5aced80b518825482e39441e" target="_blank" rel="noopener">参考链接:全面解析Vue.nextTick实现原理</a></li>
+<li>通过他的文章我们知道有 MutationObserver 这么一个东西，它比 setTimeout 的优先级更高</li>
+<li>看看它的API<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver" target="_blank" rel="noopener">MutationObserver mdn</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<h4 id="MutationObserver"><a href="#MutationObserver" class="headerlink" title="MutationObserver"></a>MutationObserver</h4></blockquote>
+<p>它本来是监听 DOM树 的更新的，它有一个特别厉害的地方就是 当DOM树更新就会调用一个异步的回调，而这个回调的优先级比 setTimeout 要高</p>
+<p><strong>示例代码</strong></p>
+<ul>
+<li>你可以拷贝代码在 <a href="https://jsbin.com/" target="_blank" rel="noopener">jsbin里运行</a></li>
+<li>通过实例可以看到无论 setTimeout 在 span改变之前还是之后都没 MutationObserver 的优先级高</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;span id=&quot;aaa&quot;&gt;1&lt;/span&gt;</span><br><span class="line">  &lt;br&gt;</span><br><span class="line">  &lt;button id=&quot;btn&quot;&gt;+1&lt;/button&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">  </span><br><span class="line">  var span = document.getElementById(&apos;aaa&apos;);</span><br><span class="line"></span><br><span class="line">  var config = &#123; attributes: true, childList: true, subtree: true &#125;;</span><br><span class="line"></span><br><span class="line">  var callback = function() &#123;</span><br><span class="line">      console.log(&quot;observer&quot;)</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  var observer = new MutationObserver(callback);</span><br><span class="line">  observer.observe(span, config);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  btn.onclick = function()&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;)&#125;,0)</span><br><span class="line">    span.innerText += &quot;s&quot;;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;)&#125;,0)</span><br><span class="line">  &#125;</span><br><span class="line">  /*</span><br><span class="line">  每次点击button 始终打印</span><br><span class="line">  observer</span><br><span class="line">  timeout1</span><br><span class="line">  timeout2</span><br><span class="line">  */</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们自己实现一个 nextTick</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;button id=&quot;btn&quot;&gt;+1&lt;/button&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line"> </span><br><span class="line">  btn.onclick = function()&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;)&#125;,0)</span><br><span class="line">    nextTick(()=&gt;&#123;console.log(&quot;nextTick&quot;)&#125;)</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;)&#125;,0)</span><br><span class="line">  &#125;</span><br><span class="line">  /*</span><br><span class="line">  每次点击button 始终打印</span><br><span class="line">  nextTick</span><br><span class="line">  timeout1</span><br><span class="line">  timeout2</span><br><span class="line">  */</span><br><span class="line">  </span><br><span class="line">  function nextTick(fn)&#123;</span><br><span class="line">    var counter = 1</span><br><span class="line">    var observer = new MutationObserver(fn)</span><br><span class="line">    var textNode = document.createTextNode(String(counter))</span><br><span class="line">    observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line"></span><br><span class="line">    // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">    counter = counter + 1</span><br><span class="line">    textNode.data = String(counter)</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="兼容node和浏览器的nextTick"><a href="#兼容node和浏览器的nextTick" class="headerlink" title="兼容node和浏览器的nextTick"></a>兼容node和浏览器的nextTick</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function nextTick(fn)&#123;</span><br><span class="line">    if( process !== undefined &amp;&amp; typeof process.nextTick === &apos;function&apos;)&#123;</span><br><span class="line">        return process.nextTick(fn);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        var counter = 1</span><br><span class="line">        var observer = new MutationObserver(fn)</span><br><span class="line">        var textNode = document.createTextNode(String(counter))</span><br><span class="line">        observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line">        // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">        counter = counter + 1</span><br><span class="line">        textNode.data = String(counter)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="代码仓库-1"><a href="#代码仓库-1" class="headerlink" title="代码仓库"></a>代码仓库</h4><ul>
+<li><a href="https://github.com/slTrust/promise-2/tree/72c88d0b1bb1ea257da8529bfaeda61938b9cb32" target="_blank" rel="noopener">https://github.com/slTrust/promise-2/</a></li>
+</ul>
+<h3 id="重构代码"><a href="#重构代码" class="headerlink" title="重构代码"></a>重构代码</h3><ul>
+<li>注意每次优化都跑一下测试用例保证代码正确性</li>
+<li>注意每次优化都跑一下测试用例保证代码正确性</li>
+<li>注意每次优化都跑一下测试用例保证代码正确性</li>
+</ul>
+<p>src/promise.ts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line">class Promise2&#123;</span><br><span class="line">    state = &quot;pending&quot;;</span><br><span class="line">    callbacks = [];</span><br><span class="line">    private resolveOrReject(state, data, i)&#123;</span><br><span class="line">        if(this.state !== &quot;pending&quot;) return;</span><br><span class="line">        this.state = state;</span><br><span class="line">        nextTick(() =&gt; &#123;</span><br><span class="line">            this.callbacks.forEach(handle=&gt;&#123;</span><br><span class="line">                if(typeof handle[i] === &quot;function&quot;)&#123;</span><br><span class="line">                    let x;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        x = handle[i].call(undefined,data);</span><br><span class="line">                    &#125; catch (e) &#123;</span><br><span class="line">                        return handle[2].reject(e);</span><br><span class="line">                    &#125;</span><br><span class="line">                    handle[2].resolveWith(x);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)  </span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    resolve(result)&#123;</span><br><span class="line">        this.resolveOrReject(&quot;fulfilled&quot;,result,0);</span><br><span class="line">    &#125;</span><br><span class="line">    reject(reason)&#123;</span><br><span class="line">        this.resolveOrReject(&quot;rejected&quot;,reason,1);</span><br><span class="line">    &#125;</span><br><span class="line">    constructor(fn)&#123;</span><br><span class="line">        if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">            throw new Error(&quot;我只接受函数&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">       </span><br><span class="line">        fn(this.resolve.bind(this), this.reject.bind(this));</span><br><span class="line">    &#125;</span><br><span class="line">    then(succeed?,fail?)&#123;</span><br><span class="line">        // handle除了记录成功和失败 还要记录成功和失败的后续</span><br><span class="line">        const handle = [];</span><br><span class="line">        if(typeof succeed === &apos;function&apos;)&#123;</span><br><span class="line">            handle[0] = succeed;</span><br><span class="line">        &#125;</span><br><span class="line">        if(typeof fail === &apos;function&apos;)&#123;</span><br><span class="line">            handle[1] = fail;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 记录then之后的后续</span><br><span class="line">        handle[2] = new Promise2(()=&gt;&#123;&#125;);</span><br><span class="line">        </span><br><span class="line">        this.callbacks.push(handle); </span><br><span class="line">        // 把函数推进 callBacks 里面</span><br><span class="line"></span><br><span class="line">        return handle[2];</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithSelf()&#123;</span><br><span class="line">        this.reject(new TypeError())</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithPromise(x)&#123;</span><br><span class="line">        x.then(</span><br><span class="line">            (result)=&gt;&#123;</span><br><span class="line">                this.resolve(result)</span><br><span class="line">            &#125;,</span><br><span class="line">            (reason)=&gt;&#123;</span><br><span class="line">                this.reject(reason)</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">    private getThen(x)&#123;</span><br><span class="line">        let then;</span><br><span class="line">        try&#123;</span><br><span class="line">            then = x.then;</span><br><span class="line">        &#125;catch(e)&#123;</span><br><span class="line">            return this.reject(e);</span><br><span class="line">        &#125;</span><br><span class="line">        return then;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithThenable(x)&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            x.then(</span><br><span class="line">                y =&gt; &#123;</span><br><span class="line">                this.resolveWith(y)</span><br><span class="line">                &#125;,</span><br><span class="line">                r =&gt;&#123;</span><br><span class="line">                    this.reject(r);</span><br><span class="line">                &#125;</span><br><span class="line">            );</span><br><span class="line">        &#125; catch (error) &#123;</span><br><span class="line">            this.reject(error)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithObject(x)&#123;</span><br><span class="line">        let then = this.getThen(x);</span><br><span class="line">        if(then instanceof Function)&#123;</span><br><span class="line">            this.resolveWithThenable(x);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            this.resolve(x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWith(x)&#123;</span><br><span class="line">        if( this === x)&#123;</span><br><span class="line">           this.resolveWithSelf();</span><br><span class="line">        &#125; else if ( x instanceof Promise2)&#123;</span><br><span class="line">            this.resolveWithPromise(x);</span><br><span class="line">        &#125; else if ( x instanceof Object)&#123;</span><br><span class="line">            this.resolveWithObject(x);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            this.resolve(x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Promise2</span><br><span class="line"></span><br><span class="line">function nextTick(fn)&#123;</span><br><span class="line">    if( process !== undefined &amp;&amp; typeof process.nextTick === &apos;function&apos;)&#123;</span><br><span class="line">        return process.nextTick(fn);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        var counter = 1</span><br><span class="line">        var observer = new MutationObserver(fn)</span><br><span class="line">        var textNode = document.createTextNode(String(counter))</span><br><span class="line">        observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line">        // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">        counter = counter + 1</span><br><span class="line">        textNode.data = String(counter)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="区分宏任务和微任务"><a href="#区分宏任务和微任务" class="headerlink" title="区分宏任务和微任务"></a>区分宏任务和微任务</h3><blockquote>
+<p>MacroTask</p>
+</blockquote>
+<ul>
+<li>setTimeout</li>
+</ul>
+<blockquote>
+<p>MicroTask(优先级高)</p>
+</blockquote>
+<ul>
+<li>process.nextTick(nodeJS里用) / MutationObserver(浏览器里用)</li>
+<li>setImmediate(只能在IE浏览器里用，nodeJS虽然也有这个API但是兼容性不好)</li>
+</ul>
+<h4 id="整体完成后的代码"><a href="#整体完成后的代码" class="headerlink" title="整体完成后的代码"></a>整体完成后的代码</h4><ul>
+<li><a href="https://github.com/slTrust/promise-2" target="_blank" rel="noopener">https://github.com/slTrust/promise-2/</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/" data-id="cklhjlfd5009coyfyx5i2klku" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node-JS专精10-01Promise2-7之后的规范" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/03/03/Node-JS专精10-01Promise2-7之后的规范/" class="article-date">
@@ -117,7 +206,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/03/Node-JS专精10-01Promise2-7之后的规范/" data-id="cklhgt2py009iq1fy3na0rbxc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/03/Node-JS专精10-01Promise2-7之后的规范/" data-id="cklhjlfd4009aoyfyphh92p5t" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -167,7 +256,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/02/Node-JS专精09-03参考Promise规范完成Promise/" data-id="cklhgt2pw009dq1fy2j86m20b" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/02/Node-JS专精09-03参考Promise规范完成Promise/" data-id="cklhjlfd30097oyfyqiaseggp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -253,7 +342,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/01/Node-JS专精09-02使用chai和sinon/" data-id="cklhgt2pu0098q1fyt03ge4pz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/01/Node-JS专精09-02使用chai和sinon/" data-id="cklhjlfd10092oyfy27azhau6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -369,7 +458,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/01/Node-JS专精09-01手写Promise/" data-id="cklhgt2pv009bq1fy72lfdbf1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/01/Node-JS专精09-01手写Promise/" data-id="cklhjlfd0008xoyfy41desrrp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -480,7 +569,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/14/ZB-046-05JVM字节码/" data-id="cklhgt2z900wcq1fyxgx3wrp8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/14/ZB-046-05JVM字节码/" data-id="cklhjlfmp00v6oyfyj1d325sc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
@@ -583,7 +672,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/14/ZB-046-04JVM运行时内存区域/" data-id="cklhgt2z800waq1fyd90exam0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/01/14/ZB-046-04JVM运行时内存区域/" data-id="cklhjlfmo00v5oyfy7dznma3l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
@@ -674,7 +763,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝03/" data-id="cklhgt2pr0091q1fypgpam4yi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝03/" data-id="cklhjlfcy008soyfym46bcbpe" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -884,7 +973,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝02/" data-id="cklhgt2pq008zq1fyqz9ofebs" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝02/" data-id="cklhjlfcx008qoyfyke4lzh37" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1029,124 +1118,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精08手写bind02/" data-id="cklhgt2pt0096q1fy3okplt9q" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-JS专精08手写bind01" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/12/26/Node-JS专精08手写bind01/" class="article-date">
-  <time datetime="2019-12-26T14:39:38.000Z" itemprop="datePublished">2019-12-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/26/Node-JS专精08手写bind01/">Node-JS专精08手写bind01</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="手写bind"><a href="#手写bind" class="headerlink" title="手写bind"></a>手写bind</h1><ul>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="noopener">MDN bind</a></li>
-</ul>
-<h3 id="确定API"><a href="#确定API" class="headerlink" title="确定API"></a>确定API</h3><ul>
-<li>bind 位于 Function.prototype 上</li>
-<li>需要做 polyfill</li>
-</ul>
-<blockquote>
-<p>什么是<strong>polyfill</strong>？</p>
-</blockquote>
-<ul>
-<li><a href="https://juejin.im/post/5a579bc7f265da3e38496ba1" target="_blank" rel="noopener">polyfill为何物</a></li>
-<li>聚填充(生活中)<ul>
-<li>抹平</li>
-<li>补全</li>
-<li>你的桌子一个腿短，于是底下垫了一个纸片</li>
-<li>你的墙面不够平整，有坑，于是用白浆填平它</li>
-</ul>
-</li>
-<li>对于前端<ul>
-<li>你的JS代码运行在坑人的IE6下</li>
-<li>我们知道方法一般挂在<code>Function.prototype</code>上 也就是<code>Function.prototype.bind</code>而在 IE6没有，此时你就需要 <strong>polyfill</strong> </li>
-</ul>
-</li>
-</ul>
-<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ul>
-<li><code>fn.bind(asThis)</code></li>
-<li><code>fn.bind(asThis, param1, param2)</code></li>
-<li><code>fn.bind(asThis)()</code></li>
-<li><code>fn.bind(asThis, param1, param2)()</code></li>
-<li><code>fn.bind(asThis)(param1)</code></li>
-<li><code>fn.bind(asThis, param1, param2)(p3, p4)</code></li>
-</ul>
-<blockquote>
-<p>bind API例子</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function aa()&#123;</span><br><span class="line">    console.log(this);</span><br><span class="line">    console.log(arguments)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)</span><br><span class="line">// fn.bind(asThis)()</span><br><span class="line">var newFn = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis, param1, param2)</span><br><span class="line">// fn.bind(asThis, param1, param2)()</span><br><span class="line">var newFn2 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn2()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)(param1)</span><br><span class="line">var newFn3 = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn3(1)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis,p1,p2)(p3,p4)</span><br><span class="line">var newFn4 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn4(3,4)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2,3,4]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="001bind-asThis-实现"><a href="#001bind-asThis-实现" class="headerlink" title="001bind(asThis) 实现"></a>001<code>bind(asThis)</code> 实现</h3></blockquote>
-<ul>
-<li>新建项目目录 <code>bind_demo</code></li>
-<li>新建 <code>bind_demo/src/index.js</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>新建 <code>bind_demo/test/index.js</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="002bind-asThis-p1-p2-实现"><a href="#002bind-asThis-p1-p2-实现" class="headerlink" title="002bind(asThis,p1,p2) 实现"></a>002<code>bind(asThis,p1,p2)</code> 实现</h3></blockquote>
-<ul>
-<li>通过扩展运算符</li>
-</ul>
-<p><code>src/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis, ...args)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>test/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;, 123, 456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h3 id="003bind-asThis-p1-p2-实现"><a href="#003bind-asThis-p1-p2-实现" class="headerlink" title="003bind(asThis,p1)(p2) 实现"></a>003<code>bind(asThis,p1)(p2)</code> 实现</h3></blockquote>
-<ul>
-<li>step1通过<code>newFn = fn.bind({name:&#39;hjx&#39;},1)</code> 绑定this 传递参数</li>
-<li>step2<code>newFn(2)</code> 在此传递参数调用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>test/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123,456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const anotherFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123);</span><br><span class="line">console.assert(anotherFn2(456)[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(anotherFn2(456)[1] === 123);</span><br><span class="line">console.assert(anotherFn2(456)[2] === 456);</span><br></pre></td></tr></table></figure>
-<h3 id="MDN-bind的Polyfill实现"><a href="#MDN-bind的Polyfill实现" class="headerlink" title="MDN bind的Polyfill实现"></a>MDN bind的Polyfill实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">if (!Function.prototype.bind) (function()&#123;</span><br><span class="line">  var slice = Array.prototype.slice;</span><br><span class="line">  Function.prototype.bind = function() &#123;</span><br><span class="line">    var thatFunc = this, thatArg = arguments[0];</span><br><span class="line">    var args = slice.call(arguments, 1);</span><br><span class="line">    if (typeof thatFunc !== &apos;function&apos;) &#123;</span><br><span class="line">      // closest thing possible to the ECMAScript 5</span><br><span class="line">      // internal IsCallable function</span><br><span class="line">      throw new TypeError(&apos;Function.prototype.bind - &apos; +</span><br><span class="line">             &apos;what is trying to be bound is not callable&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">      var funcArgs = args.concat(slice.call(arguments))</span><br><span class="line">      return thatFunc.apply(thatArg, funcArgs);</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>改写我们的 bind </p>
-</blockquote>
-<ul>
-<li>为什么MDN 不用扩展运算符，因为它不能用和 bind 同时期的API</li>
-</ul>
-<p><code>src/index.js</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="ES5和ES6版-bind"><a href="#ES5和ES6版-bind" class="headerlink" title="ES5和ES6版 bind"></a>ES5和ES6版 bind</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ES6版</span><br><span class="line">function _bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><a href="https://github.com/slTrust/source-bind" target="_blank" rel="noopener">代码分支:01手写bind基本实现</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精08手写bind01/" data-id="cklhgt2ps0093q1fyg7ate0sx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精08手写bind02/" data-id="cklhjlfd10090oyfyboohdpu1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1186,7 +1158,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1208,6 +1180,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -1221,10 +1197,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

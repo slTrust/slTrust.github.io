@@ -62,6 +62,119 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py007-01-07requests高级操作cookie和代理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/30/Py007-01-07requests高级操作cookie和代理/" class="article-date">
+  <time datetime="2018-11-30T13:27:14.000Z" itemprop="datePublished">2018-11-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/30/Py007-01-07requests高级操作cookie和代理/">Py007-01-07requests高级操作cookie和代理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="requests模块高级："><a href="#requests模块高级：" class="headerlink" title="requests模块高级："></a>requests模块高级：</h3><h4 id="cookie："><a href="#cookie：" class="headerlink" title="cookie："></a>cookie：</h4><blockquote>
+<p>基于用户的用户数据</p>
+<ul>
+<li>需求：爬取张三用户的豆瓣网的个人主页页面数据</li>
+</ul>
+</blockquote>
+<ul>
+<li>在没有登录的情况下浏览器访问 <a href="https://www.douban.com/people/185687620/" target="_blank" rel="noopener">https://www.douban.com/people/185687620/</a></li>
+<li>发现不是对应主页信息而是要求你登录的页面</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#问题：没有获取个人主页的页面数据</span><br><span class="line">#原因：爬虫程序没有严格遵从浏览器的请求流程</span><br><span class="line">import requests</span><br><span class="line"></span><br><span class="line">#1.指定url</span><br><span class="line">url = &apos;https://www.douban.com/people/185687620/&apos;</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">    &#125;</span><br><span class="line">#2.发起请求</span><br><span class="line">response = requests.get(url=url,headers=headers)</span><br><span class="line"></span><br><span class="line">#3.获取页面数据</span><br><span class="line">page_text = response.text</span><br><span class="line"></span><br><span class="line">#4.持久化存储</span><br><span class="line">with open(&apos;./douban.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(page_text)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="无法访问对应页码的成因"><a href="#无法访问对应页码的成因" class="headerlink" title="无法访问对应页码的成因"></a>无法访问对应页码的成因</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">结果发现，写入到文件中的数据，不是张三个人页面的数据，而是豆瓣登陆的首页面，why？首先我们来回顾下cookie的相关概念及作用：</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>cookie概念：当用户通过浏览器首次访问一个域名时，访问的web服务器会给客户端发送数据，以保持web服务器与客户端之间的状态保持，这些数据就是cookie。</p>
+</li>
+<li><p>cookie作用：我们在浏览器中，经常涉及到数据的交换，比如你登录邮箱，登录一个页面。我们经常会在此时设置30天内记住我，或者自动登录选项。那么它们是怎么记录信息的呢，答案就是今天的主角cookie了，Cookie是由HTTP服务器设置的，保存在浏览器中，但HTTP协议是一种无状态协议，在数据交换完毕后，服务器端和客户端的链接就会关闭，每次交换数据都需要建立新的链接。就像我们去超市买东西，没有积分卡的情况下，我们买完东西之后，超市没有我们的任何消费信息，但我们办了积分卡之后，超市就有了我们的消费信息。cookie就像是积分卡，可以保存积分，商品就是我们的信息，超市的系统就像服务器后台，http协议就是交易的过程。</p>
+</li>
+<li><p>经过cookie的相关介绍，其实你已经知道了为什么上述案例中爬取到的不是张三个人信息页，而是登录页面。那应该如何抓取到张三的个人信息页呢？</p>
+</li>
+</ul>
+<blockquote>
+<p>思路：</p>
+</blockquote>
+<ol>
+<li>我们需要使用爬虫程序对豆瓣的登录时的请求进行一次抓取，获取请求中的cookie数据</li>
+<li>在使用个人信息页的url进行请求时，该请求需要携带 1 中的cookie，只有携带了cookie后，服务器才可识别这次请求的用户信息，方可响应回指定的用户信息页数据</li>
+</ol>
+<h4 id="cookie作用：服务器端使用cookie来记录客户端的状态信息。"><a href="#cookie作用：服务器端使用cookie来记录客户端的状态信息。" class="headerlink" title="cookie作用：服务器端使用cookie来记录客户端的状态信息。"></a>cookie作用：服务器端使用cookie来记录客户端的状态信息。</h4><blockquote>
+<p>实现流程：</p>
+</blockquote>
+<ol>
+<li>执行登录操作（获取cookie）</li>
+<li>在发起个人主页请求时，需要将cookie携带到该请求中</li>
+</ol>
+<p>注意：session对象：发送请求（会将cookie对象进行自动存储）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">session = requests.session()</span><br><span class="line">#1.发起登录请求：将cookie获取，切存储到session对象中</span><br><span class="line">login_url = &apos;https://accounts.douban.com/login&apos;</span><br><span class="line">data = &#123;</span><br><span class="line">    &quot;source&quot;: &quot;None&quot;,</span><br><span class="line">    &quot;redir&quot;: &quot;https://www.douban.com/people/185687620/&quot;,</span><br><span class="line">    &quot;form_email&quot;: &quot;15027900535&quot;,</span><br><span class="line">    &quot;form_password&quot;: &quot;bobo@15027900535&quot;,</span><br><span class="line">    &quot;login&quot;: &quot;登录&quot;,</span><br><span class="line">&#125;</span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line">#使用session发起post请求</span><br><span class="line">login_response = session.post(url=login_url,data=data,headers=headers)</span><br><span class="line"></span><br><span class="line">#2.对个人主页发起请求（session（cookie）），获取响应页面数据</span><br><span class="line">url = &apos;https://www.douban.com/people/185687620/&apos;</span><br><span class="line">response = session.get(url=url,headers=headers)</span><br><span class="line">page_text = response.text</span><br><span class="line"></span><br><span class="line">with open(&apos;./douban110.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(page_text)</span><br></pre></td></tr></table></figure>
+<h4 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h4><blockquote>
+<p>基于requests模块的代理操作</p>
+</blockquote>
+<ul>
+<li>什么是代理</li>
+</ul>
+<p>代理就是第三方代替本体处理相关事务。例如：生活中的代理：代购，中介，微商……</p>
+<ul>
+<li>爬虫中为什么需要使用代理</li>
+</ul>
+<p>一些网站会有相应的反爬虫措施，例如很多网站会检测某一段时间某个IP的访问次数，如果访问频率太快以至于看起来不像正常访客，它可能就会会禁止这个IP的访问。所以我们需要设置一些代理IP，每隔一段时间换一个代理IP，就算IP被禁止，依然可以换个IP继续爬取。</p>
+<ul>
+<li>代理的分类：</li>
+</ul>
+<p>正向代理：代理客户端获取数据。正向代理是为了保护客户端防止被追究责任。</p>
+<p>反向代理：代理服务器提供数据。反向代理是为了保护服务器或负责负载均衡。</p>
+<ul>
+<li>免费代理ip提供网站</li>
+</ul>
+<ol>
+<li><p><a href="http://www.goubanjia.com/" target="_blank" rel="noopener">http://www.goubanjia.com/</a> (推荐)</p>
+</li>
+<li><p>西祠代理</p>
+</li>
+<li><p>快代理</p>
+</li>
+</ol>
+<blockquote>
+<p>代理实例</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">url = &apos;https://www.baidu.com/s?ie=utf-8&amp;wd=ip&apos;</span><br><span class="line"></span><br><span class="line">headers=&#123;</span><br><span class="line">    &apos;User-Agent&apos;: &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36&apos;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#将代理ip封装到字典</span><br><span class="line">proxy = &#123;</span><br><span class="line">    &apos;http&apos;:&apos;77.73.69.120:3128&apos;,</span><br><span class="line">   # &apos;https&apos;:&apos;xxxx&apos; 也可以是https</span><br><span class="line">&#125;</span><br><span class="line">#更换网路IP</span><br><span class="line">response = requests.get(url=url,proxies=proxy,headers=headers)</span><br><span class="line"></span><br><span class="line">with open(&apos;./daili.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;) as fp:</span><br><span class="line">    fp.write(response.text)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意点</p>
+</blockquote>
+<ul>
+<li>请求的协议要与代理ip的协议统一</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/30/Py007-01-07requests高级操作cookie和代理/" data-id="cklhjlfhi00j9oyfyqdpsc975" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py007-01-06requests综合实战" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/11/30/Py007-01-06requests综合实战/" class="article-date">
@@ -99,7 +212,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/30/Py007-01-06requests综合实战/" data-id="cklhgt2tz00jnq1fy0xradcpe" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/30/Py007-01-06requests综合实战/" data-id="cklhjlfhh00j7oyfylpsznbqj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -166,7 +279,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/Py007-01-05requests模块之post和ajax/" data-id="cklhgt2tw00jgq1fylwc7cqbn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/29/Py007-01-05requests模块之post和ajax/" data-id="cklhjlfhg00j5oyfyiaskm2rt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -240,7 +353,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/Py007-01-04requests模块/" data-id="cklhgt2tx00jiq1fy339r6jt1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/29/Py007-01-04requests模块/" data-id="cklhjlfhg00j3oyfy5cs444kr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -351,7 +464,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/Py007-01-03内置urllib模块补充/" data-id="cklhgt2ty00jkq1fypqzya7kc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/29/Py007-01-03内置urllib模块补充/" data-id="cklhjlfhe00j1oyfyic5h45xr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -433,7 +546,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/Py007-01-02内置urllib模块/" data-id="cklhgt2tv00jdq1fydbja3opa" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/29/Py007-01-02内置urllib模块/" data-id="cklhjlfhd00izoyfy72l1gf5j" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -500,7 +613,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/29/Py007-01-01爬虫初识/" data-id="cklhgt2tv00jbq1fy4bb38a4t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/29/Py007-01-01爬虫初识/" data-id="cklhjlfhc00ixoyfyy4f8radu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -562,7 +675,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/27/Py008-01-05选择排序和插入排序/" data-id="cklhgt2uk00l5q1fyduqqcne7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/27/Py008-01-05选择排序和插入排序/" data-id="cklhjlfi200kkoyfyrxu6eriu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -645,7 +758,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/26/Py008-01-04排序/" data-id="cklhgt2uj00l3q1fyjs6dzdg4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/26/Py008-01-04排序/" data-id="cklhjlfi300knoyfyp2mt2jgh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -709,64 +822,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/26/Py008-01-03查找算法/" data-id="cklhgt2ui00kyq1fyyul6xx7y" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py008-01-02递归和汉诺塔" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/11/26/Py008-01-02递归和汉诺塔/" class="article-date">
-  <time datetime="2018-11-26T13:15:59.000Z" itemprop="datePublished">2018-11-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/11/26/Py008-01-02递归和汉诺塔/">Py008-01-02递归和汉诺塔</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><p>特点</p>
-<ul>
-<li>调用自身</li>
-<li>结束条件</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def fn1(x):</span><br><span class="line">    print(x)</span><br><span class="line">    fn1(x-1)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def fn2(x):</span><br><span class="line">    if x&gt;0:</span><br><span class="line">        print(x)</span><br><span class="line">        fn2(x+1)</span><br><span class="line"></span><br><span class="line"># 合法递归   fn3(3)  ==&gt;3 2 1</span><br><span class="line">def fn3(x):</span><br><span class="line">    if x&gt;0:</span><br><span class="line">        print(x)</span><br><span class="line">        fn3(x-1)</span><br><span class="line"></span><br><span class="line"># 合法递归   fn4(3)  ==&gt;1 2 3</span><br><span class="line">def fn4(x):</span><br><span class="line">    if x&gt;0:</span><br><span class="line">        fn4(x-1)</span><br><span class="line">        print(x)</span><br></pre></td></tr></table></figure>
-<h4 id="汉诺塔问题"><a href="#汉诺塔问题" class="headerlink" title="汉诺塔问题"></a>汉诺塔问题</h4><ul>
-<li>三个柱子 A B C</li>
-<li>A上有3个盘子   大盘子在最下  小盘子在最上</li>
-<li>只能在 三个柱子上移动</li>
-<li>实现  把A上的盘子移动到C</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">n=2时</span><br><span class="line">1. 把小圆盘从A移动到B</span><br><span class="line">2. 把小圆盘从A移动到C</span><br><span class="line">3. 把小圆盘从B移动到C</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">n=n时</span><br><span class="line">1. 把n-1个盘子从A经过C移动到B</span><br><span class="line">2. 把第n个圆盘从A移动到C</span><br><span class="line">3. 把n-1个圆盘从B经过A移动到C</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>代码实现</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&apos;&apos;&apos;</span><br><span class="line">a:从那个盘子</span><br><span class="line">b:经过那个盘子</span><br><span class="line">c:到那个盘子</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">def hanoi(n,a,b,c):</span><br><span class="line">    if n&gt;0:</span><br><span class="line">        hanoi(n-1,a,c,b)</span><br><span class="line">        print(&apos;moving from %s to %s&apos;%(a,c))</span><br><span class="line">        hanoi(n-1,b,a,c)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">hanoi(3,&apos;A&apos;,&apos;B&apos;,&apos;C&apos;)</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">moving from A to C</span><br><span class="line">moving from A to B</span><br><span class="line">moving from C to B</span><br><span class="line">moving from A to C</span><br><span class="line">moving from B to A</span><br><span class="line">moving from B to C</span><br><span class="line">moving from A to C</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<p>汉诺塔移动次数的递推式：h(x)=2h(x-1)+1<br>h(64)=18446744073709551615</p>
-<p>假设每秒搬一个盘子，则需要5800亿年！</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/11/26/Py008-01-02递归和汉诺塔/" data-id="cklhgt2uj00l1q1fy1fvlg1f4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/11/26/Py008-01-03查找算法/" data-id="cklhjlfi100kjoyfyl3zbygqp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
@@ -806,7 +862,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -828,6 +884,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -841,10 +901,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

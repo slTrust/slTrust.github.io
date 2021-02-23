@@ -62,6 +62,79 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py006-01-11django之模版语法继承" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/25/Py006-01-11django之模版语法继承/" class="article-date">
+  <time datetime="2018-10-25T14:09:02.000Z" itemprop="datePublished">2018-10-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/25/Py006-01-11django之模版语法继承/">Py006-01-11django之模版语法继承</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="模版继承"><a href="#模版继承" class="headerlink" title="模版继承"></a>模版继承</h3><p>Django模版引擎中最强大也是最复杂的部分就是模版继承了。模版继承可以让您创建一个基本的“骨架”模版，它包含您站点中的全部元素，并且可以定义能够被子模版覆盖的 blocks 。</p>
+<blockquote>
+<p>自行建立一个django项目 </p>
+</blockquote>
+<ul>
+<li>含有应用 app001</li>
+<li>视图函数 index</li>
+<li>视图模版 index.html</li>
+</ul>
+<p>app001/urls.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from app001 import views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    path(r&apos;index/&apos;,views.index)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>app001/views.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def index(request):</span><br><span class="line">    return render(request,&apos;index.html&apos;)</span><br></pre></td></tr></table></figure>
+<p>index.html有如下布局</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        header&#123;height: 50px;background: #369;&#125;</span><br><span class="line">        .left&#123;background: #ddd;&#125;</span><br><span class="line">        .right&#123;background: aqua&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;header&gt;&lt;/header&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;row&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">            &lt;ol&gt;</span><br><span class="line">                &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">            &lt;/ol&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-9 right&quot;&gt;</span><br><span class="line">            &lt;ul&gt;</span><br><span class="line">                &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;5&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;6&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;7&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;8&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;9&lt;/li&gt;</span><br><span class="line">                &lt;li&gt;10&lt;/li&gt;</span><br><span class="line">            &lt;/ul&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="需求想复用左侧的菜单列表"><a href="#需求想复用左侧的菜单列表" class="headerlink" title="需求想复用左侧的菜单列表"></a>需求想复用左侧的菜单列表</h3></blockquote>
+<p>拷贝菜单这段代码，在templates下建立menu.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;ol&gt;</span><br><span class="line">    &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">&lt;/ol&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>修改index.html</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">    &lt;ol&gt;</span><br><span class="line">        &lt;li&gt;菜单1&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单2&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单3&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单4&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;菜单5&lt;/li&gt;</span><br><span class="line">    &lt;/ol&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">替换为</span><br><span class="line">&lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">    &#123;% include &apos;menu.html&apos; %&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="需求现在有订单页order-html-想有index-html的-顶部的header和左边菜单"><a href="#需求现在有订单页order-html-想有index-html的-顶部的header和左边菜单" class="headerlink" title="需求现在有订单页order.html 想有index.html的 顶部的header和左边菜单"></a>需求现在有订单页order.html 想有index.html的 顶部的header和左边菜单</h3></blockquote>
+<p>创建模版文件base.html</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        header&#123;height: 50px;background: #369;&#125;</span><br><span class="line">        .left&#123;background: #ddd;&#125;</span><br><span class="line">        .right&#123;background: aqua&#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css&quot; integrity=&quot;sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u&quot; crossorigin=&quot;anonymous&quot;&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;header&gt;&lt;/header&gt;</span><br><span class="line">&lt;div class=&quot;container&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;row&quot;&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-3 left&quot;&gt;</span><br><span class="line">            &#123;% include &apos;menu.html&apos; %&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;div class=&quot;col-md-9 right&quot;&gt;</span><br><span class="line">           &#123;% block con %&#125;</span><br><span class="line">               &lt;h1&gt;默认显示内容&lt;/h1&gt;</span><br><span class="line">           &#123;% endblock  %&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line">-----------------------------</span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">    </span><br><span class="line">&#123;% endblock  %&#125;</span><br><span class="line">是一个空盒子 等继承的人来填充内容</span><br><span class="line"></span><br><span class="line">也可以设置默认内容</span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">    &lt;h1&gt;默认显示内容&lt;/h1&gt;</span><br><span class="line">&#123;% endblock  %&#125;</span><br><span class="line">当继承模版的页面没有使用盒子就用这个默认的内容</span><br><span class="line">使用了就覆盖掉这个默认的盒子</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>index.html</p>
+</blockquote>
+<ul>
+<li>extends 标签是这里的关键。它告诉模版引擎，这个模版“继承”了另一个模版。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &apos;base.html&apos; %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block con %&#125;</span><br><span class="line">&lt;ul&gt;</span><br><span class="line">    &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;5&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;6&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;7&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;8&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;9&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;10&lt;/li&gt;</span><br><span class="line">&lt;/ul&gt;</span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- 如果你在模版中使用 &#123;% extends %&#125; 标签，它必须是模版中的第一个标签。其他的任何情况下，模版继承都将无法工作。</span><br><span class="line"></span><br><span class="line">- 在base模版中设置越多的 &#123;% block %&#125; 标签越好。请记住，子模版不必定义全部父模版中的blocks，所以，你可以在大多数blocks中填充合理的默认内容，然后，只定义你需要的那一个。多一点钩子总比少一点好。</span><br><span class="line"></span><br><span class="line">- 如果你发现你自己在大量的模版中复制内容，那可能意味着你应该把内容移动到父模版中的一个 &#123;% block %&#125; 中。</span><br><span class="line"></span><br><span class="line">- If you need to get the content of the block from the parent template, the &#123;&#123; block.super &#125;&#125; variable will do the trick. This is useful if you want to add to the contents of a parent block instead of completely overriding it. Data inserted using &#123;&#123; block.super &#125;&#125; will not be automatically escaped (see the next section), since it was already escaped, if necessary, in the parent template.</span><br><span class="line"></span><br><span class="line">- 为了更好的可读性，你也可以给你的 &#123;% endblock %&#125; 标签一个 名字 。例如：</span><br><span class="line"></span><br><span class="line">&#123;% block content %&#125;</span><br><span class="line">...</span><br><span class="line">&#123;% endblock content %&#125;　　</span><br><span class="line"></span><br><span class="line">在大型模版中，这个方法帮你清楚的看到哪一个　 &#123;% block %&#125; 标签被关闭了。</span><br><span class="line"></span><br><span class="line">- 不能在一个模版中定义多个相同名字的 block 标签。</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/25/Py006-01-11django之模版语法继承/" data-id="cklhjlfgv00hvoyfyibaadqop" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py006-01-10django之自定义过滤器和标签" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/10/25/Py006-01-10django之自定义过滤器和标签/" class="article-date">
@@ -96,7 +169,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/Py006-01-10django之自定义过滤器和标签/" data-id="cklhgt2te00i7q1fylbza3hxb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/25/Py006-01-10django之自定义过滤器和标签/" data-id="cklhjlfgu00htoyfy3ba0ukka" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -162,7 +235,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/25/Py006-01-09django之模版标签/" data-id="cklhgt2td00i5q1fybl8e5ek4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/25/Py006-01-09django之模版标签/" data-id="cklhjlfgt00hroyfyug656y37" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -265,7 +338,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/24/Py006-01-08django之模版/" data-id="cklhgt2tc00i3q1fy882bgsr5" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/24/Py006-01-08django之模版/" data-id="cklhjlfgs00hpoyfyuqweq7xg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -331,7 +404,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/24/Py006-01-07django之request和response/" data-id="cklhgt2tb00i0q1fysj0kb5ys" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/24/Py006-01-07django之request和response/" data-id="cklhjlfgr00hnoyfyycbltjr8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -409,7 +482,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/22/Py006-01-06django之url控制path/" data-id="cklhgt2ta00hyq1fypm97s9cy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/22/Py006-01-06django之url控制path/" data-id="cklhjlfgr00hloyfyfyndiq1y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -520,7 +593,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/21/Py006-01-05django路由反向解析/" data-id="cklhgt2t900htq1fyw8varqm4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/21/Py006-01-05django路由反向解析/" data-id="cklhjlfgp00hhoyfy6r1vq8ja" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -618,7 +691,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/21/Py006-01-04django路由简单配置/" data-id="cklhgt2t900hvq1fyknjzl4yu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/21/Py006-01-04django路由简单配置/" data-id="cklhjlfgq00hjoyfykc2hucr8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -663,7 +736,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/21/Py006-01-03django静态文件配置/" data-id="cklhgt2t800hrq1fyqbfdwhy7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/21/Py006-01-03django静态文件配置/" data-id="cklhjlfgo00hfoyfymqarx7go" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -733,55 +806,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/20/Py006-01-02django的下载和基本命令/" data-id="cklhgt2t700hoq1fyngo9ktce" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py006-01-01django初识" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/10/20/Py006-01-01django初识/" class="article-date">
-  <time datetime="2018-10-20T15:17:01.000Z" itemprop="datePublished">2018-10-20</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/10/20/Py006-01-01django初识/">Py006-01-01django初识</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="django简介"><a href="#django简介" class="headerlink" title="django简介"></a>django简介</h3><h4 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h4><p>Web服务器开发领域里著名的MVC模式，所谓MVC就是把Web应用分为模型(M)，控制器(C)和视图(V)三层，他们之间以一种插件式的、松耦合的方式连接在一起，模型负责业务对象与数据库的映射(ORM)，视图负责与用户的交互(页面)，控制器接受用户的输入调用模型和视图完成用户的请求</p>
-<h4 id="MTV"><a href="#MTV" class="headerlink" title="MTV"></a>MTV</h4><p>Django的MTV模式本质上和MVC是一样的，也是为了各组件间保持松耦合关系，只是定义上有些许不同，Django的MTV分别是值：</p>
-<ul>
-<li>M 代表模型（Model）： 负责业务对象和数据库的关系映射(ORM)。</li>
-<li>T 代表模板 (Template)：负责如何把页面展示给用户(html)。</li>
-<li>V 代表视图（View）：   负责业务逻辑，并在适当时候调用Model和Template。</li>
-</ul>
-<p>除了以上三层之外，还需要一个URL分发器，它的作用是将一个个URL的页面请求分发给不同的View处理，View再调用相应的Model和Template，MTV的响应模式如下所示：</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py006_01_0101.png" alt></p>
-<p>一般是用户通过浏览器向我们的服务器发起一个请求(request)，这个请求回去访问视图函数，（如果不涉及到数据调用，那么这个时候视图函数返回一个模板也就是一个网页给用户），视图函数调用模型，模型去数据库查找数据，然后逐级返回，视图函数把返回的数据填充到模板中空格中，最后返回网页给用户。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/10/20/Py006-01-01django初识/" data-id="cklhgt2t700hmq1fyg1aqzrke" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/10/20/Py006-01-02django的下载和基本命令/" data-id="cklhjlfgn00hdoyfyaznepp77" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M06/">M06</a></li></ul>
@@ -821,7 +846,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -843,6 +868,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -856,10 +885,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

@@ -62,6 +62,123 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node-JS专精08手写bind01" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/26/Node-JS专精08手写bind01/" class="article-date">
+  <time datetime="2019-12-26T14:39:38.000Z" itemprop="datePublished">2019-12-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/12/26/Node-JS专精08手写bind01/">Node-JS专精08手写bind01</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="手写bind"><a href="#手写bind" class="headerlink" title="手写bind"></a>手写bind</h1><ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind" target="_blank" rel="noopener">MDN bind</a></li>
+</ul>
+<h3 id="确定API"><a href="#确定API" class="headerlink" title="确定API"></a>确定API</h3><ul>
+<li>bind 位于 Function.prototype 上</li>
+<li>需要做 polyfill</li>
+</ul>
+<blockquote>
+<p>什么是<strong>polyfill</strong>？</p>
+</blockquote>
+<ul>
+<li><a href="https://juejin.im/post/5a579bc7f265da3e38496ba1" target="_blank" rel="noopener">polyfill为何物</a></li>
+<li>聚填充(生活中)<ul>
+<li>抹平</li>
+<li>补全</li>
+<li>你的桌子一个腿短，于是底下垫了一个纸片</li>
+<li>你的墙面不够平整，有坑，于是用白浆填平它</li>
+</ul>
+</li>
+<li>对于前端<ul>
+<li>你的JS代码运行在坑人的IE6下</li>
+<li>我们知道方法一般挂在<code>Function.prototype</code>上 也就是<code>Function.prototype.bind</code>而在 IE6没有，此时你就需要 <strong>polyfill</strong> </li>
+</ul>
+</li>
+</ul>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ul>
+<li><code>fn.bind(asThis)</code></li>
+<li><code>fn.bind(asThis, param1, param2)</code></li>
+<li><code>fn.bind(asThis)()</code></li>
+<li><code>fn.bind(asThis, param1, param2)()</code></li>
+<li><code>fn.bind(asThis)(param1)</code></li>
+<li><code>fn.bind(asThis, param1, param2)(p3, p4)</code></li>
+</ul>
+<blockquote>
+<p>bind API例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">function aa()&#123;</span><br><span class="line">    console.log(this);</span><br><span class="line">    console.log(arguments)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)</span><br><span class="line">// fn.bind(asThis)()</span><br><span class="line">var newFn = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">// fn.bind(asThis, param1, param2)</span><br><span class="line">// fn.bind(asThis, param1, param2)()</span><br><span class="line">var newFn2 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn2()</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis)(param1)</span><br><span class="line">var newFn3 = aa.bind(&#123;a:1&#125;)</span><br><span class="line">newFn3(1)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1]</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// fn.bind(asThis,p1,p2)(p3,p4)</span><br><span class="line">var newFn4 = aa.bind(&#123;a:1&#125;,1,2)</span><br><span class="line">newFn4(3,4)</span><br><span class="line">/*</span><br><span class="line">&#123;a:1&#125;</span><br><span class="line">arguments[1,2,3,4]</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="001bind-asThis-实现"><a href="#001bind-asThis-实现" class="headerlink" title="001bind(asThis) 实现"></a>001<code>bind(asThis)</code> 实现</h3></blockquote>
+<ul>
+<li>新建项目目录 <code>bind_demo</code></li>
+<li>新建 <code>bind_demo/src/index.js</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>新建 <code>bind_demo/test/index.js</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="002bind-asThis-p1-p2-实现"><a href="#002bind-asThis-p1-p2-实现" class="headerlink" title="002bind(asThis,p1,p2) 实现"></a>002<code>bind(asThis,p1,p2)</code> 实现</h3></blockquote>
+<ul>
+<li>通过扩展运算符</li>
+</ul>
+<p><code>src/index.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function()&#123;</span><br><span class="line">        return fn.call(asThis, ...args)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>test/index.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;, 123, 456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h3 id="003bind-asThis-p1-p2-实现"><a href="#003bind-asThis-p1-p2-实现" class="headerlink" title="003bind(asThis,p1)(p2) 实现"></a>003<code>bind(asThis,p1)(p2)</code> 实现</h3></blockquote>
+<ul>
+<li>step1通过<code>newFn = fn.bind({name:&#39;hjx&#39;},1)</code> 绑定this 传递参数</li>
+<li>step2<code>newFn(2)</code> 在此传递参数调用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">function bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">module.exports = bind;</span><br><span class="line"></span><br><span class="line">if(!Function.prototype.bind)&#123;</span><br><span class="line">    Function.prototype.bind = bind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>test/index.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">const bind = require(&apos;../src/index&apos;);</span><br><span class="line">Function.prototype.bind2 = bind;</span><br><span class="line"></span><br><span class="line">console.assert(Function.prototype.bind2 !== undefined);</span><br><span class="line"></span><br><span class="line">const fn1 = function()&#123;</span><br><span class="line">    return this;</span><br><span class="line">&#125; </span><br><span class="line">const newFn = fn1.bind2(&#123;name:&apos;hjx&apos;&#125;);</span><br><span class="line">console.assert(newFn().name === &apos;hjx&apos;);</span><br><span class="line"></span><br><span class="line">const fn2 = function(p1,p2)&#123;</span><br><span class="line">    return [this,p1,p2]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const newFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123,456);</span><br><span class="line">console.assert(newFn2()[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(newFn2()[1] === 123 , &quot;p1&quot;);</span><br><span class="line">console.assert(newFn2()[2] === 456 , &quot;p2&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">const anotherFn2 = fn2.bind2(&#123;name:&apos;hjx&apos;&#125;,123);</span><br><span class="line">console.assert(anotherFn2(456)[0].name === &apos;hjx&apos;);</span><br><span class="line">console.assert(anotherFn2(456)[1] === 123);</span><br><span class="line">console.assert(anotherFn2(456)[2] === 456);</span><br></pre></td></tr></table></figure>
+<h3 id="MDN-bind的Polyfill实现"><a href="#MDN-bind的Polyfill实现" class="headerlink" title="MDN bind的Polyfill实现"></a>MDN bind的Polyfill实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">if (!Function.prototype.bind) (function()&#123;</span><br><span class="line">  var slice = Array.prototype.slice;</span><br><span class="line">  Function.prototype.bind = function() &#123;</span><br><span class="line">    var thatFunc = this, thatArg = arguments[0];</span><br><span class="line">    var args = slice.call(arguments, 1);</span><br><span class="line">    if (typeof thatFunc !== &apos;function&apos;) &#123;</span><br><span class="line">      // closest thing possible to the ECMAScript 5</span><br><span class="line">      // internal IsCallable function</span><br><span class="line">      throw new TypeError(&apos;Function.prototype.bind - &apos; +</span><br><span class="line">             &apos;what is trying to be bound is not callable&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">      var funcArgs = args.concat(slice.call(arguments))</span><br><span class="line">      return thatFunc.apply(thatArg, funcArgs);</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>改写我们的 bind </p>
+</blockquote>
+<ul>
+<li>为什么MDN 不用扩展运算符，因为它不能用和 bind 同时期的API</li>
+</ul>
+<p><code>src/index.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ES5和ES6版-bind"><a href="#ES5和ES6版-bind" class="headerlink" title="ES5和ES6版 bind"></a>ES5和ES6版 bind</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">var slice = Array.prototype.slice;</span><br><span class="line">// ES5版</span><br><span class="line">function bind(asThis)&#123;</span><br><span class="line">    var args = slice.call(arguments,1);</span><br><span class="line">    const fn = this</span><br><span class="line">    if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">        throw new Error(&quot;bind 必须调用在函数身上&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return function()&#123;</span><br><span class="line">        var args2 = slice.call(arguments,0);</span><br><span class="line">        return fn.apply(asThis, args.concat(args2))</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// ES6版</span><br><span class="line">function _bind(asThis, ...args)&#123;</span><br><span class="line">    const fn = this</span><br><span class="line">    return function(...args2)&#123;</span><br><span class="line">        return fn.call(asThis, ...args, ...args2)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><a href="https://github.com/slTrust/source-bind" target="_blank" rel="noopener">代码分支:01手写bind基本实现</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精08手写bind01/" data-id="cklhjlfcz008voyfyiz0er1ba" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node-JS专精07手写深拷贝" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/12/26/Node-JS专精07手写深拷贝/" class="article-date">
@@ -116,7 +233,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝/" data-id="cklhgt2pp008wq1fyu9dkxwyb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/26/Node-JS专精07手写深拷贝/" data-id="cklhjlfcw008noyfy55ldsixn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -220,7 +337,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/25/Node-JS专精05高阶函数/" data-id="cklhgt2po008rq1fy5ecquw1l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/25/Node-JS专精05高阶函数/" data-id="cklhjlfd30095oyfy6wlvjyl7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -312,7 +429,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/24/Node-JS专精06手写EventHub/" data-id="cklhgt2pp008uq1fytvbiqlzv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/24/Node-JS专精06手写EventHub/" data-id="cklhjlfcw008loyfyrtva1vf2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -391,7 +508,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/24/Node-JS专精04柯里化/" data-id="cklhgt2pm008kq1fy9bklcfxy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/24/Node-JS专精04柯里化/" data-id="cklhjlfcv008ioyfyyq66gvji" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -482,127 +599,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/23/Node-JS专精03递归记忆化/" data-id="cklhgt2pn008pq1fyl3j926pr" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-JS专精02this变态面试题" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/12/19/Node-JS专精02this变态面试题/" class="article-date">
-  <time datetime="2019-12-19T15:05:45.000Z" itemprop="datePublished">2019-12-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/19/Node-JS专精02this变态面试题/">Node-JS专精02this变态面试题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="回顾基础知识，JS如何声明函数"><a href="#回顾基础知识，JS如何声明函数" class="headerlink" title="回顾基础知识，JS如何声明函数"></a>回顾基础知识，JS如何声明函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const f1 = new Function(&apos;x&apos;,&apos;y&apos;,&apos;return x + y&apos;)</span><br><span class="line"></span><br><span class="line">function f2(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f3 = function(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f4 = (x, y)=&gt; x + y</span><br></pre></td></tr></table></figure>
-<p>其中，<code>f1,f2,f3</code> 是ES6之前的语法，<strong>支持 <code>this,arguments,new</code></strong><br>而 <code>f4</code> 是 ES6语法，<strong>不支持 <code>this,arguments,new</code></strong></p>
-<blockquote>
-<p>你可以去 浏览器控制台里试试</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const f2 = ()=&gt;console.log(this)</span><br><span class="line">f2() // window</span><br><span class="line"></span><br><span class="line">f2.call(&#123;name:&apos;hjx&apos;&#125;)  // 还是 window</span><br></pre></td></tr></table></figure>
-<h4 id="箭头函数不支持this"><a href="#箭头函数不支持this" class="headerlink" title="箭头函数不支持this"></a>箭头函数不支持this</h4><blockquote>
-<p>箭头函数如何处理 a ,就如何处理 this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const a = 233</span><br><span class="line">const f2 = ()=&gt;console.log(a)</span><br><span class="line">f2() //</span><br><span class="line"></span><br><span class="line">console.log(this) </span><br><span class="line">const f2 = ()=&gt;console.log(this)</span><br></pre></td></tr></table></figure>
-<p>箭头函数把 this 当作外部的变量，仅此而已，但是非箭头函数的 this 有很多<strong>特殊处理</strong></p>
-<p>箭头函数不支持this 指的就是<strong>尖头函数对 this 和其他变量一视同仁，不会特殊对待</strong></p>
-<h4 id="非箭头函数的this"><a href="#非箭头函数的this" class="headerlink" title="非箭头函数的this"></a>非箭头函数的this</h4><blockquote>
-<p>网传死记方法</p>
-</blockquote>
-<ul>
-<li>this是上下文</li>
-<li>全局环境执行时候,this是全局对象</li>
-<li>调用对象方法时，this是该对象</li>
-<li>函数里调用函数时，this是全局对象</li>
-<li>箭头函数的this，不看调用，看定义(静态作用域)</li>
-<li>还有人说箭头函数里的 this 指向外面的this</li>
-<li>用new调用函数时，this是新增对象</li>
-<li>可以用<code>call/apply/bind</code>指定this</li>
-</ul>
-<blockquote>
-<p>记忆力好可以这样记</p>
-</blockquote>
-<ul>
-<li>我记不住</li>
-</ul>
-<h4 id="那么this是参数还是环境？"><a href="#那么this是参数还是环境？" class="headerlink" title="那么this是参数还是环境？"></a>那么this是参数还是环境？</h4><ul>
-<li>答案：this是参数，只有箭头函数 this是环境</li>
-</ul>
-<h4 id="如何确定this"><a href="#如何确定this" class="headerlink" title="如何确定this"></a>如何确定this</h4><blockquote>
-<p>显式this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn.call(asThis,1,2)</span><br><span class="line">fn.bind(asThis,1,2)()</span><br><span class="line">obj.method.call(obj,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>隐式this</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-<p><strong>为什么你很难确定this,因为你总是让js帮你选this</strong></p>
-<p><strong>所以你应该自己指定this</strong></p>
-<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// this 是参数， 答 button 是错的</span><br></pre></td></tr></table></figure>
-<p>答案是：<strong>不知道,要看怎么调用</strong></p>
-<p>因为你没看到call,没指定this,所以没法确定</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当你手点的时候 是 button</span><br><span class="line"></span><br><span class="line">// 如果js调用呢?</span><br><span class="line">button.click()</span><br><span class="line"></span><br><span class="line">// 而如果这样，就不是button</span><br><span class="line">var fn = button.onclick</span><br><span class="line">fn() // 打印的是 window</span><br><span class="line">fn.call(&#123;name:&apos;hjx&apos;&#125;) // &#123;name:&apos;hjx&apos;&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>标准答案</p>
-</blockquote>
-<p>这个this的值无法确定，我们要看this是如何调用的，如果是用户点击按钮的时候浏览器调用的，那么浏览器一定会把button作为this传递进来，<br>如果是通过其他方式调用的，那么就要看它是如何调用的如以下代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var fn = button.onclick</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
-<p>由于fn没指定this所以相当于 fn.call(undefined) 那么浏览器就会把这个this变成全局对象 window</p>
-<blockquote>
-<p>再来一个题</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const vm = new Vue(&#123;</span><br><span class="line">    data:&#123;</span><br><span class="line">        msg:&apos;hi&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods:&#123;</span><br><span class="line">        sayHi()&#123;</span><br><span class="line">            console.log(this.msg) // this是什么</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案依然是 不知道</span><br><span class="line">如果你是在 vue正常情况下调用 这个this 就是 vm</span><br><span class="line">但如果你是把 vm.sayHi放在其他地方调用就要看你调用的时候怎么传递参数</span><br><span class="line">根据传参的形式不同，我才能确定this是什么</span><br><span class="line">所以this是一个参数，只有在调用的时候唯一的确定</span><br></pre></td></tr></table></figure>
-<h4 id="真实面试题"><a href="#真实面试题" class="headerlink" title="真实面试题"></a>真实面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1) // 输出什么，有陷阱</span><br></pre></td></tr></table></figure>
-<p>你可以拷贝代码到浏览器里试一下</p>
-<blockquote>
-<p>分析以下，先把 <code>fn()</code>改写</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        // fn()</span><br><span class="line">        fn.call(undefined) // 所以此时 this 实际是 window</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj.method(fn,1) </span><br><span class="line">//所以打印的是 window.length</span><br><span class="line">// 然而 let length 是不是 window 的 length?</span><br><span class="line">// 答案是 没关系</span><br><span class="line">// window.length 是什么？</span><br><span class="line"></span><br><span class="line">window.length 默认指的是 当前页面有多少个窗口或者说多少个 iframe</span><br><span class="line">// 你说这题是不是非常坑</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>再来分析<code>arguments[0]()</code></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 改写 arguments[0]()</span><br><span class="line">// 实际就变成了这样 arguments.0.call(arguments)</span><br><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">        // arguments.0.call(arguments)</span><br><span class="line">        // 所以此时 this是 arguments</span><br><span class="line">        // arguments.length 是什么？</span><br><span class="line">        // 是形参的长度还是，实参的长度</span><br><span class="line">        // 答案是 arguments.length 是 实参的长度</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1)</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
-<li><p>首先碰到这些this问题，一定要改写，你不改写就是坑自己</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>this 是 call 的第一个参数</p>
-</li>
-<li>new 重新设计了 this/箭头函数不接受 this <ul>
-<li><a href="https://zhuanlan.zhihu.com/p/23987456" target="_blank" rel="noopener">参考链接</a></li>
-</ul>
-</li>
-<li>函数的返回值由参数和环境确定</li>
-<li>this是参数，arguments也是参数</li>
-<li>全局变量和自由变量是环境</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/19/Node-JS专精02this变态面试题/" data-id="cklhgt2pk008hq1fyy1rob7bu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/23/Node-JS专精03递归记忆化/" data-id="cklhjlfcu008goyfy9yl2kiud" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -769,7 +766,127 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/19/Node-JS专精01函数与闭包/" data-id="cklhgt2pm008mq1fyl6rhsvwy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/19/Node-JS专精01函数与闭包/" data-id="cklhjlfcp0088oyfyrpojyqfe" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-JS专精02this变态面试题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/19/Node-JS专精02this变态面试题/" class="article-date">
+  <time datetime="2019-12-19T15:05:45.000Z" itemprop="datePublished">2019-12-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/12/19/Node-JS专精02this变态面试题/">Node-JS专精02this变态面试题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="回顾基础知识，JS如何声明函数"><a href="#回顾基础知识，JS如何声明函数" class="headerlink" title="回顾基础知识，JS如何声明函数"></a>回顾基础知识，JS如何声明函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const f1 = new Function(&apos;x&apos;,&apos;y&apos;,&apos;return x + y&apos;)</span><br><span class="line"></span><br><span class="line">function f2(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f3 = function(x,y)&#123;return x + y&#125;</span><br><span class="line"></span><br><span class="line">const f4 = (x, y)=&gt; x + y</span><br></pre></td></tr></table></figure>
+<p>其中，<code>f1,f2,f3</code> 是ES6之前的语法，<strong>支持 <code>this,arguments,new</code></strong><br>而 <code>f4</code> 是 ES6语法，<strong>不支持 <code>this,arguments,new</code></strong></p>
+<blockquote>
+<p>你可以去 浏览器控制台里试试</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const f2 = ()=&gt;console.log(this)</span><br><span class="line">f2() // window</span><br><span class="line"></span><br><span class="line">f2.call(&#123;name:&apos;hjx&apos;&#125;)  // 还是 window</span><br></pre></td></tr></table></figure>
+<h4 id="箭头函数不支持this"><a href="#箭头函数不支持this" class="headerlink" title="箭头函数不支持this"></a>箭头函数不支持this</h4><blockquote>
+<p>箭头函数如何处理 a ,就如何处理 this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">const a = 233</span><br><span class="line">const f2 = ()=&gt;console.log(a)</span><br><span class="line">f2() //</span><br><span class="line"></span><br><span class="line">console.log(this) </span><br><span class="line">const f2 = ()=&gt;console.log(this)</span><br></pre></td></tr></table></figure>
+<p>箭头函数把 this 当作外部的变量，仅此而已，但是非箭头函数的 this 有很多<strong>特殊处理</strong></p>
+<p>箭头函数不支持this 指的就是<strong>尖头函数对 this 和其他变量一视同仁，不会特殊对待</strong></p>
+<h4 id="非箭头函数的this"><a href="#非箭头函数的this" class="headerlink" title="非箭头函数的this"></a>非箭头函数的this</h4><blockquote>
+<p>网传死记方法</p>
+</blockquote>
+<ul>
+<li>this是上下文</li>
+<li>全局环境执行时候,this是全局对象</li>
+<li>调用对象方法时，this是该对象</li>
+<li>函数里调用函数时，this是全局对象</li>
+<li>箭头函数的this，不看调用，看定义(静态作用域)</li>
+<li>还有人说箭头函数里的 this 指向外面的this</li>
+<li>用new调用函数时，this是新增对象</li>
+<li>可以用<code>call/apply/bind</code>指定this</li>
+</ul>
+<blockquote>
+<p>记忆力好可以这样记</p>
+</blockquote>
+<ul>
+<li>我记不住</li>
+</ul>
+<h4 id="那么this是参数还是环境？"><a href="#那么this是参数还是环境？" class="headerlink" title="那么this是参数还是环境？"></a>那么this是参数还是环境？</h4><ul>
+<li>答案：this是参数，只有箭头函数 this是环境</li>
+</ul>
+<h4 id="如何确定this"><a href="#如何确定this" class="headerlink" title="如何确定this"></a>如何确定this</h4><blockquote>
+<p>显式this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn.call(asThis,1,2)</span><br><span class="line">fn.bind(asThis,1,2)()</span><br><span class="line">obj.method.call(obj,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>隐式this</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+<p><strong>为什么你很难确定this,因为你总是让js帮你选this</strong></p>
+<p><strong>所以你应该自己指定this</strong></p>
+<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// this 是参数， 答 button 是错的</span><br></pre></td></tr></table></figure>
+<p>答案是：<strong>不知道,要看怎么调用</strong></p>
+<p>因为你没看到call,没指定this,所以没法确定</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">button.onclick = function(e)&#123;</span><br><span class="line">    console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当你手点的时候 是 button</span><br><span class="line"></span><br><span class="line">// 如果js调用呢?</span><br><span class="line">button.click()</span><br><span class="line"></span><br><span class="line">// 而如果这样，就不是button</span><br><span class="line">var fn = button.onclick</span><br><span class="line">fn() // 打印的是 window</span><br><span class="line">fn.call(&#123;name:&apos;hjx&apos;&#125;) // &#123;name:&apos;hjx&apos;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>标准答案</p>
+</blockquote>
+<p>这个this的值无法确定，我们要看this是如何调用的，如果是用户点击按钮的时候浏览器调用的，那么浏览器一定会把button作为this传递进来，<br>如果是通过其他方式调用的，那么就要看它是如何调用的如以下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var fn = button.onclick</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+<p>由于fn没指定this所以相当于 fn.call(undefined) 那么浏览器就会把这个this变成全局对象 window</p>
+<blockquote>
+<p>再来一个题</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const vm = new Vue(&#123;</span><br><span class="line">    data:&#123;</span><br><span class="line">        msg:&apos;hi&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods:&#123;</span><br><span class="line">        sayHi()&#123;</span><br><span class="line">            console.log(this.msg) // this是什么</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">答案依然是 不知道</span><br><span class="line">如果你是在 vue正常情况下调用 这个this 就是 vm</span><br><span class="line">但如果你是把 vm.sayHi放在其他地方调用就要看你调用的时候怎么传递参数</span><br><span class="line">根据传参的形式不同，我才能确定this是什么</span><br><span class="line">所以this是一个参数，只有在调用的时候唯一的确定</span><br></pre></td></tr></table></figure>
+<h4 id="真实面试题"><a href="#真实面试题" class="headerlink" title="真实面试题"></a>真实面试题</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1) // 输出什么，有陷阱</span><br></pre></td></tr></table></figure>
+<p>你可以拷贝代码到浏览器里试一下</p>
+<blockquote>
+<p>分析以下，先把 <code>fn()</code>改写</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        // fn()</span><br><span class="line">        fn.call(undefined) // 所以此时 this 实际是 window</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">obj.method(fn,1) </span><br><span class="line">//所以打印的是 window.length</span><br><span class="line">// 然而 let length 是不是 window 的 length?</span><br><span class="line">// 答案是 没关系</span><br><span class="line">// window.length 是什么？</span><br><span class="line"></span><br><span class="line">window.length 默认指的是 当前页面有多少个窗口或者说多少个 iframe</span><br><span class="line">// 你说这题是不是非常坑</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>再来分析<code>arguments[0]()</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// 改写 arguments[0]()</span><br><span class="line">// 实际就变成了这样 arguments.0.call(arguments)</span><br><span class="line">let length = 10</span><br><span class="line">function fn()&#123; console.log(this.length) &#125;</span><br><span class="line"></span><br><span class="line">let obj = &#123;</span><br><span class="line">    length:5,</span><br><span class="line">    method(fn)&#123;</span><br><span class="line">        fn()</span><br><span class="line">        arguments[0]()</span><br><span class="line">        // arguments.0.call(arguments)</span><br><span class="line">        // 所以此时 this是 arguments</span><br><span class="line">        // arguments.length 是什么？</span><br><span class="line">        // 是形参的长度还是，实参的长度</span><br><span class="line">        // 答案是 arguments.length 是 实参的长度</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.method(fn,1)</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>首先碰到这些this问题，一定要改写，你不改写就是坑自己</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fn(1,2)</span><br><span class="line">// fn.call(undefined,1,2)</span><br><span class="line"></span><br><span class="line">obj.method(&apos;hi&apos;)</span><br><span class="line">// obj.method.call(obj,&apos;hi&apos;)</span><br><span class="line"></span><br><span class="line">array[0](&apos;hi&apos;)</span><br><span class="line">// array[0].call(array,&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>this 是 call 的第一个参数</p>
+</li>
+<li>new 重新设计了 this/箭头函数不接受 this <ul>
+<li><a href="https://zhuanlan.zhihu.com/p/23987456" target="_blank" rel="noopener">参考链接</a></li>
+</ul>
+</li>
+<li>函数的返回值由参数和环境确定</li>
+<li>this是参数，arguments也是参数</li>
+<li>全局变量和自由变量是环境</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/19/Node-JS专精02this变态面试题/" data-id="cklhjlfcr008doyfyfn3g371y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1010,7 +1127,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/13/ZB-044-01自动化测试/" data-id="cklhgt2z700w8q1fyi6wubtkb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/13/ZB-044-01自动化测试/" data-id="cklhjlfmn00v2oyfyt3rosr7f" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
@@ -1335,46 +1452,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/13/ZB-043-01操作系统和计算机原理/" data-id="cklhgt2z600w6q1fyaaxs9sfx" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-ZB-042-01常见面试题总结" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/12/12/ZB-042-01常见面试题总结/" class="article-date">
-  <time datetime="2019-12-12T07:59:56.000Z" itemprop="datePublished">2019-12-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/12/ZB-042-01常见面试题总结/">ZB-042-01常见面试题总结</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>待更新</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/12/ZB-042-01常见面试题总结/" data-id="cklhgt2z200w0q1fyu9ac394q" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/12/13/ZB-043-01操作系统和计算机原理/" data-id="cklhjlfmn00v1oyfy6fglo2sr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
@@ -1414,7 +1492,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1436,6 +1514,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -1449,10 +1531,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>

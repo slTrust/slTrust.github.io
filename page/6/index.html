@@ -62,6 +62,125 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node全解02-01node命令行程序" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/08/Node全解02-01node命令行程序/" class="article-date">
+  <time datetime="2020-03-08T05:58:10.000Z" itemprop="datePublished">2020-03-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/08/Node全解02-01node命令行程序/">Node全解02_01node命令行程序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="CRM学习-Node-js-之文件模块"><a href="#CRM学习-Node-js-之文件模块" class="headerlink" title="CRM学习 Node.js 之文件模块"></a>CRM学习 Node.js 之文件模块</h3><p>目标 <strong>完成一个命令行工具</strong></p>
+<blockquote>
+<p>001 新建目录 node-todo-1</p>
+</blockquote>
+<ul>
+<li>打开这个目录终端 yarn init -y </li>
+<li>修改package.json 的版本号为 0.0.1</li>
+<li>新建 index.js 内容为<code>console.log(&#39;hi&#39;)</code></li>
+</ul>
+<blockquote>
+<p>002 使用库 <a href="https://github.com/tj/commander.js" target="_blank" rel="noopener">commander.js</a></p>
+</blockquote>
+<ul>
+<li>抄文档开始干</li>
+<li><code>npm install commander</code> 或者你 <code>yarn add commander</code></li>
+<li><p>安装后，继续抄</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">const program = require(&apos;commander&apos;);</span><br><span class="line"></span><br><span class="line">program</span><br><span class="line">.option(&apos;-d, --debug&apos;, &apos;output extra debugging&apos;)</span><br><span class="line">.option(&apos;-s, --small&apos;, &apos;small pizza size&apos;)</span><br><span class="line">.option(&apos;-p, --pizza-type &lt;type&gt;&apos;, &apos;flavour of pizza&apos;);</span><br><span class="line"></span><br><span class="line">program.parse(process.argv);</span><br><span class="line"></span><br><span class="line">// 额外加一行</span><br><span class="line">console.log(&apos;hi&apos;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>项目根目录运行 node index.js  只打印了 hi</p>
+</li>
+<li><p>此时你运行 <code>node index -h</code> 会显示如下内容</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Usage: index [options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">-d, --debug              output extra debugging</span><br><span class="line">-s, --small              small pizza size</span><br><span class="line">-p, --pizza-type &lt;type&gt;  flavour of pizza</span><br><span class="line">-h, --help               output usage information</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改 index.js</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 修改后然后运行  node index -h 就会显示你修改的内容</span><br><span class="line">const program = require(&apos;commander&apos;);</span><br><span class="line"></span><br><span class="line">program</span><br><span class="line">.option(&apos;-x, --xxx&apos;, &apos;what the x&apos;)</span><br><span class="line"></span><br><span class="line">program.parse(process.argv);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>继续抄文档， 实现一个子命令</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">const program = require(&apos;commander&apos;);</span><br><span class="line"></span><br><span class="line">// 设置它的选项</span><br><span class="line">program</span><br><span class="line">.option(&apos;-x, --xxx&apos;, &apos;what the x&apos;)</span><br><span class="line"></span><br><span class="line">// 设置子命令</span><br><span class="line">program</span><br><span class="line">.command(&apos;add &lt;taskName&gt;&apos;)</span><br><span class="line">.description(&apos;add a task&apos;)</span><br><span class="line">.action((x,y) =&gt; &#123;</span><br><span class="line">    console.log(x)</span><br><span class="line">    console.log(y)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">program.parse(process.argv);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 运行 node index add  会提示缺少一个 taskName</span><br><span class="line"></span><br><span class="line">// 运行 node index add aa  打印 </span><br><span class="line">aa</span><br><span class="line">Command &#123;</span><br><span class="line">commands: [],</span><br><span class="line">options: [],</span><br><span class="line">_execs: Set &#123;&#125;,</span><br><span class="line">_allowUnknownOption: false,</span><br><span class="line">_args: [ &#123; required: true, name: &apos;taskName&apos;, variadic: false &#125; ],</span><br><span class="line">_name: &apos;add&apos;,</span><br><span class="line">_optionValues: &#123;&#125;,</span><br><span class="line">_storeOptionsAsProperties: true,</span><br><span class="line">_passCommandToAction: true,</span><br><span class="line">_actionResults: [],</span><br><span class="line">_helpFlags: &apos;-h, --help&apos;,</span><br><span class="line">_helpDescription: &apos;output usage information&apos;,</span><br><span class="line">_helpShortFlag: &apos;-h&apos;,</span><br><span class="line">_helpLongFlag: &apos;--help&apos;,</span><br><span class="line">_noHelp: false,</span><br><span class="line">_exitCallback: undefined,</span><br><span class="line">_executableFile: undefined,</span><br><span class="line">parent: Command &#123;</span><br><span class="line">    commands: [ [Circular] ],</span><br><span class="line">    options: [ [Option] ],</span><br><span class="line">    _execs: Set &#123;&#125;,</span><br><span class="line">    _allowUnknownOption: false,</span><br><span class="line">    _args: [],</span><br><span class="line">    _name: &apos;index&apos;,</span><br><span class="line">    _optionValues: &#123;&#125;,</span><br><span class="line">    _storeOptionsAsProperties: true,</span><br><span class="line">    _passCommandToAction: true,</span><br><span class="line">    _actionResults: [],</span><br><span class="line">    _helpFlags: &apos;-h, --help&apos;,</span><br><span class="line">    _helpDescription: &apos;output usage information&apos;,</span><br><span class="line">    _helpShortFlag: &apos;-h&apos;,</span><br><span class="line">    _helpLongFlag: &apos;--help&apos;,</span><br><span class="line">    Command: [Function: Command],</span><br><span class="line">    Option: [Function: Option],</span><br><span class="line">    CommanderError: [Function: CommanderError],</span><br><span class="line">    _events: [Object: null prototype] &#123;</span><br><span class="line">    &apos;option:xxx&apos;: [Function],</span><br><span class="line">    &apos;command:add&apos;: [Function: listener]</span><br><span class="line">    &#125;,</span><br><span class="line">    _eventsCount: 2,</span><br><span class="line">    rawArgs: [</span><br><span class="line">    &apos;/Users/hjx/.nvm/versions/node/v12.14.1/bin/node&apos;,</span><br><span class="line">    &apos;/Users/hjx/Desktop/node-todo-1/index.js&apos;,</span><br><span class="line">    &apos;add&apos;,</span><br><span class="line">    &apos;aa&apos;,</span><br><span class="line">    &apos;bb&apos;,</span><br><span class="line">    &apos;cc&apos;</span><br><span class="line">    ],</span><br><span class="line">    args: [ &apos;aa&apos;, &apos;bb&apos;, &apos;cc&apos; ]</span><br><span class="line">&#125;,</span><br><span class="line">_description: &apos;add a task&apos;,</span><br><span class="line">_argsDescription: undefined</span><br><span class="line">&#125;</span><br><span class="line">// 你就可以自己领会了</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>index.js</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">const program = require(&apos;commander&apos;);</span><br><span class="line"></span><br><span class="line">// 设置它的选项</span><br><span class="line">program</span><br><span class="line">.option(&apos;-x, --xxx&apos;, &apos;what the x&apos;)</span><br><span class="line"></span><br><span class="line">// 设置子命令</span><br><span class="line">program</span><br><span class="line">  .command(&apos;add &lt;taskName&gt;&apos;)</span><br><span class="line">  .description(&apos;add a task&apos;)</span><br><span class="line">  .action((firstArg,info) =&gt; &#123;</span><br><span class="line">      let args = info.parent.args;</span><br><span class="line">      console.log(args);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">program.parse(process.argv);</span><br><span class="line"></span><br><span class="line">// node index aa bb cc dd</span><br><span class="line">// 打印 aa bb cc dd</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>003 修改目录结构</p>
+</blockquote>
+<p>cli.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">const program = require(&apos;commander&apos;);</span><br><span class="line">const api = require(&apos;./index.js&apos;)</span><br><span class="line">// 设置它的选项</span><br><span class="line">program</span><br><span class="line">.option(&apos;-x, --xxx&apos;, &apos;what the x&apos;)</span><br><span class="line"></span><br><span class="line">// 设置子命令</span><br><span class="line">program</span><br><span class="line">  .command(&apos;add &lt;taskName&gt;&apos;)</span><br><span class="line">  .description(&apos;add a task&apos;)</span><br><span class="line">  .action((firstArg,info) =&gt; &#123;</span><br><span class="line">      let words = info.parent.args;</span><br><span class="line">      console.log(words);</span><br><span class="line">      api.add(words);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">program</span><br><span class="line">  .command(&apos;clear&apos;)</span><br><span class="line">  .description(&apos;clear all tasks&apos;)</span><br><span class="line">  .action(() =&gt; &#123;</span><br><span class="line">      console.log(&apos;this is clear&apos;);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">program.parse(process.argv);</span><br></pre></td></tr></table></figure>
+<p>index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">module.exports.add = (title)=&gt;&#123;</span><br><span class="line">    console.log(&apos;add &apos; + title);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行 <code>node cli add aa bb cc</code> 会显示相应的任务被添加</p>
+<blockquote>
+<p>004 持久化任务内容</p>
+</blockquote>
+<ul>
+<li>但是没有数据库～</li>
+<li>使用一个文件吧！ 存到用户home目录里 打算存在<code>~/</code></li>
+<li>google 搜索 <code>nodejs get home directory</code></li>
+<li>得到答案<code>const homedir = require(&#39;os&#39;).homedir()</code></li>
+<li><p>获取用户设置的 home 目录 <code>const home = process.env.HOME</code></p>
+</li>
+<li><p>修改 index.js</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const homedir = require(&apos;os&apos;).homedir()</span><br><span class="line">const home = process.env.HOME || homedir;</span><br><span class="line">module.exports.add = (title)=&gt;&#123;</span><br><span class="line">    console.log(&apos;add &apos; + title);</span><br><span class="line">    // 读取之前的任务</span><br><span class="line">    fs.readFile(dbPath,&#123;&#125;);</span><br><span class="line">    // 往里面添加一个任务</span><br><span class="line">    // 存储任务到文件</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>005 如何拼目录 path</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 专门用来拼路径的 windows 是 \  mac 是 /</span><br><span class="line">const p = require(&apos;path&apos;);</span><br><span class="line">const dbPath = p.join(目录,目录&apos;);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>006 利用<a href="https://devdocs.io/" target="_blank" rel="noopener">https://devdocs.io/</a>查fs模块使用</p>
+</blockquote>
+<ul>
+<li>搜索 fs.readFile 查看api </li>
+<li>看到 参数里 options 有个 flag 点进去</li>
+<li>得到各种模式 <code>a / ax / a+ ...</code></li>
+</ul>
+<blockquote>
+<p>007 实现创建任务功能</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">const homedir = require(&apos;os&apos;).homedir()</span><br><span class="line">const home = process.env.HOME || homedir;</span><br><span class="line">// 专门用来拼路径的 windows 是 \  mac 是 /</span><br><span class="line">const p = require(&apos;path&apos;);</span><br><span class="line">const dbPath = p.join(home,&apos;.todo&apos;);</span><br><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line"></span><br><span class="line">module.exports.add = (title)=&gt;&#123;</span><br><span class="line">    // 读取之前的任务</span><br><span class="line">    fs.readFile(dbPath,&#123;flag:&apos;a+&apos;&#125;,(error,data)=&gt;&#123;</span><br><span class="line">        if(error)&#123;</span><br><span class="line">            console.log(error)</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            let list;</span><br><span class="line">            try&#123;</span><br><span class="line">                list = JSON.parse(data.toString())</span><br><span class="line">            &#125;catch(error2)&#123;</span><br><span class="line">                list = []</span><br><span class="line">            &#125;</span><br><span class="line">            const task = &#123;</span><br><span class="line">                title: title,</span><br><span class="line">                done: false</span><br><span class="line">            &#125;</span><br><span class="line">            list.push(task);</span><br><span class="line">            const string = JSON.stringify(list);</span><br><span class="line">            fs.writeFile(dbPath,string + &quot;\n&quot;,(error3)=&gt;&#123;</span><br><span class="line">                if(error3)&#123;</span><br><span class="line">                    console.log(error3)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            console.log(list)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    // 往里面添加一个任务</span><br><span class="line">    // 存储任务到文件</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>007 优化代码 <strong>面向接口编程</strong></p>
+</blockquote>
+<p>index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const db = require(&apos;./db.js&apos;);</span><br><span class="line"></span><br><span class="line">module.exports.add = async (title) =&gt;&#123;</span><br><span class="line">    // 读取之前的任务</span><br><span class="line">    const list = await db.read();</span><br><span class="line">    // 往里面添加一个任务</span><br><span class="line">    list.push(&#123;title,done:false&#125;);</span><br><span class="line">    // 存储任务到文件</span><br><span class="line">    await db.write(list);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>db.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">const homedir = require(&apos;os&apos;).homedir()</span><br><span class="line">const home = process.env.HOME || homedir;</span><br><span class="line">// 专门用来拼路径的 windows 是 \  mac 是 /</span><br><span class="line">const p = require(&apos;path&apos;);</span><br><span class="line">const dbPath = p.join(home,&apos;.todo&apos;);</span><br><span class="line">const fs = require(&apos;fs&apos;);</span><br><span class="line"></span><br><span class="line">const db = &#123;</span><br><span class="line">    read(path = dbPath)&#123;</span><br><span class="line">        return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">            fs.readFile(path,&#123;flag:&apos;a+&apos;&#125;,(error,data)=&gt;&#123;</span><br><span class="line">                if(error)&#123; return reject(error); &#125;</span><br><span class="line">                let list;</span><br><span class="line">                try&#123;</span><br><span class="line">                    list = JSON.parse(data.toString())</span><br><span class="line">                &#125;catch(error2)&#123;</span><br><span class="line">                    list = []</span><br><span class="line">                &#125;</span><br><span class="line">                resolve(list);</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;)   </span><br><span class="line">    &#125;,</span><br><span class="line">    write(list, path = dbPath)&#123;</span><br><span class="line">        return new Promise((resolve,reject)=&gt;&#123;</span><br><span class="line">            const string = JSON.stringify(list);</span><br><span class="line">            fs.writeFile(path,string + &quot;\n&quot;,(error)=&gt;&#123;</span><br><span class="line">                if(error)&#123; return reject(error); &#125;</span><br><span class="line">                resolve(); </span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;)</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module.exports = db;</span><br></pre></td></tr></table></figure>
+<h3 id="代码仓库"><a href="#代码仓库" class="headerlink" title="代码仓库"></a>代码仓库</h3><ul>
+<li><a href="https://github.com/slTrust/node-todo-1/tree/4e6810251dc4aa880d96c660d435b7487c7d7cb5" target="_blank" rel="noopener">https://github.com/slTrust/node-todo-1/tree/4e6810251dc4aa880d96c660d435b7487c7d7cb5</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/08/Node全解02-01node命令行程序/" data-id="cklhjlfe000b2oyfy3qdl43dg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node全解01-02如何学习Node" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/03/07/Node全解01-02如何学习Node/" class="article-date">
@@ -167,7 +286,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/07/Node全解01-02如何学习Node/" data-id="cklhgt2qn00b8q1fy94g5fdpf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/07/Node全解01-02如何学习Node/" data-id="cklhjlfdz00azoyfyf2kj21y6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -352,7 +471,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/07/Node全解01-01Node简介/" data-id="cklhgt2qn00b6q1fyuaowwga8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/07/Node全解01-01Node简介/" data-id="cklhjlfdx00auoyfylvkwvtic" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -521,7 +640,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/06/Node-JS专精13-02继承和组合/" data-id="cklhgt2q600a2q1fy3hpygvuc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/06/Node-JS专精13-02继承和组合/" data-id="cklhjlfdb009royfyic4wn2hu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -623,7 +742,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/06/Node-JS专精13-01类/" data-id="cklhgt2q3009vq1fy3jdjr2aa" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/06/Node-JS专精13-01类/" data-id="cklhjlfda009poyfydghb6ci0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -817,7 +936,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/05/Node-JS专精12-01Eventloop/" data-id="cklhgt2q4009xq1fyxh7etgp9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/05/Node-JS专精12-01Eventloop/" data-id="cklhjlfda009noyfyfh47rrvk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -892,7 +1011,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-04async-await问题/" data-id="cklhgt2q2009sq1fy69iu195l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-04async-await问题/" data-id="cklhjlfd8009joyfysf5m5ej2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1015,7 +1134,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-03async-await/" data-id="cklhgt2q1009qq1fyczcy1gkg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-03async-await/" data-id="cklhjlfd7009hoyfyzir8p1zn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1128,7 +1247,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-02Promise使用场景/" data-id="cklhgt2q0009nq1fyj31shncp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-02Promise使用场景/" data-id="cklhjlfd9009loyfyah3yobai" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1235,96 +1354,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-01Promise精讲/" data-id="cklhgt2pz009lq1fyexekqqg6" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-JS专精10-02在浏览器支持nextTick" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/" class="article-date">
-  <time datetime="2020-03-03T14:41:09.000Z" itemprop="datePublished">2020-03-03</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/">Node-JS专精10_02在浏览器支持nextTick</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="代码仓库"><a href="#代码仓库" class="headerlink" title="代码仓库"></a><a href="https://github.com/slTrust/promise-2/tree/58a31c016d2f5e6d38cf763c5db98ea0cd061b79" target="_blank" rel="noopener">代码仓库</a></h3><blockquote>
-<h4 id="我们使用了-process-nextTick-代替-setTimeout"><a href="#我们使用了-process-nextTick-代替-setTimeout" class="headerlink" title="我们使用了 process.nextTick 代替 setTimeout"></a>我们使用了 process.nextTick 代替 setTimeout</h4></blockquote>
-<ul>
-<li>浏览器不支持 nextTick</li>
-<li>如果你用过vue, 你知道vue提供了一个 nextTick,那么 vue是如何做到即支持 node又支持 浏览器呢？<ul>
-<li><a href="https://juejin.im/entry/5aced80b518825482e39441e" target="_blank" rel="noopener">参考链接:全面解析Vue.nextTick实现原理</a></li>
-<li>通过他的文章我们知道有 MutationObserver 这么一个东西，它比 setTimeout 的优先级更高</li>
-<li>看看它的API<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver" target="_blank" rel="noopener">MutationObserver mdn</a></li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<h4 id="MutationObserver"><a href="#MutationObserver" class="headerlink" title="MutationObserver"></a>MutationObserver</h4></blockquote>
-<p>它本来是监听 DOM树 的更新的，它有一个特别厉害的地方就是 当DOM树更新就会调用一个异步的回调，而这个回调的优先级比 setTimeout 要高</p>
-<p><strong>示例代码</strong></p>
-<ul>
-<li>你可以拷贝代码在 <a href="https://jsbin.com/" target="_blank" rel="noopener">jsbin里运行</a></li>
-<li>通过实例可以看到无论 setTimeout 在 span改变之前还是之后都没 MutationObserver 的优先级高</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;span id=&quot;aaa&quot;&gt;1&lt;/span&gt;</span><br><span class="line">  &lt;br&gt;</span><br><span class="line">  &lt;button id=&quot;btn&quot;&gt;+1&lt;/button&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line">  </span><br><span class="line">  var span = document.getElementById(&apos;aaa&apos;);</span><br><span class="line"></span><br><span class="line">  var config = &#123; attributes: true, childList: true, subtree: true &#125;;</span><br><span class="line"></span><br><span class="line">  var callback = function() &#123;</span><br><span class="line">      console.log(&quot;observer&quot;)</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  var observer = new MutationObserver(callback);</span><br><span class="line">  observer.observe(span, config);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  btn.onclick = function()&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;)&#125;,0)</span><br><span class="line">    span.innerText += &quot;s&quot;;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;)&#125;,0)</span><br><span class="line">  &#125;</span><br><span class="line">  /*</span><br><span class="line">  每次点击button 始终打印</span><br><span class="line">  observer</span><br><span class="line">  timeout1</span><br><span class="line">  timeout2</span><br><span class="line">  */</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>我们自己实现一个 nextTick</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;button id=&quot;btn&quot;&gt;+1&lt;/button&gt;</span><br><span class="line">  &lt;script&gt;</span><br><span class="line"> </span><br><span class="line">  btn.onclick = function()&#123;</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout1&quot;)&#125;,0)</span><br><span class="line">    nextTick(()=&gt;&#123;console.log(&quot;nextTick&quot;)&#125;)</span><br><span class="line">    setTimeout(()=&gt;&#123;console.log(&quot;timeout2&quot;)&#125;,0)</span><br><span class="line">  &#125;</span><br><span class="line">  /*</span><br><span class="line">  每次点击button 始终打印</span><br><span class="line">  nextTick</span><br><span class="line">  timeout1</span><br><span class="line">  timeout2</span><br><span class="line">  */</span><br><span class="line">  </span><br><span class="line">  function nextTick(fn)&#123;</span><br><span class="line">    var counter = 1</span><br><span class="line">    var observer = new MutationObserver(fn)</span><br><span class="line">    var textNode = document.createTextNode(String(counter))</span><br><span class="line">    observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line"></span><br><span class="line">    // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">    counter = counter + 1</span><br><span class="line">    textNode.data = String(counter)</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h4 id="兼容node和浏览器的nextTick"><a href="#兼容node和浏览器的nextTick" class="headerlink" title="兼容node和浏览器的nextTick"></a>兼容node和浏览器的nextTick</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function nextTick(fn)&#123;</span><br><span class="line">    if( process !== undefined &amp;&amp; typeof process.nextTick === &apos;function&apos;)&#123;</span><br><span class="line">        return process.nextTick(fn);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        var counter = 1</span><br><span class="line">        var observer = new MutationObserver(fn)</span><br><span class="line">        var textNode = document.createTextNode(String(counter))</span><br><span class="line">        observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line">        // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">        counter = counter + 1</span><br><span class="line">        textNode.data = String(counter)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="代码仓库-1"><a href="#代码仓库-1" class="headerlink" title="代码仓库"></a>代码仓库</h4><ul>
-<li><a href="https://github.com/slTrust/promise-2/tree/72c88d0b1bb1ea257da8529bfaeda61938b9cb32" target="_blank" rel="noopener">https://github.com/slTrust/promise-2/</a></li>
-</ul>
-<h3 id="重构代码"><a href="#重构代码" class="headerlink" title="重构代码"></a>重构代码</h3><ul>
-<li>注意每次优化都跑一下测试用例保证代码正确性</li>
-<li>注意每次优化都跑一下测试用例保证代码正确性</li>
-<li>注意每次优化都跑一下测试用例保证代码正确性</li>
-</ul>
-<p>src/promise.ts</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line">class Promise2&#123;</span><br><span class="line">    state = &quot;pending&quot;;</span><br><span class="line">    callbacks = [];</span><br><span class="line">    private resolveOrReject(state, data, i)&#123;</span><br><span class="line">        if(this.state !== &quot;pending&quot;) return;</span><br><span class="line">        this.state = state;</span><br><span class="line">        nextTick(() =&gt; &#123;</span><br><span class="line">            this.callbacks.forEach(handle=&gt;&#123;</span><br><span class="line">                if(typeof handle[i] === &quot;function&quot;)&#123;</span><br><span class="line">                    let x;</span><br><span class="line">                    try &#123;</span><br><span class="line">                        x = handle[i].call(undefined,data);</span><br><span class="line">                    &#125; catch (e) &#123;</span><br><span class="line">                        return handle[2].reject(e);</span><br><span class="line">                    &#125;</span><br><span class="line">                    handle[2].resolveWith(x);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)  </span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    resolve(result)&#123;</span><br><span class="line">        this.resolveOrReject(&quot;fulfilled&quot;,result,0);</span><br><span class="line">    &#125;</span><br><span class="line">    reject(reason)&#123;</span><br><span class="line">        this.resolveOrReject(&quot;rejected&quot;,reason,1);</span><br><span class="line">    &#125;</span><br><span class="line">    constructor(fn)&#123;</span><br><span class="line">        if(typeof fn !== &apos;function&apos;)&#123;</span><br><span class="line">            throw new Error(&quot;我只接受函数&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">       </span><br><span class="line">        fn(this.resolve.bind(this), this.reject.bind(this));</span><br><span class="line">    &#125;</span><br><span class="line">    then(succeed?,fail?)&#123;</span><br><span class="line">        // handle除了记录成功和失败 还要记录成功和失败的后续</span><br><span class="line">        const handle = [];</span><br><span class="line">        if(typeof succeed === &apos;function&apos;)&#123;</span><br><span class="line">            handle[0] = succeed;</span><br><span class="line">        &#125;</span><br><span class="line">        if(typeof fail === &apos;function&apos;)&#123;</span><br><span class="line">            handle[1] = fail;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 记录then之后的后续</span><br><span class="line">        handle[2] = new Promise2(()=&gt;&#123;&#125;);</span><br><span class="line">        </span><br><span class="line">        this.callbacks.push(handle); </span><br><span class="line">        // 把函数推进 callBacks 里面</span><br><span class="line"></span><br><span class="line">        return handle[2];</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithSelf()&#123;</span><br><span class="line">        this.reject(new TypeError())</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithPromise(x)&#123;</span><br><span class="line">        x.then(</span><br><span class="line">            (result)=&gt;&#123;</span><br><span class="line">                this.resolve(result)</span><br><span class="line">            &#125;,</span><br><span class="line">            (reason)=&gt;&#123;</span><br><span class="line">                this.reject(reason)</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">    private getThen(x)&#123;</span><br><span class="line">        let then;</span><br><span class="line">        try&#123;</span><br><span class="line">            then = x.then;</span><br><span class="line">        &#125;catch(e)&#123;</span><br><span class="line">            return this.reject(e);</span><br><span class="line">        &#125;</span><br><span class="line">        return then;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithThenable(x)&#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            x.then(</span><br><span class="line">                y =&gt; &#123;</span><br><span class="line">                this.resolveWith(y)</span><br><span class="line">                &#125;,</span><br><span class="line">                r =&gt;&#123;</span><br><span class="line">                    this.reject(r);</span><br><span class="line">                &#125;</span><br><span class="line">            );</span><br><span class="line">        &#125; catch (error) &#123;</span><br><span class="line">            this.reject(error)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWithObject(x)&#123;</span><br><span class="line">        let then = this.getThen(x);</span><br><span class="line">        if(then instanceof Function)&#123;</span><br><span class="line">            this.resolveWithThenable(x);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            this.resolve(x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    resolveWith(x)&#123;</span><br><span class="line">        if( this === x)&#123;</span><br><span class="line">           this.resolveWithSelf();</span><br><span class="line">        &#125; else if ( x instanceof Promise2)&#123;</span><br><span class="line">            this.resolveWithPromise(x);</span><br><span class="line">        &#125; else if ( x instanceof Object)&#123;</span><br><span class="line">            this.resolveWithObject(x);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            this.resolve(x);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Promise2</span><br><span class="line"></span><br><span class="line">function nextTick(fn)&#123;</span><br><span class="line">    if( process !== undefined &amp;&amp; typeof process.nextTick === &apos;function&apos;)&#123;</span><br><span class="line">        return process.nextTick(fn);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        var counter = 1</span><br><span class="line">        var observer = new MutationObserver(fn)</span><br><span class="line">        var textNode = document.createTextNode(String(counter))</span><br><span class="line">        observer.observe(textNode, &#123;characterData: true&#125;)</span><br><span class="line">        // 更改文本内容触发 dom树更新 触发回调</span><br><span class="line">        counter = counter + 1</span><br><span class="line">        textNode.data = String(counter)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="区分宏任务和微任务"><a href="#区分宏任务和微任务" class="headerlink" title="区分宏任务和微任务"></a>区分宏任务和微任务</h3><blockquote>
-<p>MacroTask</p>
-</blockquote>
-<ul>
-<li>setTimeout</li>
-</ul>
-<blockquote>
-<p>MicroTask(优先级高)</p>
-</blockquote>
-<ul>
-<li>process.nextTick(nodeJS里用) / MutationObserver(浏览器里用)</li>
-<li>setImmediate(只能在IE浏览器里用，nodeJS虽然也有这个API但是兼容性不好)</li>
-</ul>
-<h4 id="整体完成后的代码"><a href="#整体完成后的代码" class="headerlink" title="整体完成后的代码"></a>整体完成后的代码</h4><ul>
-<li><a href="https://github.com/slTrust/promise-2" target="_blank" rel="noopener">https://github.com/slTrust/promise-2/</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/03/Node-JS专精10-02在浏览器支持nextTick/" data-id="cklhgt2px009gq1fyhri2za4j" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/04/Node-JS专精11-01Promise精讲/" data-id="cklhjlfd6009foyfyb0k1vitk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1364,7 +1394,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.75px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.17px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.25px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.33px;">M01</a> <a href="/tags/M02/" style="font-size: 15px;">M02</a> <a href="/tags/M03/" style="font-size: 15.83px;">M03</a> <a href="/tags/M04/" style="font-size: 16.25px;">M04</a> <a href="/tags/M06/" style="font-size: 18.33px;">M06</a> <a href="/tags/M07/" style="font-size: 17.92px;">M07</a> <a href="/tags/M08/" style="font-size: 17.08px;">M08</a> <a href="/tags/M09/" style="font-size: 11.67px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.42px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.75px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.67px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.58px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.42px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.92px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.08px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.17px;">java</a> <a href="/tags/linux/" style="font-size: 10.83px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.25px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.5px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10.42px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.5px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 12.92px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.58px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1386,6 +1416,10 @@
       <ul>
         
           <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
           </li>
         
@@ -1399,10 +1433,6 @@
         
           <li>
             <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-02服务器相关配置及使用/">Node-web05-07-02服务器相关配置及使用</a>
           </li>
         
       </ul>
