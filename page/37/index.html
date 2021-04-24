@@ -62,6 +62,321 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py003-02-03模拟ssh远程登录" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/09/Py003-02-03模拟ssh远程登录/" class="article-date">
+  <time datetime="2018-09-09T08:47:55.000Z" itemprop="datePublished">2018-09-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/09/Py003-02-03模拟ssh远程登录/">Py003-02-03模拟ssh远程登录</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="模拟ssh远程登录"><a href="#模拟ssh远程登录" class="headerlink" title="模拟ssh远程登录"></a>模拟ssh远程登录</h3><blockquote>
+<p>注意 window默认编码是gbk,linux默认是 utf-8</p>
+</blockquote>
+<p>服务端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line">import subprocess</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8082)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">while True: # 链接循环</span><br><span class="line">    conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">    while True: # 通讯循环</span><br><span class="line">        try:</span><br><span class="line">            # 1 接受命令</span><br><span class="line">            cmd = conn.recv(1024)</span><br><span class="line">            # 针对客户端中断问题</span><br><span class="line">            if not cmd:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">            # 2 执行命令，拿到结果</span><br><span class="line">            obj = subprocess.Popen(cmd.decode(&apos;gbk&apos;),shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)</span><br><span class="line">            stdout = obj.stdout.read().decode(&apos;gbk&apos;)</span><br><span class="line">            stderr = obj.stderr.read().decode(&apos;gbk&apos;)</span><br><span class="line">            # 3 把命令结果返回给客户端</span><br><span class="line">            data = stdout+stderr</span><br><span class="line">            print(len(data))</span><br><span class="line">            conn.send(data.encode(&apos;gbk&apos;))</span><br><span class="line">        except ConnectionResetError: # 适用于windows</span><br><span class="line">            break</span><br><span class="line">    conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8082)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    # 1 发命令</span><br><span class="line">    cmd = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    phone.send(cmd.encode(&apos;gbk&apos;))</span><br><span class="line">    # 2 拿到命令结果</span><br><span class="line">    data = phone.recv(1024) # 1024的坑</span><br><span class="line">    print(data.decode(&apos;gbk&apos;))</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<h4 id="1024的坑"><a href="#1024的坑" class="headerlink" title="1024的坑"></a>1024的坑</h4><p>如果命令的返回结果超过1024的话，就会有问题了。即——粘包</p>
+<p>我们知道结果保存在管道里，你内容超过1024的时候，多余的内容还在管道里</p>
+<blockquote>
+<p>所以当你输入 ipconfig 的时候假设结果为2024 那么还残留1000 在管道里，你再次输入其他命令如ls的时候会先把上次剩余的内容 返回。。。</p>
+</blockquote>
+<p>以上现象就是————————粘包</p>
+<h4 id="粘包的原理"><a href="#粘包的原理" class="headerlink" title="粘包的原理"></a>粘包的原理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. 不管是recv 和send都不是直接接受对方的数据，而是操作自己的操作系统内存---》不是一个send对应一个recv</span><br><span class="line">2.  recv:</span><br><span class="line">        wait data 耗时时间长</span><br><span class="line">        copy data</span><br><span class="line">    send:</span><br><span class="line">        copy data </span><br><span class="line">3.</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="粘包的触发条件"><a href="#粘包的触发条件" class="headerlink" title="粘包的触发条件"></a>粘包的触发条件</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line"></span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1024) # &apos;helloworld&apos;</span><br><span class="line">res2 = conn.recv(1024) # &apos;&apos;</span><br><span class="line">send间隔比较短,就会触发粘包，合并一次发送到服务端</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">time.sleep(5)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1024) # &apos;hello&apos;</span><br><span class="line">res2 = conn.recv(1024) # 5秒后 &apos;world&apos;</span><br><span class="line"></span><br><span class="line">send的间隔已经超过一次正常数据接受的时间。会分两次发送</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">客户端</span><br><span class="line">client.send(&apos;hello&apos;)</span><br><span class="line">time.sleep(5)</span><br><span class="line">client.send(&apos;world&apos;)</span><br><span class="line">服务端</span><br><span class="line">res1 = conn.recv(1) # &apos;h&apos;</span><br><span class="line">res2 = conn.recv(1024) # 5秒后 &apos;ellowworld&apos;</span><br><span class="line"></span><br><span class="line">服务端粘包：第一次内容过多，会在下次接受多余的</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/09/Py003-02-03模拟ssh远程登录/" data-id="cknvgpu0z00fz0xjp9rya8iq4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py003-02-02socket" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/09/Py003-02-02socket/" class="article-date">
+  <time datetime="2018-09-09T05:48:36.000Z" itemprop="datePublished">2018-09-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/09/Py003-02-02socket/">Py003-02-02socket</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><h4 id="简单例子-拨打电话"><a href="#简单例子-拨打电话" class="headerlink" title="简单例子 拨打电话"></a>简单例子 拨打电话</h4><p>服务端.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line"># 1 买手机</span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"># 2 绑定手机卡</span><br><span class="line"></span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"># 3 开机</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line"># 4 等电话打入</span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line"># 5 收发消息</span><br><span class="line"># 单位bytes 现在表示最大接受1024字节的数据</span><br><span class="line">data = conn.recv(1024) # 1024代表接受数据的最大数</span><br><span class="line">print(&apos;客户端的数据&apos;,data)</span><br><span class="line">conn.send(data.upper())</span><br><span class="line"></span><br><span class="line"># 6 挂电话</span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line"># 7 关机</span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<p>客户端.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line"># 1 买手机</span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line"># 2 拨号</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line"># 3 发/收消息</span><br><span class="line">phone.send(&apos;hello&apos;.encode(&apos;utf-8&apos;))</span><br><span class="line">data = phone.recv(1024)</span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line"># 4 关闭</span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<h4 id="通讯循环"><a href="#通讯循环" class="headerlink" title="通讯循环"></a>通讯循环</h4><p>服务端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">while True: # 通讯循环</span><br><span class="line">    data = conn.recv(1024)</span><br><span class="line">    print(&apos;客户端的数据&apos;,data)</span><br><span class="line">    conn.send(data.upper())</span><br><span class="line"></span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    msg = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    phone.send(msg.encode(&apos;utf-8&apos;))</span><br><span class="line">    data = phone.recv(1024)</span><br><span class="line">    print(data)</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<h4 id="重复启动服务端的bug"><a href="#重复启动服务端的bug" class="headerlink" title="重复启动服务端的bug"></a>重复启动服务端的bug</h4><p>因为端口重复占用，所以必须收到切换端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"># 添加这一行代表重用端口</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br></pre></td></tr></table></figure>
+<h4 id="客户端直接敲回车发数据的bug"><a href="#客户端直接敲回车发数据的bug" class="headerlink" title="客户端直接敲回车发数据的bug"></a>客户端直接敲回车发数据的bug</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">phone.connect((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">    msg = input(&apos;&gt;&gt;:&apos;).strip()</span><br><span class="line">    # bug解决</span><br><span class="line">    if not msg:continue</span><br><span class="line">    phone.send(msg.encode(&apos;utf-8&apos;))</span><br><span class="line">    data = phone.recv(1024)</span><br><span class="line">    print(data)</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<h4 id="客户端意外中断，服务器端在linux里会造成死循环的bug"><a href="#客户端意外中断，服务器端在linux里会造成死循环的bug" class="headerlink" title="客户端意外中断，服务器端在linux里会造成死循环的bug"></a>客户端意外中断，服务器端在linux里会造成死循环的bug</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">while True: # 通讯循环</span><br><span class="line">    try:</span><br><span class="line">        data = conn.recv(1024)</span><br><span class="line">        # 针对客户端中断问题</span><br><span class="line">        if not data:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">        print(&apos;客户端的数据&apos;,data)</span><br><span class="line">        conn.send(data.upper())</span><br><span class="line">    except ConnectionResetError: # 适用于windows</span><br><span class="line">        break</span><br><span class="line"></span><br><span class="line">conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<h4 id="在不会并发的情况下——一个一个的服务用户"><a href="#在不会并发的情况下——一个一个的服务用户" class="headerlink" title="在不会并发的情况下——一个一个的服务用户"></a>在不会并发的情况下——一个一个的服务用户</h4><p>服务端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">phone = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line">phone.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)</span><br><span class="line">phone.bind((&apos;127.0.0.1&apos;,8081)) # ip 加端口号</span><br><span class="line">phone.listen(5) # 5代表最大链接数</span><br><span class="line"></span><br><span class="line">print(&apos;starting....&apos;)</span><br><span class="line">while True: # 链接循环</span><br><span class="line">    conn,client_addr = phone.accept()</span><br><span class="line"></span><br><span class="line">    while True: # 通讯循环</span><br><span class="line">        try:</span><br><span class="line">            data = conn.recv(1024)</span><br><span class="line">            # 针对客户端中断问题</span><br><span class="line">            if not data:break # 适用于linux　如果是windows就 try catch</span><br><span class="line">            print(&apos;客户端的数据&apos;,data)</span><br><span class="line">            conn.send(data.upper())</span><br><span class="line">        except ConnectionResetError: # 适用于windows</span><br><span class="line">            break</span><br><span class="line">    conn.close()</span><br><span class="line"></span><br><span class="line">phone.close()</span><br></pre></td></tr></table></figure>
+<p>服务一个客户就要把对应客户端终止才能服务下一个客户</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/09/Py003-02-02socket/" data-id="cknvgpu1000g10xjp4rzpbh36" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py003-02-01网络" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/09/Py003-02-01网络/" class="article-date">
+  <time datetime="2018-09-09T05:02:29.000Z" itemprop="datePublished">2018-09-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/09/Py003-02-01网络/">Py003-02-01网络</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="网络协议"><a href="#网络协议" class="headerlink" title="网络协议"></a>网络协议</h3><blockquote>
+<p>os七层：</p>
+</blockquote>
+<ul>
+<li>应——应用层</li>
+<li>表——表示层</li>
+<li>会——会话层</li>
+<li>传——传输层</li>
+<li>网——网络层</li>
+<li>数——数据链路层</li>
+<li>物——物理层</li>
+</ul>
+<blockquote>
+<p>也叫五层协议</p>
+</blockquote>
+<p>把 应用层/表示层/会话层 统一表示为——应用层</p>
+<h4 id="五层协议详解"><a href="#五层协议详解" class="headerlink" title="五层协议详解"></a>五层协议详解</h4><blockquote>
+<p>数据报：有报头和报文   报头代表头信息 报文是实际的数据内容</p>
+</blockquote>
+<ul>
+<li>物理层</li>
+</ul>
+<p>物理设备，负责发电信号——形如01010101的二进制内容通过网线</p>
+<ul>
+<li>数据链路层</li>
+</ul>
+<p>以太网协议：一组数据帧称为一个数据报，基于mac地址以广播的形式(只能在局域网里)</p>
+<ul>
+<li>网络层</li>
+</ul>
+<p>以太网通过mac只能表示同一局域网的一台机子</p>
+<p>而ip地址可以标识一个子网的地址</p>
+<p>IP协议：也是数据报的形式：形如 ip头+data</p>
+<p>最后ip+mac就可以标识全世界独一无二的一台机器</p>
+<ul>
+<li>传输层</li>
+</ul>
+<p>tcp/udp</p>
+<ul>
+<li>应用层</li>
+</ul>
+<p>各种软件自己的协议  http/ftp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">客户端:                                                     服务端：</span><br><span class="line">应用层   http头 + data                                      应用层   http头 + data </span><br><span class="line">↓封包                                                       ↑解包</span><br><span class="line">传输层   tcp头 + (http头 + data)                            传输层   tcp头 + (http头 + data)</span><br><span class="line">↓封包                                                       ↑解包 </span><br><span class="line">网络层   ip头 + (tcp头 + (http头 + data))                    网络层   ip头 + (tcp头 + (http头 + data))</span><br><span class="line">↓封包                                                       ↑解包 </span><br><span class="line">数据链路层 以太网头 + (ip头 + (tcp头 + (http头 + data)))      数据链路层 以太网头 + (ip头 + (tcp头 + (http头 + data)))</span><br><span class="line">↓                                                           ↑</span><br><span class="line">物理层                                                      物理层 </span><br><span class="line">↓                                                           ↑</span><br><span class="line">    →→→→→→→→→→→→→→→→→→→→→→→→网络→→→→→→→→→→→→→→→→→→→→→→→→</span><br></pre></td></tr></table></figure>
+<h4 id="tcp三次握手"><a href="#tcp三次握手" class="headerlink" title="tcp三次握手"></a>tcp三次握手</h4><ol>
+<li>客户端：我能连接你吗？</li>
+<li>服务端：我准备好了，你连接吧！</li>
+<li>客户端：好！我连接你了</li>
+</ol>
+<h4 id="tcp协议-udp协议"><a href="#tcp协议-udp协议" class="headerlink" title="tcp协议/udp协议"></a>tcp协议/udp协议</h4><p>tcp协议</p>
+<ul>
+<li>可靠的：面向连接，双向通道</li>
+<li>传输速度慢</li>
+</ul>
+<p>生活的实例：你往水里扔石头看见了浪花</p>
+<p>udp协议</p>
+<ul>
+<li>不可靠：不面向连接</li>
+<li>直接发送数据是否收到数据未知，数据可能丢</li>
+<li>传输速度快</li>
+</ul>
+<p>生活的实例：你往草里扔石头没啥反应</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/09/Py003-02-01网络/" data-id="cknvgpu1400g90xjpwukyv8wa" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py003-01-15异常操作方式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/09/Py003-01-15异常操作方式/" class="article-date">
+  <time datetime="2018-09-09T03:19:02.000Z" itemprop="datePublished">2018-09-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/09/Py003-01-15异常操作方式/">Py003-01-15异常操作方式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="异常的处理"><a href="#异常的处理" class="headerlink" title="异常的处理"></a>异常的处理</h3><h4 id="多分支"><a href="#多分支" class="headerlink" title="多分支"></a>多分支</h4><blockquote>
+<p>被监测的代码块抛出的异常有多种可能性，并且我们需要针对每一种异常类型都定制专门的处理逻辑</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="万能异常：Exception"><a href="#万能异常：Exception" class="headerlink" title="万能异常：Exception"></a>万能异常：Exception</h4><ul>
+<li>被监测的代码块抛出的异常有多种可能性，</li>
+<li>并且我们针对所有的异常类型都只用一种处理逻辑就可以了，那就使用Exception</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;异常发生啦：&apos;,e)</span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;统一的处理方法&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="其他结构"><a href="#其他结构" class="headerlink" title="其他结构"></a>其他结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    print(&apos;===&gt;1&apos;)</span><br><span class="line">    # name</span><br><span class="line">    print(&apos;===&gt;2&apos;)</span><br><span class="line">    l=[1,2,3]</span><br><span class="line">    # l[100]</span><br><span class="line">    print(&apos;===&gt;3&apos;)</span><br><span class="line">    d=&#123;&#125;</span><br><span class="line">    d[&apos;name&apos;]</span><br><span class="line">    print(&apos;===&gt;4&apos;)</span><br><span class="line"></span><br><span class="line">except NameError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except IndexError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except KeyError as e:</span><br><span class="line">    print(&apos;---&gt;&apos;,e)</span><br><span class="line"></span><br><span class="line">except Exception as e:</span><br><span class="line">    print(&apos;统一的处理方法&apos;)</span><br><span class="line"></span><br><span class="line">else:</span><br><span class="line">    print(&apos;在被检测的代码块没有发生异常时执行&apos;)</span><br><span class="line"></span><br><span class="line">finally:</span><br><span class="line">    print(&apos;不管被检测的代码块有无发生异常都会执行&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;afer code&apos;)</span><br><span class="line"></span><br><span class="line"># 回收资源</span><br><span class="line"></span><br><span class="line">try:</span><br><span class="line">    f=open(&apos;a.txt&apos;,&apos;r&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line"></span><br><span class="line">    print(next(f))</span><br><span class="line">    print(next(f))</span><br><span class="line">finally:</span><br><span class="line">    f.close()</span><br></pre></td></tr></table></figure>
+<h4 id="主动触发异常：raise-异常类型-值"><a href="#主动触发异常：raise-异常类型-值" class="headerlink" title="主动触发异常：raise  异常类型(值)"></a>主动触发异常：raise  异常类型(值)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age):</span><br><span class="line">        if not isinstance(name,str):</span><br><span class="line">            raise TypeError(&apos;名字必须传入str类型&apos;)</span><br><span class="line">        if not isinstance(age,int):</span><br><span class="line">            raise TypeError(&apos;年龄必须传入int类型&apos;)</span><br><span class="line">        self.name=name</span><br><span class="line">        self.age=age</span><br><span class="line"></span><br><span class="line">p=People(&apos;egon&apos;,18)</span><br></pre></td></tr></table></figure>
+<h4 id="自定义异常类型"><a href="#自定义异常类型" class="headerlink" title="自定义异常类型"></a>自定义异常类型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class MyException(BaseException):</span><br><span class="line">    def __init__(self,msg):</span><br><span class="line">        super(MyException,self).__init__()</span><br><span class="line">        self.msg=msg</span><br><span class="line"></span><br><span class="line">    def __str__(self):</span><br><span class="line">        return &apos;&lt;%s&gt;&apos; %self.msg</span><br><span class="line"></span><br><span class="line">raise MyException(&apos;我自己的异常类型&apos;) #print(obj)</span><br></pre></td></tr></table></figure>
+<h4 id="断言assert"><a href="#断言assert" class="headerlink" title="断言assert"></a>断言assert</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">info=&#123;&#125;</span><br><span class="line">info[&apos;name&apos;]=&apos;hjx&apos;</span><br><span class="line"># info[&apos;age&apos;]=18</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># if &apos;name&apos; not in info:</span><br><span class="line">#     raise KeyError(&apos;必须有name这个key&apos;)</span><br><span class="line">#</span><br><span class="line"># if &apos;age&apos; not in info:</span><br><span class="line">#     raise KeyError(&apos;必须有age这个key&apos;)</span><br><span class="line"></span><br><span class="line">assert (&apos;name&apos; in info) and (&apos;age&apos; in info)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if info[&apos;name&apos;] == &apos;hjx&apos; and info[&apos;age&apos;] &gt; 10:</span><br><span class="line">    print(&apos;welcome&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="万能异常-铁定不出错"><a href="#万能异常-铁定不出错" class="headerlink" title="万能异常(铁定不出错)"></a>万能异常(铁定不出错)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">except Exception:</span><br><span class="line">    pass</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-15异常操作方式/" data-id="cknvgpu0w00ft0xjpf8vxgnql" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py003-01-14异常处理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/09/Py003-01-14异常处理/" class="article-date">
+  <time datetime="2018-09-09T03:18:02.000Z" itemprop="datePublished">2018-09-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/09/Py003-01-14异常处理/">Py003-01-14异常处理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="什么是异常"><a href="#什么是异常" class="headerlink" title="什么是异常"></a>什么是异常</h3><blockquote>
+<p>异常是错误发生的信号，一旦程序出错，并且程序没有处理这个错误，那个就会抛出异常，并且程序的运行随之终止</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">print(&apos;1&apos;)</span><br><span class="line">print(&apos;2&apos;)</span><br><span class="line">print(&apos;3&apos;)</span><br><span class="line">int(&apos;aaaa&apos;)</span><br><span class="line">print(&apos;4&apos;)</span><br><span class="line">print(&apos;5&apos;)</span><br><span class="line">print(&apos;6&apos;)</span><br></pre></td></tr></table></figure>
+<h4 id="错误分为两种："><a href="#错误分为两种：" class="headerlink" title="错误分为两种："></a>错误分为两种：</h4><ul>
+<li>语法错误:在程序执行前就要立刻改正过来</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(&apos;xxxx&apos;</span><br><span class="line">if 1 &gt; 2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>逻辑错误</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#ValueError</span><br><span class="line"># int(&apos;aaa&apos;)</span><br><span class="line"></span><br><span class="line">#NameError</span><br><span class="line"># name</span><br><span class="line"></span><br><span class="line">#IndexError</span><br><span class="line"># l=[1,2,3]</span><br><span class="line"># l[1000]</span><br><span class="line"></span><br><span class="line">#KeyError</span><br><span class="line"># d=&#123;&#125;</span><br><span class="line"># d[&apos;name&apos;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#AttributeError</span><br><span class="line"># class Foo:</span><br><span class="line">#     pass</span><br><span class="line">#</span><br><span class="line"># Foo.xxx</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#ZeroDivisionError:</span><br><span class="line"># 1/0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#TypeError:int类型不可迭代</span><br><span class="line"># for i in 3:</span><br><span class="line">#     pass</span><br><span class="line"></span><br><span class="line"># import time</span><br><span class="line"># time.sleep(1000)</span><br></pre></td></tr></table></figure>
+<h4 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h4><blockquote>
+<h5 id="强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常"><a href="#强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常" class="headerlink" title="强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常"></a>强调一：错误发生的条件如果是可以预知的，此时应该用if判断去预防异常</h5></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">AGE=10</span><br><span class="line">age=input(&apos;&gt;&gt;: &apos;).strip()</span><br><span class="line"></span><br><span class="line">if age.isdigit():</span><br><span class="line">    age=int(age)</span><br><span class="line">    if age &gt; AGE:</span><br><span class="line">        print(&apos;太大了&apos;)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h5 id="强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except"><a href="#强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except" class="headerlink" title="强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except"></a>强调二：错误发生的条件如果是不可预知的，此时应该用异常处理机制，try…except</h5></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    f=open(&apos;a.txt&apos;,&apos;r&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line"></span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line"></span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line">    print(next(f),end=&apos;&apos;)</span><br><span class="line"></span><br><span class="line">    f.close()</span><br><span class="line">except StopIteration:</span><br><span class="line">    print(&apos;出错啦&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(&apos;====&gt;1&apos;)</span><br><span class="line">print(&apos;====&gt;2&apos;)</span><br><span class="line">print(&apos;====&gt;3&apos;)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-14异常处理/" data-id="cknvgpu0y00fx0xjpp33h2vnz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py003-01-13元类" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/09/Py003-01-13元类/" class="article-date">
@@ -128,7 +443,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/09/Py003-01-13元类/" data-id="cklhjp23q00fmulfyvsj4i9yd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-13元类/" data-id="cknvgpu0x00fv0xjpn8txvcht" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
@@ -181,7 +496,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/09/Py003-01-12内置方法/" data-id="cklhjp23q00fkulfysfzspccl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-12内置方法/" data-id="cknvgpu0t00fp0xjpfrtt7svj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
@@ -220,7 +535,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/09/Py003-01-11反射/" data-id="cklhjp23p00fiulfyajacwg4t" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-11反射/" data-id="cknvgpu0v00fr0xjpdu0m2c45" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
@@ -281,7 +596,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/09/Py003-01-10绑定方法与非绑定方法/" data-id="cklhjp23o00fgulfyxweo9mfn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-10绑定方法与非绑定方法/" data-id="cknvgpu0r00fj0xjpwy8uy4p3" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
@@ -329,322 +644,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/09/Py003-01-09proterty/" data-id="cklhjp23n00feulfyhkkzqwa2" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py003-01-08封装的意义" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/08/Py003-01-08封装的意义/" class="article-date">
-  <time datetime="2018-09-08T15:45:13.000Z" itemprop="datePublished">2018-09-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/08/Py003-01-08封装的意义/">Py003-01-08封装的意义</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="封装的意义"><a href="#封装的意义" class="headerlink" title="封装的意义"></a>封装的意义</h3><ul>
-<li>封装数据属性:明确的区分内外,控制外部对隐藏属性的操作行为</li>
-</ul>
-<p>将数据隐藏起来，外部无法直接访问，然后暴露接口访问</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    def __init__(self,name,age):</span><br><span class="line">        self.__name = name</span><br><span class="line">        self.__age = age</span><br><span class="line"></span><br><span class="line">    def tellInfo(self):</span><br><span class="line">        print(&quot;我是%s，今年%s岁&quot;%(self.__name,self.__age))</span><br><span class="line">    def setInfo(self,name,age):</span><br><span class="line">        if not isinstance(name,str):</span><br><span class="line">            print(&apos;名字必须是字符串&apos;)</span><br><span class="line">            return</span><br><span class="line">        if not isinstance(age, int):</span><br><span class="line">            print(&apos;age必须是数字&apos;)</span><br><span class="line">            return</span><br><span class="line">        self.__name = name</span><br><span class="line">        self.__age = age</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = People(&apos;hjx&apos;,18)</span><br><span class="line">p.tellInfo()</span><br><span class="line">p.setInfo(&apos;hjx2&apos;,&apos;aaa&apos;) # 设置年龄失败</span><br></pre></td></tr></table></figure>
-<ul>
-<li>封装方法：隔离复杂度</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class ATM:</span><br><span class="line">    def __card(self):</span><br><span class="line">        print(&apos;插卡&apos;)</span><br><span class="line">    def __auth(self):</span><br><span class="line">        print(&apos;用户认证&apos;)</span><br><span class="line">    def __input(self):</span><br><span class="line">        print(&apos;输入取出金额&apos;)</span><br><span class="line">    def __print_bill(self):</span><br><span class="line">        print(&apos;打印出账单&apos;)</span><br><span class="line">    def __take_money(self):</span><br><span class="line">        print(&apos;取款&apos;)</span><br><span class="line"></span><br><span class="line">    def withdraw(self):</span><br><span class="line">        self.__card()</span><br><span class="line">        self.__auth()</span><br><span class="line">        self.__input()</span><br><span class="line">        self.__print_bill()</span><br><span class="line">        self.__take_money()</span><br></pre></td></tr></table></figure>
-<p>支付宝，微信支付，qq支付，</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/Py003-01-08封装的意义/" data-id="cklhjp23m00fculfyy80qjugd" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py003-01-07封装" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/08/Py003-01-07封装/" class="article-date">
-  <time datetime="2018-09-08T15:06:03.000Z" itemprop="datePublished">2018-09-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/08/Py003-01-07封装/">Py003-01-07封装</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><p>属性和方法的隐藏,外部不能直接通过属性和方法名访问</p>
-<ul>
-<li>双下划线前缀的属性和方法,在类外部无法直接这样访问</li>
-<li>但在类的内部可以访问这些“双下划线前缀的属性和方法”</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">class A:</span><br><span class="line">    __x = 1</span><br><span class="line"></span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.__name = name</span><br><span class="line"></span><br><span class="line">    def __foo(self):</span><br><span class="line">        print(&apos;run foo&apos;)</span><br><span class="line">    </span><br><span class="line">    def bar(self):</span><br><span class="line">        self.__foo()</span><br><span class="line">        print(&apos;from bar&apos;)</span><br><span class="line"></span><br><span class="line"># print(A.__x)  报错</span><br><span class="line"># print(A.__foo())  报错</span><br><span class="line"># print(A.bar()) 不报错</span><br><span class="line"></span><br><span class="line"># 即使创建该类对象 也无法访问双下划线的属性和方法</span><br><span class="line">a = A(&apos;hjx&apos;)</span><br><span class="line"># print(a.__name)  报错</span><br><span class="line"># print(a.__foo())  报错</span><br><span class="line"></span><br><span class="line"># 可以通过 __dict__ 访问A类的相关属性信息</span><br><span class="line">print(A.__dict__)</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">&#123;</span><br><span class="line">    &apos;__module__&apos;: &apos;__main__&apos;,</span><br><span class="line">    &apos;_A__x&apos;: 1,</span><br><span class="line">    &apos;__init__&apos;: &lt;function A.__init__ at 0x00000187A059AF28&gt;, </span><br><span class="line">    &apos;_A__foo&apos;: &lt;function A.__foo at 0x00000187A059AEA0&gt;, </span><br><span class="line">    &apos;__dict__&apos;: &lt;attribute &apos;__dict__&apos; of &apos;A&apos; objects&gt;, </span><br><span class="line">    &apos;__weakref__&apos;: &lt;attribute &apos;__weakref__&apos; of &apos;A&apos; objects&gt;, </span><br><span class="line">    &apos;__doc__&apos;: None</span><br><span class="line">&#125;</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>我们发现 dict信息里属性通过一种方式——变形</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    __x = 1 # _A__x = 1</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.__name = name # _A__name = name</span><br><span class="line">    def __foo(self): # def _A__foo(self)</span><br><span class="line">        print(&apos;run foo&apos;)</span><br><span class="line"></span><br><span class="line">类中的 __x 会变为  _A__x</span><br><span class="line">类中的 __foo 会变为  _A__foo</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="这种变形的特点"><a href="#这种变形的特点" class="headerlink" title="这种变形的特点"></a>这种变形的特点</h4></blockquote>
-<ul>
-<li>在类外部无法直接obj.__属性名</li>
-<li>类内部可以通过:obj.__属性名</li>
-<li><p>子类无法覆盖父类双下划线前缀的属性和方法<br>  (因为在类执行前 双下划线前缀的属性和方<br>  法会产生变形)</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    __x = 1 # 变形为 _A__x</span><br><span class="line">    def __foo(self): # 变形为 def _A__foo(self):</span><br><span class="line">        print(&apos;from foo A&apos;)</span><br><span class="line"></span><br><span class="line">class B(A):</span><br><span class="line">    __x = 2 # 变形为 _B__x</span><br><span class="line">    def __foo(self): # 变形为 def _B__foo(self):</span><br><span class="line">        print(&apos;from foo B&apos;)</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>知道变形规则后你可以这样投机的访问这些双下划线前缀的属性和方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 这样就不报错了</span><br><span class="line">a = A(&apos;hjx&apos;)</span><br><span class="line">print(a._A__x)</span><br><span class="line">a._A__foo()</span><br></pre></td></tr></table></figure>
-<h4 id="这种变形需要注意的问题："><a href="#这种变形需要注意的问题：" class="headerlink" title="这种变形需要注意的问题："></a>这种变形需要注意的问题：</h4><ul>
-<li>如果想隐藏属性和方法你就添加双下划线前缀，你知道了变形规则和访问方式还想直接访问那索性不如不加双下划线前缀</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class B:</span><br><span class="line">    __x = 1</span><br><span class="line">    y = 2</span><br><span class="line"></span><br><span class="line">print(B._B__x) # 你都隐藏了还这样访问？ 是不是傻？</span><br><span class="line">print(B.y) # 既然想访问就别费劲了 还加双下划线前缀</span><br></pre></td></tr></table></figure>
-<ul>
-<li>双下划线前缀的属性和方法只在类定义的时候变形，后续添加的双下划线前缀属性或方法不会进行——变形</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class B:</span><br><span class="line">    __x = 1</span><br><span class="line"></span><br><span class="line">B.__y = 2</span><br><span class="line">print(B.__dict__)</span><br><span class="line">print(B.__y) # 像普通属性一样访问</span><br><span class="line"># 自己看吧！</span><br></pre></td></tr></table></figure>
-<p>所以说你要隐藏属性或方法，要在类定义的时候进行</p>
-<ul>
-<li>在继承中，父类如果不想让子类覆盖自己的方法，可以将方法定义为私有的</li>
-</ul>
-<p>先看我们之前的学习</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    def foo(self):</span><br><span class="line">        print(&apos;from a foo&apos;)</span><br><span class="line">    def bar(self):</span><br><span class="line">        print(&apos;from a bar&apos;)</span><br><span class="line">        self.foo()</span><br><span class="line">        </span><br><span class="line">class B(A):</span><br><span class="line">    def foo(self):</span><br><span class="line">        print(&apos;from b foo&apos;)</span><br><span class="line"></span><br><span class="line">b = B()</span><br><span class="line">b.bar()</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">执行结果： </span><br><span class="line">from a bar</span><br><span class="line">from b foo</span><br><span class="line">1. b本身没有bar方法</span><br><span class="line">2. 于是从父类A查找 bar方法 找到了</span><br><span class="line">3. 执行 bar的时候 调用 self.foo() 此时的self是 b对象 所以 self.foo() 相当于 b.foo()</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<p>实现我们的需求 子类调用父类的同名方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">class A:</span><br><span class="line">    def __foo(self): # _A__foo</span><br><span class="line">        print(&apos;from a foo&apos;)</span><br><span class="line">    def bar(self):</span><br><span class="line">        print(&apos;from a bar&apos;)</span><br><span class="line">        self.__foo() # self._A_foo</span><br><span class="line"></span><br><span class="line">class B(A):</span><br><span class="line">    def __foo(self):</span><br><span class="line">        print(&apos;from b foo&apos;)</span><br><span class="line"></span><br><span class="line">b = B()</span><br><span class="line">b.bar()</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">执行结果</span><br><span class="line">from a bar</span><br><span class="line">from a foo</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/Py003-01-07封装/" data-id="cklhjp23l00faulfyi09uxxo9" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py003-01-06多态与多态性" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/08/Py003-01-06多态与多态性/" class="article-date">
-  <time datetime="2018-09-08T09:42:58.000Z" itemprop="datePublished">2018-09-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/08/Py003-01-06多态与多态性/">Py003-01-06多态与多态性</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h3><blockquote>
-<p>同类事物有多种形态</p>
-</blockquote>
-<ul>
-<li>动物的几种形态，人狗猪三种形态</li>
-<li>游戏里角色的几种形态，法师战士弓箭手</li>
-</ul>
-<h3 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h3><p>在不考虑实例类型的情况下，直接使用实例</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import abc</span><br><span class="line">class Animal(metaclass=abc.ABCMeta):</span><br><span class="line">    category = &apos;animal&apos;</span><br><span class="line">    @abc.abstractmethod</span><br><span class="line">    def run(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">class People(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;人   跑&apos;)</span><br><span class="line"></span><br><span class="line">class Pig(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;猪   跑&apos;)</span><br><span class="line"></span><br><span class="line">class Dog(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;狗   跑&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 多态性：在不考虑实例类型的情况下，直接使用实例</span><br><span class="line">people = People()</span><br><span class="line">dog = Dog()</span><br><span class="line">pig = Pig()</span><br><span class="line"></span><br><span class="line"># 它们都能 调用对应的 run方法</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">people.run()</span><br><span class="line">dog.run()</span><br><span class="line">pig.run()</span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line"># 统一的形式去调用，增加程序的灵活性</span><br><span class="line">def commonRun(animal):</span><br><span class="line">    animal.run()</span><br><span class="line"></span><br><span class="line">commonRun(people)</span><br><span class="line">commonRun(pig)</span><br><span class="line">commonRun(dog)</span><br></pre></td></tr></table></figure>
-<h4 id="为啥用多态性"><a href="#为啥用多态性" class="headerlink" title="为啥用多态性"></a>为啥用多态性</h4><p>1.增加了程序的灵活性</p>
-<p>　　以不变应万变，不论对象千变万化，使用者都是同一种形式去调用，如commonRun(animal)</p>
-<p>2.增加了程序额可扩展性</p>
-<p>　通过继承animal类创建了一个新的类，使用者无需更改自己的代码，还是用commonRun(animal)去调用 　　</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class Cat(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;猫   跑&apos;)</span><br></pre></td></tr></table></figure>
-<h4 id="鸭子类型"><a href="#鸭子类型" class="headerlink" title="鸭子类型"></a>鸭子类型</h4><p>Python崇尚鸭子类型，即‘如果看起来像、叫声像而且走起路来像鸭子，那么它就是鸭子’</p>
-<p>python程序员通常根据这种行为来编写程序。例如，如果想编写现有对象的自定义版本，可以继承该对象</p>
-<p>也可以创建一个外观和行为像，但与它无任何关系的全新对象，后者通常用于保存程序组件的松耦合度。</p>
-<blockquote>
-<p>你所学的序列类型</p>
-</blockquote>
-<ul>
-<li>列表list</li>
-<li>元组tuple</li>
-<li>字符串str</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">l = list([1,2,3])</span><br><span class="line">t = tuple((&apos;a&apos;,&apos;b&apos;))</span><br><span class="line">s = str(&apos;hello&apos;)</span><br><span class="line"></span><br><span class="line"># 此时都有len方法  你需要考虑它是 list tuple str吗？</span><br><span class="line">print(l.__len__())</span><br><span class="line">print(t.__len__())</span><br><span class="line">print(s.__len__())</span><br><span class="line"></span><br><span class="line">&apos;&apos;&apos;</span><br><span class="line">def len(obj):</span><br><span class="line">    return obj.__len__()</span><br><span class="line">&apos;&apos;&apos;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>所以说你看着像鸭子，没准你就真的是鸭子</p>
-</blockquote>
-<p>学习也是一样</p>
-<blockquote>
-<p>fake it until you make it</p>
-</blockquote>
-<p>如果你不是一个优秀的人，你就假装你是一个优秀的人(模仿优秀的人做的事),久而久之你也变成了一个优秀的人。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/Py003-01-06多态与多态性/" data-id="cklhjp23l00f8ulfygwqlgv61" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py003-01-05抽象类与归一化" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/08/Py003-01-05抽象类与归一化/" class="article-date">
-  <time datetime="2018-09-08T09:15:28.000Z" itemprop="datePublished">2018-09-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/08/Py003-01-05抽象类与归一化/">Py003-01-05抽象类与归一化</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="抽象类与归一化"><a href="#抽象类与归一化" class="headerlink" title="抽象类与归一化"></a>抽象类与归一化</h3><p>以下都属于动物，它们都有走的方法，只是形式不同</p>
-<ul>
-<li>人</li>
-<li>猪</li>
-<li>狗</li>
-</ul>
-<p>java中提供一种接口的方式来实现方法的统一，但是python中没有，以下为java代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">=================第一部分：Java 语言中的接口很好的展现了接口的含义: IAnimal.java</span><br><span class="line">/*</span><br><span class="line">* Java的Interface接口的特征:</span><br><span class="line">* 1)是一组功能的集合,而不是一个功能</span><br><span class="line">* 2)接口的功能用于交互,所有的功能都是public,即别的对象可操作</span><br><span class="line">* 3)接口只定义函数,但不涉及函数实现</span><br><span class="line">* 4)这些功能是相关的,都是动物相关的功能,但光合作用就不适宜放到IAnimal里面了 */</span><br><span class="line"></span><br><span class="line">package com.oo.demo;</span><br><span class="line">public interface IAnimal &#123;</span><br><span class="line">    public void eat();</span><br><span class="line">    public void run(); </span><br><span class="line">    public void sleep(); </span><br><span class="line">    public void speak();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">=================第二部分：Pig.java：猪”的类设计,实现了IAnnimal接口 </span><br><span class="line">package com.oo.demo;</span><br><span class="line">public class Pig implements IAnimal&#123; //如下每个函数都需要详细实现</span><br><span class="line">    public void eat()&#123;</span><br><span class="line">        System.out.println(&quot;Pig like to eat grass&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void run()&#123;</span><br><span class="line">        System.out.println(&quot;Pig run: front legs, back legs&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void sleep()&#123;</span><br><span class="line">        System.out.println(&quot;Pig sleep 16 hours every day&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void speak()&#123;</span><br><span class="line">        System.out.println(&quot;Pig can not speak&quot;); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">=================第三部分：Person2.java</span><br><span class="line">/*</span><br><span class="line">*实现了IAnimal的“人”,有几点说明一下: </span><br><span class="line">* 1)同样都实现了IAnimal的接口,但“人”和“猪”的实现不一样,为了避免太多代码导致影响阅读,这里的代码简化成一行,但输出的内容不一样,实际项目中同一接口的同一功能点,不同的类实现完全不一样</span><br><span class="line">* 2)这里同样是“人”这个类,但和前面介绍类时给的类“Person”完全不一样,这是因为同样的逻辑概念,在不同的应用场景下,具备的属性和功能是完全不一样的 */</span><br><span class="line"></span><br><span class="line">package com.oo.demo;</span><br><span class="line">public class Person2 implements IAnimal &#123; </span><br><span class="line">    public void eat()&#123;</span><br><span class="line">        System.out.println(&quot;Person like to eat meat&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void run()&#123;</span><br><span class="line">        System.out.println(&quot;Person run: left leg, right leg&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void sleep()&#123;</span><br><span class="line">        System.out.println(&quot;Person sleep 8 hours every dat&quot;); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void speak()&#123;</span><br><span class="line">        System.out.println(&quot;Hellow world, I am a person&quot;);</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">=================第四部分：Tester03.java</span><br><span class="line">package com.oo.demo;</span><br><span class="line"></span><br><span class="line">public class Tester03 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;===This is a person===&quot;); </span><br><span class="line">        IAnimal person = new Person2();</span><br><span class="line">        person.eat();</span><br><span class="line">        person.run();</span><br><span class="line">        person.sleep();</span><br><span class="line">        person.speak();</span><br><span class="line"></span><br><span class="line">        System.out.println(&quot;\n===This is a pig===&quot;);</span><br><span class="line">        IAnimal pig = new Pig();</span><br><span class="line">        pig.eat();</span><br><span class="line">        pig.run();</span><br><span class="line">        pig.sleep();</span><br><span class="line">        pig.speak();</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">java中的interface</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="如果你非要实现如上的接口一样的效果，你需要借助一个模块-abc模块"><a href="#如果你非要实现如上的接口一样的效果，你需要借助一个模块-abc模块" class="headerlink" title="如果你非要实现如上的接口一样的效果，你需要借助一个模块 abc模块"></a>如果你非要实现如上的接口一样的效果，你需要借助一个模块 abc模块</h4></blockquote>
-<h4 id="抽象类概念"><a href="#抽象类概念" class="headerlink" title="抽象类概念"></a>抽象类概念</h4><ul>
-<li>抽象类只能被继承,无法被实例化</li>
-<li>抽象类定义的抽象方法子类必须实现否则报错</li>
-<li>抽象类的属性子类可以查找到(前提是子类本身没有该属性)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">import abc</span><br><span class="line"></span><br><span class="line"># 只进行接口的定义</span><br><span class="line">class Animal(metaclass=abc.ABCMeta):</span><br><span class="line">    category = &apos;animal&apos;</span><br><span class="line">    @abc.abstractmethod</span><br><span class="line">    def run(self):</span><br><span class="line">        pass</span><br><span class="line">    @abc.abstractmethod</span><br><span class="line">    def eat(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">class People(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;人   跑&apos;)</span><br><span class="line">    def eat(self):</span><br><span class="line">        print(&apos;人   吃饭&apos;)</span><br><span class="line"></span><br><span class="line">class Pig(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;猪   跑&apos;)</span><br><span class="line">    def eat(self):</span><br><span class="line">        print(&apos;猪   吃饭&apos;)</span><br><span class="line"></span><br><span class="line">class Dog(Animal):</span><br><span class="line">    def run(self):</span><br><span class="line">        print(&apos;狗   跑&apos;)</span><br><span class="line">    def eat(self):</span><br><span class="line">        print(&apos;狗   吃饭&apos;)</span><br><span class="line"></span><br><span class="line"># a = Animal() 报错   抽象类 只能被继承，无法实例化</span><br><span class="line"></span><br><span class="line">people = People()</span><br><span class="line">people.run()</span><br><span class="line">people.eat()</span><br><span class="line"></span><br><span class="line">pig = Pig()</span><br><span class="line">pig.run()</span><br><span class="line">pig.eat()</span><br><span class="line"></span><br><span class="line">dog = Dog()</span><br><span class="line">dog.run()</span><br><span class="line">dog.eat()</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>我们知道People继承了 Animal，如果注释了People内部的eat方法就会报错。因为抽象方法必须实现</p>
-</blockquote>
-<blockquote>
-<p>这样就实现了接口的统一，归一化</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/08/Py003-01-05抽象类与归一化/" data-id="cklhjp23i00f4ulfyr6l02top" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py003-01-04组合" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/09/06/Py003-01-04组合/" class="article-date">
-  <time datetime="2018-09-06T14:46:35.000Z" itemprop="datePublished">2018-09-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/09/06/Py003-01-04组合/">Py003-01-04组合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>继承是类与类之间的关系</p>
-<h3 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h3><blockquote>
-<p>先看这样一段代码  老师和学生</p>
-</blockquote>
-<ul>
-<li>有共用的属性 school</li>
-<li>有重复的属性 name,age,sex</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">class Teacher:</span><br><span class="line">    school = &apos;中科院&apos;</span><br><span class="line"></span><br><span class="line">    def __init__(self,name,age,sex,level,salary):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.sex = sex</span><br><span class="line">        </span><br><span class="line">        self.level = level</span><br><span class="line">        self.salary = salary</span><br><span class="line"></span><br><span class="line">    def teach(self):</span><br><span class="line">        print(&apos;%s is teaching&apos;%self.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Student:</span><br><span class="line">    school = &apos;中科院&apos;</span><br><span class="line">    def __init__(self,name,age,sex,classname):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.sex = sex</span><br><span class="line"></span><br><span class="line">        self.classname = classname</span><br><span class="line"></span><br><span class="line">    def learn(self):</span><br><span class="line">        print(&apos;%s is learning&apos;%self.name)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="提取公共"><a href="#提取公共" class="headerlink" title="提取公共"></a>提取公共</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">class People:</span><br><span class="line">    school = &apos;中科院&apos;</span><br><span class="line">    def __init__(self, name, age, sex):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.age = age</span><br><span class="line">        self.sex = sex</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Teacher(People):</span><br><span class="line">    def __init__(self,name,age,sex,level,salary):</span><br><span class="line">        super().__init__(name,age,sex)</span><br><span class="line">        self.level = level</span><br><span class="line">        self.salary = salary</span><br><span class="line"></span><br><span class="line">    def teach(self):</span><br><span class="line">        print(&apos;%s is teaching&apos;%self.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Student(People):</span><br><span class="line">    def __init__(self,name,age,sex,classname):</span><br><span class="line">        super().__init__(name, age, sex)</span><br><span class="line">        self.classname = classname</span><br><span class="line"></span><br><span class="line">    def learn(self):</span><br><span class="line">        print(&apos;%s is learning&apos;%self.name)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="老师有课程，如果都教-python呢？"><a href="#老师有课程，如果都教-python呢？" class="headerlink" title="老师有课程，如果都教 python呢？"></a>老师有课程，如果都教 python呢？</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class Teacher(People):</span><br><span class="line">    def __init__(self,name,age,sex,level,salary,course_name,course_price,course_period):</span><br><span class="line">        super().__init__(name,age,sex)</span><br><span class="line">        self.level = level</span><br><span class="line">        self.salary = salary</span><br><span class="line">        self.course_name = course_name</span><br><span class="line">        self.course_price = course_price</span><br><span class="line">        self.course_period = course_period</span><br><span class="line"></span><br><span class="line"># 这样就又重复了 俩个老师都教 python</span><br><span class="line">t1 = Teacher(&apos;阮老师&apos;,49,&apos;man&apos;,10,3000,&apos;python&apos;,30000,&apos;半年&apos;)</span><br><span class="line">t2 = Teacher(&apos;廖雪峰&apos;,59,&apos;man&apos;,10,3000,&apos;python&apos;,30000,&apos;半年&apos;)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="继续提取课程-类"><a href="#继续提取课程-类" class="headerlink" title="继续提取课程 类"></a>继续提取课程 类</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class Course:</span><br><span class="line">    def __init__(self,course_name,course_price,course_period):</span><br><span class="line">        self.course_name = course_name</span><br><span class="line">        self.course_price = course_price</span><br><span class="line">        self.course_period = course_period</span><br><span class="line"></span><br><span class="line">python = Course(&apos;python&apos;,30000,&apos;半年&apos;)</span><br><span class="line"></span><br><span class="line">此时老师和课程的关系？</span><br></pre></td></tr></table></figure>
-<ul>
-<li>继承的关系是？——什么是什么</li>
-<li>组合呢？——什么有什么  如：老师有课程 学生有课程</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">t1 = Teacher(&apos;阮老师&apos;,49,&apos;man&apos;,10,3000)</span><br><span class="line">t2 = Teacher(&apos;廖雪峰&apos;,59,&apos;man&apos;,10,3000)   </span><br><span class="line"></span><br><span class="line">t1.course = python</span><br><span class="line">t2.course = python</span><br><span class="line"></span><br><span class="line"># 访问t1/t2老师的课程名称</span><br><span class="line">t1.course.course_name</span><br><span class="line">t2.course.course_name</span><br><span class="line"></span><br><span class="line">这种方式不是继承而是组合</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/09/06/Py003-01-04组合/" data-id="cklhjp23h00f2ulfy75wertmb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/09/09/Py003-01-09proterty/" data-id="cknvgpu0t00fn0xjpfwlvuuy8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M03/">M03</a></li></ul>
@@ -674,7 +674,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -684,7 +684,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -706,23 +706,23 @@
       <ul>
         
           <li>
+            <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
       </ul>

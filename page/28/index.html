@@ -62,6 +62,361 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Py008-01-10堆排序之topk问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/12/Py008-01-10堆排序之topk问题/" class="article-date">
+  <time datetime="2018-12-12T13:37:36.000Z" itemprop="datePublished">2018-12-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/12/Py008-01-10堆排序之topk问题/">Py008-01-10堆排序之topk问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="topk问题"><a href="#topk问题" class="headerlink" title="topk问题"></a>topk问题</h3><ul>
+<li>现在有n个数，设计算法得到前k大的数。 (k&lt;n)</li>
+<li>解决思路：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- 1.排序后切片 O(nlogn) + k</span><br><span class="line"></span><br><span class="line">- 2.排序lowB三人组 O(kn) </span><br><span class="line">    如果是冒泡只需要k趟就可以</span><br><span class="line"></span><br><span class="line">- 3.堆排序思路  O(nlogk)</span><br></pre></td></tr></table></figure>
+<h4 id="堆排序解决思路"><a href="#堆排序解决思路" class="headerlink" title="堆排序解决思路"></a>堆排序解决思路</h4><ul>
+<li>取列表前k个元素建立一个小根堆。堆顶就是目前第k大的数。</li>
+<li>依次向后遍历原列表，对于列表中的元素，如果小于堆顶，则忽略该元素；如果大于堆顶，则将堆顶更换为该元素，并且对堆进行一次调整；</li>
+<li>遍历列表所有元素后，倒序弹出堆顶</li>
+</ul>
+<blockquote>
+<p>如假设一个长度为10的列表,取最大的前5个数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[6,8,1,9,3,0,7,2,4,5]</span><br><span class="line">思路</span><br><span class="line">step001 </span><br><span class="line">从列表里取出前5个数[6,8,1,9,3]</span><br><span class="line">step002 将这5个数变成一个小根堆</span><br><span class="line">      1</span><br><span class="line">  3       6</span><br><span class="line">9   8</span><br><span class="line">step003 循环剩余列表[0,7,2,4,5]依次跟堆顶比较</span><br><span class="line"></span><br><span class="line">0 &lt; 1 不换 [7,2,4,5]</span><br><span class="line"></span><br><span class="line">7 &gt; 1 换 [2,4,5]</span><br><span class="line">      7</span><br><span class="line">  3       6</span><br><span class="line">9   8</span><br><span class="line">此时向上调整</span><br><span class="line">      3</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br><span class="line">2 &lt; 3 不换 [4,5]</span><br><span class="line">4 &gt; 3 换 [5]</span><br><span class="line">      4</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br><span class="line">无需调整继续循环</span><br><span class="line">5 &gt; 4 换 []</span><br><span class="line">      5</span><br><span class="line">  7       6</span><br><span class="line">9   8</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时时间复杂度是O(nlogk)</li>
+</ul>
+<h4 id="topk实现"><a href="#topk实现" class="headerlink" title="topk实现"></a>topk实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line">#-*- encoding:utf-8 -*-</span><br><span class="line"></span><br><span class="line"># 原地排序，所以 大根堆 堆顶下来的元素会放到列表的末尾</span><br><span class="line"># high则标记 堆的最后一个元素</span><br><span class="line">def sift(li,low,high):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    :param li: 列表</span><br><span class="line">    :param low: 堆的根节点位置</span><br><span class="line">    :param high: 堆的最后一个元素的位置</span><br><span class="line">    :return:</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    i = low # i最开始指向根节点</span><br><span class="line">    j = 2 * i + 1 # j就是i的左孩子</span><br><span class="line">    tmp = li[low] # 把堆顶存起来</span><br><span class="line">    while j &lt;= high: # 只要j位置有数</span><br><span class="line">        if j + 1 &lt;= high and li[j+1] &lt; li[j]: # 如果有右孩子而且 右孩子比左孩子小</span><br><span class="line">            j = j + 1 # 指向右孩子</span><br><span class="line"></span><br><span class="line">        if li[j] &lt; tmp: # 要么是左孩子  要么是右孩子</span><br><span class="line">            li[i] = li[j]</span><br><span class="line">            i = j    # 往下看一层</span><br><span class="line">            j = 2 * i + 1</span><br><span class="line"></span><br><span class="line">        else: # tmp最大，把tmp放到i的位置上</span><br><span class="line">            li[i] = tmp # 把tmp放到某一级领导位置上</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        li[i] = tmp # 把tmp放到叶子节点上</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#</span><br><span class="line">def topk(li,k):</span><br><span class="line">    heap = li[0:k];</span><br><span class="line">    for i in range((k-2)//2,-1,-1):</span><br><span class="line">        sift(heap,i,k-1)</span><br><span class="line">    # 1。建堆</span><br><span class="line">    # 循环 k到 len(li)-1</span><br><span class="line">    for i in range(k,len(li)-1):</span><br><span class="line">        if li[i] &gt; heap[0]:</span><br><span class="line">            heap[0] = li[i]</span><br><span class="line">            sift(heap,0,k-1)</span><br><span class="line">    # 2。遍历</span><br><span class="line">    for i in range(k-1,-1,-1):</span><br><span class="line">        heap[0],heap[i] = heap[i],heap[0]</span><br><span class="line">        sift(heap,0,i-1)</span><br><span class="line"></span><br><span class="line">    # 3。出数</span><br><span class="line">    return heap</span><br><span class="line"></span><br><span class="line">import random</span><br><span class="line">li = list(range(1000))</span><br><span class="line">random.shuffle(li)</span><br><span class="line"></span><br><span class="line">print(topk(li,10))</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/12/Py008-01-10堆排序之topk问题/" data-id="cknvgpu3h00l40xjpuq43h9qy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-01-09堆排序" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/12/Py008-01-09堆排序/" class="article-date">
+  <time datetime="2018-12-12T12:36:39.000Z" itemprop="datePublished">2018-12-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/12/Py008-01-09堆排序/">Py008-01-09堆排序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="堆排序过程"><a href="#堆排序过程" class="headerlink" title="堆排序过程"></a>堆排序过程</h3><ul>
+<li>1.建立堆</li>
+<li>2.得到堆顶元素，为最大元素</li>
+<li>3.去掉堆顶，将堆最后一个元素放到堆顶，此时可通过一次调整重新使堆有序</li>
+<li>4.堆顶元素为第二最大元素</li>
+<li>5.重复步骤3，直到堆变空</li>
+</ul>
+<h4 id="堆向下调整实现"><a href="#堆向下调整实现" class="headerlink" title="堆向下调整实现"></a>堆向下调整实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># 原地排序，所以 大根堆 堆顶下来的元素会放到列表的末尾</span><br><span class="line"># high则标记 堆的最后一个元素</span><br><span class="line">def sift(li,low,high):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    :param li: 列表</span><br><span class="line">    :param low: 堆的根节点位置</span><br><span class="line">    :param high: 堆的最后一个元素的位置</span><br><span class="line">    :return:</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    i = low # i最开始指向根节点</span><br><span class="line">    j = 2 * i + 1 # j就是i的左孩子</span><br><span class="line">    tmp = li[low] # 把堆顶存起来</span><br><span class="line">    while j &lt;= high: # 只要j位置有数</span><br><span class="line">        if j + 1 &lt;= high and li[j+1] &gt; li[j]: # 如果有右孩子而且 右孩子比左孩子大</span><br><span class="line">            j = j + 1 # 指向右孩子</span><br><span class="line"></span><br><span class="line">        if li[j] &gt; tmp: # 要么是左孩子  要么是右孩子</span><br><span class="line">            li[i] = li[j]</span><br><span class="line">            i = j    # 往下看一层</span><br><span class="line">            j = 2 * i + 1</span><br><span class="line"></span><br><span class="line">        else: # tmp最大，把tmp放到i的位置上</span><br><span class="line">            li[i] = tmp # 把tmp放到某一级领导位置上</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        li[i] = tmp # 把tmp放到叶子节点上</span><br></pre></td></tr></table></figure>
+<h4 id="建立堆"><a href="#建立堆" class="headerlink" title="建立堆"></a>建立堆</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def heap_sort(li):</span><br><span class="line">    n = len(li)</span><br><span class="line">    # 倒着循环 找村级别</span><br><span class="line">    for i in range((n-2)//2,-1,-1):</span><br><span class="line">        # i表示建堆时候调整的部分的根的下标</span><br><span class="line">        # 此时的high不用 2*i+1</span><br><span class="line">        sift(li,i,n-1)</span><br><span class="line">    # 建堆完成了</span><br></pre></td></tr></table></figure>
+<h4 id="挨个出数"><a href="#挨个出数" class="headerlink" title="挨个出数"></a>挨个出数</h4><ul>
+<li>因为是原地排序</li>
+<li>所以堆顶下台的元素会放到末尾</li>
+<li>high = 列表长度 - 下太元素的个数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"># 原地排序，所以 大根堆 堆顶下来的元素会放到列表的末尾</span><br><span class="line"># high则标记 堆的最后一个元素</span><br><span class="line">def sift(li,low,high):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    :param li: 列表</span><br><span class="line">    :param low: 堆的根节点位置</span><br><span class="line">    :param high: 堆的最后一个元素的位置</span><br><span class="line">    :return:</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    i = low # i最开始指向根节点</span><br><span class="line">    j = 2 * i + 1 # j就是i的左孩子</span><br><span class="line">    tmp = li[low] # 把堆顶存起来</span><br><span class="line">    while j &lt;= high: # 只要j位置有数</span><br><span class="line">        if j + 1 &lt;= high and li[j+1] &gt; li[j]: # 如果有右孩子而且 右孩子比左孩子大</span><br><span class="line">            j = j + 1 # 指向右孩子</span><br><span class="line"></span><br><span class="line">        if li[j] &gt; tmp: # 要么是左孩子  要么是右孩子</span><br><span class="line">            li[i] = li[j]</span><br><span class="line">            i = j    # 往下看一层</span><br><span class="line">            j = 2 * i + 1</span><br><span class="line"></span><br><span class="line">        else: # tmp最大，把tmp放到i的位置上</span><br><span class="line">            li[i] = tmp # 把tmp放到某一级领导位置上</span><br><span class="line">            break</span><br><span class="line">    else:</span><br><span class="line">        li[i] = tmp # 把tmp放到叶子节点上</span><br><span class="line"></span><br><span class="line">def heap_sort(li):</span><br><span class="line">    n = len(li)</span><br><span class="line">    # 倒着循环 找村级别</span><br><span class="line">    for i in range((n-2)//2,-1,-1):</span><br><span class="line">        # i表示建堆时候调整的部分的根的下标</span><br><span class="line">        # 此时的high不用 2*i+1</span><br><span class="line">        sift(li,i,n-1)</span><br><span class="line">    # 建堆完成了</span><br><span class="line"></span><br><span class="line">    for i in range(n-1,-1,-1):</span><br><span class="line">        # i 指向当前堆的最后一个元素</span><br><span class="line">        # 把堆的最后一个元素放到堆顶</span><br><span class="line">        li[0],li[i] = li[i],li[0]</span><br><span class="line">        # 此时high = i-1 就是前一个元素</span><br><span class="line">        sift(li,0,i-1)</span><br><span class="line"></span><br><span class="line">li = [i for i in range(100)]</span><br><span class="line">import random</span><br><span class="line">random.shuffle(li)</span><br><span class="line">print(li)</span><br><span class="line"></span><br><span class="line">heap_sort(li)</span><br><span class="line">print(li)</span><br></pre></td></tr></table></figure>
+<h3 id="堆排序的时间复杂度"><a href="#堆排序的时间复杂度" class="headerlink" title="堆排序的时间复杂度"></a>堆排序的时间复杂度</h3><ul>
+<li>时间复杂度：O(nlogn)</li>
+</ul>
+<h3 id="堆排序——内置模块-heapq"><a href="#堆排序——内置模块-heapq" class="headerlink" title="堆排序——内置模块 heapq"></a>堆排序——内置模块 heapq</h3><blockquote>
+<p>常用函数</p>
+</blockquote>
+<ul>
+<li>heapify(x)</li>
+<li>heappush(heap,item)</li>
+<li>heappop(heap)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import heapq # q=&gt;queue 优先队列</span><br><span class="line">import random</span><br><span class="line"></span><br><span class="line">li = [i for i in range(100)]</span><br><span class="line">random.shuffle(li)</span><br><span class="line">print(li)</span><br><span class="line"></span><br><span class="line">heapq.heapify(li) # 建堆</span><br><span class="line"></span><br><span class="line">n = len(li)</span><br><span class="line">for i in range(n):</span><br><span class="line">    # 每次出数</span><br><span class="line">    print(heapq.heappop(li),end=&apos;,&apos;)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/12/Py008-01-09堆排序/" data-id="cknvgpu3e00ky0xjpe4r9p3l7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-01-08堆和堆的向下调整" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/Py008-01-08堆和堆的向下调整/" class="article-date">
+  <time datetime="2018-12-10T14:08:21.000Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/10/Py008-01-08堆和堆的向下调整/">Py008-01-08堆和堆的向下调整</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p>一种特殊的完全二叉树结构</p>
+<ul>
+<li>大根堆：一颗完全二叉树，任意节点都比其孩子节点大</li>
+<li>小根堆：一颗完全二叉树，任意节点都比其孩子节点小</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0801.png" alt></p>
+<blockquote>
+<h4 id="一个具体的方式来看堆的问题-如上图的大根堆"><a href="#一个具体的方式来看堆的问题-如上图的大根堆" class="headerlink" title="一个具体的方式来看堆的问题(如上图的大根堆)"></a>一个具体的方式来看堆的问题(如上图的大根堆)</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">第一层 9 好比 省长</span><br><span class="line">第二层 8，7 好比 县长</span><br><span class="line">第三层 6，5，0，1 好比 村长</span><br><span class="line">第四层 2，4，3  好比 村民</span><br></pre></td></tr></table></figure>
+<h4 id="堆的向下调整性"><a href="#堆的向下调整性" class="headerlink" title="堆的向下调整性"></a>堆的向下调整性</h4><blockquote>
+<h4 id="假设：节点的左右子树都是堆，但自身不是堆"><a href="#假设：节点的左右子树都是堆，但自身不是堆" class="headerlink" title="假设：节点的左右子树都是堆，但自身不是堆"></a>假设：节点的左右子树都是堆，但自身不是堆</h4></blockquote>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0802.png" alt></p>
+<blockquote>
+<h4 id="很明显第一层坐在省长位置的2不合格"><a href="#很明显第一层坐在省长位置的2不合格" class="headerlink" title="很明显第一层坐在省长位置的2不合格"></a>很明显第一层坐在省长位置的2不合格</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">于是把 2 撸下来</span><br><span class="line">            ?</span><br><span class="line">    9                  7</span><br><span class="line">  8         5        0  1</span><br><span class="line">6   4     3</span><br><span class="line"></span><br><span class="line">让谁上去？待选人肯定是县长级别的   所以是 9 和 7，但是肯定要权限值大的上去</span><br><span class="line"></span><br><span class="line">            9</span><br><span class="line">    ？                 7</span><br><span class="line">  8         5        0  1</span><br><span class="line">6   4     3</span><br><span class="line">此时问？ 2能做一个县长吗？ 不能因为它领导不了下面的村长 8和5 而此时需要上位一个县长 8&gt;5  8上位了</span><br><span class="line">            9</span><br><span class="line">    8                 7</span><br><span class="line">  ?         5        0  1</span><br><span class="line">6   4     3</span><br><span class="line">此时问？ 2能做一个村长吗？ 不能因为它领导不了下面的村民 6，4和3 而此时需要上位一个村长 6&gt;4&gt;3  6上位了</span><br><span class="line"></span><br><span class="line">            9</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">?   4     3</span><br><span class="line"></span><br><span class="line">最后没法在撸了 ，所以2只能当村民了</span><br><span class="line">        9</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     3</span><br></pre></td></tr></table></figure>
+<h3 id="堆排序过程演示"><a href="#堆排序过程演示" class="headerlink" title="堆排序过程演示"></a>堆排序过程演示</h3><blockquote>
+<p>原理就是挨个出数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line">res = []</span><br><span class="line">如大根堆的情况：</span><br><span class="line">            9</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     3</span><br><span class="line">step001 第一次 先让最大的下台 9下台了 </span><br><span class="line">res=[9]</span><br><span class="line">            ？</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     3</span><br><span class="line">---------------------------------</span><br><span class="line">思考假设  让谁上台</span><br><span class="line">如果是8上台</span><br><span class="line">导致8的位置空了</span><br><span class="line">            8</span><br><span class="line">    ?                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     3</span><br><span class="line">就必须 6上台</span><br><span class="line">导致6的位置空了</span><br><span class="line">            8</span><br><span class="line">    6                 7</span><br><span class="line">  ?         5        0  1</span><br><span class="line">2   4     3</span><br><span class="line">就必须 4上台</span><br><span class="line">导致4的位置空了</span><br><span class="line">            8</span><br><span class="line">    6                 7</span><br><span class="line">  4        5        0  1</span><br><span class="line">2   ?     3</span><br><span class="line">此时就不知道4的位置有一个空位</span><br><span class="line">这样就很麻烦</span><br><span class="line">这样就很麻烦</span><br><span class="line">这样就很麻烦</span><br><span class="line">---------------------------------</span><br><span class="line">            ？</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     3</span><br><span class="line">另一种思路 选一个备胎上去 取树的最后一层的最后的孩子也就是3</span><br><span class="line">            3</span><br><span class="line">    8                 7</span><br><span class="line">  6         5        0  1</span><br><span class="line">2   4     </span><br><span class="line">此时只要通过一次向下调整就能保持堆的层级:如下</span><br><span class="line">            8</span><br><span class="line">    6                 7</span><br><span class="line">  4         5        0  1</span><br><span class="line">2   3   </span><br><span class="line">step002  先让最大的下台 8下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是3</span><br><span class="line">res=[9,8]</span><br><span class="line">            3</span><br><span class="line">    6                 7</span><br><span class="line">  4         5        0  1</span><br><span class="line">2     </span><br><span class="line">通过一次向下调整就能保持堆的层级</span><br><span class="line">res=[9,8]</span><br><span class="line">            7</span><br><span class="line">    6                 3</span><br><span class="line">  4         5        0  1</span><br><span class="line">2   </span><br><span class="line">step003  先让最大的下台 7下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是2</span><br><span class="line">res=[9,8,7]</span><br><span class="line">          2</span><br><span class="line">    6            3</span><br><span class="line">  4   5        0  1</span><br><span class="line">通过一次向下调整就能保持堆的层级</span><br><span class="line">          6</span><br><span class="line">    5            3</span><br><span class="line">  4   2        0  1</span><br><span class="line">step004  先让最大的下台 6下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是1</span><br><span class="line">res = [9,8,7,6]</span><br><span class="line">          1</span><br><span class="line">    5            3</span><br><span class="line">  4   2        0 </span><br><span class="line">通过一次向下调整就能保持堆的层级</span><br><span class="line">           5</span><br><span class="line">    4            3</span><br><span class="line">  1   2        0 </span><br><span class="line">step005  先让最大的下台 5下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是0</span><br><span class="line">res = [9,8,7,6,5]</span><br><span class="line">           0</span><br><span class="line">    4            3</span><br><span class="line">  1   2  </span><br><span class="line">通过一次向下调整就能保持堆的层级       </span><br><span class="line">           4</span><br><span class="line">    2            3</span><br><span class="line">  1   0 </span><br><span class="line">step006  先让最大的下台 4下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是0</span><br><span class="line">res = [9,8,7,6,5,4]</span><br><span class="line">          0</span><br><span class="line">    2            3</span><br><span class="line">  1   </span><br><span class="line">通过一次向下调整就能保持堆的层级 </span><br><span class="line">          3</span><br><span class="line">    2            0</span><br><span class="line">  1 </span><br><span class="line">step007  先让最大的下台 3下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是1</span><br><span class="line">res = [9,8,7,6,5,4,3]</span><br><span class="line">           1</span><br><span class="line">    2            0</span><br><span class="line">通过一次向下调整就能保持堆的层级 </span><br><span class="line">        2</span><br><span class="line">    1        0</span><br><span class="line">step008  先让最大的下台 2下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是0</span><br><span class="line">res = [9,8,7,6,5,4,3,2]</span><br><span class="line">        0</span><br><span class="line">    1        </span><br><span class="line">通过一次向下调整就能保持堆的层级</span><br><span class="line">        1</span><br><span class="line">    0 </span><br><span class="line">step008  先让最大的下台 1下台了</span><br><span class="line">取树的最后一层的最后的孩子也就是0</span><br><span class="line">res = [9,8,7,6,5,4,3,2,1] </span><br><span class="line">    0</span><br><span class="line">step008  先让最大的下台 0下台了</span><br><span class="line">res = [9,8,7,6,5,4,3,2,1,0]</span><br></pre></td></tr></table></figure>
+<h3 id="构造堆"><a href="#构造堆" class="headerlink" title="构造堆"></a>构造堆</h3><ul>
+<li>堆一开始是没有秩序的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">如</span><br><span class="line">                6</span><br><span class="line">        8               1</span><br><span class="line">    9       3          0  7</span><br><span class="line">   2  4    5</span><br><span class="line"></span><br><span class="line">先管理一个村 3</span><br><span class="line">3和5调换</span><br><span class="line">看前一个村 9发现是好的 </span><br><span class="line">                6</span><br><span class="line">        8               1</span><br><span class="line">    9       5          0  7</span><br><span class="line">   2  4    3</span><br><span class="line">村都好了</span><br><span class="line">管理县7</span><br><span class="line">                6</span><br><span class="line">        8               7</span><br><span class="line">    9       5          0  1</span><br><span class="line">   2  4    3</span><br><span class="line">管理前一个县8</span><br><span class="line">                6</span><br><span class="line">        9               7</span><br><span class="line">    8       5          0  1</span><br><span class="line">   2  4    3</span><br><span class="line">县管理好了，管理省6</span><br><span class="line">                9</span><br><span class="line">        8               7</span><br><span class="line">    6       5          0  1</span><br><span class="line">   2  4    3</span><br><span class="line">此时构造堆的过程就结束了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结论就是：每次从最底层构建堆</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">管理村级别的最后一个村</span><br><span class="line">村级别都好了</span><br><span class="line">管理县级别的最后一个县</span><br><span class="line">县级别都好了</span><br><span class="line">管理省级别的最后一个省</span><br><span class="line">县级别都好了</span><br><span class="line">最后就成了一个堆</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/Py008-01-08堆和堆的向下调整/" data-id="cknvgpu3d00kw0xjp4cv16fnm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-01-07堆排序前传树与二叉树" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/Py008-01-07堆排序前传树与二叉树/" class="article-date">
+  <time datetime="2018-12-10T13:02:13.000Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/10/Py008-01-07堆排序前传树与二叉树/">Py008-01-07堆排序前传树与二叉树</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="树"><a href="#树" class="headerlink" title="树"></a>树</h3><blockquote>
+<p>树是一种数据结构</p>
+</blockquote>
+<p>比如：目录结构</p>
+<ul>
+<li>树是一种可以递归定义的数据结构</li>
+<li>树由n个节点组成的集合<ul>
+<li>如果n=0,那是一棵空树</li>
+<li>如果n&gt;0,那存在一个节点作为树的根节点，其他节点可以分为m个集合，每个集合本身又是一棵树</li>
+</ul>
+</li>
+</ul>
+<h4 id="树的基本概念"><a href="#树的基本概念" class="headerlink" title="树的基本概念"></a>树的基本概念</h4><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0701.png" alt></p>
+<blockquote>
+<p>根节点，叶子节点</p>
+</blockquote>
+<ul>
+<li>如上图，A就是根节点</li>
+<li>不能分叉的节点就是叶子节点 如B,C,H,I,P,Q,K,L,M,N</li>
+</ul>
+<blockquote>
+<p>树的深度(高度) </p>
+</blockquote>
+<ul>
+<li>看它的递归深度  如上为 4</li>
+</ul>
+<blockquote>
+<p>树的度</p>
+</blockquote>
+<ul>
+<li>就是最大分叉的个数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如 E 的度是2</span><br><span class="line">如 F 的度是3</span><br><span class="line">如 A 的度是6</span><br><span class="line"></span><br><span class="line">所以如上图   树的度就是6</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>孩子节点，父节点</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E是I的父节点</span><br><span class="line">I是E的子节点</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>子树</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如 把 E,I,J,P,Q拎出来 E就是一个子树</span><br></pre></td></tr></table></figure>
+<h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><ul>
+<li>二叉树就是度不超过2的树</li>
+<li>每个节点最多有两个子节点</li>
+<li>两个孩子节点被区分为左孩子节点和右孩子节点</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0702.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0703.png" alt></p>
+<blockquote>
+<h4 id="二叉树的存储方式"><a href="#二叉树的存储方式" class="headerlink" title="二叉树的存储方式"></a>二叉树的存储方式</h4></blockquote>
+<ul>
+<li>链式存储方式</li>
+<li>顺序存储方式(就是用一个列表来存储)</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py008_01_0704.png" alt></p>
+<blockquote>
+<h4 id="思考：如果从孩子找父亲该怎么找？"><a href="#思考：如果从孩子找父亲该怎么找？" class="headerlink" title="思考：如果从孩子找父亲该怎么找？"></a>思考：如果从孩子找父亲该怎么找？</h4></blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如子节点下标为9</span><br><span class="line">(9-1)整除2=4</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/Py008-01-07堆排序前传树与二叉树/" data-id="cknvgpu3c00ku0xjpklil9qnw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Py008-01-06快速排序" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/09/Py008-01-06快速排序/" class="article-date">
+  <time datetime="2018-12-09T03:45:23.000Z" itemprop="datePublished">2018-12-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/12/09/Py008-01-06快速排序/">Py008-01-06快速排序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h3><blockquote>
+<p>第一个实现方式</p>
+</blockquote>
+<p>非原地排序，非常费空间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import math</span><br><span class="line"># 非原地排序  每次都把列表分为左右两个区间</span><br><span class="line">def quickSort(arr):</span><br><span class="line">    if len(arr) &lt;= 1: return arr</span><br><span class="line"></span><br><span class="line">    # 取中间位</span><br><span class="line">    pivotIndex = math.ceil(len(arr) / 2);</span><br><span class="line">    pivot = arr[pivotIndex];</span><br><span class="line">    del arr[pivotIndex];</span><br><span class="line"></span><br><span class="line">    # 左右区间，用于存放排序后的数</span><br><span class="line">    left = [];</span><br><span class="line">    right = [];</span><br><span class="line">    for i in range(len(arr)):</span><br><span class="line">        print(&apos;分区操作的第 &apos; + str(i + 1) + &apos; 次循环：&apos;);</span><br><span class="line">        # 小于基准，放于左区间，大于基准，放于右区间</span><br><span class="line">        if arr[i] &lt; pivot:</span><br><span class="line">            left.append(arr[i]);</span><br><span class="line">            print(&apos;左边：&apos; + str(arr[i]))</span><br><span class="line">        else:</span><br><span class="line">            right.append(arr[i]);</span><br><span class="line">            print(&apos;右边：&apos; + str(arr[i]))</span><br><span class="line">    print(left, right)</span><br><span class="line">    return quickSort(left) + [pivot] + quickSort(right)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">arr = [14, 3, 15, 7, 2, 76, 11];</span><br><span class="line">print(quickSort(arr));</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>原地排序</p>
+</blockquote>
+<ul>
+<li>以第一个值为起点 li[0] </li>
+<li>从右开始找 li[len(li)-1] 比 li[0] 小则交换，索引往左移动一位。</li>
+<li>然后从左往右找 比li[0]大 则交换，索引往右移动一位</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">def partition(li,left,right):</span><br><span class="line">    tmp = li[left]</span><br><span class="line">    while left &lt; right:</span><br><span class="line">        while left &lt; right and li[right] &gt;= tmp: # 从右面找比tmp小的数</span><br><span class="line">            right -= 1 # 往左走一步</span><br><span class="line">            print(li,&apos;right&apos;)</span><br><span class="line">        li[left] = li[right] # 把右边的值填到左边的空位上</span><br><span class="line"></span><br><span class="line">        while left &lt; right and li[left] &lt;= tmp: # 从左面找比tmp大的数</span><br><span class="line">            left += 1 # 往右走一步</span><br><span class="line">            print(li,&apos;left&apos;)</span><br><span class="line">        li[right] = li[left] # 把左边的值填到右边的空位上</span><br><span class="line"></span><br><span class="line">    li[left] = tmp # 把tmp归位</span><br><span class="line">    return left # 返回中间值</span><br><span class="line"></span><br><span class="line">li = [5,7,4,6,3,1,2,9,8]</span><br><span class="line"></span><br><span class="line">print(li)</span><br><span class="line">partition(li,0,len(li)-1)</span><br><span class="line">print(li)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>第二步，递归的方式来排序左面的和右边</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def partition(li,left,right):</span><br><span class="line">    tmp = li[left]</span><br><span class="line">    while left &lt; right:</span><br><span class="line">        while left &lt; right and li[right] &gt;= tmp: # 从右面找比tmp小的数</span><br><span class="line">            right -= 1 # 往左走一步</span><br><span class="line">        li[left] = li[right] # 把右边的值填到左边的空位上</span><br><span class="line"></span><br><span class="line">        while left &lt; right and li[left] &lt;= tmp: # 从左面找比tmp大的数</span><br><span class="line">            left += 1 # 往右走一步</span><br><span class="line">        li[right] = li[left] # 把左边的值填到右边的空位上</span><br><span class="line"></span><br><span class="line">    li[left] = tmp # 把tmp归位</span><br><span class="line">    return left # 返回中间值</span><br><span class="line"></span><br><span class="line">def quick_sort(li,left,right):</span><br><span class="line">    if left&lt;right :# 至少两个元素</span><br><span class="line">        mid = partition(li,left,right)</span><br><span class="line">        quick_sort(li,left,mid-1)</span><br><span class="line">        quick_sort(li,mid+1,right)</span><br><span class="line"></span><br><span class="line">li = [5,7,4,6,3,1,2,9,8]</span><br><span class="line">quick_sort(li,0,len(li)-1)</span><br><span class="line">print(li)</span><br></pre></td></tr></table></figure>
+<h4 id="快速排序的效率"><a href="#快速排序的效率" class="headerlink" title="快速排序的效率"></a>快速排序的效率</h4><ul>
+<li>时间复杂度 O(n*log n)</li>
+</ul>
+<h4 id="快排的问题"><a href="#快排的问题" class="headerlink" title="快排的问题"></a>快排的问题</h4><ul>
+<li>递归 (python有个递归层数的问题默认1000)</li>
+<li>最坏情况</li>
+</ul>
+<blockquote>
+<p>什么是最坏情况</p>
+</blockquote>
+<ul>
+<li>当列表是 倒序排列的时候 [9,8,7,6,5,4,3,2,1]</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">基本和冒泡一样了</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h4 id="解决方案就是随机一个数字-而不是固定取第一位"><a href="#解决方案就是随机一个数字-而不是固定取第一位" class="headerlink" title="解决方案就是随机一个数字,而不是固定取第一位"></a>解决方案就是随机一个数字,而不是固定取第一位</h4></blockquote>
+<ul>
+<li>随机快排</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/09/Py008-01-06快速排序/" data-id="cknvgpu3c00ks0xjpnqefqfir" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M08/">M08</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Py007-03-02权限系统介绍" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/04/Py007-03-02权限系统介绍/" class="article-date">
@@ -137,7 +492,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/Py007-03-02权限系统介绍/" data-id="cklhjp25n00kbulfy6yzyugnl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/Py007-03-02权限系统介绍/" data-id="cknvgpu3800kk0xjppcmcmfje" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -187,7 +542,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/04/Py007-03-01crm介绍/" data-id="cklhjp25m00kaulfyy28do5kq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/04/Py007-03-01crm介绍/" data-id="cknvgpu3500kc0xjp7fn4aced" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -318,7 +673,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-13分布式爬虫简介/" data-id="cklhjp25l00k7ulfy91pm6z9n" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/02/Py007-02-13分布式爬虫简介/" data-id="cknvgpu3700ki0xjpzmgv4146" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -396,7 +751,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-12scrapy之CrawlSpider/" data-id="cklhjp25l00k6ulfyzcx2kett" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/02/Py007-02-12scrapy之CrawlSpider/" data-id="cknvgpu3600ke0xjp5by5fsy4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -464,342 +819,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-11scrapy之请求传参/" data-id="cklhjp25k00k3ulfy2xb7kqrh" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-02-10scrapy之日志等级" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/02/Py007-02-10scrapy之日志等级/" class="article-date">
-  <time datetime="2018-12-02T09:48:01.000Z" itemprop="datePublished">2018-12-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/Py007-02-10scrapy之日志等级/">Py007-02-10scrapy之日志等级</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><p>回顾我们之前的爬虫命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl 应用名  --nolog</span><br><span class="line"></span><br><span class="line"># 此时的打印信息  很多完全看不懂！</span><br></pre></td></tr></table></figure>
-<h4 id="日志等级-种类"><a href="#日志等级-种类" class="headerlink" title="日志等级(种类)"></a>日志等级(种类)</h4><ul>
-<li>ERROR:错误</li>
-<li>WARNING:警告</li>
-<li>INFO:一般信息</li>
-<li>DEBUG:调试信息(默认)</li>
-</ul>
-<blockquote>
-<h4 id="控制日志的打印-settings-py"><a href="#控制日志的打印-settings-py" class="headerlink" title="控制日志的打印 settings.py"></a>控制日志的打印 settings.py</h4></blockquote>
-<ul>
-<li>LOG_LEVEL 指定输出某一种信息</li>
-<li>LOG_FILE 将日志信息存到一个文件里</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 添加 LOG_LEVEL = &apos;种类&apos; 来控制显示哪一层级的日志</span><br><span class="line">LOG_LEVEL = &apos;ERROR&apos;</span><br><span class="line"># 此时只有错误的时候才会打印日志</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>将日志信息存到一个文件里</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOG_FILE = &apos;log.txt&apos;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-10scrapy之日志等级/" data-id="cklhjp25j00k2ulfybyfhuhdl" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-02-09scrapy之代理操作" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/02/Py007-02-09scrapy之代理操作/" class="article-date">
-  <time datetime="2018-12-02T09:15:35.000Z" itemprop="datePublished">2018-12-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/Py007-02-09scrapy之代理操作/">Py007-02-09scrapy之代理操作</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="代理操作"><a href="#代理操作" class="headerlink" title="代理操作"></a>代理操作</h3><ul>
-<li><a href="https://www.baidu.com/s?wd=ip" target="_blank" rel="noopener">https://www.baidu.com/s?wd=ip</a> </li>
-</ul>
-<p>这个url可以看本机ip</p>
-<h4 id="代理操作初步——先看本机ip"><a href="#代理操作初步——先看本机ip" class="headerlink" title="代理操作初步——先看本机ip"></a>代理操作初步——先看本机ip</h4><blockquote>
-<p>新建工程</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject proxyPro</span><br><span class="line"></span><br><span class="line">cd proxyPro</span><br><span class="line"></span><br><span class="line">scrapy genspider proxyDemo www.baidu.com/s?wd=ip</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p> 修改 生成的spiders/proxyDemo.py</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class ProxydemoSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;proxyDemo&apos;</span><br><span class="line">    # allowed_domains = [&apos;www.baidu.com/s?wd=ip&apos;]</span><br><span class="line">    start_urls = [&apos;https://www.baidu.com/s?wd=ip&apos;]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        fp = open(&apos;proxy.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line">        fp.write(response.text)</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>修改一些配置 settings.py</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 伪装请求载体身份</span><br><span class="line">19行：USER_AGENT = &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36&apos; </span><br><span class="line"></span><br><span class="line">22行：ROBOTSTXT_OBEY = False  #可以忽略或者不遵守robots协议</span><br><span class="line"># 不遵守robots协议</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>执行爬虫命令</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl proxyDemo --nolog</span><br><span class="line"></span><br><span class="line"># 查看 proxy.html 看到本机ip</span><br></pre></td></tr></table></figure>
-<h4 id="代理——中间件"><a href="#代理——中间件" class="headerlink" title="代理——中间件"></a>代理——中间件</h4><blockquote>
-<p>middlewares.py 的修改</p>
-</blockquote>
-<p>自定义下载中间件的类，在类中事先 process_request (处理中间拦截到的请求的)方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class MyProxy(object):</span><br><span class="line">    # 此时的process_request 依旧是对父类方法的重写</span><br><span class="line">    def process_request(self,request,spider):</span><br><span class="line">        # 请求ip的更换</span><br><span class="line">        &apos;&apos;&apos;</span><br><span class="line">        去 代理ip网 找个代理</span><br><span class="line">        http://www.goubanjia.com/</span><br><span class="line">        &apos;&apos;&apos;</span><br><span class="line">        request.meta[&apos;proxy&apos;] = &apos;https://123.1.150.244:80&apos;</span><br><span class="line"></span><br><span class="line"># 之前其他的无用代码可以移除</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>去settings.py里继续配置</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 找到 下载中间件 DOWNLOADER_MIDDLEWARES</span><br><span class="line"># 这个是之前 middlewares.py里的 下载中间件</span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">   &apos;proxyPro.middlewares.ProxyproDownloaderMiddleware&apos;: 543,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 修改成我们自己定义的 中间件类</span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">   &apos;proxyPro.middlewares.MyProxy&apos;: 543,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>执行爬虫命令(此时建议  不携带–nolog参数，因为代理ip可能会失败)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl proxyDemo</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代理和请求的url的协议头  要一致  要么是http ,要么是https</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>1.下载中间件类的自定义：</p>
-</blockquote>
-<ul>
-<li>继承 object </li>
-<li>重写 process_request(self,request,spider) 方法</li>
-</ul>
-<blockquote>
-<p>2.配置文件中 开启下载中间件</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-09scrapy之代理操作/" data-id="cklhjp25j00jzulfyy0yoo5a3" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-02-08scrapy之cookie操作" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/02/Py007-02-08scrapy之cookie操作/" class="article-date">
-  <time datetime="2018-12-02T08:36:45.000Z" itemprop="datePublished">2018-12-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/Py007-02-08scrapy之cookie操作/">Py007-02-08scrapy之cookie操作</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="cookie操作"><a href="#cookie操作" class="headerlink" title="cookie操作"></a>cookie操作</h3><blockquote>
-<p>豆瓣登陆指定页面</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject doubanPro</span><br><span class="line"></span><br><span class="line">cd doubanPro</span><br><span class="line"></span><br><span class="line">scrapy genspider douban www.douban.com</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="第一步-先该settins-py里的一些配置"><a href="#第一步-先该settins-py里的一些配置" class="headerlink" title="第一步 先该settins.py里的一些配置"></a>第一步 先该settins.py里的一些配置</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">USER_AGENT = &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36&apos;</span><br><span class="line"></span><br><span class="line">ROBOTSTXT_OBEY = False</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h4></blockquote>
-<ul>
-<li>修改起始url 也就是登陆的url</li>
-<li>重写 start_requests方法  发起post请求 (这里有登录操作，携带post参数)</li>
-<li>登录成功后 通过yield 来发送第二个请求 也就是个人主页页面数据</li>
-<li>自定义 请求成功后的parse方法 来进行个人页面数据的解析操作</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class DoubanSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;douban&apos;</span><br><span class="line">    allowed_domains = [&apos;www.douban.com&apos;]</span><br><span class="line">    start_urls = [&apos;http://www.douban.com/accounts/login&apos;]</span><br><span class="line"></span><br><span class="line">    # 重写 start_requests</span><br><span class="line">    def start_requests(self):</span><br><span class="line">        # 将请求参数封装到 字典中</span><br><span class="line">        # 豆瓣登陆页面 https://accounts.douban.com/login</span><br><span class="line">        data = &#123;</span><br><span class="line">            &apos;source&apos;: &apos;index_nav&apos;,</span><br><span class="line">            &apos;form_email&apos;: &apos;15027900535&apos;,</span><br><span class="line">            &apos;form_password&apos;: &apos;bobo@15027900535&apos;,</span><br><span class="line">        &#125;</span><br><span class="line">        for url in self.start_urls:</span><br><span class="line">            yield scrapy.FormRequest(url=url,formdata=data,callback=self.parse)</span><br><span class="line">    def parse(self, response):</span><br><span class="line"></span><br><span class="line">        # 登陆成功后的页面数据进行存储</span><br><span class="line"></span><br><span class="line">        fp = open(&apos;main.html&apos;,&apos;w&apos;,encoding=&apos;utf-8&apos;)</span><br><span class="line">        fp.write(response.text)</span><br><span class="line"></span><br><span class="line">        # 获取当前用户个人主页对应的页面数据</span><br><span class="line">        url = &apos;https://www.douban.com/people/185687620/&apos;</span><br><span class="line"></span><br><span class="line">        yield scrapy.Request(url=url,callback=self.parseSecondPage)</span><br><span class="line"></span><br><span class="line">    # 定义跳转指定页面的 parse方法</span><br><span class="line">    def parseSecondPage(self,response):</span><br><span class="line">        fp = open(&apos;second.html&apos;, &apos;w&apos;, encoding=&apos;utf-8&apos;)</span><br><span class="line">        fp.write(response.text)</span><br><span class="line"></span><br><span class="line">        # 可以对当前用户的个人主页的页面数据进行解析操作</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h4 id="第三步-执行爬虫命令"><a href="#第三步-执行爬虫命令" class="headerlink" title="第三步 执行爬虫命令"></a>第三步 执行爬虫命令</h4></blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl douban --nolog</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>通过scrapy进行cookie操作时，并不需要将cookie进行特定的提取，也不需要将cookie加载到我们的请求对象中去</p>
-</blockquote>
-<ul>
-<li>涉及登录的时候，如果服务器给我们设置了cookie,scrapy在第二次请求页面的时候自动帮我们携带cookie </li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-08scrapy之cookie操作/" data-id="cklhjp25i00jyulfyolwwlqr3" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-02-07scrapy发post请求" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/02/Py007-02-07scrapy发post请求/" class="article-date">
-  <time datetime="2018-12-02T07:05:43.000Z" itemprop="datePublished">2018-12-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/Py007-02-07scrapy发post请求/">Py007-02-07scrapy发post请求</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="scrapy里post请求"><a href="#scrapy里post请求" class="headerlink" title="scrapy里post请求"></a>scrapy里post请求</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject postPro</span><br><span class="line"></span><br><span class="line">cd postPro</span><br><span class="line"></span><br><span class="line">scrapy genspider postDemo www.baidu.com</span><br></pre></td></tr></table></figure>
-<h4 id="start-requests方法"><a href="#start-requests方法" class="headerlink" title="start_requests方法"></a>start_requests方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class PostdemoSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;postDemo&apos;</span><br><span class="line">    # allowed_domains = [&apos;www.baidu.com&apos;]</span><br><span class="line">    start_urls = [&apos;https://fanyi.baidu.com/sug&apos;]</span><br><span class="line"></span><br><span class="line">    # start_requests是父类的方法：对start_urls里的url进行get请求发送</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 大概实现如下</span><br><span class="line">    def start_requests(self):</span><br><span class="line">        for url in self.start_urls:</span><br><span class="line">            yield scrapy.Request(url=url,callback=self.parse)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    </span><br><span class="line">    def parse(self, response):</span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>
-<h4 id="发送post请求"><a href="#发送post请求" class="headerlink" title="发送post请求"></a>发送post请求</h4><p>start_requests 默认发送get 如何发送post呢？</p>
-<blockquote>
-<p>重写 start_requests 方法的实现</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 发起post</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    1.将Request方法的method赋值成post(不推荐)</span><br><span class="line">    2.FormRequest() 这个方法也可以发起post请求(推荐)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    def start_requests(self):</span><br><span class="line">        # post请求参数</span><br><span class="line">        data = &#123;</span><br><span class="line">            &apos;kw&apos;:&apos;dog&apos;</span><br><span class="line">        &#125;</span><br><span class="line">        for url in self.start_urls:</span><br><span class="line">            # formdata :请求参数对应的字典</span><br><span class="line">            yield scrapy.FormRequest(url=url,formdata=data,callback=self.parse)</span><br></pre></td></tr></table></figure>
-<h3 id="需求：百度翻译中指定词条的翻译结果-进行获取"><a href="#需求：百度翻译中指定词条的翻译结果-进行获取" class="headerlink" title="需求：百度翻译中指定词条的翻译结果 进行获取"></a>需求：百度翻译中指定词条的翻译结果 进行获取</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class PostdemoSpider(scrapy.Spider):</span><br><span class="line">    name = &apos;postDemo&apos;</span><br><span class="line">    # allowed_domains = [&apos;www.baidu.com&apos;]</span><br><span class="line">    start_urls = [&apos;https://fanyi.baidu.com/sug&apos;]</span><br><span class="line"></span><br><span class="line">    # start_requests是父类的方法：对start_urls里的url进行get请求发送</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    # 大概实现如下</span><br><span class="line">    def start_requests(self):</span><br><span class="line">        for url in self.start_urls:</span><br><span class="line">            yield scrapy.Request(url=url,callback=self.parse)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line"></span><br><span class="line">    # 发起post</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    1.将Request方法的method赋值成post</span><br><span class="line">    2.FormRequest() 这个方法也可以发起post请求(推荐)</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    def start_requests(self):</span><br><span class="line">        # post请求参数</span><br><span class="line">        data = &#123;</span><br><span class="line">            &apos;kw&apos;:&apos;dog&apos;</span><br><span class="line">        &#125;</span><br><span class="line">        for url in self.start_urls:</span><br><span class="line">            # formdata :请求参数对应的字典</span><br><span class="line">            yield scrapy.FormRequest(url=url,formdata=data,callback=self.parse)</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        print(response.text)</span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>注意：别忘了修改settings.py里的设置</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 伪装请求载体身份</span><br><span class="line">19行：USER_AGENT = &apos;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36&apos; </span><br><span class="line"></span><br><span class="line">22行：ROBOTSTXT_OBEY = False  #可以忽略或者不遵守robots协议</span><br><span class="line"># 不遵守robots协议</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>验证结果</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl postDemo --nolog</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote>
-<p>如何发post方法？</p>
-</blockquote>
-<p>一定要对start_requests方法进行重写</p>
-<ul>
-<li>1.将Request方法的method赋值成post</li>
-<li>2.FormRequest() 这个方法也可以发起post请求(推荐)</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-07scrapy发post请求/" data-id="cklhjp25h00jvulfyitkrs16c" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Py007-02-06scrapy核心组件" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/12/02/Py007-02-06scrapy核心组件/" class="article-date">
-  <time datetime="2018-12-02T06:39:47.000Z" itemprop="datePublished">2018-12-02</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/12/02/Py007-02-06scrapy核心组件/">Py007-02-06scrapy核心组件</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="scrapy五大核心组件"><a href="#scrapy五大核心组件" class="headerlink" title="scrapy五大核心组件"></a>scrapy五大核心组件</h3><p><img src="https://raw.githubusercontent.com/slTrust/note/master/img/py/py007_02_0601.png" alt></p>
-<blockquote>
-<p>引擎(Scrapy)</p>
-</blockquote>
-<ul>
-<li>用来处理整个系统的数据流处理, 触发事务(框架核心)</li>
-</ul>
-<blockquote>
-<p>调度器(Scheduler)</p>
-</blockquote>
-<ul>
-<li>用来接受引擎发过来的请求, 压入队列中, 并在引擎再次请求的时候返回. 可以想像成一个URL（抓取网页的网址或者说是链接）的优先队列, 由它来决定下一个要抓取的网址是什么, 同时去除重复的网址</li>
-</ul>
-<blockquote>
-<p>下载器(Downloader)</p>
-</blockquote>
-<ul>
-<li>用于下载网页内容, 并将网页内容返回给蜘蛛(Scrapy下载器是建立在twisted这个高效的异步模型上的)</li>
-</ul>
-<blockquote>
-<p>爬虫(Spiders)</p>
-</blockquote>
-<ul>
-<li>爬虫是主要干活的, 用于从特定的网页中提取自己需要的信息, 即所谓的实体(Item)。用户也可以从中提取出链接,让Scrapy继续抓取下一个页面</li>
-</ul>
-<blockquote>
-<p>项目管道(Pipeline)</p>
-</blockquote>
-<ul>
-<li>负责处理爬虫从网页中抽取的实体，主要的功能是持久化实体、验证实体的有效性、清除不需要的信息。当页面被爬虫解析后，将被发送到项目管道，并经过几个特定的次序处理数据。</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/02/Py007-02-06scrapy核心组件/" data-id="cklhjp25h00juulfyxe8z02s6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/02/Py007-02-11scrapy之请求传参/" data-id="cknvgpu3400ka0xjp59ngjgf4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/M07/">M07</a></li></ul>
@@ -829,7 +849,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -839,7 +859,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -861,23 +881,23 @@
       <ul>
         
           <li>
+            <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
       </ul>

@@ -62,6 +62,305 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node-web05-07-01博客系统部署" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-07-01博客系统部署/" class="article-date">
+  <time datetime="2021-02-18T15:12:09.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-07-01博客系统部署/">Node-web05-07-01博客系统部署</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客部署阿里云"><a href="#博客部署阿里云" class="headerlink" title="博客部署阿里云"></a>博客部署阿里云</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4" target="_blank" rel="noopener">初始代码</a></li>
+</ul>
+<h3 id="我们先build代码"><a href="#我们先build代码" class="headerlink" title="我们先build代码"></a>我们先build代码</h3><ul>
+<li><code>yarn build</code> 结果报错了，说找不到 Post</li>
+<li><p>原因是 next-env.d.ts ,一旦有 import 这个声明就不是全局的了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;reference types=&quot;next&quot; /&gt;</span><br><span class="line">/// &lt;reference types=&quot;next/types/global&quot; /&gt;</span><br><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line"></span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建 custom.d.ts 在项目根目录，里面放置全局的类型声明</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">type Post = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">  htmlContent: string;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时再次 <code>yarn build</code> 构建成功</li>
+<li>去看 <code>.next/BUILD_ID</code> 这个是每次 build产生的id</li>
+<li>然后 <code>yarn start</code> 运行，部署代码也是这样运行</li>
+</ul>
+<h3 id="docker化应用"><a href="#docker化应用" class="headerlink" title="docker化应用"></a>docker化应用</h3><ul>
+<li>google docker nodejs 得到 <a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" target="_blank" rel="noopener">Dockerizing a Node.js web app</a></li>
+<li>所有的英文都不看，直接看例子</li>
+<li>创建 Dockerfile <code>touch Dockerfile</code></li>
+<li>内容如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">FROM node:12</span><br><span class="line">#  在 linux 的 /usr/src/app 目录工作</span><br><span class="line">WORKDIR /usr/src/app</span><br><span class="line">COPY package.json ./</span><br><span class="line"># 因为我们用的是 yarn 不是 npm</span><br><span class="line">COPY yarn.lock ./</span><br><span class="line"># run 开头 代表运行 命令</span><br><span class="line">RUN yarn install</span><br><span class="line"># 这个意思是 把你项目根目录的内容 拷贝到 工作目录</span><br><span class="line">COPY . .</span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 3000</span><br><span class="line"># 最后一步你要运行的代码</span><br><span class="line">CMD [ &quot;yarn&quot;, &quot;start&quot; ]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>再次创建一个忽略文件 <code>.dockerignore</code></p>
+<ul>
+<li>同<code>.gitignore</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node_modules</span><br><span class="line">*.log</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>继续看文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 看文档</span><br><span class="line"># 构建你的 docker应用 </span><br><span class="line"># 构建成功会生成一个镜像</span><br><span class="line">docker build -t &lt;your username&gt;/node-web-app .</span><br><span class="line"></span><br><span class="line"># 如何运行镜像呢？</span><br><span class="line">docker run -p 3000:3000 -d &lt;your username&gt;/node-web-app</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>我的构建命令如下</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
+<h3 id="构建过程出错了"><a href="#构建过程出错了" class="headerlink" title="构建过程出错了"></a>构建过程出错了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 第一个问题 yarn install 一直卡在 &quot;Fetch packages...&quot;</span><br><span class="line">yarn cache clean &amp; yarn install</span><br><span class="line"></span><br><span class="line"># 第二个问题 yarn install --verbose 显示它的进度，发现卡在这里</span><br><span class="line">Browserslist: caniuse-lite is outdated. Please run: npx browserslist@latest --update-db</span><br><span class="line"></span><br><span class="line">- 解决办法</span><br><span class="line">- 删除 node_modules 文件夹及 package-lock.json 文件</span><br><span class="line"></span><br><span class="line">结果不管事</span><br><span class="line">再次添加参数</span><br><span class="line"></span><br><span class="line">RUN  yarn cache clean &amp; yarn install --verbose --network-timeout 60000</span><br></pre></td></tr></table></figure>
+<ul>
+<li>历经千辛万苦，终于build成功了</li>
+<li>运行<code>docker run -p 3000:3000 -d my-node-app/node-web-app</code> 打开浏览器 <a href="http://localhost:3000/" target="_blank" rel="noopener">http://localhost:3000/</a> </li>
+<li>发现报错， 通过log看运行日志</li>
+<li>docker logs 你的应用id </li>
+<li>应该是 数据库连接问题，数据库需要一个 pg 容器，并配置好localhost</li>
+<li>修改 ormconfig.json 里的host为你的本机ip<ul>
+<li>因为 容器内的 localhost 不是你本机的 localhost</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-07-01博客系统部署/" data-id="cknvgptyj00aj0xjp5le9i8nz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-06博客系统后端分页" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-06博客系统后端分页/" class="article-date">
+  <time datetime="2021-02-18T13:49:13.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="博客分页"><a href="#博客分页" class="headerlink" title="博客分页"></a>博客分页</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/1fbe3c0de245cd6dd2a18cd1cb27d9afa9982616" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/c61325850c7b041914eeb33f6721e73bf7c21a24" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h2 id="未登录的处理"><a href="#未登录的处理" class="headerlink" title="未登录的处理"></a>未登录的处理</h2><ul>
+<li>后端发现没登录返回401</li>
+<li>前端发现401也提示登录，同时在url后面 附上 returnTo 参数</li>
+<li>前端登录成功后，根据 returnTo 回跳页面</li>
+<li>后端发现登录了，就可以 根据携带的cookie 拿到session里的 currentUser</li>
+</ul>
+<blockquote>
+<p>功能点</p>
+</blockquote>
+<ul>
+<li>使用 query-string 处理参数</li>
+<li>returnTo后面的路径 可能也包含参数<ul>
+<li>encodeURIComponent 处理传递的路径转译问题<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sign_in?returnTo=$&#123;encodeURIComponent(window.location.pathname)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="分页如何做"><a href="#分页如何做" class="headerlink" title="分页如何做"></a>分页如何做</h2><ul>
+<li>1) <code>/posts</code> or <code>/posts?page=1</code></li>
+<li>2) <code>/posts?page=100</code>咋办<ul>
+<li>实际没有100页 ，前端瞎写的</li>
+</ul>
+</li>
+<li>3) 后端获取 page （查询字符串）</li>
+<li>4) typeorm 的 page 功能</li>
+<li>5) 输出JSON给前端，同时告诉前端这是第几页</li>
+</ul>
+<h3 id="大型网站的微博咋写的？"><a href="#大型网站的微博咋写的？" class="headerlink" title="大型网站的微博咋写的？"></a>大型网站的微博咋写的？</h3><ul>
+<li>参考新浪</li>
+<li>你访问 <code>/posts?page=1</code> 看了，然后在看第二页</li>
+<li>此时访问的是 <code>/posts?page=2</code>，但是新浪微博的用户量很大，这期间可能 更新了10来条 你看到可能跟刚才的存在重叠，或者完美错过</li>
+<li><strong>正确姿势</strong></li>
+<li><code>/posts?page=2&amp;id=上一页最后一个id&amp;offset=10</code></li>
+<li>后端获取id小于此 id的数据，最多10条</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-06博客系统后端分页/" data-id="cknvgptyk00am0xjp2dgond8h" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-05博客系统创建博客" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-05博客系统创建博客/" class="article-date">
+  <time datetime="2021-02-18T10:59:34.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="创建博客"><a href="#创建博客" class="headerlink" title="创建博客"></a>创建博客</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/
+commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/1fbe3c0de245cd6dd2a18cd1cb27d9afa9982616" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h3 id="如何在代码里隐藏密码-密钥"><a href="#如何在代码里隐藏密码-密钥" class="headerlink" title="如何在代码里隐藏密码/密钥"></a>如何在代码里隐藏密码/密钥</h3><ul>
+<li>绝对不能写在代码里，一旦泄漏很危险</li>
+<li>必须放到环境变量里，或者被 .gitignore 的文件里</li>
+</ul>
+<blockquote>
+<p>正确姿势</p>
+</blockquote>
+<ul>
+<li><p>第一种：环境变量(不够方便)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 命令行里</span><br><span class="line">export SECRET=你的密钥</span><br><span class="line"></span><br><span class="line"># js程序里</span><br><span class="line">password:process.env.SECRET</span><br><span class="line"></span><br><span class="line"># 操作流程</span><br><span class="line">export SECRET=你的密钥</span><br><span class="line"># 重启你的应用即可，开发用这个</span><br><span class="line">yarn dev</span><br><span class="line"># 如果是部署在生产环境，你就登录到这个机器设置环境变量，然后运行你的 “程序”</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第二种：仅限于next.js 因为提供了支持</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># next.js的项目里新建 .env.local</span><br><span class="line"># 在这里设置环境变量</span><br><span class="line"># 内容如下</span><br><span class="line">SECRET=你的密钥</span><br><span class="line"></span><br><span class="line"># 最重要的一步，将这个文件 添加到 .gitignore</span><br><span class="line"></span><br><span class="line"># 这样的好处是，每个人有自己的 密钥，相互不知道</span><br></pre></td></tr></table></figure>
+<h3 id="Entity-循环引用-bug"><a href="#Entity-循环引用-bug" class="headerlink" title="Entity 循环引用 bug"></a>Entity 循环引用 bug</h3><ul>
+<li>ManyToOne , OneToMany 循环引用问题</li>
+<li>解决方案<a href="https://github.com/typeorm/typeorm/issues/1290" target="_blank" rel="noopener">使用字符串关联</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-05博客系统创建博客/" data-id="cknvgptyi00ah0xjpw7gs3jwj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Node-web05-04博客系统登录" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/18/Node-web05-04博客系统登录/" class="article-date">
+  <time datetime="2021-02-18T08:40:03.000Z" itemprop="datePublished">2021-02-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="登录功能"><a href="#登录功能" class="headerlink" title="登录功能"></a>登录功能</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/9aec928eacfaf53dd839e5280e04113d9f24810b" target="_blank" rel="noopener">初始代码</a></li>
+<li><a href="https://github.com/slTrust/next-demo-2/commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">最终代码</a></li>
+</ul>
+<h3 id="实现逻辑"><a href="#实现逻辑" class="headerlink" title="实现逻辑"></a>实现逻辑</h3><ul>
+<li>创建登录页面 sign_in</li>
+<li>创建 posts/sessions API</li>
+<li>使用 SignIn Model 校验数据</li>
+<li>使用 session 记录登录状态</li>
+</ul>
+<h4 id="用-session记录登录状态"><a href="#用-session记录登录状态" class="headerlink" title="用 session记录登录状态"></a>用 session记录登录状态</h4><ul>
+<li>google 搜索 next.js session</li>
+<li>没找到标准答案</li>
+<li>搜仓库 发现 example 里有个<a href="https://github.com/vercel/next.js/tree/canary/examples/with-iron-session" target="_blank" rel="noopener">例子 with-iron-session</a></li>
+<li><code>lib/withSession.tsx</code></li>
+<li>一定不能把密钥写在代码里，测试可以这样，但是生产环境一定不能这样</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &#123;withIronSession&#125; from &apos;next-iron-session&apos;;</span><br><span class="line">import &#123;NextApiHandler&#125; from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">export function withSession(handler: NextApiHandler) &#123;</span><br><span class="line">    return withIronSession(handler, &#123;</span><br><span class="line">        // password: process.env.SECRET_COOKIE_PASSWORD,</span><br><span class="line">        password: &apos;c2a85490-cc60-4f21-94e8-8dc5dd3220da&apos;, //密钥，这个应该用环境变量</span><br><span class="line">        cookieName: &apos;blog&apos;,</span><br><span class="line">        // 这个选项如果不设置 你本地开发是http的 就会种不下 cookie 获取 user 会是 undefined</span><br><span class="line">        cookieOptions: &#123;secure: false&#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后修改 <code>api/v1/sessions.tsx</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import &#123;NextApiHandler&#125; from &apos;next&apos;;</span><br><span class="line">import &#123;SignIn&#125; from &apos;../../../src/model/SignIn&apos;;</span><br><span class="line">import &#123;withSession&#125; from &quot;../../../lib/withSession&quot;;</span><br><span class="line"></span><br><span class="line">const Sessions: NextApiHandler = async (req, res) =&gt; &#123;</span><br><span class="line">    const &#123;username, password&#125; = req.body;</span><br><span class="line">    res.setHeader(&apos;Content-Type&apos;, &apos;application/json; charset=utf-8&apos;);</span><br><span class="line">    const signIn = new SignIn();</span><br><span class="line">    signIn.username = username;</span><br><span class="line">    signIn.password = password;</span><br><span class="line">    await signIn.validate();</span><br><span class="line">    if (signIn.hasErrors()) &#123;</span><br><span class="line">        res.statusCode = 422;</span><br><span class="line">        res.end(JSON.stringify(signIn.errors));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        req.session.set(&apos;currentUser&apos;, signIn.user);</span><br><span class="line">        await req.session.save()</span><br><span class="line">        res.statusCode = 200;</span><br><span class="line">        res.end(JSON.stringify(signIn.user));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 包一层</span><br><span class="line">export default withSession(Sessions);</span><br><span class="line"></span><br><span class="line">// 但是遇到了问题 req.session 点不出来，因为没类型，ts无法识别</span><br><span class="line">// 除非我们能对 NextApiRequest 进行一个扩展，添加 session 选项</span><br></pre></td></tr></table></figure>
+<h3 id="如何声明对已有类型进行扩展"><a href="#如何声明对已有类型进行扩展" class="headerlink" title="如何声明对已有类型进行扩展"></a>如何声明对已有类型进行扩展</h3><ul>
+<li><a href="https://github.com/microsoft/TypeScript/issues/10859" target="_blank" rel="noopener">Extend external modules declared</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">首先引入 这个类型，然后在这个类上加属性</span><br><span class="line"></span><br><span class="line">import * as [原有类型] from &apos;[原有类型]&apos;;</span><br><span class="line"></span><br><span class="line">declare module &apos;[原有类型]&apos; &#123;</span><br><span class="line">  interface MyAddon &#123;</span><br><span class="line">    [你的属性]:any</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>next-env.d.ts 修改如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后去登录 <a href="http://localhost:3000/sign_in" target="_blank" rel="noopener">http://localhost:3000/sign_in</a></li>
+<li>此时登录成功 会响应一个 set-cookie 头，这个东西对应服务器里的一小块内存。这个session里记录了用户的信息</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-04博客系统登录/" data-id="cknvgptyf00ac0xjpapgtlmzb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node-web05-03博客系统注册" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/02/18/Node-web05-03博客系统注册/" class="article-date">
@@ -128,7 +427,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-03博客系统注册/" data-id="cklhjp21j00a9ulfyxpfxmcqu" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-03博客系统注册/" data-id="cknvgptyn00ar0xjpmoet1ce6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -235,7 +534,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-02博客系统数据显示/" data-id="cklhjp21i00a8ulfyca6n5qcl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/18/Node-web05-02博客系统数据显示/" data-id="cknvgptyg00ae0xjpli3ix5rg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -422,7 +721,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/17/Node-web05-01博客系统构建/" data-id="cklhjp21h00a5ulfyaolb2qdl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/17/Node-web05-01博客系统构建/" data-id="cknvgptyc00a40xjpwo4k8u0i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -587,7 +886,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/14/Node-web04-01TypeORM/" data-id="cklhjp21g00a4ulfyddcmdsw3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/14/Node-web04-01TypeORM/" data-id="cknvgptye00a90xjphaf94yu5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -644,7 +943,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/20/HTTP06密码学到https流程/" data-id="cklhjp1xu001julfyndv5zqbe" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/20/HTTP06密码学到https流程/" data-id="cknvgptur001w0xjpmocz75or" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -737,406 +1036,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/19/HTTP05缓存控制/" data-id="cklhjp1xt001gulfyxk7jeego" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP04报文和http状态码" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/18/HTTP04报文和http状态码/" class="article-date">
-  <time datetime="2021-01-18T15:31:52.000Z" itemprop="datePublished">2021-01-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/18/HTTP04报文和http状态码/">HTTP04报文和http状态码</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="报文的内容"><a href="#报文的内容" class="headerlink" title="报文的内容"></a>报文的内容</h3><h4 id="request-请求报文"><a href="#request-请求报文" class="headerlink" title="request 请求报文"></a>request 请求报文</h4><ul>
-<li>第一部分 请求行<code>method path  http版本号</code></li>
-<li>第二部分 K/V对的 请求首部</li>
-<li>第三部分 空行</li>
-<li>第四部分 请求体</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1 请求行</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;87&quot;, &quot; Not;A Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;87&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line"></span><br><span class="line">请求体</span><br></pre></td></tr></table></figure>
-<h4 id="response-响应报文"><a href="#response-响应报文" class="headerlink" title="response 响应报文"></a>response 响应报文</h4><ul>
-<li>第一部分 请求行<code>http版本号  状态码 状态码的解释</code></li>
-<li>第二部分 K/V对的 请求首部</li>
-<li>第三部分 空行</li>
-<li>第四部分 响应体</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 2</span><br><span class="line">Bdqid: 0xc2b78305000219a6</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line">Date: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Expires: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=116; path=/</span><br><span class="line">Set-Cookie: BD_HOME=1; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Traceid: 1609343343346522650614030827221594282406</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">空行</span><br><span class="line">响应体</span><br></pre></td></tr></table></figure>
-<h3 id="HTTP状态码"><a href="#HTTP状态码" class="headerlink" title="HTTP状态码"></a>HTTP状态码</h3><ul>
-<li>200 OK 成功</li>
-<li>204 No Content 请求成功了服务器做了处理了，但是不返回任何内容</li>
-<li>206 Partial Content 返回部分数据</li>
-<li>301 永久重定向, <ul>
-<li>比如 当你访问aa.com ，重定向到bb.com,此时浏览器就会记录缓存，下次你输入 aa.com 会直接 跳转到 bb.com</li>
-</ul>
-</li>
-<li>302 Found 临时重定向</li>
-<li>303 See Other</li>
-<li>304 Not Modified 缓存相关</li>
-<li>307 也是临时重定向</li>
-<li>400 bad request </li>
-<li>401 Unauthorized 未授权，没权限</li>
-<li>403 forbidden 被服务器拒绝了</li>
-<li>404 not found </li>
-<li>500 Internal Server Error </li>
-<li>503 Service Unavailable 服务器处理不过来了</li>
-</ul>
-<h4 id="重定向"><a href="#重定向" class="headerlink" title="重定向"></a>重定向</h4><h5 id="302情况-访问-aa-com重定向"><a href="#302情况-访问-aa-com重定向" class="headerlink" title="302情况 访问 aa.com重定向"></a>302情况 访问 aa.com重定向</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 服务器端</span><br><span class="line">statusCode = 302</span><br><span class="line">setHeader(&apos;location&apos;,&apos;www.baidu.com&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>先发送 <a href="http://www.aa.com，响应" target="_blank" rel="noopener">http://www.aa.com，响应</a> 302</li>
-<li>然后再次 发送 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a> 请求</li>
-</ul>
-<h5 id="301情况-访问-aa-com重定向"><a href="#301情况-访问-aa-com重定向" class="headerlink" title="301情况 访问 aa.com重定向"></a>301情况 访问 aa.com重定向</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 服务器端设置响应</span><br><span class="line">statusCode = 301</span><br><span class="line">setHeader(&apos;location&apos;,&apos;www.baidu.com&apos;)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>先发送 <a href="http://www.aa.com，响应" target="_blank" rel="noopener">http://www.aa.com，响应</a> 301</li>
-<li>然后再次 发送 <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a> 请求</li>
-<li>此时如果关闭你的服务器 再次网址里输入 <a href="http://www.aa.com，会直接" target="_blank" rel="noopener">http://www.aa.com，会直接</a> 访问  <a href="http://www.baidu.com" target="_blank" rel="noopener">http://www.baidu.com</a></li>
-</ul>
-<p><strong>注意！chrome调试的时候 不要勾选disable cache</strong></p>
-<h4 id="响应类型和请求类型"><a href="#响应类型和请求类型" class="headerlink" title="响应类型和请求类型"></a>响应类型和请求类型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 响应类型</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line"></span><br><span class="line">// 请求类型</span><br><span class="line">Content-Type: application/x-www-form-urlencoded;charset=utf-8</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/18/HTTP04报文和http状态码/" data-id="cklhjp1xs001eulfy5q4ex796" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP03http常用方法" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/17/HTTP03http常用方法/" class="article-date">
-  <time datetime="2021-01-17T15:31:24.000Z" itemprop="datePublished">2021-01-17</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/17/HTTP03http常用方法/">HTTP03http常用方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.常见HTTP方法有哪些？使用场景分别是什么？<br>2.GET与POST有什么区别？<br>3.什么是RESTful API？</p>
-<h3 id="常见Http方法"><a href="#常见Http方法" class="headerlink" title="常见Http方法"></a>常见Http方法</h3><ul>
-<li>GET</li>
-<li>POST</li>
-<li>PUT</li>
-<li>HEAD</li>
-<li>DELETE</li>
-<li>OPTIONS</li>
-<li>CONNECT</li>
-</ul>
-<h3 id="RESTful-API"><a href="#RESTful-API" class="headerlink" title="RESTful API"></a>RESTful API</h3><p>表现层状态转换（英语：Representational State Transfer，缩写：REST），API设计规范，HTTP方法与对应数据库增删改查对应</p>
-<ul>
-<li>GET：读取（Read）</li>
-<li>POST：新建（Create）</li>
-<li>PUT：更新（Update）</li>
-<li>PATCH：更新（Update），通常是部分更新</li>
-<li>DELETE：删除（Delete）</li>
-</ul>
-<blockquote>
-<p>范例</p>
-</blockquote>
-<ul>
-<li>GET /books , 列出所有的图书</li>
-<li>POST /books , 创建一本图书</li>
-<li>PUT /books, 批量更新图书信息</li>
-<li>DELETE /books, 删除所有图书</li>
-<li>GET /books/10， 获取10号图书详细信息</li>
-<li>PUT /books/10， 更新10号图书</li>
-<li>PATCH /books/10， 更新10号图书</li>
-<li>DELETE /books/10, 删除10号图书</li>
-</ul>
-<h5 id="PUT和PATCH有什么差别？"><a href="#PUT和PATCH有什么差别？" class="headerlink" title="PUT和PATCH有什么差别？"></a>PUT和PATCH有什么差别？</h5><p>对于</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;username&quot;: &quot;xxx&quot;</span><br><span class="line">    &quot;email&quot;: &quot;xxx@xxxx.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>PUT修改传参，需包含全部参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;username&quot;: &quot;xxx&quot;</span><br><span class="line">    &quot;email&quot;: &quot;xxx@vip.qq.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>PATCH修改传参，只需要传递需要修改的参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;email&quot;: &quot;hunger@vip.qq.com&quot; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外推荐在URL中强制加入版本号，如</p>
-<p>GET /v1/books</p>
-<h4 id="Form表单支持哪些方法"><a href="#Form表单支持哪些方法" class="headerlink" title="Form表单支持哪些方法"></a>Form表单支持哪些方法</h4><p>form表单只支持 post 和get。但是可以通过变通的方法，让服务器知道你本意是想做什么。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=&quot;/books&quot; method=&quot;POST&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;_method&quot; value=&quot;PUT&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="HTTP-持久连接"><a href="#HTTP-持久连接" class="headerlink" title="HTTP-持久连接"></a>HTTP-持久连接</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>一个请求的过程是</p>
-</blockquote>
-<ul>
-<li>step01 三次握手 建立连接</li>
-<li>step02 HTTP request / response</li>
-<li>step03 四度挥手 断开连接</li>
-</ul>
-<p>每次请求都经历这些过程，握手很频繁。损耗时间</p>
-<p>通过添加 <code>Connection: keep-alive</code> 代表建立连接后，你们以后别再次握手挥手了，直接发请求就行了，等都ok了 在挥手停下来</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/17/HTTP03http常用方法/" data-id="cklhjp1xs001culfyaer9yqal" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP02三次握手四度挥手" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/16/HTTP02三次握手四度挥手/" class="article-date">
-  <time datetime="2021-01-16T15:30:55.000Z" itemprop="datePublished">2021-01-16</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/16/HTTP02三次握手四度挥手/">HTTP02三次握手四度挥手</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><p>A：我准备好了你准备好了吗，收到请回答。<br>B：收到收到，我也准备好了，收到请回答。<br>A：收到收到</p>
-<blockquote>
-<p>粗略理解</p>
-</blockquote>
-<ul>
-<li>step01 A询问B服务器,并带着序号seq=x的问题<ul>
-<li>SYN=1,seq=x  </li>
-</ul>
-</li>
-<li>step02 B用 <code>ack=x+1</code>响应seq=x的问题，同时问了A一个问题 SYN=1,seq=y<ul>
-<li>ACK=1,ack=x+1,SYN=1,seq=y</li>
-</ul>
-</li>
-<li>step03 A回答B的问题,同时当前问题的序号加1<ul>
-<li>ACK=1,ack=y+1,seq=x+1</li>
-</ul>
-</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/001.png" alt></p>
-<blockquote>
-<p>SYN 是啥？</p>
-</blockquote>
-<ul>
-<li>就是一个确认报文</li>
-<li>SYN=1 代表向对方询问。 我已经OK了，我要去问你了，同时要加一个序号  seq = x，</li>
-</ul>
-<blockquote>
-<p>序号 seq</p>
-</blockquote>
-<p>保证 每次询问的问题都会有一个seq，这样即使 对方没有反应，下次询问的时候又有新的序号，不会发生错乱</p>
-<blockquote>
-<p>ACK=1 代表回答</p>
-</blockquote>
-<p>ack=x+1 代表 回答你刚刚seq=x的问题</p>
-<p>TCP规定SYN=1时不能携带数据，但要消耗一个序号,因此声明自己的序号是 seq=x</p>
-<h3 id="四步挥手"><a href="#四步挥手" class="headerlink" title="四步挥手"></a>四步挥手</h3><p>1.客户端发送一个 FIN ，告诉服务器想关闭连接。<br>2.服务器收到这个 FIN ，发回一个 ACK。（关闭需要时间，此时只是回应知道这个事了）<br>3.服务器通知应用程序关闭网络连接，应用程序关闭后通知服务器。服务器发送一个 FIN 给客户端 。 (真的关闭后，再次发送FIN给客户端，同时告诉你也关闭吧，我已经关了)<br>4.客户端发回 ACK 报文确认。</p>
-<p><img src="https://raw.githubusercontent.com/slTrust/note/master/http/002.png" alt></p>
-<h4 id="为什么挥手要四步"><a href="#为什么挥手要四步" class="headerlink" title="为什么挥手要四步"></a>为什么挥手要四步</h4><p>这是因为服务端的 LISTEN 状态下的 SOCKET 当收到客户端建立连接请求的SYN 报文后，它可以把 ACK 和 SYN （ ACK 起应答作用，而 SYN 起同步作用）放在一个报文里来发送。但关闭连接时，当服务器收到客户端的 FIN 报文通知时，服务器只能发一个回应报文ACK：“哦，我知道了”，然后通知应用程序。应用程序完成全部数据发送并确定可以终止了，服务器才能发送FIN告诉客户端可以真正断开连接了。所以这一步ACK报文和FIN报文需要分开发送，因此多了一个步骤。</p>
-<h4 id="TCP报文格式"><a href="#TCP报文格式" class="headerlink" title="TCP报文格式"></a>TCP报文格式</h4><ul>
-<li>ACK ： TCP协议规定，只有ACK=1时有效，也规定连接建立后所有发送的报文的ACK必须为1。</li>
-<li>SYN(SYNchronization) ： 在连接建立时用来同步序号。当SYN=1而ACK=0时，表明这是一个连接请求报文。对方若同意建立连接，则应在响应报文中使SYN=1和ACK=1. 因此, SYN置1就表示这是一个连接请求或连接接受报文。</li>
-<li>FIN （finis）即完，终结的意思， 用来释放一个连接。当 FIN = 1 时，表明此报文段的发送方的数据已经发送完毕，并要求释放连接。</li>
-</ul>
-<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><ul>
-<li><a href="https://blog.csdn.net/daocaoren1543169565/article/details/80535949" target="_blank" rel="noopener">CSDN-TCP报文详解</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/16/HTTP02三次握手四度挥手/" data-id="cklhjp1xr0019ulfyat3vq95s" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-HTTP01网络各种层" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/01/15/HTTP01网络各种层/" class="article-date">
-  <time datetime="2021-01-15T15:30:20.000Z" itemprop="datePublished">2021-01-15</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/15/HTTP01网络各种层/">HTTP01网络各种层</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="网络基础"><a href="#网络基础" class="headerlink" title="网络基础"></a>网络基础</h1><h3 id="使用HTTP协议-访问Web"><a href="#使用HTTP协议-访问Web" class="headerlink" title="使用HTTP协议 访问Web"></a>使用HTTP协议 访问Web</h3><ul>
-<li>打开浏览器输入 taobao.com</li>
-<li>套壳应用里内嵌网址</li>
-<li>命令行里 访问 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></li>
-</ul>
-<h3 id="HTTP的版本"><a href="#HTTP的版本" class="headerlink" title="HTTP的版本"></a>HTTP的版本</h3><ul>
-<li>HTTP/1.0 最早的 </li>
-<li>HTTP/1.1 <strong>主流的</strong></li>
-<li>后续还有 HTTP/2.0</li>
-</ul>
-<h2 id="URI-和-URL区别"><a href="#URI-和-URL区别" class="headerlink" title="URI 和 URL区别"></a>URI 和 URL区别</h2><ul>
-<li>URI 统一资源标识符<ul>
-<li>某一互联网资源，宽泛的范围<ul>
-<li>ftp上的某个资源</li>
-<li>http服务器上的一个 txt文件</li>
-<li>等等</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>URL 统一资源定位符 （网址）</li>
-</ul>
-<h2 id="OSI7层模型和TCP-IP4层模型"><a href="#OSI7层模型和TCP-IP4层模型" class="headerlink" title="OSI7层模型和TCP/IP4层模型"></a>OSI7层模型和TCP/IP4层模型</h2><h3 id="OSI模型-7层模型"><a href="#OSI模型-7层模型" class="headerlink" title="OSI模型 (7层模型)"></a>OSI模型 (7层模型)</h3><p>记忆口诀—— <strong>应表会传网数物</strong></p>
-<ul>
-<li>应用层</li>
-<li>表示层</li>
-<li>会话层</li>
-<li>传输层</li>
-<li>网络层</li>
-<li>数据链路层</li>
-<li>物理层</li>
-</ul>
-<p>记忆一下即可，已被 TCP/IP四层模型取代</p>
-<h3 id="TCP-IP四层模型-（应传网数）"><a href="#TCP-IP四层模型-（应传网数）" class="headerlink" title="TCP/IP四层模型 （应传网数）"></a>TCP/IP四层模型 （应传网数）</h3><h4 id="来个例子-豪门之间的通信"><a href="#来个例子-豪门之间的通信" class="headerlink" title="来个例子 豪门之间的通信"></a>来个例子 豪门之间的通信</h4><ul>
-<li><p>豪门望族，规矩多，还得有礼仪</p>
-</li>
-<li><p>step01 写信的规则 <strong>(应用层)</strong></p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">尊敬的xxx:</span><br><span class="line">  代表我和我家和您进行问候！</span><br><span class="line">  邀请xxx时来一起 high</span><br><span class="line"></span><br><span class="line">  您的朋友：</span><br><span class="line">    yyy</span><br></pre></td></tr></table></figure>
-<ul>
-<li>step002 把信给管家 <strong>(传输层)</strong> ，这种小事交给管家去做<ul>
-<li>豪门a的管家给豪门b的管家通通信<ul>
-<li>A我们家要给你们家发信了</li>
-<li>B收到，你发吧</li>
-<li>A收到，我发了</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>step003 邮差 <strong>(网络层)</strong><ul>
-<li>B家族的地址和小区名称</li>
-</ul>
-</li>
-<li>step004 邮筒 <strong>(数据链路层)</strong><ul>
-<li>信的大小不能超过 xx寸，太大了邮筒放不进去，还要贴邮票</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>应用层</p>
-</blockquote>
-<p>  应用层是大多数普通与网络相关的程序为了通过网络与其他程序通信所使用的层。这个层的处理过程是应用特有的；数据从网络相关的程序以这种应用内部使用的格式进行传送，然后被编码成标准协议的格式。每一个应用层协议一般都会使用到传输层协议TCP和UDP协议之一：</p>
-<p>运行在TCP协议上的协议：</p>
-<ul>
-<li>HTTP（80端口），主要用于普通浏览。</li>
-<li>HTTPS（443端口）,HTTP协议的安全版本。</li>
-<li>FTP（20和21端口），由名知义，用于文件传输。</li>
-<li>POP3（110端口），收邮件用。</li>
-<li>SMTP（25端口），用来发送电子邮件。</li>
-<li>SSH（22端口），用于加密安全登陆用。</li>
-</ul>
-<p>运行在UDP协议上的协议：</p>
-<ul>
-<li>DHCP（67端口，动态主机配置协议），动态配置IP地址。</li>
-</ul>
-<p>其他：</p>
-<ul>
-<li>DNS（Domain Name Service，域名服务），用于完成地址查找，邮件转发等工作（运行在TCP和UDP协议上）。</li>
-<li>SNMP（Simple Network Management Protocol，简单网络管理协议），用于网络信息的收集和网络管理。</li>
-<li>ARP（Address Resolution Protocol，地址解析协议），用于动态解析以太网硬件的地址。</li>
-</ul>
-<blockquote>
-<p>传输层</p>
-</blockquote>
-<p>解决诸如端到端可靠性（数据是否已经到达目的地？）和保证数据按照正确的顺序到达这样的问题。TCP、UDP都是传输层协议。</p>
-<blockquote>
-<p>网络层</p>
-</blockquote>
-<p>解决在一个单一网络上传输数据包的问题。IP协议是网络层协议。</p>
-<blockquote>
-<p>数据链路层</p>
-</blockquote>
-<p>它是数据包从一个设备的网络层传输到另外一个设备的网络层的方法。这个过程能够在网卡的软件驱动程序中控制或者专用芯片中控制。这将完成如添加报头准备发送、通过实体介质实际发送这样一些数据链路功能。另一端，链路层将完成数据帧接收、去除报头并且将接收到的包传到网络层。</p>
-<h3 id="粗略理解-http协议"><a href="#粗略理解-http协议" class="headerlink" title="粗略理解 http协议"></a>粗略理解 http协议</h3><ul>
-<li>打开 chrome 输入 baidu.com </li>
-<li>调试模式 network 选项</li>
-<li>选择一个http请求 右键 copy request headers/ response headers</li>
-</ul>
-<p>request</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">GET / HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;87&quot;, &quot; Not;A Brand&quot;;v=&quot;99&quot;, &quot;Chromium&quot;;v=&quot;87&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cookie: PSTM=1587438853; BIDUPSID=1E44DAEF1B34E707E2BCE796151A30D5; BAIDUID=212F1EB08E8B84AD626014F0EED3983F:SL=0:NR=10:FG=1; BD_UPN=123253; MCITY=-131%3A; BDUSS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDUSS_BFESS=taSllIdEtBckQtZWhkUVl5RVA5LUVzcERMWWJDcThRQ0w0dWl6RGhwMHVSNjFmRVFBQUFBJCQAAAAAAAAAAAEAAAA~F2-l1MbLtezh0razwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC66hV8uuoVfY0; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; __yjs_duid=1_0f057bc5e273f735bb3b90c9f7fb3bf91608867444564; BDSFRCVID_BFESS=4iDOJeC62xkxsV7rg5g6KwgregKaGx6TH6aokUReTbdIYJeK4QwiEG0PDf8g0Ku-yxYDogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; BDSFRCVID=u_-OJeC62CWHCSOrgOLXKwgreU1oMPQTH6aoFxh6Z3kqjmbLtEppEG0P8M8g0Ku-8Uu8ogKK0mOTHv8F_2uxOjjg8UtVJeC6EG0Ptf8g0M5; H_BDCLCKID_SF=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; H_BDCLCKID_SF_BFESS=fRPD_Dt5f-5_jJ7kqtbSMttfqx6betJyaR3tM56vWJ5TMCoJ3U7T0U4XbPnrXUnf55r--CjOBxJGShPC-tnP2-vBWGbWb4TLKeJJK4JM3l02VKnEe-t2ynQDebotqPRMW20jWl7mWPLWsxA45J7cM4IseboJLfT-0bc4KKJxbnLWeIJEjj6jK4JKjG0eJjvP; delPer=0; BD_CK_SAM=1; PSINO=2; BAIDUID_BFESS=8A88B5E71009B0079D8E6B45E8F33721:FG=1; BD_HOME=1; BDRCVFR[feWj1Vr5u3D]=I67x6TjHwwYf0; Hm_lvt_aec699bb6442ba076c8981c6dc490771=1607495989,1607755061,1608720675,1609259205; Hm_lpvt_aec699bb6442ba076c8981c6dc490771=1609259205; COOKIE_SESSION=30608_8_9_5_53_38_0_2_9_6_1_1_0_0_2_4_1609228598_1609144332_1609259204%7C9%2398408_356_1609144328%7C9; H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; H_PS_645EC=fc05%2B%2BlWgGb0cU%2B%2BbxUlUMSOqIsEiSUpRrm1pdbAFhR7A8t6VjcWGqbPXM8TdxnFox3C; sug=0; sugstore=0; ORIGIN=0; bdime=0; BA_HECTOR=ak2la1048h81a4a02c1fup8b50q</span><br></pre></td></tr></table></figure>
-<p>response</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Bdpagetype: 2</span><br><span class="line">Bdqid: 0xc2b78305000219a6</span><br><span class="line">Cache-Control: private</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Type: text/html;charset=utf-8</span><br><span class="line">Date: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Expires: Wed, 30 Dec 2020 15:49:03 GMT</span><br><span class="line">Server: BWS/1.1</span><br><span class="line">Set-Cookie: BDSVRTM=116; path=/</span><br><span class="line">Set-Cookie: BD_HOME=1; path=/</span><br><span class="line">Set-Cookie: H_PS_PSSID=33423_1467_33355_33306_33261_31253_33343_33313_33312_33311_33310_33309_26350_33308_33307_33389_33370; path=/; domain=.baidu.com</span><br><span class="line">Strict-Transport-Security: max-age=172800</span><br><span class="line">Traceid: 1609343343346522650614030827221594282406</span><br><span class="line">X-Ua-Compatible: IE=Edge,chrome=1</span><br><span class="line">Transfer-Encoding: chunked</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-id="cklhjp1xq0017ulfyeznf82q7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/19/HTTP05缓存控制/" data-id="cknvgptup001r0xjp9fmha7oe" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -1166,7 +1066,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -1176,7 +1076,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1198,23 +1098,23 @@
       <ul>
         
           <li>
+            <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
       </ul>

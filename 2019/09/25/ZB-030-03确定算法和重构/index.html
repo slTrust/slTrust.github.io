@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>ZB-030-03确定算法和重构 | Almost</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="确定算法 为什么互联网称为“网”，爬虫被称为“爬虫” 从一个节点出发，遍历所有节点   算法：广度优先算法的一个变体 非常建议自己手写相关算法 广度优先/队列数据结构/JDK的队列实现     如何扩展？ 慢慢的把烂代码，啰嗦的代码去掉 假如我想要未来换数据库/上ES 爬虫的通用化    开始实践 新开一个分支   1git checkout -b basic-algorithm  先来一个死循环">
+<meta name="keywords" content="oak">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ZB-030-03确定算法和重构">
+<meta property="og:url" content="http://yoursite.com/2019/09/25/ZB-030-03确定算法和重构/index.html">
+<meta property="og:site_name" content="Almost">
+<meta property="og:description" content="确定算法 为什么互联网称为“网”，爬虫被称为“爬虫” 从一个节点出发，遍历所有节点   算法：广度优先算法的一个变体 非常建议自己手写相关算法 广度优先/队列数据结构/JDK的队列实现     如何扩展？ 慢慢的把烂代码，啰嗦的代码去掉 假如我想要未来换数据库/上ES 爬虫的通用化    开始实践 新开一个分支   1git checkout -b basic-algorithm  先来一个死循环">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-04-24T04:54:27.666Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ZB-030-03确定算法和重构">
+<meta name="twitter:description" content="确定算法 为什么互联网称为“网”，爬虫被称为“爬虫” 从一个节点出发，遍历所有节点   算法：广度优先算法的一个变体 非常建议自己手写相关算法 广度优先/队列数据结构/JDK的队列实现     如何扩展？ 慢慢的把烂代码，啰嗦的代码去掉 假如我想要未来换数据库/上ES 爬虫的通用化    开始实践 新开一个分支   1git checkout -b basic-algorithm  先来一个死循环">
+  
+    <link rel="alternate" href="/atom.xml" title="Almost" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Almost</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-ZB-030-03确定算法和重构" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/09/25/ZB-030-03确定算法和重构/" class="article-date">
+  <time datetime="2019-09-25T01:35:18.000Z" itemprop="datePublished">2019-09-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ZB-030-03确定算法和重构
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="确定算法"><a href="#确定算法" class="headerlink" title="确定算法"></a>确定算法</h3><ul>
+<li>为什么互联网称为“网”，爬虫被称为“爬虫”<ul>
+<li>从一个节点出发，遍历所有节点</li>
+</ul>
+</li>
+<li>算法：广度优先算法的一个变体<ul>
+<li><strong>非常建议自己手写相关算法</strong><ul>
+<li>广度优先/队列数据结构/JDK的队列实现</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如何扩展？<ul>
+<li>慢慢的把烂代码，啰嗦的代码去掉</li>
+<li>假如我想要未来换数据库/上ES</li>
+<li>爬虫的通用化</li>
+</ul>
+</li>
+</ul>
+<h4 id="开始实践"><a href="#开始实践" class="headerlink" title="开始实践"></a>开始实践</h4><blockquote>
+<p>新开一个分支 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b basic-algorithm</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>先来一个死循环</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">        // 待处理的链接池</span><br><span class="line">        List&lt;String&gt; linkPool = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        // 已经处理的链接池</span><br><span class="line">        Set&lt;String&gt; processedLinks = new HashSet&lt;&gt;();</span><br><span class="line">        linkPool.add(&quot;https://sina.cn&quot;);</span><br><span class="line"></span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(linkPool.isEmpty())&#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String link = linkPool.get(0);</span><br><span class="line">            if(processedLinks.contains(link))&#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 过滤外链</span><br><span class="line">            if(!link.contains(&quot;sina.cn&quot;))&#123;</span><br><span class="line">                // 这是我们不感兴趣的不管他</span><br><span class="line">                continue;</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line">                CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">                HttpGet httpGet = new HttpGet(&quot;https://sina.cn/&quot;);</span><br><span class="line">                try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">                    System.out.println(response1.getStatusLine());</span><br><span class="line">                    HttpEntity entity1 = response1.getEntity();</span><br><span class="line">                    System.out.println(EntityUtils.toString(entity1));</span><br><span class="line">                &#125;</span><br><span class="line">                // 此时需要 jsoup</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>jsoup maven</p>
+</blockquote>
+<p>添加依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.jsoup&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jsoup&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;1.12.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>继续解析网页</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">package com.github.hcsp;</span><br><span class="line"></span><br><span class="line">import org.apache.http.HttpEntity;</span><br><span class="line">import org.apache.http.client.methods.CloseableHttpResponse;</span><br><span class="line">import org.apache.http.client.methods.HttpGet;</span><br><span class="line">import org.apache.http.impl.client.CloseableHttpClient;</span><br><span class="line">import org.apache.http.impl.client.HttpClients;</span><br><span class="line">import org.apache.http.util.EntityUtils;</span><br><span class="line">import org.jsoup.Jsoup;</span><br><span class="line">import org.jsoup.nodes.Document;</span><br><span class="line">import org.jsoup.nodes.Element;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.List;</span><br><span class="line">import java.util.Set;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">        // 待处理的链接池</span><br><span class="line">        List&lt;String&gt; linkPool = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        // 已经处理的链接池</span><br><span class="line">        Set&lt;String&gt; processedLinks = new HashSet&lt;&gt;();</span><br><span class="line">        linkPool.add(&quot;https://sina.cn&quot;);</span><br><span class="line"></span><br><span class="line">        while(true)&#123;</span><br><span class="line">            if(linkPool.isEmpty())&#123;</span><br><span class="line">                break;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">//            String link = linkPool.get(linkPool.size() - 1);</span><br><span class="line">//            // ArrayList从底部删除更有效率</span><br><span class="line">//            linkPool.remove(linkPool.size() - 1);</span><br><span class="line"></span><br><span class="line">            // 简化为一行</span><br><span class="line">            String link = linkPool.remove(linkPool.size() - 1);</span><br><span class="line"></span><br><span class="line">            if(processedLinks.contains(link))&#123;</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // 过滤外链</span><br><span class="line">            if ( link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link) ) &#123;</span><br><span class="line">                // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line"></span><br><span class="line">                System.out.println(link);</span><br><span class="line">                if(link.startsWith(&quot;//&quot;))&#123;</span><br><span class="line">                    link = &quot;https:&quot; + link;</span><br><span class="line">                    System.out.println(&quot;处理后的link:&quot;+link);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">                HttpGet httpGet = new HttpGet(link);</span><br><span class="line">                httpGet.addHeader(&quot;User-Agent&quot;,&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">                    System.out.println(response1.getStatusLine());</span><br><span class="line">                    HttpEntity entity1 = response1.getEntity();</span><br><span class="line">                    String html = EntityUtils.toString(entity1);</span><br><span class="line"></span><br><span class="line">                    Document doc = Jsoup.parse(html);</span><br><span class="line"></span><br><span class="line">                    ArrayList&lt;Element&gt; links = doc.select(&quot;a&quot;);</span><br><span class="line"></span><br><span class="line">                    for(Element aTag:links)&#123;</span><br><span class="line">                        // 丢到链接池里</span><br><span class="line">                        linkPool.add(aTag.attr(&quot;href&quot;));</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    // 假如这是个新闻的详情页就存入数据库，否则，就什么都不做</span><br><span class="line">                    /*</span><br><span class="line">                    新闻详情有 标题/内容</span><br><span class="line">                     */</span><br><span class="line">                    ArrayList&lt;Element&gt; articleTags = doc.select(&quot;article&quot;);</span><br><span class="line">                    if(!articleTags.isEmpty())&#123;</span><br><span class="line">                        for (Element articleTag:articleTags)&#123;</span><br><span class="line">                            String title = articleTags.get(0).child(0).text();</span><br><span class="line">                            System.out.println(title);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    processedLinks.add(link);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                // 这是我们不感兴趣的不管他</span><br><span class="line">                continue;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="重构"><a href="#重构" class="headerlink" title="重构"></a>重构</h3><p>上面代码里有这样一个条件来筛选我们要的网址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 过滤外链</span><br><span class="line">if ( (link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link)) &amp;&amp; !link.contains(&quot;passport.sina.cn&quot;) ) &#123;</span><br><span class="line">    // 这是我们感兴趣的，我们只处理新浪站内的链接</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">`</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通常情况下，这么多的条件下</p>
+</blockquote>
+<ul>
+<li>你会写注释，我们不反对写注释，<ul>
+<li>注释可能会过时，有一天条件变了，但是注释你没改</li>
+<li>或者两年后代码不停的变更</li>
+<li>一个过时的注释，比不写注释还要糟糕，因为他给了你错误的信息</li>
+</ul>
+</li>
+<li>最聪明的方法是 提取方法并给一个名字</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">private static boolean isIntresetingLink(String link)&#123;</span><br><span class="line">    return (link.contains(&quot;news.sina.cn&quot;) || &quot;https://sina.cn&quot;.equals(link)) &amp;&amp; !link.contains(&quot;passport.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 还可以继续简化</span><br><span class="line">private static boolean isIntresetingLink(String link)&#123;</span><br><span class="line">    return (isNewsPage(link) || isIndexPage(link)) &amp;&amp; isNotLoginPage(link);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">private static boolean isNewsPage(String link)&#123;</span><br><span class="line">    return link.contains(&quot;news.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private static boolean isIndexPage(String link)&#123;</span><br><span class="line">    return &quot;https://sina.cn&quot;.equals(link);</span><br><span class="line">&#125;</span><br><span class="line">private static boolean isNotLoginPage(String link)&#123;</span><br><span class="line">    return !link.contains(&quot;passport.sina.cn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 此时的 if</span><br><span class="line">if(isIntresetingLink(link))&#123;</span><br><span class="line">    ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>每当你要写注释的时候，请先尝试重构，让注释显得多余</strong></p>
+<h4 id="继续优化-提取函数"><a href="#继续优化-提取函数" class="headerlink" title="继续优化,提取函数"></a>继续优化,提取函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">private static Document httpGetAndParseHtml(String link)&#123;</span><br><span class="line">    if(link.startsWith(&quot;//&quot;))&#123;</span><br><span class="line">        link = &quot;https:&quot; + link;</span><br><span class="line">        System.out.println(&quot;处理后的link:&quot;+link);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CloseableHttpClient httpclient = HttpClients.createDefault();</span><br><span class="line">    HttpGet httpGet = new HttpGet(link);</span><br><span class="line">    httpGet.addHeader(&quot;User-Agent&quot;,&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36&quot;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) &#123;</span><br><span class="line">        System.out.println(response1.getStatusLine());</span><br><span class="line">        HttpEntity entity1 = response1.getEntity();</span><br><span class="line">        String html = EntityUtils.toString(entity1);</span><br><span class="line">        return  Jsoup.parse(html);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>IDEA重构技巧</p>
+</blockquote>
+<ul>
+<li>选中你的代码块 </li>
+<li>右键 Refactor -&gt; Extract -&gt; Method -&gt; 写个方法名</li>
+</ul>
+<blockquote>
+<p><strong>三个好处</strong></p>
+</blockquote>
+<ul>
+<li>你是个人类，你大脑处理信息是有限的，因此100行的代码 和10行的小方法，10行的更容易被处理和理解</li>
+<li>短的方法容易被复用，越短小的方法越容易复用，而复用所有代码的书写原则，不要重复你自己</li>
+<li>对于Java来说你可以对复用方法进行覆盖，实现多态的功能</li>
+</ul>
+<h4 id="提交代码"><a href="#提交代码" class="headerlink" title="提交代码"></a>提交代码</h4><ul>
+<li>01我们在新分支 basic-algorithm</li>
+<li>02提交我们的代码<ul>
+<li><code>git add .</code></li>
+<li><code>git commit</code> 在vi里写你的信息</li>
+<li><code>git push</code> 此时报错了，因为远程仓库没有你的这个分支</li>
+<li><code>git push --set-upstream origin basic-algorithm</code>  </li>
+</ul>
+</li>
+<li><p>03打开你的 github 我的是 <a href="https://github.com/slTrust/xdml-crawler/" target="_blank" rel="noopener">https://github.com/slTrust/xdml-crawler/</a></p>
+<ul>
+<li>页面会显示一个你最近的提交信息 点击 <code>Compare &amp; pull request</code> 绿色按钮</li>
+<li>点击 Create pull request</li>
+<li>此时它会开始跑CI ，我们这个代码是会失败的 在 Details里<ul>
+<li>有任何错误请看 日志的内容 红色的 ERROR</li>
+</ul>
+</li>
+<li>改正我们的代码，再次执行 02 步操作</li>
+<li>此时页面刷新以下，多了你最新的 commit , 此时代码通过了检查，意味着我们可以合并了</li>
+<li><p>Merge pull request 合并很有讲究的，它有三个选项</p>
+<ul>
+<li><p>Create a merge commit<br>等价于 </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git merge basic-algorithm</span><br><span class="line"># 它会产生一个新的提交</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Squash and merge<br>等价于</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git merge --squash</span><br><span class="line">好处是 比方你这个分支有两个或100个 提交</span><br><span class="line">他给你压缩成一个提交，这样你回滚的时候非常方便</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Rebase and merge</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rebase</span><br><span class="line">自行尝试</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>04 此时我们尝试 <code>Squash and merge</code> ,然后点击 <code>Squash and merge</code></p>
+<ul>
+<li>此时弹出一个文本框，意思是 你本来有多个commit 现在压缩成一个 commit </li>
+<li>你需要为压扁的这个 commit 定义 提交信息 ， 默认是把之前的提交信息列出来</li>
+<li>我们稍微修改下信息， 然后点击 Confirm squash and merge</li>
+</ul>
+</li>
+<li>05 此时去看你的仓库的 commit</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/09/25/ZB-030-03确定算法和重构/" data-id="cknvgpuai011z0xjpw8wk1gk2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/oak/">oak</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/09/26/ZB-030-04Maven生命周期详解和插件配置/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ZB-030-04Maven生命周期详解和插件配置
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/09/24/ZB-030-02从零开始爬虫/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ZB-030-02从零开始爬虫</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 Stevin<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

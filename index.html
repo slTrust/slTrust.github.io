@@ -62,6 +62,443 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Webpack-03loader" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/28/Webpack-03loader/" class="article-date">
+  <time datetime="2021-02-28T03:03:07.000Z" itemprop="datePublished">2021-02-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="loader"><a href="#loader" class="headerlink" title="loader"></a>loader</h1><h2 id="如何加载css文件"><a href="#如何加载css文件" class="headerlink" title="如何加载css文件"></a>如何加载css文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// 收集依赖读取代码 看见 import/require 的时候</span><br><span class="line">const code = readFileSync(filepath).toString()</span><br><span class="line"></span><br><span class="line">// 重点：正则判断</span><br><span class="line">if(/\.css$/.test(filepath))&#123;</span><br><span class="line">  // 此时 css文件的内容 变成了 js的一个字符串</span><br><span class="line">  code = `</span><br><span class="line">    const str = $&#123;JSON.stringify(code)&#125;</span><br><span class="line">    if(document)&#123;</span><br><span class="line">      const style = document.createElement(&apos;style&apos;)</span><br><span class="line">      style.innerHTML = str;</span><br><span class="line">      document.head.appendChild(style)</span><br><span class="line">    &#125;</span><br><span class="line">    export default str;</span><br><span class="line">  `</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="loader-可以是一个函数-or-异步函数"><a href="#loader-可以是一个函数-or-异步函数" class="headerlink" title="loader 可以是一个函数 or 异步函数"></a>loader 可以是一个函数 or 异步函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function transform(code)&#123;</span><br><span class="line">  const code2 = doXXX(code)</span><br><span class="line">  return code2</span><br><span class="line">&#125;</span><br><span class="line">module.exports = transform</span><br><span class="line"></span><br><span class="line">// or</span><br><span class="line">async function transform(code)&#123;</span><br><span class="line">  const code2 = await doXXX(code)</span><br><span class="line">  return code2</span><br><span class="line">&#125;</span><br><span class="line">module.exports = transform</span><br></pre></td></tr></table></figure>
+<ul>
+<li>css-loader.js</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function transform(code)&#123;</span><br><span class="line">  return `</span><br><span class="line">    const str= $&#123;JSON.stringify(code)&#125;</span><br><span class="line">    if(document)&#123;</span><br><span class="line">      const style = document.createElement(&apos;style&apos;)</span><br><span class="line">      style.innerHTML = str;</span><br><span class="line">      document.head.appendChild(style)</span><br><span class="line">    &#125;</span><br><span class="line">    export default str;</span><br><span class="line">  `</span><br><span class="line">&#125;</span><br><span class="line">module.exports = transform</span><br></pre></td></tr></table></figure>
+<ul>
+<li>核心逻辑<ul>
+<li>为啥用 require 加载loader,因为webpack的loader是从 config里读取的，要动态的加载</li>
+<li>第二个原因是 旧版的node不支持 import</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if(/\.css$/.test(filepath))&#123;</span><br><span class="line">  // 此时 css文件的内容 变成了 js的一个字符串</span><br><span class="line">  code = require(&apos;./loaders/css-loader.js&apos;)(code)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="loader的优化"><a href="#loader的优化" class="headerlink" title="loader的优化"></a>loader的优化</h3><ul>
+<li>单一职责原则</li>
+<li>每个loader只做一件事</li>
+</ul>
+<h4 id="大概流程"><a href="#大概流程" class="headerlink" title="大概流程"></a>大概流程</h4><ul>
+<li>sass-loader 将 <code>.scss</code> 文件转化为 <code>.css</code></li>
+<li>css-loader 将 <code>.css</code> 文件转化为 js 里的一个变量 字符串str</li>
+<li>style-loader  通过 生成style标签 将 str 内容插入到 style里<ul>
+<li>本质是在 原有代码基础上 插入一部分代码</li>
+<li>这个时机在哪？这个要参考webpack</li>
+</ul>
+</li>
+</ul>
+<h4 id="webpack-style-loader思路"><a href="#webpack-style-loader思路" class="headerlink" title="webpack style-loader思路"></a>webpack style-loader思路</h4><ul>
+<li>style-loader 在 pitch 钩子里通过 css-loader 来require 内容</li>
+<li>然后</li>
+</ul>
+<h3 id="webpack-loader-是什么"><a href="#webpack-loader-是什么" class="headerlink" title="webpack-loader 是什么"></a>webpack-loader 是什么</h3><ul>
+<li>webpack自带的打包只支持 js</li>
+<li>当我们想要加载 css/scss/ts/md 文件时，需要用loader</li>
+<li>loader 原理就是把文件内容包装成能运行的JS</li>
+</ul>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<ul>
+<li>加载 css 用到 style-loader 和 css-loader</li>
+<li>css-loader 把代码 从 CSS 变成 export default str 形式的JS</li>
+<li>style-loader 把代码挂在到 head 里的 style 里</li>
+</ul>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<ul>
+<li>file-loader 如果是 图片，图片小就变成 base64,图片大就在 形如public 的资源目录里生成这个文件，然后读取这个文件的相对路径</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/28/Webpack-03loader/" data-id="cknvgpu9d00zy0xjpws3bj6ue" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Webpack/">Webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Webpack-02打包器" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/27/Webpack-02打包器/" class="article-date">
+  <time datetime="2021-02-27T10:54:33.000Z" itemprop="datePublished">2021-02-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Webpack解决那些问题"><a href="#Webpack解决那些问题" class="headerlink" title="Webpack解决那些问题"></a>Webpack解决那些问题</h1><ul>
+<li>浏览器不支持 <code>import/export</code>,因为浏览器里这样运行不了</li>
+<li>代码<a href="https://github.com/slTrust/webpack-demo-2" target="_blank" rel="noopener">仓库</a></li>
+<li>安装好依赖</li>
+</ul>
+<h2 id="怎样解决这个问题"><a href="#怎样解决这个问题" class="headerlink" title="怎样解决这个问题"></a>怎样解决这个问题</h2><h3 id="不同浏览器功能不同"><a href="#不同浏览器功能不同" class="headerlink" title="不同浏览器功能不同"></a>不同浏览器功能不同</h3><ul>
+<li>现代浏览器可以通过<code>&lt;script type=&quot;module&quot;&gt;</code> 来支持 import/export</li>
+<li>但是 IE8~15 不支持</li>
+</ul>
+<h3 id="兼容策略"><a href="#兼容策略" class="headerlink" title="兼容策略"></a>兼容策略</h3><ul>
+<li>激进策略：所有代码放到 <code>&lt;script type=&quot;module&quot;&gt;</code> 里<ul>
+<li>缺点：<ul>
+<li>http请求文件过多</li>
+<li>不被IE支持</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>平稳兼容：把关键字转译为普通代码，并把所有文件打包为一个文件<ul>
+<li>缺点：需要写复杂的代码，完成这个事。<strong>这就是我们的任务</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="解决问题1-import-export-转化成函数"><a href="#解决问题1-import-export-转化成函数" class="headerlink" title="解决问题1: import/export 转化成函数"></a>解决问题1: import/export 转化成函数</h2><ul>
+<li>通过<code>@babel/preset-env</code> 把ES6 转化为 ES5</li>
+<li>bundler_1.ts</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const code = readFileSync(filepath).toString()</span><br><span class="line">// step01 code 不要原封不动的放到 这里，而是变成es5</span><br><span class="line">const &#123; code: es5Code &#125; = babel.transform(code, &#123;</span><br><span class="line">  presets: [&apos;@babel/preset-env&apos;]</span><br><span class="line">&#125;)</span><br><span class="line">// 初始化 depRelation[key]</span><br><span class="line">depRelation[key] = &#123; deps: [], code: es5Code &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>运行<code>node -r ts-node/register bundler_1.ts</code> 后打印 depRelation</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &apos;index.js&apos;: &#123;</span><br><span class="line">    deps: [ &apos;a.js&apos;, &apos;b.js&apos; ],</span><br><span class="line">    code: &apos;&quot;use strict&quot;;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var _a = _interopRequireDefault(require(&quot;./a.js&quot;));\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var _b = _interopRequireDefault(require(&quot;./b.js&quot;));\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;console.log(_a[&quot;default&quot;].getB());\n&apos; +</span><br><span class="line">      &apos;console.log(_b[&quot;default&quot;].getA());&apos;</span><br><span class="line">  &#125;,</span><br><span class="line">  &apos;a.js&apos;: &#123;</span><br><span class="line">    deps: [ &apos;b.js&apos; ],</span><br><span class="line">    code: &apos;&quot;use strict&quot;;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;Object.defineProperty(exports, &quot;__esModule&quot;, &#123;\n&apos; +</span><br><span class="line">      &apos;  value: true\n&apos; +</span><br><span class="line">      &apos;&#125;);\n&apos; +</span><br><span class="line">      &apos;exports[&quot;default&quot;] = void 0;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var _b = _interopRequireDefault(require(&quot;./b.js&quot;));\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var a = &#123;\n&apos; +</span><br><span class="line">      &quot;  value: &apos;a&apos;,\n&quot; +</span><br><span class="line">      &apos;  getB: function getB() &#123;\n&apos; +</span><br><span class="line">      `    return _b[&quot;default&quot;].value + &apos; from a.js&apos;;\n` +</span><br><span class="line">      &apos;  &#125;\n&apos; +</span><br><span class="line">      &apos;&#125;;\n&apos; +</span><br><span class="line">      &apos;var _default = a;\n&apos; +</span><br><span class="line">      &apos;exports[&quot;default&quot;] = _default;&apos;</span><br><span class="line">  &#125;,</span><br><span class="line">  &apos;b.js&apos;: &#123;</span><br><span class="line">    deps: [ &apos;a.js&apos; ],</span><br><span class="line">    code: &apos;&quot;use strict&quot;;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;Object.defineProperty(exports, &quot;__esModule&quot;, &#123;\n&apos; +</span><br><span class="line">      &apos;  value: true\n&apos; +</span><br><span class="line">      &apos;&#125;);\n&apos; +</span><br><span class="line">      &apos;exports[&quot;default&quot;] = void 0;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var _a = _interopRequireDefault(require(&quot;./a.js&quot;));\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;\n&apos; +</span><br><span class="line">      &apos;\n&apos; +</span><br><span class="line">      &apos;var b = &#123;\n&apos; +</span><br><span class="line">      &quot;  value: &apos;b&apos;,\n&quot; +</span><br><span class="line">      &apos;  getA: function getA() &#123;\n&apos; +</span><br><span class="line">      `    return _a[&quot;default&quot;].value + &apos; from b.js&apos;;\n` +</span><br><span class="line">      &apos;  &#125;\n&apos; +</span><br><span class="line">      &apos;&#125;;\n&apos; +</span><br><span class="line">      &apos;var _default = b;\n&apos; +</span><br><span class="line">      &apos;exports[&quot;default&quot;] = _default;&apos;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="观察a-js变化"><a href="#观察a-js变化" class="headerlink" title="观察a.js变化"></a>观察a.js变化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// a.js代码</span><br><span class="line">import b from &apos;./b.js&apos;</span><br><span class="line">const a = &#123;</span><br><span class="line">  value: &apos;a&apos;,</span><br><span class="line">  getB: () =&gt; b.value + &apos; from a.js&apos;</span><br><span class="line">&#125;</span><br><span class="line">export default a</span><br></pre></td></tr></table></figure>
+<ul>
+<li>import 不见了，变成了 <code>require()</code></li>
+<li>export 不见了，变成了 <code>exports[&#39;default&#39;]</code></li>
+<li>这里的code 是字符串</li>
+</ul>
+<h3 id="es5后的-a-js内容字符串整理"><a href="#es5后的-a-js内容字符串整理" class="headerlink" title="es5后的 a.js内容字符串整理"></a>es5后的 a.js内容字符串整理</h3><ul>
+<li>疑问1<ul>
+<li>实际效果是 <code>exports[&#39;__esModule&#39;]=true</code></li>
+<li>给当前模块添加 __esModule 属性，方便跟 CommonJS模块 区分</li>
+<li>这样写是为了解决特定环境的一些问题，不要细究。。。</li>
+</ul>
+</li>
+<li>疑问2 <code>exports[&quot;default&quot;] = void 0;</code><ul>
+<li><code>void 0; // 等价于 赋值 undefined</code></li>
+<li>强制清空 <code>exports[&#39;default&#39;]</code>的值</li>
+</ul>
+</li>
+<li>疑问3 <code>import b from &#39;./b.js&#39;</code> 变成了 <code>var _b = _interopRequireDefault(require(&quot;./b.js&quot;));</code><ul>
+<li><code>_interopRequireDefault</code> _ 代表内部的一个函数</li>
+<li>意图就是给模块添加 default</li>
+</ul>
+</li>
+<li>疑问4<ul>
+<li>给 require 的obj添加一个 default</li>
+<li>如果是 _esModule 代表有默认导出</li>
+<li>反之 <code>obj = { &quot;default&quot;: obj }</code></li>
+</ul>
+</li>
+<li>疑问5 <code>b.value  变成了 _b[&quot;default&quot;].value</code><ul>
+<li>因为 require 的obj 经过 <code>_interopRequireDefault</code> 处理，有了默认 <code>obj:{default:obj}</code></li>
+<li>所以 变成了 <code>_b[&quot;default&quot;].value</code></li>
+</ul>
+</li>
+<li>疑问6 <code>var _default = a;exports[&quot;default&quot;] = _default;</code><ul>
+<li>简化后就是 <code>exports[&#39;default&#39;] = a</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&quot;use strict&quot;; //开启严格模式</span><br><span class="line">// 疑问1</span><br><span class="line">Object.defineProperty(exports, &quot;__esModule&quot;, &#123;value: true&#125;);</span><br><span class="line">// 疑问2</span><br><span class="line">exports[&quot;default&quot;] = void 0; </span><br><span class="line"></span><br><span class="line">// 疑问3</span><br><span class="line">var _b = _interopRequireDefault(require(&quot;./b.js&quot;));</span><br><span class="line"></span><br><span class="line">// 疑问4</span><br><span class="line">function _interopRequireDefault(obj) &#123; </span><br><span class="line">  return obj &amp;&amp; obj._esModule ? obj : &#123; &quot;default&quot;: obj &#125;; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var a = &#123;</span><br><span class="line">  value: &apos;a&apos;,</span><br><span class="line">  getB: function getB() &#123;</span><br><span class="line">    // 疑问5 </span><br><span class="line">    return _b[&quot;default&quot;].value + &apos; from a.js&apos;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 疑问6</span><br><span class="line">var _default = a;</span><br><span class="line">exports[&quot;default&quot;] = _default;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结论：我们通过 babel/core 把 ESModule 语法变成了 CommonJS 规则<ul>
+<li>CommonJS 就是使用 require/exports 定义模块</li>
+</ul>
+</li>
+</ul>
+<h2 id="打包所有文件成为一个文件"><a href="#打包所有文件成为一个文件" class="headerlink" title="打包所有文件成为一个文件"></a>打包所有文件成为一个文件</h2><ul>
+<li>所有改动参考 <code>bundler_1.ts =&gt; bundler_1.ts</code></li>
+</ul>
+<h3 id="第一步：改变depRelation的结构为数组"><a href="#第一步：改变depRelation的结构为数组" class="headerlink" title="第一步：改变depRelation的结构为数组"></a>第一步：改变depRelation的结构为数组</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">var depRelation = [</span><br><span class="line">  &#123;</span><br><span class="line">    key:&apos;index.js&apos;,</span><br><span class="line">    deps:[&apos;a.js&apos;,&apos;b.js&apos;],</span><br><span class="line">    code:`字符串code`</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    key:&apos;a.js&apos;,</span><br><span class="line">    deps:[&apos;b.js&apos;],</span><br><span class="line">    code:`字符串code`</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    key:&apos;b.js&apos;,</span><br><span class="line">    deps:[&apos;a.js&apos;],</span><br><span class="line">    code:`字符串code`</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">// 为什么把 depRelation 变成了数组，因为对象&#123;&#125; 没有第一项的概念</span><br><span class="line">// 数组第一项是入口</span><br></pre></td></tr></table></figure>
+<h3 id="第二步：code是字符串，需要变成一个函数"><a href="#第二步：code是字符串，需要变成一个函数" class="headerlink" title="第二步：code是字符串，需要变成一个函数"></a>第二步：code是字符串，需要变成一个函数</h3><ul>
+<li>require, module, exports 是 CommonJS2 的规范<ul>
+<li>module基本用不到，可以忽略</li>
+<li>重点看 require/exports</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">code2 = `function (require, module, exports) &#123;</span><br><span class="line">  $&#123;code&#125;</span><br><span class="line">&#125;`</span><br><span class="line">// 此时 code2还是字符串</span><br><span class="line">// 把 `code:$&#123;code2&#125;`写入到文件</span><br><span class="line">code:function (require, module, exports) &#123;</span><br><span class="line">  // ... code代码</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 最终写入的文件效果</span><br><span class="line">var depRelation = [</span><br><span class="line">  &#123;</span><br><span class="line">    key:&apos;index.js&apos;,</span><br><span class="line">    deps:[&apos;a.js&apos;,&apos;b.js&apos;],</span><br><span class="line">    code:function (require, module, exports) &#123;</span><br><span class="line">      // ... code代码</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<h3 id="第三步：execute-这个入口"><a href="#第三步：execute-这个入口" class="headerlink" title="第三步：execute 这个入口"></a>第三步：execute 这个入口</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">const modules = &#123;&#125; // 用于缓存，防止重复加载</span><br><span class="line">execute(depRelation[0].key) // a.js</span><br><span class="line">function execute(key) &#123;</span><br><span class="line">  // 如果已经 require 过，就直接返回上次的结果</span><br><span class="line">  if (modules[key]) &#123; return modules[key] &#125;</span><br><span class="line">  // 找到 a.js 的代码</span><br><span class="line">  var item = depRelation.find(i =&gt; i.key === key) </span><br><span class="line">  // 找不到就报错，中断执行</span><br><span class="line">  if (!item) &#123; throw new Error(`$&#123;item&#125; is not found`) &#125;</span><br><span class="line">  // 把相对路径变成项目路径</span><br><span class="line">  var pathToKey = (path) =&gt; &#123;...&#125;</span><br><span class="line">  // 创建 require 函数</span><br><span class="line">  var require = (path) =&gt; &#123;</span><br><span class="line">    return execute(pathToKey(path))</span><br><span class="line">  &#125;</span><br><span class="line">  // 初始化当前模块</span><br><span class="line">  // modules[&apos;a.js&apos;] = &#123; __esModule: true &#125; 辨识我是ES模块</span><br><span class="line">  modules[key] = &#123; __esModule: true &#125;</span><br><span class="line">  // 初始化 module 方便 code 往 module.exports 上添加属性</span><br><span class="line">  //  module = &#123; exports: modules[&apos;a.js&apos;] &#125;</span><br><span class="line">  var module = &#123; exports: modules[key] &#125;</span><br><span class="line">  // 调用 code 函数，往 module.exports 上添加导出属性</span><br><span class="line">  // 第二个参数 module 大部分时候是无用的，主要用于兼容旧代码</span><br><span class="line">  item.code(require, module, module.exports)</span><br><span class="line">  // item.code执行的时候，把它导出的内容挂在 module.exports</span><br><span class="line"></span><br><span class="line">  // 返回当前模块 modules[&apos;a.js&apos;]</span><br><span class="line">  return modules[key]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="最终dist-js文件的内容"><a href="#最终dist-js文件的内容" class="headerlink" title="最终dist.js文件的内容"></a>最终dist.js文件的内容</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">var depRelation = [&#123;</span><br><span class="line">  key: &quot;index.js&quot;,</span><br><span class="line">  deps: [&quot;a.js&quot;, &quot;b.js&quot;],</span><br><span class="line">  code: function (require, module, exports) &#123;</span><br><span class="line">    &quot;use strict&quot;;</span><br><span class="line"></span><br><span class="line">    var _a = _interopRequireDefault(require(&quot;./a.js&quot;));</span><br><span class="line"></span><br><span class="line">    var _b = _interopRequireDefault(require(&quot;./b.js&quot;));</span><br><span class="line"></span><br><span class="line">    function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;</span><br><span class="line"></span><br><span class="line">    console.log(_a[&quot;default&quot;].getB());</span><br><span class="line">    console.log(_b[&quot;default&quot;].getA());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, &#123;</span><br><span class="line">  key: &quot;a.js&quot;,</span><br><span class="line">  deps: [&quot;b.js&quot;],</span><br><span class="line">  code: function (require, module, exports) &#123;</span><br><span class="line">    &quot;use strict&quot;;</span><br><span class="line"></span><br><span class="line">    Object.defineProperty(exports, &quot;__esModule&quot;, &#123;</span><br><span class="line">      value: true</span><br><span class="line">    &#125;);</span><br><span class="line">    exports[&quot;default&quot;] = void 0;</span><br><span class="line"></span><br><span class="line">    var _b = _interopRequireDefault(require(&quot;./b.js&quot;));</span><br><span class="line"></span><br><span class="line">    function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;</span><br><span class="line"></span><br><span class="line">    var a = &#123;</span><br><span class="line">      value: &apos;a&apos;,</span><br><span class="line">      getB: function getB() &#123;</span><br><span class="line">        return _b[&quot;default&quot;].value + &apos; from a.js&apos;;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    var _default = a;</span><br><span class="line">    exports[&quot;default&quot;] = _default;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;, &#123;</span><br><span class="line">  key: &quot;b.js&quot;,</span><br><span class="line">  deps: [&quot;a.js&quot;],</span><br><span class="line">  code: function (require, module, exports) &#123;</span><br><span class="line">    &quot;use strict&quot;;</span><br><span class="line"></span><br><span class="line">    Object.defineProperty(exports, &quot;__esModule&quot;, &#123;</span><br><span class="line">      value: true</span><br><span class="line">    &#125;);</span><br><span class="line">    exports[&quot;default&quot;] = void 0;</span><br><span class="line"></span><br><span class="line">    var _a = _interopRequireDefault(require(&quot;./a.js&quot;));</span><br><span class="line"></span><br><span class="line">    function _interopRequireDefault(obj) &#123; return obj &amp;&amp; obj.__esModule ? obj : &#123; &quot;default&quot;: obj &#125;; &#125;</span><br><span class="line"></span><br><span class="line">    var b = &#123;</span><br><span class="line">      value: &apos;b&apos;,</span><br><span class="line">      getA: function getA() &#123;</span><br><span class="line">        return _a[&quot;default&quot;].value + &apos; from b.js&apos;;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    var _default = b;</span><br><span class="line">    exports[&quot;default&quot;] = _default;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;]</span><br><span class="line">var modules = &#123;&#125;</span><br><span class="line">execute(depRelation[0].key)</span><br><span class="line">function execute(key) &#123;</span><br><span class="line">  // 如果已经 require 过，就直接返回上次的结果</span><br><span class="line">  if (modules[key]) &#123; return modules[key] &#125;</span><br><span class="line">  // 找到要执行的项目</span><br><span class="line">  var item = depRelation.find(i =&gt; i.key === key)</span><br><span class="line">  // 找不到就报错，中断执行</span><br><span class="line">  if (!item) &#123; throw new Error(`$&#123;item&#125; is not found`) &#125;</span><br><span class="line">  // 把相对路径变成项目路径</span><br><span class="line">  var pathToKey = (path) =&gt; &#123;</span><br><span class="line">    var dirname = key.substring(0, key.lastIndexOf(&apos;/&apos;) + 1)</span><br><span class="line">    var projectPath = (dirname + path).replace(/\.\//g, &apos;&apos;).replace(/\/\//, &apos;/&apos;)</span><br><span class="line">    return projectPath</span><br><span class="line">  &#125;</span><br><span class="line">  // 创建 require 函数</span><br><span class="line">  var require = (path) =&gt; &#123;</span><br><span class="line">    return execute(pathToKey(path))</span><br><span class="line">  &#125;</span><br><span class="line">  // 初始化当前模块</span><br><span class="line">  modules[key] = &#123; __esModule: true &#125;</span><br><span class="line">  // 初始化 module 方便 code 往 module.exports 上添加属性</span><br><span class="line">  var module = &#123; exports: modules[key] &#125;</span><br><span class="line">  // 调用 code 函数，往 module.exports 上添加导出属性</span><br><span class="line">  // 第二个参数 module 大部分时候是无用的，主要用于兼容旧代码</span><br><span class="line">  item.code(require, module, module.exports)</span><br><span class="line">  // 返回当前模块</span><br><span class="line">  return modules[key]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="打包器完成"><a href="#打包器完成" class="headerlink" title="打包器完成"></a>打包器完成</h2><ul>
+<li>拼接构造 dist.js 的内容，然后写入到文件</li>
+<li>参考 bundeler_3.ts 内容</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/27/Webpack-02打包器/" data-id="cknvgpu9g01020xjpk8r4wmvk" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Webpack/">Webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Webpack-01AST-Babel-依赖" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/27/Webpack-01AST-Babel-依赖/" class="article-date">
+  <time datetime="2021-02-27T08:42:51.000Z" itemprop="datePublished">2021-02-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Webpack"><a href="#Webpack" class="headerlink" title="Webpack"></a>Webpack</h1><h2 id="前置工作"><a href="#前置工作" class="headerlink" title="前置工作"></a>前置工作</h2><ul>
+<li>下载代码<a href="https://github.com/slTrust/webpack-demo-1" target="_blank" rel="noopener">仓库</a></li>
+<li>安装好依赖，参考README 运行我们的代码</li>
+</ul>
+<h2 id="Babel原理"><a href="#Babel原理" class="headerlink" title="Babel原理"></a>Babel原理</h2><ul>
+<li>parse：把代码code变成 AST</li>
+<li>traverse:遍历 AST 进行修改</li>
+<li>generate：把修改后的 AST 变成 code2</li>
+</ul>
+<blockquote>
+<p>过程如下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">       parse        traverse       generate</span><br><span class="line">code --------&gt; ast  -------&gt;  ast2 -------&gt; code2</span><br></pre></td></tr></table></figure>
+<h3 id="为啥不用-“正则”-来实现"><a href="#为啥不用-“正则”-来实现" class="headerlink" title="为啥不用 “正则” 来实现"></a>为啥不用 “正则” 来实现</h3><ul>
+<li>因为代码很复杂 <code>let a = &#39;let&#39;</code> 单纯一个变量声明，你就很难处理，更何况其他ES6及以上语法呢？</li>
+</ul>
+<h3 id="let-to-var"><a href="#let-to-var" class="headerlink" title="let to var"></a>let to var</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import &#123; parse &#125; from &quot;@babel/parser&quot;</span><br><span class="line">import traverse from &quot;@babel/traverse&quot;</span><br><span class="line">import generate from &quot;@babel/generator&quot;</span><br><span class="line"></span><br><span class="line">const code = `let a = &apos;let&apos;; let b = 2`</span><br><span class="line">const ast = parse(code, &#123; sourceType: &apos;module&apos; &#125;)</span><br><span class="line">traverse(ast, &#123;</span><br><span class="line">  enter: item =&gt; &#123;</span><br><span class="line">    if (item.node.type === &apos;VariableDeclaration&apos;) &#123;</span><br><span class="line">      if (item.node.kind === &apos;let&apos;) &#123;</span><br><span class="line">        item.node.kind = &apos;var&apos;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">const result = generate(ast, &#123;&#125;, code)</span><br><span class="line">console.log(result.code)</span><br></pre></td></tr></table></figure>
+<h3 id="代码转换为ES5"><a href="#代码转换为ES5" class="headerlink" title="代码转换为ES5"></a>代码转换为ES5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import &#123; parse &#125; from &quot;@babel/parser&quot;</span><br><span class="line">import * as babel from &quot;@babel/core&quot;</span><br><span class="line"></span><br><span class="line">const code = `let a = &apos;let&apos;;let b = 2; const c = 3`</span><br><span class="line">const ast = parse(code, &#123; sourceType: &apos;module&apos; &#125;)</span><br><span class="line">const result = babel.transformFromAstSync(ast, code, &#123;</span><br><span class="line">  presets: [&apos;@babel/preset-env&apos;]</span><br><span class="line">&#125;)</span><br><span class="line">console.log(result.code)</span><br></pre></td></tr></table></figure>
+<h3 id="将js文件转换为ES5"><a href="#将js文件转换为ES5" class="headerlink" title="将js文件转换为ES5"></a>将js文件转换为ES5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; parse &#125; from &quot;@babel/parser&quot;</span><br><span class="line">import * as babel from &quot;@babel/core&quot;</span><br><span class="line">import * as fs from &apos;fs&apos;</span><br><span class="line"></span><br><span class="line">const code = fs.readFileSync(&apos;./test.js&apos;).toString()</span><br><span class="line">const ast = parse(code, &#123; sourceType: &apos;module&apos; &#125;)</span><br><span class="line">const result = babel.transformFromAstSync(ast, code, &#123;</span><br><span class="line">  presets: [&apos;@babel/preset-env&apos;]</span><br><span class="line">&#125;)</span><br><span class="line">fs.writeFileSync(&apos;./test.es5.js&apos;, result.code)</span><br></pre></td></tr></table></figure>
+<h2 id="除了转换ES5代码还能做什么"><a href="#除了转换ES5代码还能做什么" class="headerlink" title="除了转换ES5代码还能做什么"></a>除了转换ES5代码还能做什么</h2><h3 id="依赖分析-004-dep-ts"><a href="#依赖分析-004-dep-ts" class="headerlink" title="依赖分析: 004_dep.ts"></a>依赖分析: 004_dep.ts</h3><ul>
+<li>project1目录的 index.js</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import a from &apos;./a.js&apos;</span><br><span class="line">import b from &apos;./b.js&apos;</span><br><span class="line">console.log(a.value + b.value)</span><br></pre></td></tr></table></figure>
+<h4 id="代码思路-004-dep-ts"><a href="#代码思路-004-dep-ts" class="headerlink" title="代码思路 004_dep.ts"></a>代码思路 004_dep.ts</h4><p>1、调用 collectCodeAndDeps(‘index.js’)<br>2、 先把 depRelation[‘index.js’] 初始化为 { deps: [], code: ‘index.js的源码’ }<br>3、然后把 index.js 源码 code 变成 ast<br>4、遍历 ast，看看 import 了哪些依赖，假设依赖了 a.js 和 b.js<br>5、把 a.js 和 b.js 写到 depRelation[‘index.js’].deps 里<br>6、最终得到的 depRelation 就收集了 index.js 的依赖 </p>
+<h3 id="升级：依赖里还有依赖-005-dep-ts"><a href="#升级：依赖里还有依赖-005-dep-ts" class="headerlink" title="升级：依赖里还有依赖 005_dep.ts"></a>升级：依赖里还有依赖 005_dep.ts</h3><ul>
+<li><p>三层依赖关系</p>
+</li>
+<li><p>index.js -&gt; a -&gt; dir/a2 -&gt; dir/dir_in_dir/a3</p>
+</li>
+<li>index.js -&gt; b -&gt; dir/b2 -&gt; dir/dir_in_dir/b3</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">function collectCodeAndDeps(filepath: string) &#123;</span><br><span class="line">  const key = getProjectPath(filepath) // 文件的项目路径，如 index.js</span><br><span class="line">  // 获取文件内容，将内容放至 depRelation</span><br><span class="line">  const code = readFileSync(filepath).toString()</span><br><span class="line">  // 初始化 depRelation[key]</span><br><span class="line">  depRelation[key] = &#123; deps: [], code: code &#125;</span><br><span class="line">  // 将代码转为 AST</span><br><span class="line">  const ast = parse(code, &#123; sourceType: &apos;module&apos; &#125;)</span><br><span class="line">  // 分析文件依赖，将内容放至 depRelation</span><br><span class="line">  traverse(ast, &#123;</span><br><span class="line">    enter: path =&gt; &#123;</span><br><span class="line">      if (path.node.type === &apos;ImportDeclaration&apos;) &#123;</span><br><span class="line">        // path.node.source.value 往往是一个相对路径，如 ./a.js，需要先把它转为一个绝对路径</span><br><span class="line">        const depAbsolutePath = resolve(dirname(filepath), path.node.source.value)</span><br><span class="line">        // 然后转为项目路径</span><br><span class="line">        const depProjectPath = getProjectPath(depAbsolutePath)</span><br><span class="line">        // 把依赖写进 depRelation</span><br><span class="line">        depRelation[key].deps.push(depProjectPath)</span><br><span class="line"></span><br><span class="line">        // 递归依赖收集的核心一句话</span><br><span class="line">        // 递归依赖收集的核心一句话</span><br><span class="line">        // 递归依赖收集的核心一句话</span><br><span class="line">        collectCodeAndDeps(depAbsolutePath)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h4><ul>
+<li>collectCodeAndDeps 太长了，缩写为 collect</li>
+<li>调用 collect(‘index.js’)</li>
+<li>发现依赖 ‘./a.js’ 于是调用 collect(‘a.js’)</li>
+<li>发现依赖 ‘./dir/a2.js’ 于是调用 collect(‘dir/a2.js’)</li>
+<li>发现依赖 ‘./dir_in_dir/a3.js’ 于是调用 collect(‘dir/dir_in_dir/a3.js’)</li>
+<li>没有更多依赖了，a.js 这条线结束，发现下一个依赖 ‘./b.js’</li>
+<li>以此类推，其实就是递归</li>
+</ul>
+<h3 id="代码如果是循环依赖呢-006-dep-ts"><a href="#代码如果是循环依赖呢-006-dep-ts" class="headerlink" title="代码如果是循环依赖呢? 006_dep.ts"></a>代码如果是循环依赖呢? 006_dep.ts</h3><ul>
+<li>index -&gt; a -&gt; b</li>
+<li>index -&gt; b -&gt; a</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// a.js</span><br><span class="line">import b from &apos;./b.js&apos;</span><br><span class="line">const a = &#123;</span><br><span class="line">  value: b.value + 1,</span><br><span class="line">&#125;</span><br><span class="line">export default a</span><br><span class="line"></span><br><span class="line">// b.js</span><br><span class="line">import a from &apos;./a.js&apos;</span><br><span class="line">const b = &#123;</span><br><span class="line">  value: a.value + 1,</span><br><span class="line">&#125;</span><br><span class="line">export default b</span><br></pre></td></tr></table></figure>
+<ul>
+<li>求值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// a.js里</span><br><span class="line">a.value = b.value +1</span><br><span class="line">// b.js里</span><br><span class="line">b.value = a.value +1</span><br><span class="line"></span><br><span class="line">// 神经病，a 依赖b，但是 b必须先执行，同时 b又依赖 a</span><br><span class="line">// 运行代码 报错</span><br><span class="line">Maximum call stack size exceeded</span><br><span class="line">// 爆栈了</span><br></pre></td></tr></table></figure>
+<h4 id="难道不能-“循环依赖”吗？007-dep-ts"><a href="#难道不能-“循环依赖”吗？007-dep-ts" class="headerlink" title="难道不能 “循环依赖”吗？007_dep.ts"></a>难道不能 “循环依赖”吗？007_dep.ts</h4><h3 id="解决循环依赖问题，用一个map-，如果已经读取过，就return"><a href="#解决循环依赖问题，用一个map-，如果已经读取过，就return" class="headerlink" title="解决循环依赖问题，用一个map ，如果已经读取过，就return"></a>解决循环依赖问题，用一个map ，如果已经读取过，就return</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (Object.keys(depRelation).includes(key)) &#123;</span><br><span class="line">  console.warn(`duplicated dependency: $&#123;key&#125;`) // 注意，重复依赖不一定是循环依赖</span><br><span class="line">  return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>分析依赖，是不需要执行代码的，所以这是可行的</li>
+<li>由于不需要执行代码，所以这个叫做“静态分析”</li>
+<li>假如执行代码，就会出现循环引用问题</li>
+</ul>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><ul>
+<li>模块里可以循环依赖<ul>
+<li><code>a-&gt;b,b-&gt;a</code></li>
+</ul>
+</li>
+<li>但是不能有逻辑漏洞<ul>
+<li><code>a.value = b.value +1</code></li>
+<li><code>b.value = a.value +1</code></li>
+</ul>
+</li>
+<li>如何写出解决循环依赖的代码 project5 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// a.js</span><br><span class="line">import b from &apos;./b.js&apos;</span><br><span class="line">const a = &#123;</span><br><span class="line">  value: &apos;a&apos;,</span><br><span class="line">  getB: () =&gt; b.value + &apos; from a.js&apos;</span><br><span class="line">&#125;</span><br><span class="line">export default a</span><br><span class="line"></span><br><span class="line">// b.js</span><br><span class="line">import a from &apos;./a.js&apos;</span><br><span class="line">const b = &#123;</span><br><span class="line">  value: &apos;b&apos;,</span><br><span class="line">  getA: () =&gt; a.value + &apos; from b.js&apos;</span><br><span class="line">&#125;</span><br><span class="line">export default b</span><br></pre></td></tr></table></figure>
+<p><strong>这样循环链就断了，运行就不会报错</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="AST"><a href="#AST" class="headerlink" title="AST"></a>AST</h3><ul>
+<li>parse 将 code 变成 ast</li>
+<li>traverse: 遍历 AST 进行修改</li>
+<li>generate: 把修改后的 AST 变成代码 code2</li>
+</ul>
+<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><ul>
+<li>babel 可以把高级代码翻译为 ES5</li>
+<li>@babel/parser</li>
+<li>@babel/traverse</li>
+<li>@babel/generator</li>
+<li>@babel/core 包含前三者</li>
+<li>@babel/preset-env 内置很多规则</li>
+</ul>
+<h3 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h3><ul>
+<li>有的循环依赖可以正常执行</li>
+<li>有的循环依赖不可以</li>
+<li>但都可以做静态分析</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/27/Webpack-01AST-Babel-依赖/" data-id="cknvgpu9f01000xjpj01fa7gm" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Webpack/">Webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Webpack-00前置内容理解webpack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/02/26/Webpack-00前置内容理解webpack/" class="article-date">
+  <time datetime="2021-02-26T05:22:51.000Z" itemprop="datePublished">2021-02-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="理解-Webpack-实现流程"><a href="#理解-Webpack-实现流程" class="headerlink" title="理解 Webpack 实现流程"></a>理解 Webpack 实现流程</h1><ul>
+<li><a href="https://github.com/slTrust/webpack-easy" target="_blank" rel="noopener">仓库</a></li>
+</ul>
+<h2 id="理解node-模块化"><a href="#理解node-模块化" class="headerlink" title="理解node 模块化"></a>理解node 模块化</h2><p>src目录有 如下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//name.js</span><br><span class="line">let name = &apos;my name is xxx&apos;</span><br><span class="line">exports.name = name</span><br><span class="line"></span><br><span class="line">// action.js</span><br><span class="line">let action = &apos;make webpack&apos;</span><br><span class="line">exports.action = action</span><br><span class="line"></span><br><span class="line">// index.js</span><br><span class="line">let action = require(&apos;./action.js&apos;).action</span><br><span class="line">let name = require(&apos;./name.js&apos;).name</span><br><span class="line">let msg = `$&#123;name&#125; is $&#123;action&#125;`</span><br><span class="line">console.log(msg)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果你学过模块化，or用过 require.js</li>
+<li>意思是每个文件代表一个模块，当一个文件(index.js)需要另一个文件内容的时候（name.js） ，我们可以 <code>require(&#39;./name.js&#39;)</code></li>
+<li>require得到的东西，就是这个模块文件如name.js 里 <code>exports</code>对象</li>
+<li>可以通过 require 拿到一个模块里的东西，同时可以用 exports 把模块需要暴露出的东西 暴露出去</li>
+<li><p>require/exports 就实现了模块化</p>
+<ul>
+<li>好处是：代码更加清晰，修改模块的时候更加的方便</li>
+</ul>
+</li>
+<li><p>运行 <code>node src/index.js</code> 得到执行</p>
+</li>
+</ul>
+<h3 id="怎么就能执行了？"><a href="#怎么就能执行了？" class="headerlink" title="怎么就能执行了？"></a>怎么就能执行了？</h3><ul>
+<li>因为我们使用的是 node环境，而node环境内部天生支持模块化，使用的是 commonJS规范</li>
+</ul>
+<h3 id="如何支持浏览器？"><a href="#如何支持浏览器？" class="headerlink" title="如何支持浏览器？"></a>如何支持浏览器？</h3><ul>
+<li>不可以直接引入 index.js ，因为浏览器没有 require/exports 这些东西</li>
+<li>你需要对源码进行处理</li>
+<li>使用“一些工具”对代码进行处理加工变成一个文件，放到dist里 浏览器引入 dist里的js </li>
+<li>这个工具就是 webpack</li>
+</ul>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><ul>
+<li>浏览器是不认识 require/exports 的</li>
+</ul>
+<h3 id="step01先套壳（此时代码是无法运行的）"><a href="#step01先套壳（此时代码是无法运行的）" class="headerlink" title="step01先套壳（此时代码是无法运行的）"></a>step01先套壳（此时代码是无法运行的）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// index.js</span><br><span class="line">function (require, exports, module) &#123;</span><br><span class="line">  let action = require(&apos;./action.js&apos;).action</span><br><span class="line">  let name = require(&apos;./name.js&apos;).name</span><br><span class="line">  let msg = `$&#123;name&#125; is $&#123;action&#125;`</span><br><span class="line">  console.log(msg)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// action.js</span><br><span class="line">function (require, exports, module) &#123;</span><br><span class="line">  let action = &apos;make webpack&apos;</span><br><span class="line">  exports.action = action</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// name.js</span><br><span class="line">function (require, exports, module) &#123;</span><br><span class="line">  let name = &apos;my name is xxx&apos;</span><br><span class="line">  exports.name = name</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="step02-模块有一个模块id，放入到一个对象里modules（命名空间）"><a href="#step02-模块有一个模块id，放入到一个对象里modules（命名空间）" class="headerlink" title="step02 模块有一个模块id，放入到一个对象里modules（命名空间）"></a>step02 模块有一个模块id，放入到一个对象里modules（命名空间）</h3><ul>
+<li>如下代码还无法运行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">modules = &#123;</span><br><span class="line">  // index.js</span><br><span class="line">  0: function (require, exports) &#123;</span><br><span class="line">    let action = require(&apos;./action.js&apos;).action</span><br><span class="line">    let name = require(&apos;./name.js&apos;).name</span><br><span class="line">    let msg = `$&#123;name&#125; is $&#123;action&#125;`</span><br><span class="line">    console.log(msg)</span><br><span class="line">  &#125;,</span><br><span class="line">  // action.js</span><br><span class="line">  1: function (require, exports) &#123;</span><br><span class="line">    let action = &apos;make webpack&apos;</span><br><span class="line">    exports.action = action</span><br><span class="line">  &#125;,</span><br><span class="line">  // name.js</span><br><span class="line">  2: function (require, exports) &#123;</span><br><span class="line">    let name = &apos;my name is xxx&apos;</span><br><span class="line">    exports.name = name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 所有的模块归拢到一处</span><br><span class="line">// 用一个 modules 收集</span><br><span class="line">// 过程就是，我们又一个工具 比如叫做 webpack,把我们的代码变成如下内容，然后把每个modules挨个执行一下</span><br><span class="line"></span><br><span class="line">// 执行模块返回结果</span><br><span class="line">function exec(id) &#123;</span><br><span class="line">  let fn = modules[id]</span><br><span class="line">  let exports = &#123;&#125;</span><br><span class="line">  fn(require, exports)</span><br><span class="line"></span><br><span class="line">  // 浏览器不是 node环境，所以没有 require，我们需要创造一个require</span><br><span class="line">  function require(path) &#123;</span><br><span class="line">    // 根据模块的路径，返回执行的结果</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 模块0 是我们的入口文件</span><br><span class="line">exec(0)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>浏览器不是node环境没有require</strong></li>
+<li><strong>浏览器不是node环境没有require</strong></li>
+<li><strong>浏览器不是node环境没有require</strong></li>
+<li>所以webpack的作用是把模块化的js处理成一个文件如 bundle.js 在浏览器执行</li>
+</ul>
+<h3 id="COMMONJS规范写源码的时候"><a href="#COMMONJS规范写源码的时候" class="headerlink" title="COMMONJS规范写源码的时候"></a>COMMONJS规范写源码的时候</h3><ul>
+<li>必须用 require(‘xx.js’) 去加载一个模块</li>
+<li>就是去执行这个模块，拿到这个模块里的 exports 对象</li>
+<li>同时模块希望被别人用的时候，我们需要在 exports 绑定东西</li>
+</ul>
+<h3 id="step03改变modules的数据格式"><a href="#step03改变modules的数据格式" class="headerlink" title="step03改变modules的数据格式"></a>step03改变modules的数据格式</h3><ul>
+<li>资源映射和启动入口</li>
+<li>代码可以在 “node环境/浏览器”执行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">modules = &#123;</span><br><span class="line">  // index.js</span><br><span class="line">  0: [</span><br><span class="line">    function (require, exports) &#123;</span><br><span class="line">      let action = require(&apos;./action.js&apos;).action</span><br><span class="line">      let name = require(&apos;./name.js&apos;).name</span><br><span class="line">      let msg = `$&#123;name&#125; is $&#123;action&#125;`</span><br><span class="line">      console.log(msg)</span><br><span class="line">    &#125;,</span><br><span class="line">    // 依赖的模块 路径和 id的映射</span><br><span class="line">    &#123;</span><br><span class="line">      &apos;./action.js&apos;: 1,</span><br><span class="line">      &apos;./name.js&apos;: 2</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  // action.js</span><br><span class="line">  1: [</span><br><span class="line">    function (require, exports) &#123;</span><br><span class="line">      let action = &apos;make webpack&apos;</span><br><span class="line">      exports.action = action</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;&#125;</span><br><span class="line">  ],</span><br><span class="line">  // name.js</span><br><span class="line">  2: [</span><br><span class="line">    function (require, exports) &#123;</span><br><span class="line">      let name = &apos;my name is xxx&apos;</span><br><span class="line">      exports.name = name</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;&#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 所有的模块归拢到一处</span><br><span class="line">// 用一个 modules 收集</span><br><span class="line">// 过程就是，我们又一个工具 比如叫做 webpack,把我们的代码变成如下内容，然后把每个modules挨个执行一下</span><br><span class="line"></span><br><span class="line">// 执行模块返回结果</span><br><span class="line">function exec(id) &#123;</span><br><span class="line">  /*</span><br><span class="line">  mapping 形如</span><br><span class="line">  &#123;</span><br><span class="line">    &apos;./action.js&apos;: 1,</span><br><span class="line">    &apos;./name.js&apos;: 2</span><br><span class="line">  &#125;</span><br><span class="line">  */</span><br><span class="line">  let [fn, mapping] = modules[id]</span><br><span class="line">  let exports = &#123;&#125;</span><br><span class="line">  fn &amp;&amp; fn(require, exports)</span><br><span class="line"></span><br><span class="line">  // 浏览器不是 node环境，所以没有 require，我们需要创造一个require</span><br><span class="line">  function require(path) &#123;</span><br><span class="line">    // 根据模块的路径，返回执行的结果</span><br><span class="line">    return exec(mapping[path])</span><br><span class="line">  &#125;</span><br><span class="line">  return exports</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 模块0 是我们的入口文件</span><br><span class="line">exec(0)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/02/26/Webpack-00前置内容理解webpack/" data-id="cknvgpu9d00zx0xjpj1emjg8y" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Webpack/">Webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node-web05-09-03博客系统使用nginx" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/" class="article-date">
@@ -143,7 +580,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/23/Node-web05-09-03博客系统使用nginx/" data-id="cklhjp21r00atulfy9two8j4x" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/23/Node-web05-09-03博客系统使用nginx/" data-id="cknvgptyt00b80xjphmnceaa1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -222,7 +659,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/22/Node-web05-09-02博客系统部署最新版流程/" data-id="cklhjp21q00asulfy9g3hhbq7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/22/Node-web05-09-02博客系统部署最新版流程/" data-id="cknvgptyp00av0xjpseo0cuen" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -321,7 +758,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/20/Node-web05-09-01博客统部署2/" data-id="cklhjp21p00apulfyiej4mtkk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/20/Node-web05-09-01博客统部署2/" data-id="cknvgptyr00b00xjpmevrc6ll" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -368,7 +805,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/20/Node-web05-08博客统页面完善/" data-id="cklhjp21p00aoulfy6es13lmh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/20/Node-web05-08博客统页面完善/" data-id="cknvgptyp00aw0xjp04knalca" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -457,7 +894,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/19/Node-web05-07-03服务器端构建/" data-id="cklhjp21n00alulfyonb5mi0c" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/19/Node-web05-07-03服务器端构建/" data-id="cknvgptyn00as0xjpetc7ug1e" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -579,306 +1016,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/19/Node-web05-07-02服务器相关配置及使用/" data-id="cklhjp21n00akulfyvx8dq2mt" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-07-01博客系统部署" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-07-01博客系统部署/" class="article-date">
-  <time datetime="2021-02-18T15:12:09.000Z" itemprop="datePublished">2021-02-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-07-01博客系统部署/">Node-web05-07-01博客系统部署</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="博客部署阿里云"><a href="#博客部署阿里云" class="headerlink" title="博客部署阿里云"></a>博客部署阿里云</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/bbc97ab4fc6adf3b93b136bcfeb0ad409c9711e4" target="_blank" rel="noopener">初始代码</a></li>
-</ul>
-<h3 id="我们先build代码"><a href="#我们先build代码" class="headerlink" title="我们先build代码"></a>我们先build代码</h3><ul>
-<li><code>yarn build</code> 结果报错了，说找不到 Post</li>
-<li><p>原因是 next-env.d.ts ,一旦有 import 这个声明就不是全局的了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/// &lt;reference types=&quot;next&quot; /&gt;</span><br><span class="line">/// &lt;reference types=&quot;next/types/global&quot; /&gt;</span><br><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line"></span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建 custom.d.ts 在项目根目录，里面放置全局的类型声明</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">type Post = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">  htmlContent: string;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>此时再次 <code>yarn build</code> 构建成功</li>
-<li>去看 <code>.next/BUILD_ID</code> 这个是每次 build产生的id</li>
-<li>然后 <code>yarn start</code> 运行，部署代码也是这样运行</li>
-</ul>
-<h3 id="docker化应用"><a href="#docker化应用" class="headerlink" title="docker化应用"></a>docker化应用</h3><ul>
-<li>google docker nodejs 得到 <a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" target="_blank" rel="noopener">Dockerizing a Node.js web app</a></li>
-<li>所有的英文都不看，直接看例子</li>
-<li>创建 Dockerfile <code>touch Dockerfile</code></li>
-<li>内容如下</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">FROM node:12</span><br><span class="line">#  在 linux 的 /usr/src/app 目录工作</span><br><span class="line">WORKDIR /usr/src/app</span><br><span class="line">COPY package.json ./</span><br><span class="line"># 因为我们用的是 yarn 不是 npm</span><br><span class="line">COPY yarn.lock ./</span><br><span class="line"># run 开头 代表运行 命令</span><br><span class="line">RUN yarn install</span><br><span class="line"># 这个意思是 把你项目根目录的内容 拷贝到 工作目录</span><br><span class="line">COPY . .</span><br><span class="line"># 暴露端口</span><br><span class="line">EXPOSE 3000</span><br><span class="line"># 最后一步你要运行的代码</span><br><span class="line">CMD [ &quot;yarn&quot;, &quot;start&quot; ]</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>再次创建一个忽略文件 <code>.dockerignore</code></p>
-<ul>
-<li>同<code>.gitignore</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node_modules</span><br><span class="line">*.log</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>继续看文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 看文档</span><br><span class="line"># 构建你的 docker应用 </span><br><span class="line"># 构建成功会生成一个镜像</span><br><span class="line">docker build -t &lt;your username&gt;/node-web-app .</span><br><span class="line"></span><br><span class="line"># 如何运行镜像呢？</span><br><span class="line">docker run -p 3000:3000 -d &lt;your username&gt;/node-web-app</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>我的构建命令如下</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t my-node-app/node-web-app . </span><br><span class="line"></span><br><span class="line">docker run -p 3000:3000 -d my-node-app/node-web-app</span><br></pre></td></tr></table></figure>
-<h3 id="构建过程出错了"><a href="#构建过程出错了" class="headerlink" title="构建过程出错了"></a>构建过程出错了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 第一个问题 yarn install 一直卡在 &quot;Fetch packages...&quot;</span><br><span class="line">yarn cache clean &amp; yarn install</span><br><span class="line"></span><br><span class="line"># 第二个问题 yarn install --verbose 显示它的进度，发现卡在这里</span><br><span class="line">Browserslist: caniuse-lite is outdated. Please run: npx browserslist@latest --update-db</span><br><span class="line"></span><br><span class="line">- 解决办法</span><br><span class="line">- 删除 node_modules 文件夹及 package-lock.json 文件</span><br><span class="line"></span><br><span class="line">结果不管事</span><br><span class="line">再次添加参数</span><br><span class="line"></span><br><span class="line">RUN  yarn cache clean &amp; yarn install --verbose --network-timeout 60000</span><br></pre></td></tr></table></figure>
-<ul>
-<li>历经千辛万苦，终于build成功了</li>
-<li>运行<code>docker run -p 3000:3000 -d my-node-app/node-web-app</code> 打开浏览器 <a href="http://localhost:3000/" target="_blank" rel="noopener">http://localhost:3000/</a> </li>
-<li>发现报错， 通过log看运行日志</li>
-<li>docker logs 你的应用id </li>
-<li>应该是 数据库连接问题，数据库需要一个 pg 容器，并配置好localhost</li>
-<li>修改 ormconfig.json 里的host为你的本机ip<ul>
-<li>因为 容器内的 localhost 不是你本机的 localhost</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-07-01博客系统部署/" data-id="cklhjp21m00ahulfywg6w6hc9" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-06博客系统后端分页" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-06博客系统后端分页/" class="article-date">
-  <time datetime="2021-02-18T13:49:13.000Z" itemprop="datePublished">2021-02-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-06博客系统后端分页/">Node-web05-06博客系统后端分页</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="博客分页"><a href="#博客分页" class="headerlink" title="博客分页"></a>博客分页</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/1fbe3c0de245cd6dd2a18cd1cb27d9afa9982616" target="_blank" rel="noopener">初始代码</a></li>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/c61325850c7b041914eeb33f6721e73bf7c21a24" target="_blank" rel="noopener">最终代码</a></li>
-</ul>
-<h2 id="未登录的处理"><a href="#未登录的处理" class="headerlink" title="未登录的处理"></a>未登录的处理</h2><ul>
-<li>后端发现没登录返回401</li>
-<li>前端发现401也提示登录，同时在url后面 附上 returnTo 参数</li>
-<li>前端登录成功后，根据 returnTo 回跳页面</li>
-<li>后端发现登录了，就可以 根据携带的cookie 拿到session里的 currentUser</li>
-</ul>
-<blockquote>
-<p>功能点</p>
-</blockquote>
-<ul>
-<li>使用 query-string 处理参数</li>
-<li>returnTo后面的路径 可能也包含参数<ul>
-<li>encodeURIComponent 处理传递的路径转译问题<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sign_in?returnTo=$&#123;encodeURIComponent(window.location.pathname)&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="分页如何做"><a href="#分页如何做" class="headerlink" title="分页如何做"></a>分页如何做</h2><ul>
-<li>1) <code>/posts</code> or <code>/posts?page=1</code></li>
-<li>2) <code>/posts?page=100</code>咋办<ul>
-<li>实际没有100页 ，前端瞎写的</li>
-</ul>
-</li>
-<li>3) 后端获取 page （查询字符串）</li>
-<li>4) typeorm 的 page 功能</li>
-<li>5) 输出JSON给前端，同时告诉前端这是第几页</li>
-</ul>
-<h3 id="大型网站的微博咋写的？"><a href="#大型网站的微博咋写的？" class="headerlink" title="大型网站的微博咋写的？"></a>大型网站的微博咋写的？</h3><ul>
-<li>参考新浪</li>
-<li>你访问 <code>/posts?page=1</code> 看了，然后在看第二页</li>
-<li>此时访问的是 <code>/posts?page=2</code>，但是新浪微博的用户量很大，这期间可能 更新了10来条 你看到可能跟刚才的存在重叠，或者完美错过</li>
-<li><strong>正确姿势</strong></li>
-<li><code>/posts?page=2&amp;id=上一页最后一个id&amp;offset=10</code></li>
-<li>后端获取id小于此 id的数据，最多10条</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-06博客系统后端分页/" data-id="cklhjp21l00agulfyrhywdggd" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-05博客系统创建博客" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-05博客系统创建博客/" class="article-date">
-  <time datetime="2021-02-18T10:59:34.000Z" itemprop="datePublished">2021-02-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-05博客系统创建博客/">Node-web05-05博客系统创建博客</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="创建博客"><a href="#创建博客" class="headerlink" title="创建博客"></a>创建博客</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/
-commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">初始代码</a></li>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/1fbe3c0de245cd6dd2a18cd1cb27d9afa9982616" target="_blank" rel="noopener">最终代码</a></li>
-</ul>
-<h3 id="如何在代码里隐藏密码-密钥"><a href="#如何在代码里隐藏密码-密钥" class="headerlink" title="如何在代码里隐藏密码/密钥"></a>如何在代码里隐藏密码/密钥</h3><ul>
-<li>绝对不能写在代码里，一旦泄漏很危险</li>
-<li>必须放到环境变量里，或者被 .gitignore 的文件里</li>
-</ul>
-<blockquote>
-<p>正确姿势</p>
-</blockquote>
-<ul>
-<li><p>第一种：环境变量(不够方便)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 命令行里</span><br><span class="line">export SECRET=你的密钥</span><br><span class="line"></span><br><span class="line"># js程序里</span><br><span class="line">password:process.env.SECRET</span><br><span class="line"></span><br><span class="line"># 操作流程</span><br><span class="line">export SECRET=你的密钥</span><br><span class="line"># 重启你的应用即可，开发用这个</span><br><span class="line">yarn dev</span><br><span class="line"># 如果是部署在生产环境，你就登录到这个机器设置环境变量，然后运行你的 “程序”</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>第二种：仅限于next.js 因为提供了支持</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># next.js的项目里新建 .env.local</span><br><span class="line"># 在这里设置环境变量</span><br><span class="line"># 内容如下</span><br><span class="line">SECRET=你的密钥</span><br><span class="line"></span><br><span class="line"># 最重要的一步，将这个文件 添加到 .gitignore</span><br><span class="line"></span><br><span class="line"># 这样的好处是，每个人有自己的 密钥，相互不知道</span><br></pre></td></tr></table></figure>
-<h3 id="Entity-循环引用-bug"><a href="#Entity-循环引用-bug" class="headerlink" title="Entity 循环引用 bug"></a>Entity 循环引用 bug</h3><ul>
-<li>ManyToOne , OneToMany 循环引用问题</li>
-<li>解决方案<a href="https://github.com/typeorm/typeorm/issues/1290" target="_blank" rel="noopener">使用字符串关联</a></li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-05博客系统创建博客/" data-id="cklhjp21k00adulfyunvdqp64" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node-web05-04博客系统登录" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2021/02/18/Node-web05-04博客系统登录/" class="article-date">
-  <time datetime="2021-02-18T08:40:03.000Z" itemprop="datePublished">2021-02-18</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/18/Node-web05-04博客系统登录/">Node-web05-04博客系统登录</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="登录功能"><a href="#登录功能" class="headerlink" title="登录功能"></a>登录功能</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><ul>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/9aec928eacfaf53dd839e5280e04113d9f24810b" target="_blank" rel="noopener">初始代码</a></li>
-<li><a href="https://github.com/slTrust/next-demo-2/commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">最终代码</a></li>
-</ul>
-<h3 id="实现逻辑"><a href="#实现逻辑" class="headerlink" title="实现逻辑"></a>实现逻辑</h3><ul>
-<li>创建登录页面 sign_in</li>
-<li>创建 posts/sessions API</li>
-<li>使用 SignIn Model 校验数据</li>
-<li>使用 session 记录登录状态</li>
-</ul>
-<h4 id="用-session记录登录状态"><a href="#用-session记录登录状态" class="headerlink" title="用 session记录登录状态"></a>用 session记录登录状态</h4><ul>
-<li>google 搜索 next.js session</li>
-<li>没找到标准答案</li>
-<li>搜仓库 发现 example 里有个<a href="https://github.com/vercel/next.js/tree/canary/examples/with-iron-session" target="_blank" rel="noopener">例子 with-iron-session</a></li>
-<li><code>lib/withSession.tsx</code></li>
-<li>一定不能把密钥写在代码里，测试可以这样，但是生产环境一定不能这样</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &#123;withIronSession&#125; from &apos;next-iron-session&apos;;</span><br><span class="line">import &#123;NextApiHandler&#125; from &apos;next&apos;;</span><br><span class="line"></span><br><span class="line">export function withSession(handler: NextApiHandler) &#123;</span><br><span class="line">    return withIronSession(handler, &#123;</span><br><span class="line">        // password: process.env.SECRET_COOKIE_PASSWORD,</span><br><span class="line">        password: &apos;c2a85490-cc60-4f21-94e8-8dc5dd3220da&apos;, //密钥，这个应该用环境变量</span><br><span class="line">        cookieName: &apos;blog&apos;,</span><br><span class="line">        // 这个选项如果不设置 你本地开发是http的 就会种不下 cookie 获取 user 会是 undefined</span><br><span class="line">        cookieOptions: &#123;secure: false&#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后修改 <code>api/v1/sessions.tsx</code></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import &#123;NextApiHandler&#125; from &apos;next&apos;;</span><br><span class="line">import &#123;SignIn&#125; from &apos;../../../src/model/SignIn&apos;;</span><br><span class="line">import &#123;withSession&#125; from &quot;../../../lib/withSession&quot;;</span><br><span class="line"></span><br><span class="line">const Sessions: NextApiHandler = async (req, res) =&gt; &#123;</span><br><span class="line">    const &#123;username, password&#125; = req.body;</span><br><span class="line">    res.setHeader(&apos;Content-Type&apos;, &apos;application/json; charset=utf-8&apos;);</span><br><span class="line">    const signIn = new SignIn();</span><br><span class="line">    signIn.username = username;</span><br><span class="line">    signIn.password = password;</span><br><span class="line">    await signIn.validate();</span><br><span class="line">    if (signIn.hasErrors()) &#123;</span><br><span class="line">        res.statusCode = 422;</span><br><span class="line">        res.end(JSON.stringify(signIn.errors));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        req.session.set(&apos;currentUser&apos;, signIn.user);</span><br><span class="line">        await req.session.save()</span><br><span class="line">        res.statusCode = 200;</span><br><span class="line">        res.end(JSON.stringify(signIn.user));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 包一层</span><br><span class="line">export default withSession(Sessions);</span><br><span class="line"></span><br><span class="line">// 但是遇到了问题 req.session 点不出来，因为没类型，ts无法识别</span><br><span class="line">// 除非我们能对 NextApiRequest 进行一个扩展，添加 session 选项</span><br></pre></td></tr></table></figure>
-<h3 id="如何声明对已有类型进行扩展"><a href="#如何声明对已有类型进行扩展" class="headerlink" title="如何声明对已有类型进行扩展"></a>如何声明对已有类型进行扩展</h3><ul>
-<li><a href="https://github.com/microsoft/TypeScript/issues/10859" target="_blank" rel="noopener">Extend external modules declared</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">首先引入 这个类型，然后在这个类上加属性</span><br><span class="line"></span><br><span class="line">import * as [原有类型] from &apos;[原有类型]&apos;;</span><br><span class="line"></span><br><span class="line">declare module &apos;[原有类型]&apos; &#123;</span><br><span class="line">  interface MyAddon &#123;</span><br><span class="line">    [你的属性]:any</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>next-env.d.ts 修改如下</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import * as next from &apos;next&apos;;</span><br><span class="line">declare module &apos;next&apos; &#123;</span><br><span class="line">    import &#123;Session&#125; from &apos;next-iron-session&apos;;</span><br><span class="line">    interface NextApiRequest &#123;</span><br><span class="line">        session: Session</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>然后去登录 <a href="http://localhost:3000/sign_in" target="_blank" rel="noopener">http://localhost:3000/sign_in</a></li>
-<li>此时登录成功 会响应一个 set-cookie 头，这个东西对应服务器里的一小块内存。这个session里记录了用户的信息</li>
-</ul>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/02/18/Node-web05-04博客系统登录/" data-id="cklhjp21k00aculfyii6pzotf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/02/19/Node-web05-07-02服务器相关配置及使用/" data-id="cknvgptyl00ao0xjpe82l0hmz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -908,7 +1046,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -918,7 +1056,7 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -940,23 +1078,23 @@ commit/cc5a2927f6905574924ade4d7fa85fd2a8c42b1d" target="_blank" rel="noopener">
       <ul>
         
           <li>
+            <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-02打包器/">Webpack-02打包器</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/27/Webpack-01AST-Babel-依赖/">Webpack-01AST_Babel_依赖</a>
+          </li>
+        
+          <li>
+            <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
+          </li>
+        
+          <li>
             <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/22/Node-web05-09-02博客系统部署最新版流程/">Node-web05-09-02博客系统部署最新版流程</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-09-01博客统部署2/">Node-web05-09-01博客统部署优化解释</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/20/Node-web05-08博客统页面完善/">Node-web05-08博客统页面完善</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/19/Node-web05-07-03服务器端构建/">Node-web05-07-03服务器端构建</a>
           </li>
         
       </ul>
