@@ -62,6 +62,99 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-HTTP05缓存控制" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/01/19/HTTP05缓存控制/" class="article-date">
+  <time datetime="2021-01-19T15:32:01.000Z" itemprop="datePublished">2021-01-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/19/HTTP05缓存控制/">HTTP05缓存控制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="缓存控制"><a href="#缓存控制" class="headerlink" title="缓存控制"></a>缓存控制</h1><h2 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h2><ul>
+<li>设置过期时间 (http1.0的东西，现在用的少了)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Wed, 30 Dec 2020 18:05:17 GMT</span><br><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br></pre></td></tr></table></figure>
+<p>存在问题是 ： 服务器时间和你客户端时间不一致。</p>
+<h2 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h2><ul>
+<li>不要缓存，每次都重新拿</li>
+<li>优先级最高，一旦设置就不会走缓存</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<p>当 Pragma 和 Expires同时出现， Pragma优先级高</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var date = new Date(Date.now()+1000*5).toGMTString()</span><br><span class="line">res.setHeader(&apos;Expires&apos;,date)</span><br><span class="line">res.setHeader(&apos;Pragma&apos;,&apos;no-cache&apos;)</span><br></pre></td></tr></table></figure>
+<h2 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h2><ul>
+<li>设置过期时间戳<ul>
+<li>解决了 Expires 时间不一致问题</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 10s后过期</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;max-age=10&apos;)</span><br></pre></td></tr></table></figure>
+<h3 id="Cache-Control-为啥不能缓存-html"><a href="#Cache-Control-为啥不能缓存-html" class="headerlink" title="Cache-Control 为啥不能缓存 html"></a>Cache-Control 为啥不能缓存 html</h3><ul>
+<li>访问 <a href="taobao.com">taobao</a></li>
+<li>你会发现 响应首页 的其他资源能被缓存，但是 这个首页html的响应头是</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cache-control: max-age=0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这是为了 解决网站改版的情况，浏览器自己设置的，如果缓存了，但是你走缓存就无法更新页面了</li>
+</ul>
+<h3 id="Cache-Control-其他值"><a href="#Cache-Control-其他值" class="headerlink" title="Cache-Control 其他值"></a>Cache-Control 其他值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 代表不走缓存,即使浏览器里有缓存</span><br><span class="line">cache-control: no-cache</span><br><span class="line"></span><br><span class="line">// 代表不走缓存</span><br><span class="line">// 资源可能中间有很多代理服务器(告诉代理服务器不要缓存)</span><br><span class="line">cache-control: no-store</span><br></pre></td></tr></table></figure>
+<h2 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，拿到——“修改时间”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个修改时间，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">if(!req.headers[&apos;if-modified-since&apos;])&#123;</span><br><span class="line">  // mtime 是修改时间</span><br><span class="line">  res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let oldMtime = Date.parse(req.headers[&apos;if-modified-since&apos;])</span><br><span class="line">  if(mtime&gt;oldMtime)&#123;</span><br><span class="line">    // 文件修改了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例1</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-cache 意思是 不要从本地缓存找 每次都找我要(每次都和服务器文件的mtime比对)</span><br><span class="line">// 第一次请求的时候响应里设置 Last-Modified 和时间，并把文件返回</span><br><span class="line">// 浏览器就会把这个时间缓存下来</span><br><span class="line">// 之后的每次请求 都会带上 if-modified-since 的时间</span><br><span class="line">// 但是发现 本地缓存信息里有 no-cache 就不会直接从本地读取，</span><br><span class="line">// 而是带上 if-modified-since 和服务器文件的 mtime 比对，如果变了就重新读取，没变就走缓存 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// no-cache 等价于 max-age=0</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>案例2，设置了 no-store</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-store&apos;)</span><br><span class="line">res.setHeader(&apos;Last-Modified&apos;,new Date(mtime).toGMTString())</span><br><span class="line">res.end(data) // data是文件数据</span><br><span class="line"></span><br><span class="line">// no-store 意思是 </span><br><span class="line">// 你设置的 Last-Modified  响应报文不会被浏览器记录,每次都重新读取文件</span><br></pre></td></tr></table></figure>
+<h2 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h2><ul>
+<li>比如 a.css文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你修改了,修改时间变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你又修改了，修改时间又变了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">body&#123;</span><br><span class="line">  color:red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是文件内容没变。但是 Last-Modified 只看时间，ETag代表 看文件内容是否变化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">// 当你访问服务器的时候，读取文件</span><br><span class="line">// 获取文件有相关的信息，生成——“md5值”</span><br><span class="line"></span><br><span class="line">// 这句代表你要重新找我拿，不走缓存，验证这个 md5值，如果变了 重新读取，没变返回304 从本地读取</span><br><span class="line">// 不设置的时候，浏览器会缓存，就不会经过服务器验证了，直接从本地读取文件</span><br><span class="line"></span><br><span class="line">let md5 = crypto.createHash(&apos;md5&apos;);</span><br><span class="line">res.setHeader(&apos;Cache-Control&apos;,&apos;no-cache&apos;) </span><br><span class="line">// 如果没有这个字段，代表第一次请求</span><br><span class="line">let oldETag = req.headers[&apos;if-none-match&apos;];</span><br><span class="line">if(!oldETag)&#123;</span><br><span class="line">  // 第一次请求</span><br><span class="line">  res.setHeader(&apos;Etag&apos;,md5.update(data).digest(&apos;base64&apos;))</span><br><span class="line">  res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">  res.end(data) // data是文件数据</span><br><span class="line">&#125;else&#123;</span><br><span class="line">  let newETag = md5.update(data).digest(&apos;base64&apos;)</span><br><span class="line">  if(newETag !== oldETag)&#123;</span><br><span class="line">    // 文件内容变了，重新读取吧</span><br><span class="line">    res.setHeader(&apos;Etag&apos;,newETag)</span><br><span class="line">    res.writeHead(200,&apos;OK&apos;)</span><br><span class="line">    res.end(data) // data是文件数据 </span><br><span class="line">  &#125;else&#123;</span><br><span class="line">    // 文件没变，你用缓存吧</span><br><span class="line">    res.writeHead(304)</span><br><span class="line">    res.end()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><ul>
+<li><a href="https://imweb.io/topic/5795dcb6fb312541492eda8c" target="_blank" rel="noopener">https://imweb.io/topic/5795dcb6fb312541492eda8c</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/23299600" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/23299600</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2021/01/19/HTTP05缓存控制/" data-id="ckovg9eh1001m8yjky853i7cy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-HTTP04报文和http状态码" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/01/18/HTTP04报文和http状态码/" class="article-date">
@@ -134,7 +227,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/18/HTTP04报文和http状态码/" data-id="cknvgptuf00160xjpp3zml62f" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/18/HTTP04报文和http状态码/" data-id="ckovg9egu00158yjkjvxb0mi1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -224,7 +317,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/17/HTTP03http常用方法/" data-id="cknvgptuk001f0xjp7y23wn4d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/17/HTTP03http常用方法/" data-id="ckovg9egy001f8yjkhrfim9bu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -308,7 +401,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/16/HTTP02三次握手四度挥手/" data-id="cknvgptui001b0xjpl53fyi1k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/16/HTTP02三次握手四度挥手/" data-id="ckovg9egw00188yjk6tjfh0aq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -449,7 +542,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-id="cknvgptuj001d0xjp2h1oqasx" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2021/01/15/HTTP01网络各种层/" data-id="ckovg9egu00138yjk48p1w7se" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/http/">http</a></li></ul>
@@ -550,7 +643,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-004-移动端常见问题/" data-id="cknvgpubs014k0xjpagbgdiwo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/移动端-004-移动端常见问题/" data-id="ckovg9ewk014f8yjknnhyxejp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
@@ -615,7 +708,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-003-移动端适配方案/" data-id="cknvgpubp014f0xjpfx4d06cr" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/移动端-003-移动端适配方案/" data-id="ckovg9ewi014a8yjkvt6b96g8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
@@ -697,7 +790,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-002-viewport/" data-id="cknvgpubo014d0xjp0s4rl7s4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/移动端-002-viewport/" data-id="ckovg9ewh01488yjknc545apj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
@@ -770,7 +863,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/移动端-001-像素单位/" data-id="cknvgpubr014i0xjp2ixz938r" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/移动端-001-像素单位/" data-id="ckovg9ewg01458yjkc3gpnubb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mobile/">mobile</a></li></ul>
@@ -847,172 +940,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/12/CSS-010-动态REM/" data-id="cknvgptu5000k0xjp99y76a28" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-CSS-009-BFC" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/10/11/CSS-009-BFC/" class="article-date">
-  <time datetime="2020-10-11T15:56:55.000Z" itemprop="datePublished">2020-10-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/10/11/CSS-009-BFC/">CSS-009-BFC</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="BFC"><a href="#BFC" class="headerlink" title="BFC"></a>BFC</h1><blockquote>
-<p>Block Formatting Context</p>
-</blockquote>
-<p>块格式化上下文</p>
-<h3 id="CSS规范中对-BFC-的描述"><a href="#CSS规范中对-BFC-的描述" class="headerlink" title="CSS规范中对 BFC 的描述"></a>CSS规范中对 BFC 的描述</h3><blockquote>
-<p>9.4.1 块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>浮动，绝对定位元素，非块盒的块容器（例如，inline-blocks，table-cells和table-captions）和’overflow’不为’visible’的块盒会为它们的内容建立一个新的块格式化上下文</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，盒在竖直方向一个接一个地放置，从包含块的顶部开始。两个兄弟盒之间的竖直距离由’margin’属性决定。同一个块格式化上下文中的相邻块级盒之间的竖直margin会合并</p>
-</blockquote>
-<blockquote>
-<p>在一个块格式化上下文中，每个盒的left外边（left outer edge）挨着包含块的left边（对于从右向左的格式化，right边挨着）。即使存在浮动（尽管一个盒的行盒可能会因为浮动收缩），这也成立。除非该盒建立了一个新的块格式化上下文（这种情况下，该盒自身可能会因为浮动变窄）</p>
-</blockquote>
-<h3 id="MDN-对-BFC-的描述"><a href="#MDN-对-BFC-的描述" class="headerlink" title="MDN 对 BFC 的描述"></a>MDN 对 BFC 的描述</h3><blockquote>
-<p>一个块格式化上下文（block formatting context） 是Web页面的可视化CSS渲染出的一部分。它是块级盒布局出现的区域，也是浮动层元素进行交互的区域。</p>
-</blockquote>
-<blockquote>
-<p>一个块格式化上下文由以下之一创建：</p>
-</blockquote>
-<ul>
-<li>根元素或其它包含它的元素</li>
-<li>浮动元素 (元素的 float 不是 none)</li>
-<li>绝对定位元素 (元素具有 position 为 absolute 或 fixed)</li>
-<li>内联块 (元素具有 display: inline-block)</li>
-<li>表格单元格 (元素具有 display: table-cell，HTML表格单元格默认属性)</li>
-<li>表格标题 (元素具有 display: table-caption, HTML表格标题默认属性)</li>
-<li>具有overflow 且值不是 visible 的块元素，</li>
-<li>display: flow-root <strong>触发BFC</strong></li>
-<li>column-span: all 应当总是会创建一个新的格式化上下文，即便具有 column-span: all 的元素并不被包裹在一个多列容器中。</li>
-</ul>
-<blockquote>
-<p>一个块格式化上下文包括创建它的元素内部所有内容，除了被包含于创建新的块级格式化上下文的后代元素内的元素。</p>
-</blockquote>
-<blockquote>
-<p>块格式化上下文对于定位 (参见 float) 与清除浮动 (参见 clear) 很重要。定位和清除浮动的样式规则只适用于处于同一块格式化上下文内的元素。浮动不会影响其它块格式化上下文中元素的布局，并且清除浮动只能清除同一块格式化上下文中在它前面的元素的浮动。</p>
-</blockquote>
-<h3 id="张鑫旭对-BFC-的描述"><a href="#张鑫旭对-BFC-的描述" class="headerlink" title="张鑫旭对 BFC 的描述"></a>张鑫旭对 BFC 的描述</h3><p><a href="http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/" target="_blank" rel="noopener">http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/</a></p>
-<blockquote>
-<p>BFC全称”Block Formatting Context”, 中文为“块级格式化上下文”。啪啦啪啦特性什么的，一言难尽，大家可以自行去查找，我这里不详述，免得乱了主次，总之，记住这么一句话：BFC元素特性表现原则就是，内部子元素再怎么翻江倒海，翻云覆雨都不会影响外部的元素。所以，避免margin穿透啊，清除浮动什么的也好理解了。</p>
-</blockquote>
-<h3 id="BFC-到底是什么？"><a href="#BFC-到底是什么？" class="headerlink" title="BFC 到底是什么？"></a>BFC 到底是什么？</h3><p>先思考一个问题：</p>
-<p>请问：什么是色情？</p>
-<p>联邦最高法院大法官斯图尔特更有一句名言</p>
-<blockquote>
-<p>我不知道什么是色情，不过，我看了之后，就能知道</p>
-</blockquote>
-<p><code>I know it when I see it</code></p>
-<p>类似地：</p>
-<p>1、我不知道什么是 BFC<br>2、但是你写出样式，我就知道这是不是 BFC</p>
-<p>BFC 就是这样的东西（堆叠上下文也是）</p>
-<p>1、它没有定义<br>2、它只有特性/功能</p>
-<h3 id="功能1：爸爸管儿子"><a href="#功能1：爸爸管儿子" class="headerlink" title="功能1：爸爸管儿子"></a>功能1：爸爸管儿子</h3><p>用 BFC 包住浮动元素。(这不是清除浮动，.clearfix 才是清除浮动）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      float:left; /* 浮动就会脱离文档流 ，导致 baba 的高度塌陷 */</span><br><span class="line">      width: 300px;</span><br><span class="line">      height: 100px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>如何触发BFC</p>
-</blockquote>
-<ul>
-<li>父级 浮动、定位、或者 <code>display = inline-block\table-cell\table-caption</code> 或者 display不是block的值的容器、 overflow 不为 visible的<ul>
-<li>overflow:auto</li>
-<li>overflow:hidden 会引发副作用，如果内部元素，超出内容不会显示</li>
-<li>display:inline-block</li>
-<li>display:table-cell</li>
-<li>display:flow-root <strong>让当前元素触发BFC，CSS3新出的属性，兼容性不太好</strong></li>
-</ul>
-</li>
-</ul>
-<h3 id="解释BFC内部元素-margin融合问题"><a href="#解释BFC内部元素-margin融合问题" class="headerlink" title="解释BFC内部元素 margin融合问题"></a>解释BFC内部元素 margin融合问题</h3><ul>
-<li>如果两个div没有浮动，它们在一个div中，它们的竖直margin会合并</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display: flow-root; /*触发BFC*/</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"><a href="#一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的" class="headerlink" title="一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的"></a>一个BFC包含它的元素内的所有内容，如果它的孩子元素是BFC，那么这个孩子的后代元素是不会被包含进来的</h3><blockquote>
-<p>通俗理解</p>
-</blockquote>
-<ul>
-<li>baba是BFC</li>
-<li>erzi是 baba的子元素，同时也是BFC</li>
-<li>sunzi 是 erzi的子元素，它的内容就不会被 baba包含</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">    .baba&#123;</span><br><span class="line">      border: 10px solid red;</span><br><span class="line">      width:500px;</span><br><span class="line">      min-height: 10px;</span><br><span class="line">      display:flow-root;</span><br><span class="line">    &#125;</span><br><span class="line">    .erzi&#123;</span><br><span class="line">      background: green;</span><br><span class="line">      width: 400px;</span><br><span class="line">      height: 100px;</span><br><span class="line">      margin:10px;</span><br><span class="line">      float:left; /* 触发BFC */</span><br><span class="line">      margin-top:100px; /* 由于父级 触发BFC所以 这个距离会被包含进 baba里*/</span><br><span class="line">    &#125;</span><br><span class="line">    .sunzi&#123;</span><br><span class="line">      height: 50px;</span><br><span class="line">      width: 400px;</span><br><span class="line">      margin-top:200px; /* 由于 sunzi被 BFC元素 erzi罩着， 所以无法被包含进 baba内 */</span><br><span class="line">      background:blue; </span><br><span class="line">      /* 由于 erzi在带sunzi，所以baba 就不管这个sunzi了 */</span><br><span class="line">    &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;</span><br><span class="line">      &lt;div class=&quot;sunzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="功能2：兄弟之间划清界限"><a href="#功能2：兄弟之间划清界限" class="headerlink" title="功能2：兄弟之间划清界限"></a>功能2：兄弟之间划清界限</h3><p>用 float + div 做左右自适应布局</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=&quot;utf-8&quot;&gt;</span><br><span class="line">  &lt;title&gt;JS Bin&lt;/title&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .gege&#123;</span><br><span class="line">  width: 100px;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 3px solid red;</span><br><span class="line">  float: left;</span><br><span class="line">  margin-right: 20px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.didi&#123;</span><br><span class="line">  min-height: 600px;</span><br><span class="line">  border: 5px solid green;</span><br><span class="line">  overflow:auto; </span><br><span class="line">  /* display:flow-root; */</span><br><span class="line">&#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;gege&quot;&gt;gege&lt;/div&gt;</span><br><span class="line">  &lt;div class=&quot;didi&quot;&gt;1234&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>第一个方式就是 overflow:auto</li>
-<li>第二个方式就是 display:flow-root;</li>
-</ul>
-<h3 id="如何回答面试官"><a href="#如何回答面试官" class="headerlink" title="如何回答面试官"></a>如何回答面试官</h3><p>千万别解释什么是 BFC，一解释就错<br>用上面的例子回答什么是 BFC</p>
-<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><blockquote>
-<p>BFC和文档流有什么关系</p>
-</blockquote>
-<ul>
-<li>BFC说的是一个div有一些属性后(float:left 或position:absolute)它自己就是BFC。BFC说的是这个 div 的特性，说的是这个div会包住它里面，它里面的内容是不会变得</li>
-<li>文档流是 内联元素从左到右，块级元素从上到下排列</li>
-<li>BFC影响一个元素的宽高，文档流影响是排列顺序</li>
-</ul>
-<blockquote>
-<p>BFC使用场景</p>
-</blockquote>
-<ul>
-<li>爸爸管儿子(参考上面的功能1)，注意这不是清除浮动，这是BFC让爸爸管儿子<ul>
-<li>BFC可以模拟清除浮动的效果，但是我可以直接 clearfix，那么BFC就没意义了，BFC会导致副作用 如 overflow:hidden;的时候，但是clearfix不会有副作用，除非所有浏览器都支持<code>display:flow-root</code></li>
-<li><strong>不要用BFC清除浮动</strong></li>
-</ul>
-</li>
-<li>兄弟之间划清界限(参考上面的功能2)<ul>
-<li>也就是以前的左右布局</li>
-<li>同样也可以不用它，用flex解决这些问题</li>
-<li>BFC是时代的产物</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>margin穿透</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;style&gt;</span><br><span class="line">  .baba&#123;</span><br><span class="line">    background:red;</span><br><span class="line">  &#125;</span><br><span class="line">  .erzi&#123;</span><br><span class="line">    height: 100px;</span><br><span class="line">    margin-top:100px;</span><br><span class="line">    background:green;</span><br><span class="line">  &#125;</span><br><span class="line">  &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;div class=&quot;baba&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;erzi&quot;&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>现在 erzi 的 margin会穿过 baba </li>
-<li>给 baba 添加 <code>overflow:hidden</code> 就能触发BFC,不让 erzi穿出来，但是有副作用就是 erzi内如果有定位元素超出容易会被隐藏</li>
-<li>所以 你只能给 baba 加 <code>display:flow-root</code> 或者 <code>borer</code></li>
-</ul>
-<blockquote>
-<p>什么情况下一定要BFC呢？</p>
-</blockquote>
-<p>没有任何情况一定要BFC，所有的场景都可以不用BFC实现</p>
-<p><strong>面试一定要搞懂BFC</strong></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/10/11/CSS-009-BFC/" data-id="cknvgptub000w0xjp0ft625b4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/10/12/CSS-010-动态REM/" data-id="ckovg9egl000j8yjkzehvtylt" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
@@ -1042,7 +970,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -1052,7 +980,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/windows/" style="font-size: 10px;">windows</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1061,7 +989,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li></ul>
     </div>
   </div>
 
@@ -1072,6 +1000,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/05/18/Win平台软件技巧01/">Win平台软件技巧01</a>
+          </li>
         
           <li>
             <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
@@ -1087,10 +1019,6 @@
         
           <li>
             <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
           </li>
         
       </ul>

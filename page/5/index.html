@@ -62,6 +62,226 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Node-web03_02Next" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/21/Node-web03_02Next/" class="article-date">
+  <time datetime="2020-03-21T05:56:44.000Z" itemprop="datePublished">2020-03-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/21/Node-web03_02Next/">Node-web03_02Next</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="next深入"><a href="#next深入" class="headerlink" title="next深入"></a>next深入</h1><ul>
+<li>基于 <a href="https://github.com/slTrust/next-demo-1" target="_blank" rel="noopener">https://github.com/slTrust/next-demo-1</a> 版本</li>
+</ul>
+<h2 id="使用-TypeScript-开发-Next"><a href="#使用-TypeScript-开发-Next" class="headerlink" title="使用 TypeScript 开发 Next"></a>使用 TypeScript 开发 Next</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 全局安装 tsx</span><br><span class="line">yarn global add typescript@3.9.2</span><br><span class="line"># 安装成功后会有两个命令</span><br><span class="line">- tsc</span><br><span class="line">- tsserver</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 tsconfig.json <code>tsc --init</code></li>
+<li><p>把 jsconfig.json内容 合并到 tsconfig.json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;compilerOptions&quot;: &#123;</span><br><span class="line">    &quot;baseUrl&quot;: &quot;.&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装类型声明文件 <code>yarn add --dev typescript @types/react @types/react-dom @types/node</code></p>
+<ul>
+<li>你就可以用ts开发 react和 node了</li>
+</ul>
+</li>
+<li>重启 yarn dev</li>
+<li>结果报错了，找不 xx.png</li>
+<li>修改类型声明文件next-env.d.ts</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">declare module &quot;*.png&quot; &#123;</span><br><span class="line">  const value: string;</span><br><span class="line">  export default value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>把js文件都修改为 tsx后缀</li>
+</ul>
+<h4 id="强烈建议加上一句配置-tsconfig-json里"><a href="#强烈建议加上一句配置-tsconfig-json里" class="headerlink" title="强烈建议加上一句配置 tsconfig.json里"></a>强烈建议加上一句配置 tsconfig.json里</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 禁用隐式 any</span><br><span class="line">noImplicitAny:&quot;true&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="Next-js-API"><a href="#Next-js-API" class="headerlink" title="Next.js API"></a>Next.js API</h2><h3 id="如何返回-JSON"><a href="#如何返回-JSON" class="headerlink" title="如何返回 JSON"></a>如何返回 JSON</h3><ul>
+<li>新建 pages/api/v1/posts.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextApiRequest, NextApiResponse &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts = (req: NextApiRequest, res: NextApiResponse) =&gt; &#123;</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(&#123; name: &apos;hjx&apos; &#125;))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
+<p>你还可以这样写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextApiHandler &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts:NextApiHandler = (req, res) =&gt; &#123;</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(&#123; name: &apos;hjx&apos; &#125;))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重启后，访问 <a href="http://localhost:3000/api/v1/posts" target="_blank" rel="noopener">http://localhost:3000/api/v1/posts</a></li>
+</ul>
+<h3 id="读取markdown文件"><a href="#读取markdown文件" class="headerlink" title="读取markdown文件"></a>读取markdown文件</h3><ul>
+<li>step01 在 <code>markdown/</code> 目录建立几个文章 ,形如</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: hjx的博客</span><br><span class="line">date: 2021-01-30</span><br><span class="line">--- </span><br><span class="line"></span><br><span class="line">hjx发布的博客 内容1111</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>step02 安装 matter <code>yarn add gray-matter</code></p>
+</li>
+<li><p>step03 新建功能函数 getPosts <code>lib/posts.tsx</code></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import fs, &#123; promises as fsPromise &#125; from &apos;fs&apos;;</span><br><span class="line">import path from &quot;path&quot;;</span><br><span class="line">import matter from &apos;gray-matter&apos;;</span><br><span class="line"></span><br><span class="line">const getPosts = async () =&gt; &#123;</span><br><span class="line">  const markdownDir = path.join(process.cwd(), &apos;markdown&apos;)</span><br><span class="line">  const fileNames = await fsPromise.readdir(markdownDir)</span><br><span class="line">  const posts = fileNames.map(fileName =&gt; &#123;</span><br><span class="line">    const fullPath = path.join(markdownDir, fileName)</span><br><span class="line">    const id = fileName.replace(/\.md$/g, &apos;&apos;);</span><br><span class="line">    const text = fs.readFileSync(fullPath, &apos;utf-8&apos;);</span><br><span class="line">    const &#123; data: &#123; title, date &#125;, content &#125; = matter(text);</span><br><span class="line">    return &#123; id, title, date, content &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  return posts;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default getPosts;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step04 新建 pages/api/v1/posts2.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import getPosts from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextApiHandler &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const Posts: NextApiHandler = async (req, res) =&gt; &#123;</span><br><span class="line">  const posts = await getPosts()</span><br><span class="line">  console.log(posts)</span><br><span class="line">  res.statusCode = 200</span><br><span class="line">  res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;)</span><br><span class="line">  res.write(JSON.stringify(posts))</span><br><span class="line">  res.end()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default Posts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>step05 重启访问 <a href="http://localhost:3000/api/v1/posts2" target="_blank" rel="noopener">http://localhost:3000/api/v1/posts2</a></li>
+</ul>
+<h2 id="Next-js的三种渲染方式"><a href="#Next-js的三种渲染方式" class="headerlink" title="Next.js的三种渲染方式"></a>Next.js的三种渲染方式</h2><ul>
+<li>客户端渲染 BSR<ul>
+<li>只在浏览器上执行的渲染</li>
+</ul>
+</li>
+<li>静态页面生成 SSG<ul>
+<li>Static Site Generation,解决白屏问题，SEO问题</li>
+<li>无法生成用户相关内容(所有用户请求的结果都一样)</li>
+</ul>
+</li>
+<li>服务器渲染 SSR<ul>
+<li>解决白屏问题，SEO问题</li>
+<li>可以生成用户相关的内容(不同用户不同结果)</li>
+</ul>
+</li>
+</ul>
+<p><strong>SSG和 SSR都属于预渲染 Pre-rendering</strong></p>
+<h3 id="三种方式实际以前就有"><a href="#三种方式实际以前就有" class="headerlink" title="三种方式实际以前就有"></a>三种方式实际以前就有</h3><ul>
+<li>BSR —— 客户端渲染 vue/react创建 html</li>
+<li>SSG —— 页面静态化 把PHP提前渲染成 HTML</li>
+<li>SSR —— 大部分后台语言java,python 如JSP</li>
+</ul>
+<h4 id="不同点"><a href="#不同点" class="headerlink" title="不同点"></a>不同点</h4><p>Next.js 的预渲染可以和前端 React无缝对接</p>
+<h3 id="客户端渲染-BSR"><a href="#客户端渲染-BSR" class="headerlink" title="客户端渲染 BSR"></a>客户端渲染 BSR</h3><ul>
+<li>安装 axios <code>yarn add axios</code></li>
+<li><code>yarn add --dev @types/axios</code></li>
+<li>pages/posts/index.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line">import axios from &apos;axios&apos;;</span><br><span class="line">import &#123; useEffect, useState &#125; from &quot;react&quot;;</span><br><span class="line"></span><br><span class="line">type Posts = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">&#125;</span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const [posts, setPosts] = useState&lt;Posts[]&gt;([]);</span><br><span class="line">  const [isLoading, setIsLoading] = useState(false);</span><br><span class="line">  const [isEmpty, setIsEmpty] = useState(false);</span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    setIsLoading(true)</span><br><span class="line">    axios.get(&apos;/api/v1/posts2&apos;).then(response =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        setPosts(response.data)</span><br><span class="line">        if (response.data.length === 0) &#123;</span><br><span class="line">          setIsEmpty(true);</span><br><span class="line">        &#125;</span><br><span class="line">        setIsLoading(false)</span><br><span class="line">      &#125;, 3000);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
+<h3 id="优化代码：自定义Hooks"><a href="#优化代码：自定义Hooks" class="headerlink" title="优化代码：自定义Hooks"></a>优化代码：自定义Hooks</h3><ul>
+<li>hooks/usePosts.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import &#123; useState, useEffect &#125; from &quot;react&quot;;</span><br><span class="line">import axios from &apos;axios&apos;;</span><br><span class="line"></span><br><span class="line">type Posts = &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  date: string;</span><br><span class="line">  title: string;</span><br><span class="line">  content: string;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export const usePosts = () =&gt; &#123;</span><br><span class="line">  const [posts, setPosts] = useState&lt;Posts[]&gt;([]);</span><br><span class="line">  const [isLoading, setIsLoading] = useState(false);</span><br><span class="line">  const [isEmpty, setIsEmpty] = useState(false);</span><br><span class="line">  useEffect(() =&gt; &#123;</span><br><span class="line">    setIsLoading(true)</span><br><span class="line">    axios.get(&apos;/api/v1/posts2&apos;).then(response =&gt; &#123;</span><br><span class="line">      setTimeout(() =&gt; &#123;</span><br><span class="line">        setPosts(response.data)</span><br><span class="line">        if (response.data.length === 0) &#123;</span><br><span class="line">          setIsEmpty(true);</span><br><span class="line">        &#125;</span><br><span class="line">        setIsLoading(false)</span><br><span class="line">      &#125;, 3000);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;, [])</span><br><span class="line">  return &#123;</span><br><span class="line">    posts,</span><br><span class="line">    setPosts,</span><br><span class="line">    isLoading,</span><br><span class="line">    setIsLoading,</span><br><span class="line">    isEmpty,</span><br><span class="line">    setIsEmpty</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>pages/posts/index.tsx</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import &#123; usePosts &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const &#123; isLoading, isEmpty, posts &#125; = usePosts();</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>访问 <a href="http://localhost:3000/posts" target="_blank" rel="noopener">http://localhost:3000/posts</a></li>
+</ul>
+<h4 id="客户端渲染的缺点"><a href="#客户端渲染的缺点" class="headerlink" title="客户端渲染的缺点"></a>客户端渲染的缺点</h4><ul>
+<li>白屏<ul>
+<li>ajax请求结果之前，显示的是 loading</li>
+</ul>
+</li>
+<li>SEO不友好<ul>
+<li>搜索引擎不友好，看不到 posts数据</li>
+<li>因为搜索引擎不会执行JS只会看到HTML</li>
+</ul>
+</li>
+</ul>
+<h4 id="问题分析，上面的渲染方式"><a href="#问题分析，上面的渲染方式" class="headerlink" title="问题分析，上面的渲染方式"></a>问题分析，上面的渲染方式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import &#123; usePosts &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">const PostsIndex: NextPage = () =&gt; &#123;</span><br><span class="line">  const &#123; isLoading, isEmpty, posts &#125; = usePosts();</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index</span><br><span class="line">      &#123;isLoading ? &lt;div&gt;加载中...&lt;/div&gt; :</span><br><span class="line">        isEmpty ? &lt;div&gt;没有文章！&lt;/div&gt; :</span><br><span class="line">          posts.map(post =&gt; &#123;</span><br><span class="line">            return (&lt;div key=&#123;post.id&#125;&gt;</span><br><span class="line">              &#123;post.id&#125;</span><br><span class="line">            &lt;/div&gt;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>是服务器渲染的还是客户端渲染的？</li>
+<li>渲染了几次？一次还是两次？</li>
+</ul>
+<h5 id="参考-React-SSR的官网"><a href="#参考-React-SSR的官网" class="headerlink" title="参考 React SSR的官网"></a>参考 React SSR的官网</h5><ul>
+<li>推荐 <a href="https://reactjs.org/docs/react-dom-server.html#rendertostring" target="_blank" rel="noopener">在后端renderToString()在前端 hydrate()</a></li>
+<li><code>hydrate()</code> 混合 ,会保留HTML附上事件监听</li>
+<li>后端渲染 html,前端比对一下，有监听，前端添加监听事件</li>
+<li>前端也会渲染一次，用以确保前后端渲染结果一致</li>
+</ul>
+<h3 id="SSG-页面静态生成"><a href="#SSG-页面静态生成" class="headerlink" title="SSG 页面静态生成"></a>SSG 页面静态生成</h3><ul>
+<li>之前的BSR 每个人访问文章列表都是一样的<ul>
+<li>每次访问 BSR 页面都会发 ajax请求 一样的数据，然后由前端渲染</li>
+</ul>
+</li>
+<li>为什么？ 不在后端渲染好，然后发给每个人</li>
+<li>N次渲染变成了一次</li>
+<li>N次ajax请求没了</li>
+<li>N次客户端渲染变成了一次静态页面生成</li>
+<li><p>这个过程 <strong>动态内容静态化</strong></p>
+</li>
+<li><p>pages/posts/index_ssg.tsx</p>
+<ul>
+<li>新建 <code>getStaticProps</code> 函数，返回 <code>{props:{posts:post}}]}</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//格式要求，函数名称必须是 getStaticProps</span><br><span class="line">// 而且必须 export 导出</span><br><span class="line">export const getStaticProps = async () =&gt; &#123;</span><br><span class="line">  const posts = await getPosts() // 你的内容</span><br><span class="line">  // 返回格式</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      posts: JSON.parse(JSON.stringify(posts))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>pages/posts/index_ssg.tsx</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import &#123; Post &#125; from &quot;hooks/usePosts&quot;;</span><br><span class="line">import getPosts from &quot;lib/posts&quot;;</span><br><span class="line">import &#123; NextPage &#125; from &quot;next&quot;;</span><br><span class="line"></span><br><span class="line">interface Props &#123;</span><br><span class="line">  posts: Post[]</span><br><span class="line">&#125;</span><br><span class="line">const PostsIndex: NextPage&lt;Props&gt; = (props) =&gt; &#123;</span><br><span class="line">  // 这个 posts是 前端/后端 都可以拿到的</span><br><span class="line">  const &#123; posts &#125; = props;</span><br><span class="line">  console.log(posts)</span><br><span class="line">  return (</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      Post Index(SSG)</span><br><span class="line">      &#123;posts.map(p =&gt; &#123;</span><br><span class="line">        return (</span><br><span class="line">          &lt;div key=&#123;p.id&#125;&gt;&#123;p.id&#125;&lt;/div&gt;</span><br><span class="line">        )</span><br><span class="line">      &#125;)&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default PostsIndex;</span><br><span class="line"></span><br><span class="line">export const getStaticProps = async () =&gt; &#123;</span><br><span class="line">  const posts = await getPosts()</span><br><span class="line">  return &#123;</span><br><span class="line">    props: &#123;</span><br><span class="line">      posts: JSON.parse(JSON.stringify(posts))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><a href="http://localhost:3000/posts/index_ssg" target="_blank" rel="noopener">http://localhost:3000/posts/index_ssg</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 你会发现页面会有个如下标签把数据封装了</span><br><span class="line">&lt;script id=&quot;__NEXT_DATA__&quot; type=&quot;application/json&quot;&gt;&#123;&quot;props&quot;:&#123;&quot;pageProps&quot;:&#123;&quot;posts&quot;:[&#123;&quot;id&quot;:&quot;第一篇博客&quot;,&quot;title&quot;:&quot;hjx的博客&quot;,&quot;date&quot;:&quot;2021-01-30T00:00:00.000Z&quot;,&quot;content&quot;:&quot; \n\nhjx发布的博客 内容1111&quot;&#125;,&#123;&quot;id&quot;:&quot;第二篇博客&quot;,&quot;title&quot;:&quot;hjx的博客2&quot;,&quot;date&quot;:&quot;2021-01-30T00:00:00.000Z&quot;,&quot;content&quot;:&quot; \n\nhjx发布的博客2 内容22222&quot;&#125;]&#125;,&quot;__N_SSG&quot;:true&#125;,&quot;page&quot;:&quot;/posts/index_ssg&quot;,&quot;query&quot;:&#123;&#125;,&quot;buildId&quot;:&quot;development&quot;,&quot;nextExport&quot;:false,&quot;isFallback&quot;:false,&quot;gsp&quot;:true&#125;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="惊叹的发现"><a href="#惊叹的发现" class="headerlink" title="惊叹的发现"></a>惊叹的发现</h4><ul>
+<li>前端不用ajax也能拿到数据 posts</li>
+<li>这就是 SSG的好处：后端数据直接给前端</li>
+<li>前端 JSON.parse 就可以得到 posts</li>
+</ul>
+<p><strong>为啥 java/php/python做不到？</strong></p>
+<ul>
+<li>也可以做到，思路一样</li>
+<li>但是他们不支持JSX,很难和React无缝对接</li>
+<li>而且他们的对象不能直接给JS用，需要类型转换</li>
+</ul>
+<h3 id="生产环境静态化示例"><a href="#生产环境静态化示例" class="headerlink" title="生产环境静态化示例"></a>生产环境静态化示例</h3><ul>
+<li><code>yarn build</code></li>
+<li>项目根目录 <code>.next/server</code>就是 我们静态化的内容</li>
+<li>如果运行 build后的页面 <code>yarn start</code></li>
+</ul>
+<h4 id="解读"><a href="#解读" class="headerlink" title="解读"></a>解读</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">λ  (Server) SSR 不能自动创建HTML</span><br><span class="line">○  (Static) 自动创建 HTML</span><br><span class="line">●  (SSG) 自动创建 HTML JS JSON</span><br></pre></td></tr></table></figure>
+<h4 id="三种文件类型"><a href="#三种文件类型" class="headerlink" title="三种文件类型"></a>三种文件类型</h4><ul>
+<li>posts.html含有静态内容，用于客户直接访问</li>
+<li>posts.js 含有静态内容，用于 快速导航<pre><code>&lt;Link href=&quot;/posts/index_bsr&quot;&gt;posts BSR&lt;/Link&gt;
+&lt;Link href=&quot;/posts/index_ssg&quot;&gt;posts SSG&lt;/Link&gt;
+</code></pre><ul>
+<li>就会预先加载 快速导航里页面对应的js <code>index_bsr.js 和 index_ssg.js</code></li>
+</ul>
+</li>
+<li>posts.json 含有数据， 和 posts.js结合得到页面</li>
+</ul>
+<h4 id="为什么不直接把-数据-放入-posts-js-呢？"><a href="#为什么不直接把-数据-放入-posts-js-呢？" class="headerlink" title="为什么不直接把 数据 放入 posts.js 呢？"></a>为什么不直接把 数据 放入 posts.js 呢？</h4><h4 id="SSG总结"><a href="#SSG总结" class="headerlink" title="SSG总结"></a>SSG总结</h4><ul>
+<li>动态内容静态化</li>
+<li>如果动态内容和用户无关，可以提前静态化</li>
+<li>通过 getStaticProps 可以获取数据</li>
+<li>静态内容(JS) + 数据(JSON) 就得到完整页面</li>
+<li>代替了之前 BSR的 静态内容 + 动态内容 (AJAX获取)</li>
+</ul>
+<blockquote>
+<p>时机</p>
+</blockquote>
+<p>静态化是在  <code>yarn build</code> 时候实现的</p>
+<blockquote>
+<p>优点</p>
+</blockquote>
+<ul>
+<li>生产环境直接给出完整页面</li>
+<li>首屏不会有白屏</li>
+<li>有利于搜索引擎(SEO)</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/21/Node-web03_02Next/" data-id="ckovg9ekd00a08yjkzsjhgdb5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Node-web02_01koa" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/03/21/Node-web02_01koa/" class="article-date">
@@ -88,7 +308,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/21/Node-web02_01koa/" data-id="cknvgpty7009p0xjpn2dkj2e9" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/21/Node-web02_01koa/" data-id="ckovg9ek8009m8yjk5d2dalak" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -238,7 +458,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/21/Node-web03_01Next/" data-id="cknvgpty9009x0xjpfgeloua6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/21/Node-web03_01Next/" data-id="ckovg9ekb009u8yjkujj9gqav" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -380,7 +600,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/20/Node-web01_01Express入门/" data-id="cknvgpty6009n0xjptetqmi7n" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/20/Node-web01_01Express入门/" data-id="ckovg9eka009q8yjkvjouojf6" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -436,7 +656,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/20/Node-web01_00curl命令使用/" data-id="cknvgptya009z0xjp2b8ptisd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/20/Node-web01_00curl命令使用/" data-id="ckovg9ek7009k8yjkaboyq7ux" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li></ul>
@@ -683,7 +903,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/14/Node全解10-01child-process/" data-id="cknvgptz400bx0xjpxz81zc6z" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/14/Node全解10-01child-process/" data-id="ckovg9ekz00bi8yjkdw3zi6wn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -792,7 +1012,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/13/Node全解09-02Stream自定义/" data-id="cknvgptz100bp0xjpk44p9zg2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/13/Node全解09-02Stream自定义/" data-id="ckovg9eky00bd8yjkctrw4gxb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -958,7 +1178,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/13/Node全解09-01stream/" data-id="cknvgptz000bn0xjp829bik3x" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/13/Node全解09-01stream/" data-id="ckovg9ekz00bg8yjklw05reqr" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1051,7 +1271,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/12/Node全解08-01sql进阶/" data-id="cknvgptz700c40xjpmrod65i4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/12/Node全解08-01sql进阶/" data-id="ckovg9el200bq8yjkwqkhpb07" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1202,48 +1422,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/12/Node全解07-01docker-mysql/" data-id="cknvgptz200bs0xjphxh3j0ns" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Node全解06-01翻译工具" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/03/11/Node全解06-01翻译工具/" class="article-date">
-  <time datetime="2020-03-10T23:02:33.000Z" itemprop="datePublished">2020-03-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/03/11/Node全解06-01翻译工具/">Node全解06_01翻译工具</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>待更新</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/11/Node全解06-01翻译工具/" data-id="cknvgptyy00bk0xjp5i012yf8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/03/12/Node全解07-01docker-mysql/" data-id="ckovg9el100bn8yjkpi4j6dln" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node后端/">Node后端</a></li></ul>
@@ -1273,7 +1452,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CSS/">CSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ES6速学/">ES6速学</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JS不知深浅/">JS不知深浅</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M01/">M01</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M02/">M02</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M03/">M03</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M04/">M04</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M06/">M06</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M07/">M07</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M08/">M08</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/M09/">M09</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NodeWeb/">NodeWeb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node后端/">Node后端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ReactWheels/">ReactWheels</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React入门/">React入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TS入门/">TS入门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webpack/">Webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/express/">express</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fullstack/">fullstack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/http/">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jQuery/">jQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mobile/">mobile</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node每日精进/">node每日精进</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oak/">oak</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tools/">tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vultr/">vultr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web性能优化/">web性能优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web面经/">web面经</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/前端知识点/">前端知识点</a></li></ul>
     </div>
   </div>
 
@@ -1283,7 +1462,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
+      <a href="/tags/CSS/" style="font-size: 13.91px;">CSS</a> <a href="/tags/ES6速学/" style="font-size: 14.35px;">ES6速学</a> <a href="/tags/JS不知深浅/" style="font-size: 11.3px;">JS不知深浅</a> <a href="/tags/M01/" style="font-size: 13.48px;">M01</a> <a href="/tags/M02/" style="font-size: 15.22px;">M02</a> <a href="/tags/M03/" style="font-size: 15.65px;">M03</a> <a href="/tags/M04/" style="font-size: 16.09px;">M04</a> <a href="/tags/M06/" style="font-size: 18.26px;">M06</a> <a href="/tags/M07/" style="font-size: 17.83px;">M07</a> <a href="/tags/M08/" style="font-size: 16.96px;">M08</a> <a href="/tags/M09/" style="font-size: 11.74px;">M09</a> <a href="/tags/NodeWeb/" style="font-size: 15.65px;">NodeWeb</a> <a href="/tags/Node后端/" style="font-size: 18.7px;">Node后端</a> <a href="/tags/ReactWheels/" style="font-size: 16.52px;">ReactWheels</a> <a href="/tags/React入门/" style="font-size: 15.22px;">React入门</a> <a href="/tags/TS入门/" style="font-size: 14.78px;">TS入门</a> <a href="/tags/Webpack/" style="font-size: 11.3px;">Webpack</a> <a href="/tags/express/" style="font-size: 10.43px;">express</a> <a href="/tags/fullstack/" style="font-size: 17.83px;">fullstack</a> <a href="/tags/http/" style="font-size: 12.17px;">http</a> <a href="/tags/jQuery/" style="font-size: 10px;">jQuery</a> <a href="/tags/java/" style="font-size: 19.13px;">java</a> <a href="/tags/linux/" style="font-size: 10.87px;">linux</a> <a href="/tags/mobile/" style="font-size: 11.3px;">mobile</a> <a href="/tags/mongodb/" style="font-size: 12.61px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 12.61px;">mysql</a> <a href="/tags/node/" style="font-size: 10.43px;">node</a> <a href="/tags/node每日精进/" style="font-size: 10px;">node每日精进</a> <a href="/tags/oak/" style="font-size: 20px;">oak</a> <a href="/tags/python/" style="font-size: 17.39px;">python</a> <a href="/tags/tools/" style="font-size: 10px;">tools</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/vue/" style="font-size: 13.04px;">vue</a> <a href="/tags/vultr/" style="font-size: 10px;">vultr</a> <a href="/tags/web性能优化/" style="font-size: 10px;">web性能优化</a> <a href="/tags/web面经/" style="font-size: 10px;">web面经</a> <a href="/tags/windows/" style="font-size: 10px;">windows</a> <a href="/tags/前端知识点/" style="font-size: 19.57px;">前端知识点</a>
     </div>
   </div>
 
@@ -1292,7 +1471,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">May 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">February 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">October 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li></ul>
     </div>
   </div>
 
@@ -1303,6 +1482,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/05/18/Win平台软件技巧01/">Win平台软件技巧01</a>
+          </li>
         
           <li>
             <a href="/2021/02/28/Webpack-03loader/">Webpack-03loader</a>
@@ -1318,10 +1501,6 @@
         
           <li>
             <a href="/2021/02/26/Webpack-00前置内容理解webpack/">Webpack-00前置内容理解webpack</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/23/Node-web05-09-03博客系统使用nginx/">Node-web05-09-03博客系统使用nginx</a>
           </li>
         
       </ul>
